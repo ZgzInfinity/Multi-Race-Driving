@@ -3,11 +3,36 @@
 #include <vector>
 #include <iostream>
 #include "SherwoodForest.h"
+#include "Player.h"
 
 const int NUMBER_FPS = 60;
 const int MAX_ELEMENTS = 20;
 
 using namespace std;
+
+
+class Player {
+    private:
+        Texture playerTexture;
+        Sprite playerSprite;
+
+    public:
+        Player(string texture){
+            playerTexture.loadFromFile(texture);
+            playerSprite.setTexture(playerTexture);
+        }
+
+        void drawPlayer(RenderWindow& app){
+            playerSprite.setPosition(Vector2f(450.f, HEIGHT - 320.f));
+            app.draw(playerSprite);
+        }
+
+        void change(RenderWindow& app){
+            playerSprite.move(Vector2f(300.f, 200.f));
+            app.draw(playerSprite);
+        }
+};
+
 
 void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w2)
 {
@@ -26,7 +51,7 @@ void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w
 int main(){
 
     // Creation of the screen game
-    RenderWindow app(VideoMode(WIDTH, HEIGHT), "Outrun Racing!");
+    RenderWindow app(VideoMode(WIDTH, HEIGHT), "Super Hang on!");
     // Control the fotograms per second, 60 FPS more less
     app.setFramerateLimit(NUMBER_FPS);
 
@@ -54,11 +79,15 @@ int main(){
     // Vector of steps to do
     vector<Step> lines;
 
+    Player h = Player("C:\\Users\\Gord\\Desktop\\p1.png");
+
+
     // For each tep walked
     for(int i = 0; i <= MAX_SPACE_DIMENSION - 1; i++){
        // Creation of the line and justify its depth in the 3d dimension
        Step line;
        line.position_3d_z = i * segL;
+
 
        // Drawing the curves of the game scene
        s.printCurves(line, i);
@@ -95,13 +124,12 @@ int main(){
             }
 
             // Velocity
-            int speed = 400;
+            int speed = 0;
 
             // Control the keys pressed
             if (Keyboard::isKeyPressed(Keyboard::Right)) playerX+=0.1;
             if (Keyboard::isKeyPressed(Keyboard::Left)) playerX-=0.1;
             if (Keyboard::isKeyPressed(Keyboard::Up)) speed=400;
-            if (Keyboard::isKeyPressed(Keyboard::Tab)) speed*=3;
 
             // Increment of the position
             pos += speed;
@@ -117,6 +145,9 @@ int main(){
 
             app.clear(Color(105,205,4));
             app.draw(sBackground);
+            // Draw motorcycle of the player
+
+
             int startPos = pos / segL;
             int camH = lines[startPos].position_3d_y + H;
 
@@ -177,6 +208,7 @@ int main(){
                 lines[n % MAX_SPACE_DIMENSION].drawSprite(app);
             }
             //Show all the elements in the console game
+            h.drawPlayer(app);
             app.display();
         }
     }
