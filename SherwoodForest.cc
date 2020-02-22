@@ -2,6 +2,7 @@
 #include "SherwoodForest.h"
 
 
+
 /**
  * Load all the sprites of the scene with their textures
  * @param t is a vector of textures empty
@@ -9,19 +10,19 @@
  */
 void SherwoodForest::loadSprites(Texture t[], Sprite object[]){
     // Load textures and sprites of the game
-    t[0].loadFromFile("images/oak_tree.png");
+    t[0].loadFromFile("images/fir_tree.png");
     t[0].setSmooth(true);
     object[0].setTexture(t[0]);
 
-    t[1].loadFromFile("images/mini_palm_tree.png");
+    t[1].loadFromFile("images/green_tree.png");
     t[1].setSmooth(true);
     object[1].setTexture(t[1]);
 
-    t[3].loadFromFile("images/palm_tree.png");
+    t[3].loadFromFile("images/green_tree2.png");
     t[3].setSmooth(true);
     object[3].setTexture(t[3]);
 
-    t[4].loadFromFile("images/tree.png");
+    t[4].loadFromFile("images/green_tree3.png");
     t[4].setSmooth(true);
     object[4].setTexture(t[4]);
 
@@ -46,39 +47,65 @@ void SherwoodForest::loadSprites(Texture t[], Sprite object[]){
  */
 void SherwoodForest::printSpritesInScene(Step& line, Sprite object[], const int i){
 
-    // Draw the tree sprite
-    if ((i < 200  || i > 10500) && i % 15 == 0) {
-        line.spriteX = -1.5;
+    // Draw the tree sprite and store its coordinates
+    if ((i < 200 || i > 10500) && i % 25 == 0) {
+        // Establishing coordinates and sprite
+        line.spriteX = -2.0f;
+        line.spriteY = i * segL;
         line.character = object[4];
+        line.offset = line.spriteX + LIMIT_BORDER;
+        // Adding the step with the sprite and its coordinates to the list
+        stepsWithSprite.push_back(line);
     }
-    // Draw the lamppost new sprite
-    if (((i > 50 && i < 700) || (i > 10500)) && i % 20 == 0){
-        line.spriteX = 0.5;
+    // Draw the lamppost new sprite and store its coordinates
+    if (((i > 50 && i < 700) || (i > 10500)) && i % 25 == 0){
+        // Establishing coordinates and sprite
+        line.spriteX = 3.1f;
+        line.spriteY = i * segL;
         line.character = object[5];
+        line.offset = line.spriteX - LIMIT_BORDER;
+        // Adding the step with the sprite and its coordinates to the list
+        stepsWithSprite.push_back(line);
     }
-    // Draw the palm_tree sprite
-    if (i > 250 && i < 700 && i % 30 == 0){
-        line.spriteX = -1;
+    // Draw the palm_tree sprite and store its coordinates
+    if (i > 250 && i < 700 && i % 45 == 0){
+        // Establishing coordinates and sprite
+        line.spriteX = -1.6f;
+        line.spriteY = i * segL;
         line.character = object[3];
+        line.offset = line.spriteX + LIMIT_BORDER;
+        // Adding the step with the sprite and its coordinates to the list
+        stepsWithSprite.push_back(line);
     }
-    // Draw the oak_tree sprite
+    // Draw the oak_tree sprite and store its coordinates
     if (i > 800 && i < 10000 && i % 20 == 0) {
-        line.spriteX = -1.2;
+        // Establishing coordinates and sprite
+        line.spriteX = -3.2f;
+        line.spriteY = i * segL;
         line.character = object[0];
+        line.offset = line.spriteX + LIMIT_BORDER;
+        // Adding the step with the sprite and its coordinates to the list
+        stepsWithSprite.push_back(line);
     }
+    // Draw the palm_tree sprite and store its coordinates
     if (i > 800 && i < 10000 && i % 30 == 0) {
-        line.spriteX = 0.5;
+        // Establishing coordinates and sprite
+        line.spriteX = 0.9f;
+        line.spriteY = i * segL;
         line.character = object[1];
+        line.offset = line.spriteX - LIMIT_BORDER;
+        // Adding the step with the sprite and its coordinates to the list
+        stepsWithSprite.push_back(line);
     }
-    // Draw the petrol station sprite
-    if (i % 400 == 0)  {
-        line.spriteX = -1.5;
-        line.character = object[6];
-    }
-    // Draw the petrol station sprite
+    // Draw the petrol station sprite and store its coordinates
     if (i % 700 == 0)  {
-        line.spriteX = 0.5;
+        // Establishing coordinates and sprite
+        line.spriteX = 2.5f;
+        line.spriteY = i * segL;
         line.character = object[6];
+        line.offset = line.spriteX - LIMIT_BORDER;
+        // Adding the step with the sprite and its coordinates to the list
+        stepsWithSprite.push_back(line);
     }
 }
 
@@ -93,8 +120,8 @@ void SherwoodForest::printSpritesInScene(Step& line, Sprite object[], const int 
  */
 void SherwoodForest::printMountains(Step& line, const int i){
     // Drawing mountains with different pending
-    if (i >= 1698 && i < 2388){
-        line.position_3d_y = sin(i / 20.0) * 1500;
+    if (i >= 1698 && i < 2546){
+        line.position_3d_y = sin(i / 30.0) * 1500;
     }
     else if ((i > 754 && i <= 1600) ||
              (i >= 4618 && i <= 5277) ||
@@ -124,7 +151,7 @@ void SherwoodForest::printMountains(Step& line, const int i){
 void SherwoodForest::printCurves(Step& line, const int i){
     // First curve
     if (i >= 300 && i <= 600){
-           line.directionCurve = 0.5;
+        line.directionCurve = 0.5;
     }
     // Second and sixth curves
     if ((i >= 1500 && i < 1700) || (i >= 3700 && i < 4000)){
@@ -186,4 +213,62 @@ void SherwoodForest::printCurves(Step& line, const int i){
     if (i >= 11600 && i < 11900){
         line.directionCurve = -2.5;
     }
+
+    // Check if the vector is empty
+    if (curvesInScene.empty()){
+        // Creation of all interval curves
+        IntervalCurve iC1 = IntervalCurve(300 * segL, 600 * segL, 0.5);       IntervalCurve iC2 = IntervalCurve(1500 * segL, 1699 * segL, 1.5);
+        IntervalCurve iC3 = IntervalCurve(2301 * segL, 2399 * segL, -1.3);    IntervalCurve iC4 = IntervalCurve(3000 * segL, 3499 * segL, 2);
+        IntervalCurve iC5 = IntervalCurve(3500 * segL, 3699 * segL, -0.3);    IntervalCurve iC6 = IntervalCurve(3700 * segL, 3999 * segL, 1.5);
+        IntervalCurve iC7 = IntervalCurve(4000 * segL, 4499 * segL, -0.8);    IntervalCurve iC8 = IntervalCurve(5000 * segL, 5299 * segL, 0.6);
+        IntervalCurve iC9 = IntervalCurve(5750 * segL, 6599 * segL, -1.5);    IntervalCurve iC10 = IntervalCurve(7900 * segL, 8099 * segL, 3);
+        IntervalCurve iC11 = IntervalCurve(8100 * segL, 8299 * segL, -3);     IntervalCurve iC12 = IntervalCurve(8800 * segL, 9099 * segL, 0.9);
+        IntervalCurve iC13 = IntervalCurve(9400 * segL, 9699 * segL, -4);     IntervalCurve iC14 = IntervalCurve(9700 * segL, 9899 * segL, 4);
+        IntervalCurve iC15 = IntervalCurve(10200 * segL, 10999 * segL, -2);   IntervalCurve iC16 = IntervalCurve(11200 * segL, 11499 * segL, 2);
+        IntervalCurve iC17 = IntervalCurve(11600 * segL, 11899 * segL, -2.5);
+
+        // Adding all intervals to the vector of interval of the scene
+        curvesInScene.push_back(iC1);  curvesInScene.push_back(iC2);  curvesInScene.push_back(iC3);  curvesInScene.push_back(iC4);
+        curvesInScene.push_back(iC5);  curvesInScene.push_back(iC6);  curvesInScene.push_back(iC7);  curvesInScene.push_back(iC8);
+        curvesInScene.push_back(iC9);  curvesInScene.push_back(iC10); curvesInScene.push_back(iC11); curvesInScene.push_back(iC12);
+        curvesInScene.push_back(iC13); curvesInScene.push_back(iC14); curvesInScene.push_back(iC15); curvesInScene.push_back(iC16);
+        curvesInScene.push_back(iC17);
+    }
+}
+
+
+
+/**
+ * Order the sprites of the scene by their coordinates in axis Y. If there
+ * are more than one sprite with the same coordinate in axis Y, sprites
+ * are ordered in axis X
+ */
+void SherwoodForest::orderSpritesInLandScape(){
+    // Order the sprites of the scene using the universal method of the father class
+    LandScape::orderSpritesInLandScape();
+}
+
+
+
+/**
+ * Detect which is the last sprite with the motorbike could have a collision
+ * @param position_axis_Y is the coordinate in the axis Y of the motorbike
+ */
+Step SherwoodForest::checkingPossibleCollision(const int position_axis_Y){
+    // Checking the possible collisions using the universal method of the father class
+    return LandScape::checkingPossibleCollision(position_axis_Y);
+}
+
+
+
+/**
+ * Check if in the actual coordinate from axis Y pos there is a curve of not
+ * using binary search
+ * @param pos is the actual coordinate from axis Y
+ * @param curve is where the possible curve will be stored
+ * @param exist is a boolean which represents if there a curve or not in the coordinate pos
+ */
+void SherwoodForest::lookForCurve( int& pos, IntervalCurve& curve, bool& exist){
+    // Looking for the curves using the universal method of the father class
+    LandScape::lookForCurve(pos, curve, exist);
 }

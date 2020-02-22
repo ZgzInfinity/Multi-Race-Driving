@@ -33,13 +33,16 @@ struct Step{
     float directionCurve;
     // Control the position of the possible sprite in the axis X
     float spriteX;
+    // Control the position of the possible sprite in the axis Y
+    int spriteY;
     // Unknown
     float clip;
     // Scale to transform 3d coordinates to 2d coordinates
     float scalingValue;
+    // Offset to control the possible collisions
+    float offset;
     // Possible sprite to draw
     Sprite character;
-
 
 
     /**
@@ -65,6 +68,16 @@ struct Step{
      * @param app is the console game where the user is playing
      */
     void drawSprite(RenderWindow &app);
+
+
+
+    /**
+     * Compares to sprites to determine which is first in the order
+     * @param line is the other step to be compared
+     * @return true is the instance caller to the method is lower than <<line>>.
+     *         Otherwise returns false
+     */
+     bool operator < (Step& line_2);
 
 };
 
