@@ -1,6 +1,6 @@
 
-#ifndef SHER_WOOD_FOREST_H
-#define SHER_WOOD_FOREST_H
+#ifndef EGYPT_H
+#define EGYPT_H
 
 #include "Step.h"
 #include "Landscape.h"
@@ -9,7 +9,7 @@
 
 using namespace sf;
 
-class SherwoodForest : public LandScape {
+class Egypt : public LandScape {
 
     public:
 
@@ -110,5 +110,4 @@ class SherwoodForest : public LandScape {
 };
 
 
-#endif // SHER_WOORD_FOREST_H
-
+#endif // EGYPT_H

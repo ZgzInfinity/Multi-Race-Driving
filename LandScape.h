@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "Step.h"
 #include "IntervalCurve.h"
 #include <vector>
@@ -12,7 +14,8 @@ const int MIN_NUMBER = 200;
 const int MAX_NUMBER = 11000;
 const int MIN_DURATION = 200;
 const int MAX_DURATION = 3000;
-const int NUMBER_CURVES = 16;
+const float LIMIT_BORDER = 1.2f;
+
 
 class LandScape {
 

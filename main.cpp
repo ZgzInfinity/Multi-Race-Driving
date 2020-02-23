@@ -3,10 +3,10 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "SherwoodForest.h"
+#include "Egypt.h"
 #include "Step.h"
 #include "Player.h"
 #include "IntervalCurve.h"
-
 
 const int NUMBER_FPS = 60;
 const int MAX_ELEMENTS = 20;
@@ -27,7 +27,7 @@ void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w
 
 
 
-int main(){
+int main(int argc, char* argv[]){
 
     // Creation of the screen game
     RenderWindow app(VideoMode(WIDTH, HEIGHT), "Super Hang on!");
@@ -38,14 +38,31 @@ int main(){
     Texture t[MAX_ELEMENTS];
     Sprite object[MAX_ELEMENTS];
 
+    // Processing the index of the scene
+    int indexScene = atoi(argv[1]);
+
     // Sherwood Forest scene instance
     SherwoodForest s;
 
-    // Paint the background of the scene
-    s.loadBackground();
+    // Egypt scene instance
+    Egypt e;
 
-    // Load all the elements of the scene
-    s.loadSprites(t, object);
+    // Paint the background of the scene
+
+    switch(indexScene){
+    case 1:
+        // Load background of Sherwood forest
+        s.loadBackground();
+        // Load all the elements of Sherwood forest
+        s.loadSprites(t, object);
+        break;
+    case 2:
+        // Load background of Egypt
+        e.loadBackground();
+        // Load all the elements of Egypt
+        e.loadSprites(t, object);
+        break;
+    }
 
     // Vector of steps to do
     vector<Step> lines;
@@ -53,11 +70,22 @@ int main(){
     // Motorbike of the player
     Player h = Player();
 
-    // Rendering the landscape scene
-    s.renderLandScape(lines, object);
+    switch(indexScene){
+    case 1:
+        // Rendering the landscape of Sherwood forest
+        s.renderLandScape(lines, object);
 
-    // Order the sprites of the landscape
-    s.orderSpritesInLandScape();
+        // Order the sprites of Sherwood forest
+        s.orderSpritesInLandScape();
+        break;
+    case 2:
+        // Rendering the landscape of Egypt
+        e.renderLandScape(lines, object);
+
+        // Order the sprites of Egypt
+        e.orderSpritesInLandScape();
+        break;
+    }
 
     // Number of steps done
     int pos = 0, lastPos = 0;
@@ -79,8 +107,16 @@ int main(){
     // Variable to control the different possible curves
     IntervalCurve curve;
 
+    // Controlling possible events in the console of the game
+    Event ev;
+
     // While the game console is opened
     while (app.isOpen()){
+
+        // Detect possible actions of the user on the console game
+        if (app.pollEvent(ev) && ev.type == Event::Closed){
+                app.close();
+        }
 
         // Check the advance of the motorbike of the player
         h.advancePlayer(eventDetected);
@@ -95,7 +131,18 @@ int main(){
         pos += speed;
 
         // Get the nearest sprite found to the actual position
-        Step nearestStep = s.checkingPossibleCollision(pos);
+        Step nearestStep;
+
+        switch(indexScene){
+            case 1:
+                // Checking of the motorbike is in a curve of the scene
+                nearestStep = s.checkingPossibleCollision(pos);
+                break;
+            case 2:
+                // Rendering the landscape of Egypt
+                nearestStep = e.checkingPossibleCollision(pos);
+                break;
+        }
 
         // Check possible collisions of the motorbike
         if (h.controlPossibleCollision(nearestStep, lastPos, pos)){
@@ -103,8 +150,16 @@ int main(){
             app.close();
         }
 
-        // Checking of the motorbike is in a curve of the scene
-        s.lookForCurve(pos, curve, onCurve);
+        switch(indexScene){
+            case 1:
+                // Checking of the motorbike is in a curve of the scene
+                s.lookForCurve(pos, curve, onCurve);
+                break;
+            case 2:
+                // Rendering the landscape of Egypt
+                e.lookForCurve(pos, curve, onCurve);
+                break;
+        }
 
         // Control the inertia force of the motorbike
         h.controlInertiaForce(onCurve, curve, speed);
@@ -121,7 +176,17 @@ int main(){
 
         // Draw the background in the consoles
         app.clear(Color(105, 205, 4));
-        app.draw(s.getBackGround());
+
+        switch(indexScene){
+            case 1:
+                // Rendering the landscape of Sherwood forest
+                app.draw(s.getBackGround());
+                break;
+            case 2:
+                // Rendering the landscape of Egypt
+                app.draw(e.getBackGround());
+                break;
+        }
 
         // Preparing to draw the new elements of the map
         int startPos = pos / segL;
@@ -130,7 +195,17 @@ int main(){
         // Check if advance
         if (speed > 0){
             // Advance
-            s.getBackGround().move(-lines[startPos].directionCurve * 2,0);
+
+            switch(indexScene){
+            case 1:
+                // Checking of the motorbike is in a curve of the scene
+                s.getBackGround().move(-lines[startPos].directionCurve * 2,0);
+                break;
+            case 2:
+                // Rendering the landscape of Egypt
+                e.getBackGround().move(-lines[startPos].directionCurve * 2,0);
+                break;
+            }
         }
 
         // Variables
@@ -151,7 +226,17 @@ int main(){
                 maxy = l.position_2d_y;
 
                 // Paint the scene
-                s.paintScene(n, grass, rumble, middle, road);
+
+                switch(indexScene){
+                case 1:
+                    // Rendering the landscape of Sherwood forest
+                    s.paintScene(n, grass, rumble, middle, road);
+                    break;
+                case 2:
+                    // Rendering the landscape of Egypt
+                    e.paintScene(n, grass, rumble, middle, road);
+                    break;
+                }
 
                 Step p = lines[(n - 1)% MAX_SPACE_DIMENSION]; //previous line
 

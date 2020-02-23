@@ -11,7 +11,7 @@ using namespace std;
 
 const int SPEED_INCREMENT = 50;
 const int INITIAL_SPEED = 200;
-const int MAX_SPEED = 1200;
+const int MAX_SPEED = 1000;
 const int MEDIUM_SPEED = INITIAL_SPEED + MAX_SPEED / 2;
 const int CONTROL_SPEED = INITIAL_SPEED + MEDIUM_SPEED / 2;
 
