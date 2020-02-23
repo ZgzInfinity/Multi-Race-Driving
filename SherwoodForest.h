@@ -17,9 +17,17 @@ class SherwoodForest : public LandScape {
 
 
         /**
-         * Get the sprite which contains the background
+         * Load the background of the landscape
          */
-        Sprite getBackGround();
+        void loadBackground();
+
+
+
+        /**
+         * Renders the landscape of the scene with all the elements
+         * @param lines is a vector with all the information needed to create the scene
+         */
+        void renderLandScape(vector<Step>& lines, Sprite object[]);
 
 
 
@@ -61,6 +69,18 @@ class SherwoodForest : public LandScape {
          * Draw a curve in the i step of the game scene
          */
         void printCurves(Step& line, const int i);
+
+
+
+        /**
+         * Paint the scene in order to create the correct map
+         * @param n is the step of the map which is going to be processed
+         * @param grass is going to store in which color the grass is has to be painted
+         * @param rumble is going to store in which color the rumble is has to be painted
+         * @param middle is going to store in which color the middle is has to be painted
+         * @param road is going to store in which color the road is has to be painted
+         */
+        void paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road);
 
 
 

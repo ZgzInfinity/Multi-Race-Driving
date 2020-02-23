@@ -41,19 +41,11 @@ int main(){
     // Sherwood Forest scene instance
     SherwoodForest s;
 
+    // Paint the background of the scene
+    s.loadBackground();
+
     // Load all the elements of the scene
     s.loadSprites(t, object);
-
-    // Loading backbground texture
-    Texture bg;
-    bg.loadFromFile("images/bg.png");
-    // Set repetition of texture active and assignation
-    bg.setRepeated(true);
-    Sprite sBackground(bg);
-    // Fix the dimensions of the rectangle which contains the texture
-    sBackground.setTextureRect(IntRect(-3000, 0, 5000, 411));
-    // Assign the position of the texture
-    sBackground.setPosition(-2000,0);
 
     // Vector of steps to do
     vector<Step> lines;
@@ -61,24 +53,8 @@ int main(){
     // Motorbike of the player
     Player h = Player();
 
-    // For each tep walked
-    for(int i = 0; i <= MAX_SPACE_DIMENSION - 1; i++){
-        // Creation of the line and justify its depth in the 3d dimension
-       Step line;
-       line.position_3d_z = i * segL;
-
-       // Drawing the curves of the game scene
-       s.printCurves(line, i);
-
-       // Drawing the possible mountain in the step i of the scene
-       s.printMountains(line, i);
-
-       // Draw the possible sprites in the step i of the scene
-       s.printSpritesInScene(line, object, i);
-
-       // Added vector
-       lines.push_back(line);
-    }
+    // Rendering the landscape scene
+    s.renderLandScape(lines, object);
 
     // Order the sprites of the landscape
     s.orderSpritesInLandScape();
@@ -145,7 +121,7 @@ int main(){
 
         // Draw the background in the consoles
         app.clear(Color(105, 205, 4));
-        app.draw(sBackground);
+        app.draw(s.getBackGround());
 
         // Preparing to draw the new elements of the map
         int startPos = pos / segL;
@@ -154,7 +130,7 @@ int main(){
         // Check if advance
         if (speed > 0){
             // Advance
-            sBackground.move(-lines[startPos].directionCurve * 2,0);
+            s.getBackGround().move(-lines[startPos].directionCurve * 2,0);
         }
 
         // Variables
@@ -174,18 +150,9 @@ int main(){
             if (l.position_2d_y < maxy){
                 maxy = l.position_2d_y;
 
-                // Determination of the color to paint in the screen
-                if ((n / 3) % 2){
-                    grass = Color(16, 200, 16);
-                    rumble = Color(255, 255, 255);
-                    middle = Color(255, 255, 255);
-                }
-                else {
-                    grass = Color(0, 154, 0);
-                    rumble = Color(255, 0, 0);
-                    middle = Color(77, 77, 77);
-                }
-                road = Color(77, 77, 77);
+                // Paint the scene
+                s.paintScene(n, grass, rumble, middle, road);
+
                 Step p = lines[(n - 1)% MAX_SPACE_DIMENSION]; //previous line
 
                 // Draw the grass and the road

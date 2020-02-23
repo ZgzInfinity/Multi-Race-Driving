@@ -2,6 +2,49 @@
 #include "SherwoodForest.h"
 
 
+/**
+ * Load the background of the landscape
+ */
+void SherwoodForest::loadBackground(){
+    bg.loadFromFile("images/bg.png");
+    // Set repetition of texture active and assignation
+    bg.setRepeated(true);
+    sBackground.setTexture(bg);
+    // Fix the dimensions of the rectangle which contains the texture
+    sBackground.setTextureRect(IntRect(-3000, 0, 5000, 411));
+    // Assign the position of the texture
+    sBackground.setPosition(-2000,0);
+}
+
+
+
+/**
+ * Renders the landscape of the scene with all the elements
+ * @param lines is a vector with all the information needed to create the scene
+ */
+void SherwoodForest::renderLandScape(vector<Step>& lines, Sprite object[]){
+    // For each step walked
+    for(int i = 0; i <= MAX_SPACE_DIMENSION - 1; i++){
+        // Creation of the line and justify its depth in the 3d dimension
+       Step line;
+       line.position_3d_z = i * segL;
+
+       // Drawing the curves of the game scene
+       SherwoodForest::printCurves(line, i);
+
+       // Drawing the possible mountain in the step i of the scene
+       SherwoodForest::printMountains(line, i);
+
+       // Draw the possible sprites in the step i of the scene
+       SherwoodForest::printSpritesInScene(line, object, i);
+
+       // Added vector
+       lines.push_back(line);
+    }
+}
+
+
+
 
 /**
  * Load all the sprites of the scene with their textures
@@ -234,6 +277,30 @@ void SherwoodForest::printCurves(Step& line, const int i){
         curvesInScene.push_back(iC13); curvesInScene.push_back(iC14); curvesInScene.push_back(iC15); curvesInScene.push_back(iC16);
         curvesInScene.push_back(iC17);
     }
+}
+
+
+/**
+ * Paint the scene in order to create the correct map
+ * @param n is the step of the map which is going to be processed
+ * @param grass is going to store in which color the grass is has to be painted
+ * @param rumble is going to store in which color the rumble is has to be painted
+ * @param middle is going to store in which color the middle is has to be painted
+ * @param road is going to store in which color the road is has to be painted
+ */
+void SherwoodForest::paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road){
+    // Determination of the color to paint in the screen
+    if ((n / 3) % 2){
+        grass = Color(16, 200, 16);
+        rumble = Color(255, 255, 255);
+        middle = Color(255, 255, 255);
+    }
+    else {
+        grass = Color(0, 154, 0);
+        rumble = Color(255, 0, 0);
+        middle = Color(77, 77, 77);
+    }
+    road = Color(77, 77, 77);
 }
 
 

@@ -24,8 +24,29 @@ class LandScape {
         // List of interval of curves of the scene
         vector<IntervalCurve> curvesInScene;
 
+        // Texture of the background
+        Texture bg;
+
+        // Sprite where the image of the background is going to be loaded
+        Sprite sBackground;
+
 
     public:
+
+
+        /**
+         * Load the background of the landscape
+         */
+        virtual void loadBackground() = 0;
+
+
+
+        /**
+         * Renders the landscape of the scene with all the elements
+         * @param lines is a vector with all the information needed to create the scene
+         */
+        virtual void renderLandScape(vector<Step>& lines, Sprite object[]) = 0;
+
 
 
         /**
@@ -66,6 +87,27 @@ class LandScape {
          * Draw a curve in the i step of the game scene
          */
         virtual void printCurves(Step& line, const int i) = 0;
+
+
+
+        /**
+         * Paint the scene in order to create the correct map
+         * @param n is the step of the map which is going to be processed
+         * @param grass is going to store in which color the grass is has to be painted
+         * @param rumble is going to store in which color the rumble is has to be painted
+         * @param middle is going to store in which color the middle is has to be painted
+         * @param road is going to store in which color the road is has to be painted
+         */
+        virtual void paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road) = 0;
+
+
+
+        /**
+         * Get the sprite which contains the background
+         */
+        Sprite getBackGround(){
+            return sBackground;
+        }
 
 
 
