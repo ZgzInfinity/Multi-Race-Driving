@@ -11,9 +11,9 @@ void Egypt::loadBackground(){
     bg.setRepeated(true);
     sBackground.setTexture(bg);
     // Fix the dimensions of the rectangle which contains the texture
-    sBackground.setTextureRect(IntRect(0 , 0, 5000, 411));
+    sBackground.setTextureRect(IntRect(-2000, 0, 5000, 411));
     // Assign the position of the texture
-    sBackground.setPosition(-200, 0);
+    sBackground.setPosition(-2000, 0);
 }
 
 

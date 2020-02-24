@@ -175,15 +175,15 @@ int main(int argc, char* argv[]){
         }
 
         // Draw the background in the consoles
-        app.clear(Color(105, 205, 4));
-
         switch(indexScene){
             case 1:
                 // Rendering the landscape of Sherwood forest
+                app.clear(Color(105, 205, 4));
                 app.draw(s.getBackGround());
                 break;
             case 2:
                 // Rendering the landscape of Egypt
+                app.clear(Color(250, 217, 139));
                 app.draw(e.getBackGround());
                 break;
         }
