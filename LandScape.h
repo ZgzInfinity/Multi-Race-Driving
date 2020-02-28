@@ -113,6 +113,14 @@ class LandScape {
         }
 
 
+        /**
+         * Get the sprite which contains the background
+         */
+        void setBackGround(Sprite sBack){
+            sBackground = sBack;
+        }
+
+
 
         /**
          * Order the different sprites of the landscape using the coordinate in axis Y

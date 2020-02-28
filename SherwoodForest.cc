@@ -370,7 +370,7 @@ void SherwoodForest::printCurves(Step& line, const int i){
  */
 void SherwoodForest::paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road){
     // Determination of the color to paint in the screen
-    if ((n / 3) % 2){
+    if ((n / 5) % 2){
         grass = Color(16, 200, 16);
         rumble = Color(255, 255, 255);
         middle = Color(255, 255, 255);

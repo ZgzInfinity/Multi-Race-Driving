@@ -86,12 +86,82 @@ float Player::getPlayerX(){
 }
 
 
+
 /**
  * Control if the user has pressed the w keyword to turn to the right
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
+ * @param app is the console window game where the sprite is going to be drawn
  */
-inline void Player::controlTurningPlayerRight(int& speed, bool& eventDetected){
+inline void Player::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app){
+    // Check if key left pressed
+    if (Keyboard::isKeyPressed(Keyboard::Q)){
+        // Check if the motorbike can be moved or not spite of pressing the key
+        if (playerX - 0.1 >= BORDER_LIMIT_ROAD_LEFT){
+            // Check if the motorbike is outside the road
+            if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
+                // Advance more
+                playerX -= 0.1;
+            }
+            else {
+                 playerX -= 0.035;
+            }
+        }
+        // Change the texture
+        if (actual_code_image < 3 || (actual_code_image >= 9 && actual_code_image <= 16) ||
+           (actual_code_image >= 23 && actual_code_image <= 28))
+        {
+            actual_code_image = 3;
+            playerSprite.setTexture(playerTexture_3);
+        }
+        else if (actual_code_image >= 3 && actual_code_image <= 8){
+            // Increment the actual code of the sprite
+            if (actual_code_image != 8){
+                // Increment the texture of the sprite
+                actual_code_image++;
+            }
+            else {
+                // Change sprite while the motorbike is turning to left
+                actual_code_image--;
+            }
+            switch (actual_code_image){
+                // Select the correct sprite
+                case 4:
+                    // Load the fourth sprite
+                    playerSprite.setTexture(playerTexture_4);
+                    break;
+                case 5:
+                    // Load the fifth sprite
+                    playerSprite.setTexture(playerTexture_5);
+                    break;
+                case 6:
+                    // Load the sixth sprite
+                    playerSprite.setTexture(playerTexture_6);
+                    break;
+                case 7:
+                    // Load the seventh sprite
+                    playerSprite.setTexture(playerTexture_7);
+                    break;
+                case 8:
+                    // Load the seventh sprite
+                    playerSprite.setTexture(playerTexture_8);
+                    break;
+            }
+        }
+        // Register event
+        eventDetected = true;
+    }
+}
+
+
+
+/**
+ * Control if the user has pressed the q keyword to turn to the left
+ * @param speed is the actual speed of the motorbike of the player
+ * @param eventDetected is a boolean to control if an event has occurred
+ * @param app is the console window game where the sprite is going to be drawn
+ */
+inline void Player::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app){
     // Check if key right pressed
     if (Keyboard::isKeyPressed(Keyboard::W)){
         // Check if the motorbike can be moved or not spite of pressing the key
@@ -106,7 +176,7 @@ inline void Player::controlTurningPlayerRight(int& speed, bool& eventDetected){
             }
         }
         // Change the texture
-        if (actual_code_image < 9 || actual_code_image >= 15){
+        if (actual_code_image < 9 || (actual_code_image >= 15 && actual_code_image <= 22)){
             actual_code_image = 9;
             playerSprite.setTexture(playerTexture_9);
         }
@@ -155,10 +225,13 @@ inline void Player::controlTurningPlayerRight(int& speed, bool& eventDetected){
  * Control if the user has pressed the q keyword to turn to the left
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
+ * @param app is the console window game where the sprite is going to be drawn
  */
-inline void Player::controlTurningPlayerLeft(int& speed, bool& eventDetected){
-    // Check if key left pressed
-    if (Keyboard::isKeyPressed(Keyboard::Q)){
+inline void Player::controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app){
+    // Get the x coordinate of the mouse in the window
+    int coordinateX = sf::Mouse::getPosition(app).x;
+    // Check if key right pressed
+    if (coordinateX < (int)app.getSize().x / 3  ){
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX - 0.1 >= BORDER_LIMIT_ROAD_LEFT){
             // Check if the motorbike is outside the road
@@ -171,11 +244,13 @@ inline void Player::controlTurningPlayerLeft(int& speed, bool& eventDetected){
             }
         }
         // Change the texture
-        if (actual_code_image < 3 || actual_code_image > 9){
+        if (actual_code_image < 3 || (actual_code_image >= 9 && actual_code_image <= 16) ||
+           (actual_code_image >= 23 && actual_code_image <= 28))
+        {
             actual_code_image = 3;
             playerSprite.setTexture(playerTexture_3);
         }
-        else if (actual_code_image <= 8){
+        else if (actual_code_image >= 3 && actual_code_image <= 8){
             // Increment the actual code of the sprite
             if (actual_code_image != 8){
                 // Increment the texture of the sprite
@@ -217,11 +292,80 @@ inline void Player::controlTurningPlayerLeft(int& speed, bool& eventDetected){
 
 
 /**
+ * Control if the user has pressed the w keyword to turn to the right
+ * @param speed is the actual speed of the motorbike of the player
+ * @param eventDetected is a boolean to control if an event has occurred
+ * @param app is the console window game where the sprite is going to be drawn
+ */
+inline void Player::controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app){
+    // Get the x coordinate of the mouse in the window
+    int coordinateX = sf::Mouse::getPosition(app).x;
+    // Check if key right pressed
+    if (coordinateX > 2 * (int)(app.getSize().x / 3)){
+        // Check if the motorbike can be moved or not spite of pressing the key
+        if (playerX + 0.1 <= BORDER_LIMIT_ROAD_RIGHT){
+            // Check if the motorbike is outside the road
+            if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
+                // Advance more
+                playerX += 0.1;
+            }
+            else {
+                 playerX += 0.035;
+            }
+        }
+        // Change the texture
+        if (actual_code_image < 9 || (actual_code_image >= 15 && actual_code_image <= 22)){
+            actual_code_image = 9;
+            playerSprite.setTexture(playerTexture_9);
+        }
+        else if (actual_code_image <= 14){
+            // Increment the actual code of the sprite
+            if (actual_code_image != 14){
+                // Increment the texture of the sprite
+                actual_code_image++;
+            }
+            else {
+                // Change sprite while the motorbike is turning to left
+                actual_code_image--;
+            }
+            switch (actual_code_image){
+                // Select the correct sprite
+                case 10:
+                    // Load the fourth sprite
+                    playerSprite.setTexture(playerTexture_10);
+                    break;
+                case 11:
+                    // Load the fifth sprite
+                    playerSprite.setTexture(playerTexture_11);
+                    break;
+                case 12:
+                    // Load the sixth sprite
+                    playerSprite.setTexture(playerTexture_12);
+                    break;
+                case 13:
+                    // Load the seventh sprite
+                    playerSprite.setTexture(playerTexture_13);
+                    break;
+                case 14:
+                    // Load the seventh sprite
+                    playerSprite.setTexture(playerTexture_14);
+                    break;
+            }
+        }
+        // Register event
+        eventDetected = true;
+    }
+}
+
+
+
+/**
  * Control if the user has pressed the q keyword to increase the speed
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
+ * @param app is the console window game where the sprite is going to be drawn
  */
-inline void Player::controlPlayerSpeed(int& speed, bool& eventDetected){
+inline void Player::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app){
     // Check if the user is accelerating
     if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up))){
         // Control about not acceleration if the motorbike goes in the grass
@@ -234,21 +378,35 @@ inline void Player::controlPlayerSpeed(int& speed, bool& eventDetected){
         }
         else {
             // Increment the speed because it is outside the road
-            if (speed <= INITIAL_SPEED){
+            if (speed >= INITIAL_SPEED){
                 // Decrement of the speed
                 speed -= SPEED_INCREMENT - SPEED_INCREMENT;
             }
         }
         // Check if the key to turn left is pressed
         if (!eventDetected){
-            // Check if the key to turn left is pressed
-            controlTurningPlayerRight(speed, eventDetected);
+            // Check the type of control of the motorbike
+            if (typeControl == 0){
+                 // Check if the key to turn to the right is pressed
+                 controlTurningPlayerRightKeyboard(speed, eventDetected, app);
+            }
+            else {
+                // Check if the mouse has been moved to turn to the right
+                controlTurningPlayerRightMouse(speed, eventDetected, app);
+            }
             return;
         }
         // Check if the key to turn left is pressed
         if (!eventDetected){
-            // Check if the key to turn left is pressed
-            controlTurningPlayerLeft(speed, eventDetected);
+            // Check the type of control of the motorbike
+            if (typeControl == 0){
+                 // Check if the key to turn to the left is pressed
+                 controlTurningPlayerLeftKeyboard(speed, eventDetected, app);
+            }
+            else {
+                // Check if the mouse has been moved to turn to the left
+                controlTurningPlayerLeftMouse(speed, eventDetected, app);
+            }
             return;
         }
         // Change the sprite of the motorbike
@@ -273,13 +431,15 @@ inline void Player::controlPlayerSpeed(int& speed, bool& eventDetected){
  * Control if the user has pressed the q keyword to increase the speed
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
+ * @param app is the console window game where the sprite is going to be drawn
  */
-inline void Player::controlPlayerBraking(int& speed, bool& eventDetected){
+inline void Player::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app){
     // Check if the user is braking
-    if (Keyboard::isKeyPressed(Keyboard::E)){
+    if (Keyboard::isKeyPressed(Keyboard::Down)){
+        // Check more events
         if (!eventDetected){
             // Control if first the user has accelerated
-            controlPlayerSpeed(speed, eventDetected);
+            controlPlayerSpeed(speed, eventDetected, app);
         }
         // Selection of the correct sprite of the motorbike
         if (actual_code_image <= 2){
@@ -319,22 +479,22 @@ inline void Player::controlPlayerBraking(int& speed, bool& eventDetected){
         else if (actual_code_image >= 9 && actual_code_image <= 14){
             actual_code_image += 14;
             switch(actual_code_image){
-                case 17:
+                case 23:
                     playerSprite.setTexture(playerTexture_23);
                     break;
-                case 18:
+                case 24:
                     playerSprite.setTexture(playerTexture_24);
                     break;
-                    case 19:
+                case 25:
                     playerSprite.setTexture(playerTexture_25);
                     break;
-                case 20:
+                case 26:
                     playerSprite.setTexture(playerTexture_26);
                     break;
-                case 21:
+                case 27:
                     playerSprite.setTexture(playerTexture_27);
                     break;
-                case 22:
+                case 28:
                     playerSprite.setTexture(playerTexture_28);
             }
         }
@@ -422,20 +582,31 @@ inline void Player::controlPlayerBraking(int& speed, bool& eventDetected){
  * Control if the player has done any of his possible actions
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
+ * @param app is the console window game where the sprite is going to be drawn
  */
-void Player::controlActionPlayer(int& speed, bool& eventDetected){
+void Player::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app){
+    if (typeControl == 0){
+        // Keyword
+        // Check if W keyword has been pressed to turn to the right
+        controlTurningPlayerRightKeyboard(speed, eventDetected, app);
 
-    //Check if the E keyword has been pressed to brake the motorbike
-    controlPlayerBraking(speed, eventDetected);
+        // Check if Q keyword has been pressed to turn to the left
+        controlTurningPlayerLeftKeyboard(speed, eventDetected, app);
+    }
+    else {
+        // Mouse
+        // Check if the mouse has has been moved to turn to the right
+        controlTurningPlayerRightMouse(speed, eventDetected, app);
 
-    // Check if W keyword has been pressed to turn to the right
-    controlTurningPlayerRight(speed, eventDetected);
-
-    // Check if Q keyword has been pressed to turn to the left
-    controlTurningPlayerLeft(speed, eventDetected);
+        // Check if the mouse has has been moved to turn to the left
+        controlTurningPlayerLeftMouse(speed, eventDetected, app);
+    }
 
     // Check if the Up keyword has been pressed to increase the speed
-    controlPlayerSpeed(speed, eventDetected);
+    controlPlayerSpeed(speed, eventDetected, app);
+
+    //Check if the E keyword has been pressed to brake the motorbike
+    controlPlayerBraking(speed, eventDetected, app);
 
     // Check if any event has been registered
     if (!eventDetected){

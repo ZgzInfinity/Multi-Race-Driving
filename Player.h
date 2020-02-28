@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "Step.h"
 #include "IntervalCurve.h"
+#include <iostream>
 
 using namespace sf;
 using namespace std;
@@ -34,6 +35,9 @@ class Player {
 
         // Position of the main character
         float playerX;
+
+        // How to control the motorbike
+        int typeControl = 0;
 
         // Textures of the player while running in normal direction
         Texture playerTexture_1, playerTexture_2;
@@ -90,13 +94,23 @@ class Player {
          float getPlayerX();
 
 
-
         /**
+         * Control if the user has pressed the q keyword to turn to the left
+         * @param speed is the actual speed of the motorbike of the player
+         * @param eventDetected is a boolean to control if an event has occurred
+         * @param app is the console window game where the sprite is going to be drawn
+         */
+        inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app);
+
+
+
+         /**
          * Control if the user has pressed the w keyword to turn to the right
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
+         * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerRight(int& speed, bool& eventDetected);
+        inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app);
 
 
 
@@ -104,8 +118,19 @@ class Player {
          * Control if the user has pressed the q keyword to turn to the left
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
+         * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerLeft(int& speed, bool& eventDetected);
+        inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app);
+
+
+
+        /**
+         * Control if the user has pressed the w keyword to turn to the right
+         * @param speed is the actual speed of the motorbike of the player
+         * @param eventDetected is a boolean to control if an event has occurred
+         * @param app is the console window game where the sprite is going to be drawn
+         */
+        inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app);
 
 
 
@@ -113,17 +138,19 @@ class Player {
          * Control if the user has pressed the q keyword to increase the speed
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
+         * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlPlayerSpeed(int& speed, bool& eventDetected);
+        inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app);
 
 
 
-        /**
+                /**
          * Control if the user has pressed the q keyword to increase the speed
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
+         * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlPlayerBraking(int& speed, bool& eventDetected);
+        inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app);
 
 
 
@@ -131,8 +158,9 @@ class Player {
          * Control if the player has done any of his possible actions
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
+         * @param app is the console window game where the sprite is going to be drawn
          */
-        void controlActionPlayer(int& speed, bool& eventDetected);
+        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app);
 
 
 

@@ -3,7 +3,9 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "SherwoodForest.h"
+#include "Vancouver.h"
 #include "Egypt.h"
+#include "Tokio.h"
 #include "Step.h"
 #include "Player.h"
 #include "IntervalCurve.h"
@@ -47,6 +49,11 @@ int main(int argc, char* argv[]){
     // Egypt scene instance
     Egypt e;
 
+    // Nepal scene instance
+    Vancouver m;
+
+    Tokio r;
+
     // Paint the background of the scene
 
     switch(indexScene){
@@ -61,6 +68,18 @@ int main(int argc, char* argv[]){
         e.loadBackground();
         // Load all the elements of Egypt
         e.loadSprites(t, object);
+        break;
+    case 3:
+        // Load background of Nepal
+        m.loadBackground();
+        // Load all the elements of Nepal
+        m.loadSprites(t, object);
+        break;
+    case 4:
+        // Load background of Tokio
+        r.loadBackground();
+        // Load all the elements of Tokio
+        r.loadSprites(t, object);
         break;
     }
 
@@ -84,6 +103,20 @@ int main(int argc, char* argv[]){
 
         // Order the sprites of Egypt
         e.orderSpritesInLandScape();
+        break;
+    case 3:
+        // Rendering the landscape of Nepal
+        m.renderLandScape(lines, object);
+
+        // Order the sprites of Nepal
+        m.orderSpritesInLandScape();
+        break;
+    case 4:
+        // Rendering the landscape of Tokio
+        r.renderLandScape(lines, object);
+
+        // Order the sprites of Tokio
+        r.orderSpritesInLandScape();
         break;
     }
 
@@ -122,7 +155,7 @@ int main(int argc, char* argv[]){
         h.advancePlayer(eventDetected);
 
         // Control the possible actions if the user
-        h.controlActionPlayer(speed, eventDetected);
+        h.controlActionPlayer(speed, eventDetected, app);
 
         // Store my the actual position before the move
         lastPos = pos;
@@ -142,6 +175,13 @@ int main(int argc, char* argv[]){
                 // Rendering the landscape of Egypt
                 nearestStep = e.checkingPossibleCollision(pos);
                 break;
+            case 3:
+                // Rendering the landscape of Nepal
+                nearestStep = m.checkingPossibleCollision(pos);
+                break;
+            case 4:
+                nearestStep = r.checkingPossibleCollision(pos);
+                break;
         }
 
         // Check possible collisions of the motorbike
@@ -158,6 +198,13 @@ int main(int argc, char* argv[]){
             case 2:
                 // Rendering the landscape of Egypt
                 e.lookForCurve(pos, curve, onCurve);
+                break;
+            case 3:
+                // Rendering the landscape of Egypt
+                m.lookForCurve(pos, curve, onCurve);
+                break;
+            case 4:
+                r.lookForCurve(pos, curve, onCurve);
                 break;
         }
 
@@ -186,6 +233,16 @@ int main(int argc, char* argv[]){
                 app.clear(Color(250, 217, 139));
                 app.draw(e.getBackGround());
                 break;
+            case 3:
+                // Rendering the landscape of Egypt
+                app.clear(Color(255, 255, 255));
+                app.draw(m.getBackGround());
+                break;
+            case 4:
+                // Rendering the landscape of Egypt
+                app.clear(Color(0, 0, 102));
+                app.draw(r.getBackGround());
+                break;
         }
 
         // Preparing to draw the new elements of the map
@@ -195,15 +252,32 @@ int main(int argc, char* argv[]){
         // Check if advance
         if (speed > 0){
             // Advance
+            // Checking of the motorbike is in a curve of the scene
+            Sprite newBack;
 
             switch(indexScene){
             case 1:
-                // Checking of the motorbike is in a curve of the scene
-                s.getBackGround().move(-lines[startPos].directionCurve * 2,0);
+                newBack = s.getBackGround();
+                newBack.move(-lines[startPos].directionCurve * 2,0);
+                s.setBackGround(newBack);
                 break;
             case 2:
                 // Rendering the landscape of Egypt
-                e.getBackGround().move(-lines[startPos].directionCurve * 2,0);
+                newBack = e.getBackGround();
+                newBack.move(-lines[startPos].directionCurve * 2,0);
+                e.setBackGround(newBack);
+                break;
+            case 3:
+                // Rendering the landscape of Nepal
+                newBack = m.getBackGround();
+                newBack.move(-lines[startPos].directionCurve * 2,0);
+                m.setBackGround(newBack);
+                break;
+            case 4:
+                // Rendering the landscape of Nepal
+                newBack = r.getBackGround();
+                newBack.move(-lines[startPos].directionCurve * 2,0);
+                r.setBackGround(newBack);
                 break;
             }
         }
@@ -235,6 +309,14 @@ int main(int argc, char* argv[]){
                 case 2:
                     // Rendering the landscape of Egypt
                     e.paintScene(n, grass, rumble, middle, road);
+                    break;
+                case 3:
+                    // Rendering the landscape of Egypt
+                    m.paintScene(n, grass, rumble, middle, road);
+                    break;
+                case 4:
+                    // Rendering the landscape of Egypt
+                    r.paintScene(n, grass, rumble, middle, road);
                     break;
                 }
 
