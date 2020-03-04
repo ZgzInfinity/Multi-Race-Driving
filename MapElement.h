@@ -1,33 +1,44 @@
 
-#ifndef INTERNAL_CURVE_H
-#define INTERNAL_CURVE_H
+#ifndef MAP_ELEMENT_H
+#define MAP_ELEMENT_H
 
+#include <cstring>
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
+using namespace std;
 
 
 /*
  * Step data type
  */
-struct IntervalCurve{
+struct MapElement{
 
     // Attributes of the type of data
 
+    // Identifier of the element
+    int id;
+
     // Starting position of the curves in the road
-    int startCurvePosition;
+    int startPosition;
 
     // Ending position of the curves in the road
-    int finalCurvePosition;
+    int finalPosition;
 
-    // Direction of the curve in the road
-    float directionCurve;
+    // Path of the map element
+    string path;
+
+    // Frequency of appearance
+    int each;
+
+    // Position in axis X
+    float xPos;
 
 
     /**
      * Default constructor
      */
-    IntervalCurve();
+    MapElement();
 
 
 
@@ -35,7 +46,9 @@ struct IntervalCurve{
      * Constructor of the data type IntervalCurve
      * @return an instance of the data type InternalCurve
      */
-    IntervalCurve(const int start, const int ending, const float direction);
+    MapElement(const int identifier, const int start, const int ending,
+               const float frequency, const float pos_axisX);
+
 
 
 
@@ -45,11 +58,9 @@ struct IntervalCurve{
      * @return true is the instance caller to the method is lower than <<line>>.
      *         Otherwise returns false
      */
-     bool operator < (IntervalCurve& iC);
+     bool operator < (MapElement& iC);
 
 
 };
 
 #endif // INTERNAL_CURVE_H
-
-

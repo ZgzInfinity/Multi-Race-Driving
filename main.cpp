@@ -8,14 +8,14 @@
 #include "Tokio.h"
 #include "Step.h"
 #include "Player.h"
+
 #include "IntervalCurve.h"
+#include "LandScapeNew.h"
 
 const int NUMBER_FPS = 60;
-const int MAX_ELEMENTS = 20;
 
 
 using namespace std;
-
 
 void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w2){
     ConvexShape shape(4);
@@ -28,108 +28,33 @@ void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w
 }
 
 
-
 int main(int argc, char* argv[]){
 
+
+    string name = "Vancouver.xml";
+    char* n = const_cast<char*>(name.c_str());
+    LandScapeNew L = LandScapeNew(n);
+
     // Creation of the screen game
-    RenderWindow app(VideoMode(WIDTH, HEIGHT), "Super Hang on!");
+    RenderWindow app(VideoMode(WIDTH, HEIGHT), "Hola Nacho!");
     // Control the fotograms per second, 60 FPS more less
     app.setFramerateLimit(NUMBER_FPS);
 
-    // Texture and sprite vectors
-    Texture t[MAX_ELEMENTS];
-    Sprite object[MAX_ELEMENTS];
-
-    // Processing the index of the scene
-    int indexScene = atoi(argv[1]);
-
-    // Sherwood Forest scene instance
-    SherwoodForest s;
-
-    // Egypt scene instance
-    Egypt e;
-
-    // Nepal scene instance
-    Vancouver m;
-
-    Tokio r;
-
-    // Paint the background of the scene
-
-    switch(indexScene){
-    case 1:
-        // Load background of Sherwood forest
-        s.loadBackground();
-        // Load all the elements of Sherwood forest
-        s.loadSprites(t, object);
-        break;
-    case 2:
-        // Load background of Egypt
-        e.loadBackground();
-        // Load all the elements of Egypt
-        e.loadSprites(t, object);
-        break;
-    case 3:
-        // Load background of Nepal
-        m.loadBackground();
-        // Load all the elements of Nepal
-        m.loadSprites(t, object);
-        break;
-    case 4:
-        // Load background of Tokio
-        r.loadBackground();
-        // Load all the elements of Tokio
-        r.loadSprites(t, object);
-        break;
-    }
-
-    // Vector of steps to do
-    vector<Step> lines;
-
+    string path = "images/player/";
+    char* p = const_cast<char*>(path.c_str());
     // Motorbike of the player
-    Player h = Player();
-
-    switch(indexScene){
-    case 1:
-        // Rendering the landscape of Sherwood forest
-        s.renderLandScape(lines, object);
-
-        // Order the sprites of Sherwood forest
-        s.orderSpritesInLandScape();
-        break;
-    case 2:
-        // Rendering the landscape of Egypt
-        e.renderLandScape(lines, object);
-
-        // Order the sprites of Egypt
-        e.orderSpritesInLandScape();
-        break;
-    case 3:
-        // Rendering the landscape of Nepal
-        m.renderLandScape(lines, object);
-
-        // Order the sprites of Nepal
-        m.orderSpritesInLandScape();
-        break;
-    case 4:
-        // Rendering the landscape of Tokio
-        r.renderLandScape(lines, object);
-
-        // Order the sprites of Tokio
-        r.orderSpritesInLandScape();
-        break;
-    }
+    Player h = Player(p);
 
     // Number of steps done
     int pos = 0, lastPos = 0;
     // Height position unnecessary
     int H = 1500;
 
-    // Colors to represent the landscape
-    Color grass, rumble, road, middle;
-
     // Possible event detected
     bool eventDetected = false;
+
+    // Colors of the map
+    Color grass, rumble, middle, road;
 
     // Possible event detected
     bool onCurve = false;
@@ -151,62 +76,34 @@ int main(int argc, char* argv[]){
                 app.close();
         }
 
-        // Check the advance of the motorbike of the player
-        h.advancePlayer(eventDetected);
-
-        // Control the possible actions if the user
-        h.controlActionPlayer(speed, eventDetected, app);
-
-        // Store my the actual position before the move
-        lastPos = pos;
-
         // New speed updated
-        pos += speed;
+        if (h.getModeCollision() == -1){
+            // Check the advance of the motorbike of the player
+            h.advancePlayer(eventDetected);
+
+            // Control the possible actions if the user
+            h.controlActionPlayer(speed, eventDetected, app);
+
+            // Store my the actual position before the move
+            lastPos = pos;
+
+            pos += speed;
+        }
 
         // Get the nearest sprite found to the actual position
         Step nearestStep;
 
-        switch(indexScene){
-            case 1:
-                // Checking of the motorbike is in a curve of the scene
-                nearestStep = s.checkingPossibleCollision(pos);
-                break;
-            case 2:
-                // Rendering the landscape of Egypt
-                nearestStep = e.checkingPossibleCollision(pos);
-                break;
-            case 3:
-                // Rendering the landscape of Nepal
-                nearestStep = m.checkingPossibleCollision(pos);
-                break;
-            case 4:
-                nearestStep = r.checkingPossibleCollision(pos);
-                break;
-        }
+        // Checking of the motorbike is in a curve of the scene
+        nearestStep = L.checkingPossibleCollision(pos);
 
-        // Check possible collisions of the motorbike
-        if (h.controlPossibleCollision(nearestStep, lastPos, pos)){
+        // Check possible collisions of the motorbike or if there is a collision been processed now
+        if (h.controlPossibleCollision(nearestStep, lastPos, pos) || h.getModeCollision() != -1){
             // There is collision
-            app.close();
+            h.collisionShow();
+            speed = INITIAL_SPEED;
         }
 
-        switch(indexScene){
-            case 1:
-                // Checking of the motorbike is in a curve of the scene
-                s.lookForCurve(pos, curve, onCurve);
-                break;
-            case 2:
-                // Rendering the landscape of Egypt
-                e.lookForCurve(pos, curve, onCurve);
-                break;
-            case 3:
-                // Rendering the landscape of Egypt
-                m.lookForCurve(pos, curve, onCurve);
-                break;
-            case 4:
-                r.lookForCurve(pos, curve, onCurve);
-                break;
-        }
+        L.lookForCurve(pos, curve, onCurve);
 
         // Control the inertia force of the motorbike
         h.controlInertiaForce(onCurve, curve, speed);
@@ -221,65 +118,22 @@ int main(int argc, char* argv[]){
             pos += MAX_SPACE_DIMENSION * segL;
         }
 
-        // Draw the background in the consoles
-        switch(indexScene){
-            case 1:
-                // Rendering the landscape of Sherwood forest
-                app.clear(Color(105, 205, 4));
-                app.draw(s.getBackGround());
-                break;
-            case 2:
-                // Rendering the landscape of Egypt
-                app.clear(Color(250, 217, 139));
-                app.draw(e.getBackGround());
-                break;
-            case 3:
-                // Rendering the landscape of Egypt
-                app.clear(Color(255, 255, 255));
-                app.draw(m.getBackGround());
-                break;
-            case 4:
-                // Rendering the landscape of Egypt
-                app.clear(Color(0, 0, 102));
-                app.draw(r.getBackGround());
-                break;
-        }
+        // Rendering the landscape of Sherwood forest
+        app.clear(Color(105, 205, 4));
+        app.draw(L.getBackGround());
 
         // Preparing to draw the new elements of the map
         int startPos = pos / segL;
-        int camH = lines[startPos].position_3d_y + H;
+        int camH = L.lines[startPos].position_3d_y + H;
 
         // Check if advance
-        if (speed > 0){
+        if (speed > 0 && h.getModeCollision() == -1){
             // Advance
             // Checking of the motorbike is in a curve of the scene
             Sprite newBack;
-
-            switch(indexScene){
-            case 1:
-                newBack = s.getBackGround();
-                newBack.move(-lines[startPos].directionCurve * 2,0);
-                s.setBackGround(newBack);
-                break;
-            case 2:
-                // Rendering the landscape of Egypt
-                newBack = e.getBackGround();
-                newBack.move(-lines[startPos].directionCurve * 2,0);
-                e.setBackGround(newBack);
-                break;
-            case 3:
-                // Rendering the landscape of Nepal
-                newBack = m.getBackGround();
-                newBack.move(-lines[startPos].directionCurve * 2,0);
-                m.setBackGround(newBack);
-                break;
-            case 4:
-                // Rendering the landscape of Nepal
-                newBack = r.getBackGround();
-                newBack.move(-lines[startPos].directionCurve * 2,0);
-                r.setBackGround(newBack);
-                break;
-            }
+            newBack = L.getBackGround();
+            newBack.move(-(L.lines[startPos].directionCurve) * 2, 0);
+            L.setBackGround(newBack);
         }
 
         // Variables
@@ -287,9 +141,9 @@ int main(int argc, char* argv[]){
         float x = 0, dx = 0;
 
         // Drawing the road
-        for(int n = startPos; n < startPos+300; n++){
+        for(int n = startPos; n < startPos + 300; n++){
             // Create a new line
-            Step &l = lines[n % MAX_SPACE_DIMENSION];
+            Step &l = L.lines[n % MAX_SPACE_DIMENSION];
             // Project the 3d coordinates in 2d coordinates image
             l.project(h.getPlayerX() * WIDTH_ROAD - x, camH, startPos * segL - (n>= MAX_SPACE_DIMENSION ? MAX_SPACE_DIMENSION * segL : 0));
             x += dx;
@@ -300,27 +154,8 @@ int main(int argc, char* argv[]){
                 maxy = l.position_2d_y;
 
                 // Paint the scene
-
-                switch(indexScene){
-                case 1:
-                    // Rendering the landscape of Sherwood forest
-                    s.paintScene(n, grass, rumble, middle, road);
-                    break;
-                case 2:
-                    // Rendering the landscape of Egypt
-                    e.paintScene(n, grass, rumble, middle, road);
-                    break;
-                case 3:
-                    // Rendering the landscape of Egypt
-                    m.paintScene(n, grass, rumble, middle, road);
-                    break;
-                case 4:
-                    // Rendering the landscape of Egypt
-                    r.paintScene(n, grass, rumble, middle, road);
-                    break;
-                }
-
-                Step p = lines[(n - 1)% MAX_SPACE_DIMENSION]; //previous line
+                L.paintScene(n, grass, rumble, middle, road);
+                Step p = L.lines[(n - 1)% MAX_SPACE_DIMENSION];
 
                 // Draw the grass and the road
                 drawQuad(app, grass, 0, p.position_2d_y, WIDTH, 0, l.position_2d_y, WIDTH);
@@ -332,16 +167,23 @@ int main(int argc, char* argv[]){
        // Drawing the objects of the map
        for(int n = startPos + 300; n > startPos; n--){
           // Draw sprite in that position
-          lines[n % MAX_SPACE_DIMENSION].drawSprite(app);
+          L.lines[n % MAX_SPACE_DIMENSION].drawSprite(app);
        }
 
        //Show all the elements in the console game
        h.drawPlayer(app);
        app.display();
 
-       // Sleep loop
-       sleep(milliseconds(70));
-    }
 
+       cout << h.getPlayerX() << endl;
+
+       // Sleep loop
+       if (h.getModeCollision() == -1){
+            sleep(milliseconds(70));
+       }
+       else {
+            sleep(milliseconds(100));
+       }
+    }
     return 0;
 }

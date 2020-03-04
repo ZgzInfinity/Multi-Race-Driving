@@ -1,11 +1,11 @@
 
-#include "IntervalCurve.h"
+#include "Mountain.h"
 
 
 /**
  * Default constructor
  */
-IntervalCurve:: IntervalCurve(){}
+Mountain::Mountain(){}
 
 
 
@@ -13,11 +13,12 @@ IntervalCurve:: IntervalCurve(){}
  * Constructor of the data type Step
  * @return an instance of the data type Step
  */
-IntervalCurve::IntervalCurve(const int start, const int ending, const float direction){
+Mountain::Mountain(const int start, const int ending, const float atenuation, const int height){
     // Assignment of the parameters
-    startCurvePosition = start;
-    finalCurvePosition = ending;
-    directionCurve = direction;
+    startMountainPos = start;
+    finalMountainPos = ending;
+    atenuationMountain = atenuation;
+    heightMountain = height;
 }
 
 
@@ -28,7 +29,7 @@ IntervalCurve::IntervalCurve(const int start, const int ending, const float dire
  * @return true is the instance caller to the method is lower than <<line>>.
  *         Otherwise returns false
  */
-bool IntervalCurve::operator < (IntervalCurve& iC){
+bool Mountain::operator < (Mountain& m){
     // Returns which is lower
-    return this->startCurvePosition <= iC.startCurvePosition && this->finalCurvePosition <= iC.finalCurvePosition;
+    return this->startMountainPos <= m.startMountainPos && this->finalMountainPos <= m.finalMountainPos;
 }

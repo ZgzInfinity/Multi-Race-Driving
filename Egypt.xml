@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Circuit> 
+	<Name>Egypt</Name>
+	<Background>
+		<Path>images/Egypt/desert.png</Path>
+		<LL>-2000</LL>
+		<UL>0</UL>
+		<LR>5000</LR>
+		<UR>411</UR>
+		<Xcenter>-2000</Xcenter> 
+		<Ycenter>0</Ycenter>
+	</Background>
+	<Curves>
+		<C1 startPosGE="50" finalPosLE="100">
+			<Direction>-3</Direction>
+		</C1>
+		<C2 startPosGE="300" finalPosLT="500">
+			<Direction>1.5</Direction>		
+		</C2>
+		<C3 startPosGT="500" finalPosLT="800">
+			<Direction>-1.3</Direction>
+		</C3>
+		<C4 startPosGE="800" finalPosLT="1200"> 
+			<Direction>3</Direction>
+		</C4>
+		<C5 startPosGE="1200" finalPosLE="1400"> 
+			<Direction>-3</Direction>
+		</C5>
+		<C6 startPosGT="1500" finalPosLT="1800"> 
+			<Direction>4</Direction>
+		</C6>
+		<C7 startPosGE="1800" finalPosLE="2050"> 
+			<Direction>-5</Direction>
+		</C7>
+		<C8 startPosGE="2200" finalPosLT="2300"> 
+			<Direction>0.7</Direction>
+		</C8>
+		<C9 startPosGE="2500" finalPosLT="2800"> 
+			<Direction>4</Direction>
+		</C9>
+		<C10 startPosGE="2900" finalPosLT="3000"> 
+			<Direction>-0.5</Direction>
+		</C10>
+		<C11 startPosGE="3800" finalPosLT="4300"> 
+			<Direction>-0.5</Direction>
+		</C11>
+		<C12 startPosGE="4500" finalPosLT="5000"> 
+			<Direction>5</Direction>
+		</C12>
+		<C13 startPosGE="5400" finalPosLT="6000"> 
+			<Direction>-1.3</Direction>
+		</C13>
+		<C14 startPosGE="6300" finalPosLT="7000"> 
+			<Direction>1.3</Direction>
+		</C14>
+		<C15 startPosGE="7900" finalPosLT="8100"> 
+			<Direction>2</Direction>
+		</C15>
+		<C16 startPosGE="8500" finalPosLT="8700"> 
+			<Direction>-4</Direction>
+		</C16>
+		<C17 startPosGE="8700" finalPosLT="9000"> 
+			<Direction>3</Direction>
+		</C17>
+		<C18 startPosGE="9400" finalPosLT="9700"> 
+			<Direction>-4</Direction>
+		</C18>
+		<C19 startPosGE="10000" finalPosLT="10600"> 
+			<Direction>1</Direction>
+		</C19>
+		<C20 startPosGE="10700" finalPosLT="10900"> 
+			<Direction>-4</Direction>
+		</C20>
+		<C21 startPosGE="10900" finalPosLT="11500"> 
+			<Direction>2</Direction>
+		</C21>
+		<C22 startPosGE="11500" finalPosLT="11900"> 
+			<Direction>-2.5</Direction>
+		</C22>
+	</Curves>
+	<Mountains>
+		<M1 startPosGT="754" finalPosLE="1600"> 
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M1>
+		<M2 startPosGT="1698" finalPosLT="2546">
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M2>
+		<M3 startPosGE="4618" finalPosLE="5277">
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M3>
+		<M4 startPosGE="5750" finalPosLT="6600"> 
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M4>
+		<M5 startPosGE="7790" finalPosLE="8290">
+			<Atenuation>80.0</Atenuation>
+			<Height>2000</Height>
+		</M5>
+		<M6 startPosGE="8295" finalPosLE="8798">
+			<Atenuation>80.0</Atenuation>
+			<Height>-2000</Height>
+		</M6>
+		<M7 startPosGE="9330" finalPosLE="9896">
+			<Atenuation>90.0</Atenuation>
+			<Height>2500</Height>
+		</M7>
+		<M8 startPosGE="9990" finalPosLE="11876">
+			<Atenuation>60.0</Atenuation>
+			<Height>2500</Height>
+		</M8>
+	</Mountains>
+	<Color_grass>
+		<CO1>
+			<R>250</R>
+			<G>217</G>
+			<B>139</B>
+		</CO1>
+		<CO2>
+			<R>229</R>
+			<G>193</G>
+			<B>111</B>
+		</CO2>
+	</Color_grass>
+	<Color_road>
+		<R>77</R>
+		<G>77</G>
+		<B>77</B>
+	</Color_road>
+	<Color_rumble>
+		<CO1>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</CO1>
+		<CO2>
+			<R>77</R>
+			<G>77</G>
+			<B>77</B>
+		</CO2>
+	</Color_rumble>
+	<Color_middle>
+		<CO1>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</CO1>
+		<CO2>
+			<R>77</R>
+			<G>77</G>
+			<B>77</B>
+		</CO2>
+	</Color_middle>
+	<Sprites>
+		<S1 id="1">
+			<Path>images/Egypt/palm_tree.png</Path>
+			<Interval>
+				<I1 startPosGT="800" finalPosLT="11900">
+					<Each>20</Each>
+					<Xpos>-2.3</Xpos>
+				</I1>	
+			</Interval>
+		</S1>	
+		<S2 id="2">
+			<Path>images/Egypt/palm_tree_inverted.png</Path>
+			<Interval>
+				<I1 startPosGT="800" finalPosLT="11900">
+					<Each>30</Each>
+					<Xpos>1.3</Xpos>
+				</I1>
+			</Interval>
+		</S2>
+		<S3 id="3">
+			<Path>images/Egypt/dry_tree.png</Path>
+			<Interval>
+				<I1 startPosGT="250" finalPosLT="700">
+					<Each>45</Each>
+					<Xpos>-3.3</Xpos>
+				</I1>
+			</Interval>
+		</S3>
+		<S4 id="4">
+			<Path>images/Egypt/dry_tree2.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLT="200">
+					<Each>20</Each>
+					<Xpos>-3.8</Xpos>
+				</I1>
+				<I2 startPosGT="10500" finalPosLE="12000">
+					<Each>20</Each>
+					<Xpos>-3.8</Xpos>
+				</I2>
+			</Interval>
+		</S4>
+		<S5 id="5">
+			<Path>images/Egypt/cactus.png</Path>
+			<Interval>
+				<I1 startPosGT="50" finalPosLT="700">
+					<Each>25</Each>
+					<Xpos>4.2</Xpos>
+				</I1>
+				<I2 startPosGT="10500" finalPosLE="12000">
+					<Each>25</Each>
+					<Xpos>4.2</Xpos>
+				</I2>
+			</Interval>
+		</S5>
+		<S6 id="6">
+			<Path>images/Egypt/dry_tree3.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLE="12000">
+					<Each>505</Each>
+					<Xpos>-8.6</Xpos>
+				</I1>
+			</Interval>
+		</S6>
+		<S7 id="7">
+			<Path>images/Egypt/elephant.png</Path>
+			<Interval>
+				<I1 startPosGE="900" finalPosLE="11500">
+					<Each>57</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Right</Margin>
+				</I1>
+			</Interval>
+		</S7>
+		<S8 id="8">
+			<Path>images/Egypt/camel.png</Path>
+			<Interval>
+				<I1 startPosGE="500" finalPosLE="1000">
+					<Each>63</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Left</Margin>
+				</I1>
+				<I2 startPosGE="750" finalPosLE="10500">
+					<Each>47</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Left</Margin>
+				</I2>
+			</Interval>
+		</S8>
+		<S9 id="9">
+			<Path>images/Egypt/pyramid.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLE="12000">
+					<Each>601</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Right</Margin>
+				</I1>
+				<I2 startPosGE="0" finalPosLE="12000">
+					<Each>303</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Left</Margin>
+				</I2>
+				<I3 startPosGE="0" finalPosLE="12000">
+					<Each>100</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Right</Margin>
+				</I3>
+				<I4 startPosGE="0" finalPosLE="12000">
+					<Each>300</Each>
+					<Xpos>-2</Xpos>
+				</I4>
+				<I5 startPosGE="0" finalPosLE="12000">
+					<Each>200</Each>
+					<Xpos>1</Xpos>
+				</I5>
+			</Interval>
+		</S9>
+		<S10 id="10">
+			<Path>images/Egypt/signal_go.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLE="12000">
+					<Each>370</Each>
+					<Xpos>3.8</Xpos>
+				</I1>
+			</Interval>
+		</S10>
+		<S11 id="11">
+			<Path>images/Egypt/signal_bus.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLE="12000">
+					<Each>350</Each>
+					<Xpos>-4.5</Xpos>
+				</I1>
+			</Interval>
+		</S11>
+		<S12 id="12">
+			<Path>images/Egypt/signal_50.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLE="12000">
+					<Each>500</Each>
+					<Xpos>3.8</Xpos>
+				</I1>
+			</Interval>
+		</S12>
+	</Sprites>
+</Circuit>

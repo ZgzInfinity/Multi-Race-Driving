@@ -2,13 +2,19 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <SFML/Graphics.hpp>
 #include "Step.h"
 #include "IntervalCurve.h"
-#include <iostream>
+#include "rapidxml.hpp"
+#include "rapidxml_utils.hpp"
 
 using namespace sf;
 using namespace std;
+using namespace rapidxml;
 
 const int SPEED_INCREMENT = 50;
 const int INITIAL_SPEED = 200;
@@ -57,19 +63,54 @@ class Player {
         Texture playerTexture_17, playerTexture_18, playerTexture_19,
                 playerTexture_20, playerTexture_21, playerTexture_22;
 
-         // Textures of the motorbike player while is turned to the right and braking
+        // Textures of the motorbike player while is turned to the right and braking
         Texture playerTexture_23, playerTexture_24, playerTexture_25,
                 playerTexture_26, playerTexture_27, playerTexture_28;
 
+        // Textures of the motorbike player while is crushing A
+        Texture playerTexture_29, playerTexture_30, playerTexture_31, playerTexture_32,
+                playerTexture_33, playerTexture_34, playerTexture_35, playerTexture_36,
+                playerTexture_37, playerTexture_38, playerTexture_39, playerTexture_40,
+                playerTexture_41;
+
+        // Textures of the motorbike player while is crushing with type B
+        Texture playerTexture_42, playerTexture_43, playerTexture_44, playerTexture_45,
+                playerTexture_46, playerTexture_47, playerTexture_48, playerTexture_49,
+                playerTexture_50, playerTexture_51, playerTexture_52, playerTexture_53,
+                playerTexture_54;
+
         // Sprite of the player motorbike
         Sprite playerSprite;
+
+        // Mode to show the collision of the motorbike by default
+        int mode;
+
+        // Accumulator to the coordinate of the axis Y to make collision better
+        int offset;
+
+        // Offset added if the collision is with the second type
+        int increment;
+
+        // File path with the sprites
+        char* filePath;
+
+        // Vector of textures of the player
+        vector<Texture> textures;
 
     public:
 
         /**
          * Constructor of the class
          */
-        Player();
+        Player(char* pathFile);
+
+
+
+        /**
+         * Load the set of sprites of the player
+         */
+         void loadSpritesFromPath();
+
 
 
         /**
@@ -90,8 +131,18 @@ class Player {
 
         /**
          * Get the coordinate of the payer in the axis X
+         * @return the position of the motorbike in the axis X
          */
          float getPlayerX();
+
+
+
+         /**
+          * Get the mode of collision of the motorbike
+          * @return the mode to show the collision of the motorbike
+          */
+         int getModeCollision();
+
 
 
         /**
@@ -144,7 +195,7 @@ class Player {
 
 
 
-                /**
+        /**
          * Control if the user has pressed the q keyword to increase the speed
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
@@ -181,6 +232,20 @@ class Player {
          * @param speed is the actual speed of the motorbike of the player
          */
         void controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed);
+
+
+
+        /**
+         * Shows to the user how the motorbikes crushes
+         */
+        void collisionShow();
+
+
+
+        /**
+         * Starts the process to recover the motorbike
+         */
+        void recoverMotorbike();
 
 };
 

@@ -1,42 +1,25 @@
 
 #include "Player.h"
 
-Player::Player(){
-
-    // Loading all the textures of the motorbike
-    playerTexture_1.loadFromFile("images/player/p1.png");    playerTexture_2.loadFromFile("images/player/p2.png");
-    playerTexture_3.loadFromFile("images/player/p3.png");    playerTexture_4.loadFromFile("images/player/p4.png");
-    playerTexture_5.loadFromFile("images/player/p5.png");    playerTexture_6.loadFromFile("images/player/p6.png");
-    playerTexture_7.loadFromFile("images/player/p7.png");    playerTexture_8.loadFromFile("images/player/p8.png");
-    playerTexture_9.loadFromFile("images/player/p9.png");    playerTexture_10.loadFromFile("images/player/p10.png");
-    playerTexture_11.loadFromFile("images/player/p11.png");  playerTexture_12.loadFromFile("images/player/p12.png");
-    playerTexture_13.loadFromFile("images/player/p13.png");  playerTexture_14.loadFromFile("images/player/p14.png");
-    playerTexture_15.loadFromFile("images/player/p15.png");  playerTexture_16.loadFromFile("images/player/p16.png");
-    playerTexture_17.loadFromFile("images/player/p17.png");  playerTexture_18.loadFromFile("images/player/p18.png");
-    playerTexture_19.loadFromFile("images/player/p19.png");  playerTexture_20.loadFromFile("images/player/p20.png");
-    playerTexture_21.loadFromFile("images/player/p21.png");  playerTexture_22.loadFromFile("images/player/p22.png");
-    playerTexture_23.loadFromFile("images/player/p23.png");  playerTexture_24.loadFromFile("images/player/p24.png");
-    playerTexture_25.loadFromFile("images/player/p25.png");  playerTexture_26.loadFromFile("images/player/p26.png");
-    playerTexture_27.loadFromFile("images/player/p27.png");  playerTexture_28.loadFromFile("images/player/p28.png");
-
-    // Application of smooth filter to make the pixels lees noticeable
-    playerTexture_1.setSmooth(true);   playerTexture_2.setSmooth(true);   playerTexture_3.setSmooth(true);   playerTexture_4.setSmooth(true);
-    playerTexture_5.setSmooth(true);   playerTexture_6.setSmooth(true);   playerTexture_7.setSmooth(true);   playerTexture_8.setSmooth(true);
-    playerTexture_9.setSmooth(true);   playerTexture_10.setSmooth(true);  playerTexture_11.setSmooth(true);  playerTexture_12.setSmooth(true);
-    playerTexture_13.setSmooth(true);  playerTexture_14.setSmooth(true);  playerTexture_15.setSmooth(true);  playerTexture_16.setSmooth(true);
-    playerTexture_17.setSmooth(true);  playerTexture_18.setSmooth(true);  playerTexture_19.setSmooth(true);  playerTexture_20.setSmooth(true);
-    playerTexture_21.setSmooth(true);  playerTexture_22.setSmooth(true);  playerTexture_23.setSmooth(true);  playerTexture_24.setSmooth(true);
-    playerTexture_25.setSmooth(true);  playerTexture_26.setSmooth(true);  playerTexture_27.setSmooth(true);  playerTexture_28.setSmooth(true);
-
+Player::Player(char* pathFile){
+    // Assign principal variables
+    filePath = pathFile;
     // Loading the texture with more dimension
     // to have space to the other ones
     playerSprite.setTexture(playerTexture_14);
-
     // Store actual code of the image
     actual_code_image = 1;
-
     // Initializing the position of the player in the axis X
     playerX = 0.f;
+    // Mode to show the collision of the motorbike by default
+    mode = -1;
+    // Accumulator to the coordinate of the axis Y to make collision better
+    offset = 0;
+    // Offset added if the collision is with the second type
+    increment = 50;
+
+    // Charge the sprites of the vehicle
+    loadSpritesFromPath();
 }
 
 
@@ -46,8 +29,42 @@ Player::Player(){
  * @param app is the console window game where the sprite is going to be drawn
  */
 void Player::drawPlayer(RenderWindow& app){
-    playerSprite.setPosition(Vector2f(465.f, HEIGHT - 230.f));
+    this->offset = (mode == 0 && actual_code_image <= 35) ? offset += 10 : offset += 5;
+    this->offset = (mode == 1 && actual_code_image <= 46) ? offset += 20 : offset;
+    if (mode == -1) offset = 0;
+    playerSprite.setPosition(Vector2f(465.f, HEIGHT - 190.f - offset));
     app.draw(playerSprite);
+}
+
+
+
+/**
+ * Load the set of sprites of the player
+ */
+void Player::loadSpritesFromPath(){
+    // Document xml where the document is going to be parsed
+    xml_document<> doc;
+    file<> file(filePath);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+
+    // Get the principal node of the file
+    xml_node<> *nodePlayer = doc.first_node();
+
+    // Loop in order to iterate all the children of the principal node
+    for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
+        // Check if the actual child node is the number of textures
+        if ((string)child->name() == "NumberOfSprites"){
+            // Get the number of sprites of the vehicle
+            int numberOfSprites = stoi(child->value());
+            // Reserve memory for only the number of necessary sprites
+            textures = vector<Texture> (numberOfSprites);
+        }
+        // Check if the actual node is the controller of the paths of the sprites
+        else if ((string)child->name() == "NumberOfSprites"){
+
+        }
+    }
 }
 
 
@@ -78,11 +95,24 @@ void Player::advancePlayer(bool& eventDetected){
 
 
 
+
 /**
  * Get the coordinate of the payer in the axis X
+ * @return the position of the motorbike in the axis X
  */
 float Player::getPlayerX(){
     return playerX;
+}
+
+
+
+
+/**
+ * Get the mode of collision of the motorbike
+ * @return the mode to show the collision of the motorbike
+ */
+int Player::getModeCollision(){
+    return mode;
 }
 
 
@@ -708,4 +738,127 @@ void Player::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed
         }
     }
 }
+
+
+
+/**
+ * Shows to the user how the motorbikes crushes
+ */
+void Player::collisionShow(){
+    // Not collision detected before
+    if (mode == -1){
+        // Code generated to the way of collision
+        // Pseudo generator of aleatory number in order to generate randomly the way of collision
+        srand(time(NULL));
+        mode = rand() % 2;
+        cout << mode << endl;
+        // Establish the first collision sprite
+        if (mode == 0){
+            // First way to collision
+            actual_code_image = 28;
+        }
+        else if (mode == 1) {
+            // Second way to collision
+            actual_code_image = 42;
+        }
+    }
+    else {
+        // Collision detected in process
+        // Avoid overflow of code number identifier of collision sprite
+        if (actual_code_image != 41 && actual_code_image != 52){
+            // Add to have the sprite in the range of collision
+            actual_code_image++;
+            // Check what is the way to see the collision
+            if (mode == 0){
+                // Change the actual sprite of the collision with the first mode
+                switch(actual_code_image){
+                    case 29:
+                        playerSprite.setTexture(playerTexture_29);
+                        break;
+                    case 30:
+                        playerSprite.setTexture(playerTexture_31);
+                        break;
+                    case 31:
+                        playerSprite.setTexture(playerTexture_32);
+                        break;
+                    case 32:
+                        playerSprite.setTexture(playerTexture_29);
+                        break;
+                    case 33:
+                        playerSprite.setTexture(playerTexture_33);
+                        break;
+                    case 34:
+                        playerSprite.setTexture(playerTexture_34);
+                        break;
+                    case 35:
+                        playerSprite.setTexture(playerTexture_35);
+                        break;
+                    case 36:
+                        playerSprite.setTexture(playerTexture_36);
+                        break;
+                    case 37:
+                        playerSprite.setTexture(playerTexture_37);
+                        break;
+                    case 38:
+                        playerSprite.setTexture(playerTexture_38);
+                        break;
+                    case 39:
+                        playerSprite.setTexture(playerTexture_39);
+                        break;
+                    case 40:
+                        playerSprite.setTexture(playerTexture_40);
+                        break;
+                     case 41:
+                        playerSprite.setTexture(playerTexture_40);
+                        actual_code_image = 1;
+                        mode = -1;
+                        playerX = 0.f;
+                }
+            }
+            else if (mode == 1) {
+                // Change the actual sprite of the collision with the second mode
+                switch(actual_code_image){
+                    case 42:
+                        playerSprite.setTexture(playerTexture_42);
+                        break;
+                    case 43:
+                        playerSprite.setTexture(playerTexture_43);
+                        break;
+                    case 44:
+                        playerSprite.setTexture(playerTexture_44);
+                        break;
+                    case 45:
+                        playerSprite.setTexture(playerTexture_45);
+                        break;
+                    case 46:
+                        playerSprite.setTexture(playerTexture_46);
+                        break;
+                    case 47:
+                        playerSprite.setTexture(playerTexture_47);
+                        break;
+                    case 48:
+                        playerSprite.setTexture(playerTexture_48);
+                        break;
+                    case 49:
+                        playerSprite.setTexture(playerTexture_49);
+                        break;
+                    case 50:
+                        playerSprite.setTexture(playerTexture_50);
+                        break;
+                    case 51:
+                        playerSprite.setTexture(playerTexture_51);
+                        break;
+                    case 52:
+                        playerSprite.setTexture(playerTexture_52);
+                        actual_code_image = 1;
+                        mode = -1;
+                        playerX = 0.f;
+                }
+            }
+        }
+    }
+}
+
+
+
 
