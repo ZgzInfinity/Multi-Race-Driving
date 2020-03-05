@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <cstring>
+#include <list>
 #include <SFML/Graphics.hpp>
 #include "Step.h"
 #include "IntervalCurve.h"
@@ -35,6 +37,8 @@ const float BORDER_ROAD_RIGHT = 1.15;
 class Player {
 
      private:
+
+        Texture t;
 
         // Code of the actual image texture
         int actual_code_image;

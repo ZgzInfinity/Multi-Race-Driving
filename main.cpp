@@ -45,6 +45,8 @@ int main(int argc, char* argv[]){
     // Motorbike of the player
     Player h = Player(p);
 
+    h.loadSpritesFromPath();
+
     // Number of steps done
     int pos = 0, lastPos = 0;
     // Height position unnecessary

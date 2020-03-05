@@ -4,9 +4,6 @@
 Player::Player(char* pathFile){
     // Assign principal variables
     filePath = pathFile;
-    // Loading the texture with more dimension
-    // to have space to the other ones
-    playerSprite.setTexture(playerTexture_14);
     // Store actual code of the image
     actual_code_image = 1;
     // Initializing the position of the player in the axis X
@@ -17,9 +14,6 @@ Player::Player(char* pathFile){
     offset = 0;
     // Offset added if the collision is with the second type
     increment = 50;
-
-    // Charge the sprites of the vehicle
-    loadSpritesFromPath();
 }
 
 
@@ -44,7 +38,7 @@ void Player::drawPlayer(RenderWindow& app){
 void Player::loadSpritesFromPath(){
     // Document xml where the document is going to be parsed
     xml_document<> doc;
-    file<> file(filePath);
+    file<> file("Motorbike.xml");
     // Parsing the content of file
     doc.parse<0>(file.data());
 
@@ -53,18 +47,25 @@ void Player::loadSpritesFromPath(){
 
     // Loop in order to iterate all the children of the principal node
     for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
-        // Check if the actual child node is the number of textures
-        if ((string)child->name() == "NumberOfSprites"){
-            // Get the number of sprites of the vehicle
-            int numberOfSprites = stoi(child->value());
-            // Reserve memory for only the number of necessary sprites
-            textures = vector<Texture> (numberOfSprites);
-        }
         // Check if the actual node is the controller of the paths of the sprites
-        else if ((string)child->name() == "NumberOfSprites"){
-
+        if ((string)child->name() == "SpritePaths"){
+            // Loop for iterate throughout the path files and add then to the vector
+            for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
+                // Add the texture to the vector
+                if (t.loadFromFile(string(filePath) + pathNode->value())){
+                    // Increment the textures read
+                    textures.push_back(t);
+                }
+            }
+        }
+        else {
+            // Error the tag has not been found
+            cerr << "The file must have the tag SpritePaths defined" << endl;
+            exit(12);
         }
     }
+    // Load the biggest texture to display the other ones
+    playerSprite.setTexture(textures[13]);
 }
 
 
@@ -77,15 +78,14 @@ void Player::advancePlayer(bool& eventDetected){
     // Eliminate this event detection
     if (!eventDetected){
         if (actual_code_image != 1){
+            // First advance sprite loaded
             actual_code_image = 1;
-            // Load the seventh sprite
-            playerSprite.setTexture(playerTexture_1);
         }
         else {
+            // Second advance sprite loaded
             actual_code_image = 2;
-            // Load the seventh sprite
-            playerSprite.setTexture(playerTexture_2);
         }
+        playerSprite.setTexture(textures[actual_code_image - 1]);
     }
     else {
         // Elimination of the last event registered
@@ -142,7 +142,7 @@ inline void Player::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDete
            (actual_code_image >= 23 && actual_code_image <= 28))
         {
             actual_code_image = 3;
-            playerSprite.setTexture(playerTexture_3);
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image >= 3 && actual_code_image <= 8){
             // Increment the actual code of the sprite
@@ -154,29 +154,8 @@ inline void Player::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDete
                 // Change sprite while the motorbike is turning to left
                 actual_code_image--;
             }
-            switch (actual_code_image){
-                // Select the correct sprite
-                case 4:
-                    // Load the fourth sprite
-                    playerSprite.setTexture(playerTexture_4);
-                    break;
-                case 5:
-                    // Load the fifth sprite
-                    playerSprite.setTexture(playerTexture_5);
-                    break;
-                case 6:
-                    // Load the sixth sprite
-                    playerSprite.setTexture(playerTexture_6);
-                    break;
-                case 7:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_7);
-                    break;
-                case 8:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_8);
-                    break;
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         // Register event
         eventDetected = true;
@@ -208,7 +187,7 @@ inline void Player::controlTurningPlayerRightKeyboard(int& speed, bool& eventDet
         // Change the texture
         if (actual_code_image < 9 || (actual_code_image >= 15 && actual_code_image <= 22)){
             actual_code_image = 9;
-            playerSprite.setTexture(playerTexture_9);
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image <= 14){
             // Increment the actual code of the sprite
@@ -220,29 +199,8 @@ inline void Player::controlTurningPlayerRightKeyboard(int& speed, bool& eventDet
                 // Change sprite while the motorbike is turning to left
                 actual_code_image--;
             }
-            switch (actual_code_image){
-                // Select the correct sprite
-                case 10:
-                    // Load the fourth sprite
-                    playerSprite.setTexture(playerTexture_10);
-                    break;
-                case 11:
-                    // Load the fifth sprite
-                    playerSprite.setTexture(playerTexture_11);
-                    break;
-                case 12:
-                    // Load the sixth sprite
-                    playerSprite.setTexture(playerTexture_12);
-                    break;
-                case 13:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_13);
-                    break;
-                case 14:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_14);
-                    break;
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         // Register event
         eventDetected = true;
@@ -278,7 +236,8 @@ inline void Player::controlTurningPlayerLeftMouse(int& speed, bool& eventDetecte
            (actual_code_image >= 23 && actual_code_image <= 28))
         {
             actual_code_image = 3;
-            playerSprite.setTexture(playerTexture_3);
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image >= 3 && actual_code_image <= 8){
             // Increment the actual code of the sprite
@@ -290,29 +249,8 @@ inline void Player::controlTurningPlayerLeftMouse(int& speed, bool& eventDetecte
                 // Change sprite while the motorbike is turning to left
                 actual_code_image--;
             }
-            switch (actual_code_image){
-                // Select the correct sprite
-                case 4:
-                    // Load the fourth sprite
-                    playerSprite.setTexture(playerTexture_4);
-                    break;
-                case 5:
-                    // Load the fifth sprite
-                    playerSprite.setTexture(playerTexture_5);
-                    break;
-                case 6:
-                    // Load the sixth sprite
-                    playerSprite.setTexture(playerTexture_6);
-                    break;
-                case 7:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_7);
-                    break;
-                case 8:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_8);
-                    break;
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         // Register event
         eventDetected = true;
@@ -346,7 +284,8 @@ inline void Player::controlTurningPlayerRightMouse(int& speed, bool& eventDetect
         // Change the texture
         if (actual_code_image < 9 || (actual_code_image >= 15 && actual_code_image <= 22)){
             actual_code_image = 9;
-            playerSprite.setTexture(playerTexture_9);
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image <= 14){
             // Increment the actual code of the sprite
@@ -358,29 +297,8 @@ inline void Player::controlTurningPlayerRightMouse(int& speed, bool& eventDetect
                 // Change sprite while the motorbike is turning to left
                 actual_code_image--;
             }
-            switch (actual_code_image){
-                // Select the correct sprite
-                case 10:
-                    // Load the fourth sprite
-                    playerSprite.setTexture(playerTexture_10);
-                    break;
-                case 11:
-                    // Load the fifth sprite
-                    playerSprite.setTexture(playerTexture_11);
-                    break;
-                case 12:
-                    // Load the sixth sprite
-                    playerSprite.setTexture(playerTexture_12);
-                    break;
-                case 13:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_13);
-                    break;
-                case 14:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_14);
-                    break;
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         // Register event
         eventDetected = true;
@@ -443,13 +361,15 @@ inline void Player::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWi
         if (actual_code_image == 2 && eventDetected){
             // Change the sprite;
             actual_code_image = 1;
-            playerSprite.setTexture(playerTexture_1);
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         // Change the sprite of the motorbike
         else if (actual_code_image == 1 && eventDetected){
             // Change the sprite
             actual_code_image = 2;
-            playerSprite.setTexture(playerTexture_2);
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
     }
 }
@@ -474,59 +394,28 @@ inline void Player::controlPlayerBraking(int& speed, bool& eventDetected, Render
         // Selection of the correct sprite of the motorbike
         if (actual_code_image <= 2){
             actual_code_image = 15;
-            playerSprite.setTexture(playerTexture_15);
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image == 15){
             actual_code_image = 16;
-            playerSprite.setTexture(playerTexture_16);
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image == 16){
             actual_code_image = 15;
-            playerSprite.setTexture(playerTexture_15);
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image >= 3 && actual_code_image <= 8){
             actual_code_image += 14;
-            switch(actual_code_image){
-                case 17:
-                    playerSprite.setTexture(playerTexture_17);
-                    break;
-                case 18:
-                    playerSprite.setTexture(playerTexture_18);
-                    break;
-                case 19:
-                    playerSprite.setTexture(playerTexture_19);
-                    break;
-                case 20:
-                    playerSprite.setTexture(playerTexture_20);
-                    break;
-                case 21:
-                    playerSprite.setTexture(playerTexture_21);
-                    break;
-                case 22:
-                    playerSprite.setTexture(playerTexture_22);
-                }
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
+        }
         else if (actual_code_image >= 9 && actual_code_image <= 14){
             actual_code_image += 14;
-            switch(actual_code_image){
-                case 23:
-                    playerSprite.setTexture(playerTexture_23);
-                    break;
-                case 24:
-                    playerSprite.setTexture(playerTexture_24);
-                    break;
-                case 25:
-                    playerSprite.setTexture(playerTexture_25);
-                    break;
-                case 26:
-                    playerSprite.setTexture(playerTexture_26);
-                    break;
-                case 27:
-                    playerSprite.setTexture(playerTexture_27);
-                    break;
-                case 28:
-                    playerSprite.setTexture(playerTexture_28);
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image >= 17 && actual_code_image <= 22){
             // Increment the actual code of the sprite
@@ -538,29 +427,8 @@ inline void Player::controlPlayerBraking(int& speed, bool& eventDetected, Render
                 // Change sprite while the motorbike is turning to left
                 actual_code_image--;
             }
-            switch (actual_code_image){
-                // Select the correct sprite
-                case 18:
-                    // Load the fourth sprite
-                    playerSprite.setTexture(playerTexture_18);
-                    break;
-                case 19:
-                    // Load the fifth sprite
-                    playerSprite.setTexture(playerTexture_19);
-                    break;
-                case 20:
-                    // Load the sixth sprite
-                    playerSprite.setTexture(playerTexture_20);
-                    break;
-                case 21:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_21);
-                    break;
-                case 22:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_22);
-                    break;
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         else if (actual_code_image >= 23 && actual_code_image <= 28){
             // Increment the actual code of the sprite
@@ -572,29 +440,8 @@ inline void Player::controlPlayerBraking(int& speed, bool& eventDetected, Render
                 // Change sprite while the motorbike is turning to left
                 actual_code_image--;
             }
-            switch (actual_code_image){
-                // Select the correct sprite
-                case 24:
-                    // Load the fourth sprite
-                    playerSprite.setTexture(playerTexture_24);
-                    break;
-                case 25:
-                    // Load the fifth sprite
-                    playerSprite.setTexture(playerTexture_25);
-                    break;
-                case 26:
-                    // Load the sixth sprite
-                    playerSprite.setTexture(playerTexture_26);
-                    break;
-                case 27:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_27);
-                    break;
-                    case 28:
-                    // Load the seventh sprite
-                    playerSprite.setTexture(playerTexture_28);
-                    break;
-            }
+            // Set the texture from the file
+            playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         // Reduce the speed
         if (speed > INITIAL_SPEED){
@@ -770,89 +617,21 @@ void Player::collisionShow(){
             actual_code_image++;
             // Check what is the way to see the collision
             if (mode == 0){
-                // Change the actual sprite of the collision with the first mode
-                switch(actual_code_image){
-                    case 29:
-                        playerSprite.setTexture(playerTexture_29);
-                        break;
-                    case 30:
-                        playerSprite.setTexture(playerTexture_31);
-                        break;
-                    case 31:
-                        playerSprite.setTexture(playerTexture_32);
-                        break;
-                    case 32:
-                        playerSprite.setTexture(playerTexture_29);
-                        break;
-                    case 33:
-                        playerSprite.setTexture(playerTexture_33);
-                        break;
-                    case 34:
-                        playerSprite.setTexture(playerTexture_34);
-                        break;
-                    case 35:
-                        playerSprite.setTexture(playerTexture_35);
-                        break;
-                    case 36:
-                        playerSprite.setTexture(playerTexture_36);
-                        break;
-                    case 37:
-                        playerSprite.setTexture(playerTexture_37);
-                        break;
-                    case 38:
-                        playerSprite.setTexture(playerTexture_38);
-                        break;
-                    case 39:
-                        playerSprite.setTexture(playerTexture_39);
-                        break;
-                    case 40:
-                        playerSprite.setTexture(playerTexture_40);
-                        break;
-                     case 41:
-                        playerSprite.setTexture(playerTexture_40);
-                        actual_code_image = 1;
-                        mode = -1;
-                        playerX = 0.f;
+                // Set the texture from the file
+                playerSprite.setTexture(textures[actual_code_image - 1]);
+                if (actual_code_image == 41){
+                    actual_code_image = 1;
+                    mode = -1;
+                    playerX = 0.f;
                 }
             }
             else if (mode == 1) {
                 // Change the actual sprite of the collision with the second mode
-                switch(actual_code_image){
-                    case 42:
-                        playerSprite.setTexture(playerTexture_42);
-                        break;
-                    case 43:
-                        playerSprite.setTexture(playerTexture_43);
-                        break;
-                    case 44:
-                        playerSprite.setTexture(playerTexture_44);
-                        break;
-                    case 45:
-                        playerSprite.setTexture(playerTexture_45);
-                        break;
-                    case 46:
-                        playerSprite.setTexture(playerTexture_46);
-                        break;
-                    case 47:
-                        playerSprite.setTexture(playerTexture_47);
-                        break;
-                    case 48:
-                        playerSprite.setTexture(playerTexture_48);
-                        break;
-                    case 49:
-                        playerSprite.setTexture(playerTexture_49);
-                        break;
-                    case 50:
-                        playerSprite.setTexture(playerTexture_50);
-                        break;
-                    case 51:
-                        playerSprite.setTexture(playerTexture_51);
-                        break;
-                    case 52:
-                        playerSprite.setTexture(playerTexture_52);
-                        actual_code_image = 1;
-                        mode = -1;
-                        playerX = 0.f;
+                playerSprite.setTexture(textures[actual_code_image - 1]);
+                if (actual_code_image == 52){
+                    actual_code_image = 1;
+                    mode = -1;
+                    playerX = 0.f;
                 }
             }
         }
