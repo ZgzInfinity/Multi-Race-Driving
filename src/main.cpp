@@ -1,16 +1,12 @@
 
 #include <vector>
 #include <iostream>
+#include "../include/Step.h"
+#include "../include/Player.h"
+#include "../include/IntervalCurve.h"
+#include "../include/LandScape.h"
 #include <SFML/Graphics.hpp>
-#include "SherwoodForest.h"
-#include "Vancouver.h"
-#include "Egypt.h"
-#include "Tokio.h"
-#include "Step.h"
-#include "Player.h"
 
-#include "IntervalCurve.h"
-#include "LandScapeNew.h"
 
 const int NUMBER_FPS = 60;
 
@@ -30,13 +26,12 @@ void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w
 
 int main(int argc, char* argv[]){
 
-
-    string name = "Vancouver.xml";
+    string name = "Configuration/Scenes/Vancouver.xml";
     char* n = const_cast<char*>(name.c_str());
     LandScapeNew L = LandScapeNew(n);
 
     // Creation of the screen game
-    RenderWindow app(VideoMode(WIDTH, HEIGHT), "Hola Nacho!");
+    RenderWindow app(VideoMode(WIDTH, HEIGHT), "Super Hang On!");
     // Control the fotograms per second, 60 FPS more less
     app.setFramerateLimit(NUMBER_FPS);
 
@@ -175,9 +170,6 @@ int main(int argc, char* argv[]){
        //Show all the elements in the console game
        h.drawPlayer(app);
        app.display();
-
-
-       cout << h.getPlayerX() << endl;
 
        // Sleep loop
        if (h.getModeCollision() == -1){

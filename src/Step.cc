@@ -1,5 +1,5 @@
 
-#include "Step.h"
+#include "../include/Step.h"
 
 /**
  * Constructor of the data type Step

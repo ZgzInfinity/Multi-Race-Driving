@@ -1,5 +1,5 @@
 
-#include "IntervalCurve.h"
+#include "../include/IntervalCurve.h"
 
 
 /**

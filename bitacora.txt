@@ -1,2 +1,0 @@
-14-02-20 => 17-02-20 development of the first scene Sherwood forest
-17-02-20 => 22-02-20 logic design of the motorbike

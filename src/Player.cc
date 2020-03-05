@@ -1,5 +1,5 @@
 
-#include "Player.h"
+#include "../include/Player.h"
 
 Player::Player(char* pathFile){
     // Assign principal variables
@@ -38,7 +38,7 @@ void Player::drawPlayer(RenderWindow& app){
 void Player::loadSpritesFromPath(){
     // Document xml where the document is going to be parsed
     xml_document<> doc;
-    file<> file("Motorbike.xml");
+    file<> file("Configuration/Vehicles/Motorbike.xml");
     // Parsing the content of file
     doc.parse<0>(file.data());
 

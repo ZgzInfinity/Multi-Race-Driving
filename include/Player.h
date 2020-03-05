@@ -7,12 +7,12 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
-#include <list>
-#include <SFML/Graphics.hpp>
 #include "Step.h"
 #include "IntervalCurve.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
+#include <SFML/Graphics.hpp>
+
 
 using namespace sf;
 using namespace std;

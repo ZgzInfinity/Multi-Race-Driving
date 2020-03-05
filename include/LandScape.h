@@ -1,5 +1,7 @@
 
-#pragma once
+#ifndef LAND_SCAPE_H
+#define LAND_SCAPE_H
+
 
 #include <vector>
 #include <iostream>
@@ -68,16 +70,14 @@ struct LandScapeNew {
         // Vector of textures loaded
         vector<bool>textures = vector<bool>(MAX_ELEMENTS);
 
-        // Number of textures loaded
-        int texturesLoaded = 0;
-
         // Vector of steps to do
         vector<Step> lines = vector<Step>(MAX_SPACE_DIMENSION);
 
 
 
         /**
-         *
+         * Constructor of the data type
+         * @param path is the path of the xml file which contains the scene to render
          */
         LandScapeNew(char* path);
 
@@ -91,26 +91,118 @@ struct LandScapeNew {
 
 
         /**
-         * Get the sprite which contains the background
+         * Assigns the sprite of the background
+         * @param sBack is the sprite which contains the background to assign
          */
         void setBackGround(Sprite sBack);
 
 
 
         /**
-         * Load the background of the landscape
+         * Parses all the configuration of the background written in the xml
+         * configuration file of the scene
+         * @param child is a node of the xml file that points to the background information
          */
-        void loadBackground(const string path, const int lowerLeft, const int upperLeft,
-                            const int lowerRight, const int upperRight, const int x_center,
-                            const int y_center);
+        inline void parseBackgroundScene(xml_node<> * child);
 
 
         /**
-         * Load all the sprites of the scene with their textures
-         * @param t is a vector of textures empty
-         * @param object is vector of sprites empty
+         * Get the interval coordinates of any element of the scene
+         * @param child is a pointer to the xml fils that points to a curve, mountain or sprite
+         * @param objectCode controls what kind of element is been processed
+         * @param startPos is going to store the initial interval position of the element of the scene
+         * @param finalPos is going to store the initial interval position of the element of the scene
          */
-        void loadSprites(vector<string>& spritesPaths);
+        inline void getIntervalCoordinates(xml_node<> *child, int objectCode, int& startPos, int& finalPos);
+
+
+
+        /**
+         * Parses all the information referent to the sprites of the landscape
+         * @param child is a pointer to a node of the xml file that contains the all the
+         * information of the sprites
+         */
+        inline void parseSpritesScene(xml_node<> * child);
+
+
+
+        /**
+         * Parses all the configuration of the curves written in the xml configuration file of the scene
+         * @param child is a node of the xml file that points to the curves information
+         */
+        inline void parseCurvesScene(xml_node<> * child);
+
+
+
+        /**
+         * Parses all the configuration of the mountains written in the xml configuration file of the scene
+         * @param child is a node of the xml file that points to the mountains information
+         */
+        inline void parseMountainsScene(xml_node<> * child);
+
+
+
+        /**
+         * Parses all the configuration of the color of the road written in the xml
+         * configuration file of the scene
+         * @param child is a node of the xml file that points to the color of the road information
+         */
+        inline void parseColorRoadScene(xml_node<> * child);
+
+
+
+        /**
+         * Parses all the configuration of the colors of the grass, the rumble of the road and the middle of the road
+         * configuration file of the scene
+         * @param child is a node of the xml file that points to the color of the middle of the road information
+         * @param colorRed is where is going to be stored the value of the red channel in RGB color space read from the file
+         * @param colorGreen is where is going to be stored the value of the green channel in RGB color space read from the file
+         * @param colorBlue is where is going to be stored the value of the blue channel in RGB color space read from the file
+         */
+        inline void parseColors(xml_node<> * child, int& colorRed, int& colorGreen, int& colorBlue);
+
+
+
+        /**
+         * Parses all the configuration of the color of the road written in the xml
+         * configuration file of the scene
+         * @param child is a node of the xml file that points to the color of the grass information
+         */
+        inline void parseColorGrassScene(xml_node<> * child);
+
+
+
+        /**
+         * Parses all the configuration of the color of the rumble of the road written in the xml
+         * configuration file of the scene
+         * @param child is a node of the xml file that points to the color of the rumble of road information
+         */
+        inline void parseColorRumbleScene(xml_node<> * child);
+
+
+
+        /**
+         * Parses all the configuration of the color of the middle of the road written in the xml
+         * configuration file of the scene
+         * @param child is a node of the xml file that points to the color of the middle of the road information
+         */
+        inline void parseColorMiddleScene(xml_node<> * child);
+
+
+
+        /**
+         * Renders all the landscape with all the elements already parsed and stored
+         */
+        inline void renderLandScape();
+
+
+
+        /**
+         * Load the background of the landscape
+         */
+        inline void loadBackground(const string path, const int lowerLeft, const int upperLeft,
+                                   const int lowerRight, const int upperRight, const int x_center,
+                                   const int y_center);
 
 
 
@@ -206,3 +298,4 @@ struct LandScapeNew {
         void paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road);
 };
 
+#endif // LAND_SCAPE_H
