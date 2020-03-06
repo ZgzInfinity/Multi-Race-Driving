@@ -148,7 +148,7 @@
 			<Path>images/SherwoodForest/green_tree.png</Path>
 			<Interval>
 				<I1 startPosGT="800" finalPosLT="10000">
-					<Each>30</Each>
+					<Each>42</Each>
 					<Xpos>0.9</Xpos>
 				</I1>
 			</Interval>
@@ -247,4 +247,19 @@
 			</Interval>
 		</S9>
 	</Sprites>
+	<Checkpoint>
+		<Path>images/Decoration/checkpoint.png</Path>
+		<Ch1>
+			<Position>2971</Position>
+			<Xpos>-0.5</Xpos>
+		</Ch1>
+		<Ch2>
+			<Position>5750</Position>
+			<Xpos>-0.5</Xpos>
+		</Ch2>
+		<Ch3>
+			<Position>9698</Position>
+			<Xpos>-0.5</Xpos>
+		</Ch3>
+	</Checkpoint>
 </Circuit>

@@ -10,6 +10,7 @@
 #include "IntervalCurve.h"
 #include "Mountain.h"
 #include "MapElement.h"
+#include "Checkpoint.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
@@ -22,7 +23,7 @@ const int MAX_ELEMENTS = 20;
 
 
 
-struct LandScapeNew {
+struct LandScape {
 
         // Vector of Steps of the scene where there are sprites accessed by children classes
         vector<Step> stepsWithSprite;
@@ -73,13 +74,19 @@ struct LandScapeNew {
         // Vector of steps to do
         vector<Step> lines = vector<Step>(MAX_SPACE_DIMENSION);
 
+        // Vector of the checkpoints of the scene
+        vector<Checkpoint> checkpointsScene;
+
+        // Texture of the checkpoint
+        Texture tCheckpoint;
+
 
 
         /**
          * Constructor of the data type
          * @param path is the path of the xml file which contains the scene to render
          */
-        LandScapeNew(char* path);
+        LandScape(char* path);
 
 
 
@@ -139,6 +146,15 @@ struct LandScapeNew {
          * @param child is a node of the xml file that points to the mountains information
          */
         inline void parseMountainsScene(xml_node<> * child);
+
+
+
+        /**
+         * Parses the configuration of the checkpoints of the scene which stored in its configuration file
+         * @param child is a node of the xml file that points to the mountains information
+         * @param path is the relative path of the image that contains the image of the checkpoint
+         */
+        inline void parseCheckpoints(xml_node<> * child);
 
 
 
@@ -254,6 +270,17 @@ struct LandScapeNew {
 
 
         /**
+         * Determines if there is checkpoint or not in the actual step of the map
+         * @param step is the actual step of the map where is going to be evaluated if there
+         * is or not checkpoint
+         * @param c is the possible checkpoint that can be in the actual step of the map
+         * @param exists is a boolean that controls if there is or not a checkpoint in the actual step
+         */
+        void lookForCheckpoint(int& step, Checkpoint& c, bool& exists);
+
+
+
+        /**
          * Order the curves and the mountains of the map using the coordinates of the map X and Y
          */
         void orderElementsInLandScape();
@@ -284,6 +311,15 @@ struct LandScapeNew {
          * there is or not sprite
          */
         void printSprites(int i);
+
+
+
+        /**
+         * Print the possible checkpoint of the map which can be stored in the position of the map i
+         * @param i is the step or position index of the map where is going to be evaluated if
+         * there is or not a checkpoint
+         */
+        void printCheckpoints(int i);
 
 
 

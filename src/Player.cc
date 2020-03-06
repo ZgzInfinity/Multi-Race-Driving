@@ -598,7 +598,6 @@ void Player::collisionShow(){
         // Pseudo generator of aleatory number in order to generate randomly the way of collision
         srand(time(NULL));
         mode = rand() % 2;
-        cout << mode << endl;
         // Establish the first collision sprite
         if (mode == 0){
             // First way to collision

@@ -10,7 +10,7 @@ using namespace rapidxml;
  * Constructor of the data type
  * @param path is the path of the xml file which contains the scene to render
  */
-LandScapeNew::LandScapeNew(char* path){
+LandScape::LandScape(char* path){
     // Document xml where the document is going to be parsed
     xml_document<> doc;
     file<> file(path);
@@ -70,10 +70,16 @@ LandScapeNew::LandScapeNew(char* path){
             parseColorRumbleScene(child);
             continue;
         }
-         // Check if it's the node that contains the different colors of the middle
+        // Check if it's the node that contains the different colors of the middle
         else if ((string)child->name() == "Color_middle"){
             // Parse the information of the color middle of the road
             parseColorMiddleScene(child);
+            continue;
+        }
+        // Check if it's the node that contains the checkpoints of the level
+        else if ((string)child->name() == "Checkpoint"){
+            // Parse the information referent to the checkpoints of the levels
+            parseCheckpoints(child);
             continue;
         }
     }
@@ -89,7 +95,7 @@ LandScapeNew::LandScapeNew(char* path){
 /**
  * Get the sprite which contains the background
  */
-Sprite LandScapeNew::getBackGround(){
+Sprite LandScape::getBackGround(){
     return sBackground;
 }
 
@@ -99,7 +105,7 @@ Sprite LandScapeNew::getBackGround(){
  * Assigns the sprite of the background
  * @param sBack is the sprite which contains the background to assign
  */
-void LandScapeNew::setBackGround(Sprite sBack){
+void LandScape::setBackGround(Sprite sBack){
     sBackground = sBack;
 }
 
@@ -110,7 +116,7 @@ void LandScapeNew::setBackGround(Sprite sBack){
  * configuration file of the scene
  * @param child is a node of the xml file that points to the background information
  */
-inline void LandScapeNew::parseBackgroundScene(xml_node<> * child){
+inline void LandScape::parseBackgroundScene(xml_node<> * child){
     // Get the value of the path node if it exists
     string path;
     // Coordinates of the rectangle that contains the background and its center
@@ -172,7 +178,7 @@ inline void LandScapeNew::parseBackgroundScene(xml_node<> * child){
  * @param startPos is going to store the initial interval position of the element of the scene
  * @param finalPos is going to store the initial interval position of the element of the scene
  */
-inline void LandScapeNew::getIntervalCoordinates(xml_node<> *child, int objectCode, int& startPos, int& finalPos){
+inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode, int& startPos, int& finalPos){
     // Loop in order to iterate all the children of the Sprite node
     int elementsRead = 0, intervalsRead = 0;
     // Variable to store the possible attributes
@@ -274,7 +280,7 @@ inline void LandScapeNew::getIntervalCoordinates(xml_node<> *child, int objectCo
  * @param child is a pointer to a node of the xml file that contains the all the
  * information of the sprites
  */
-inline void LandScapeNew::parseSpritesScene(xml_node<> * child){
+inline void LandScape::parseSpritesScene(xml_node<> * child){
     // Established the code number to indicate that curves are in process
     int objectCode = 1;
     // Loop in order to iterate all the children of the Sprite node
@@ -355,7 +361,7 @@ inline void LandScapeNew::parseSpritesScene(xml_node<> * child){
  * Parses all the configuration of the curves written in the xml configuration file of the scene
  * @param child is a node of the xml file that points to the curves information
  */
-inline void LandScapeNew::parseCurvesScene(xml_node<> * child){
+inline void LandScape::parseCurvesScene(xml_node<> * child){
     // Established the code number to indicate that curves are in process
     int objectCode = 2;
     // Variables to control the intervals of the elements
@@ -388,7 +394,7 @@ inline void LandScapeNew::parseCurvesScene(xml_node<> * child){
  * Parses all the configuration of the mountains written in the xml configuration file of the scene
  * @param child is a node of the xml file that points to the mountains information
  */
-inline void LandScapeNew::parseMountainsScene(xml_node<> * child){
+inline void LandScape::parseMountainsScene(xml_node<> * child){
     // Established the code number to indicate that mountains are in process
     int objectCode = 3;
     // Variables to control the intervals of the elements
@@ -427,11 +433,50 @@ inline void LandScapeNew::parseMountainsScene(xml_node<> * child){
 
 
 /**
+ * Parses the configuration of the checkpoints of the scene which stored in its configuration file
+ * @param child is a node of the xml file that points to the mountains information
+ * @param path is the relative path of the image that contains the image of the checkpoint
+ */
+inline void LandScape::parseCheckpoints(xml_node<> * child){
+    // Variables to store the attributes of the checkpoint
+    float posX; int stepPosition, checkpointsRead = 0; string path;
+    // Iterate throughout the different checkpoints of the scene
+    for (xml_node<> *checkpointNode = child->first_node(); checkpointNode; checkpointNode = checkpointNode->next_sibling()){
+        // Increment the number of checkpoints read
+        checkpointsRead++;
+        // Check the attribute path of the file
+        if ((string)checkpointNode->name() == "Path"){
+            // Store the step of the checkpoint
+            path = checkpointNode->value();
+            continue;
+        }
+        // Looping parsing the information contained in its tag fields
+        for (xml_node<> *actualCheckpoint = checkpointNode->first_node(); actualCheckpoint; actualCheckpoint = actualCheckpoint->next_sibling()){
+            // Getting all the information of the checkpoint
+            if ((string)actualCheckpoint->name() == "Position"){
+                // Store the step of the checkpoint
+                stepPosition = stoi(actualCheckpoint->value());
+                continue;
+            }
+            if ((string)actualCheckpoint->name() == "Xpos"){
+                // Store the position of the checkpoint in the axis X
+                posX = stof(actualCheckpoint->value());
+            }
+        }
+        // Store the checkpoint read into the vector
+        Checkpoint c = Checkpoint(path, posX, stepPosition);
+        checkpointsScene.push_back(c);
+    }
+}
+
+
+
+/**
  * Parses all the configuration of the color of the road written in the xml
  * configuration file of the scene
  * @param child is a node of the xml file that points to the color of the road information
  */
-inline void LandScapeNew::parseColorRoadScene(xml_node<> * child){
+inline void LandScape::parseColorRoadScene(xml_node<> * child){
     // Colors of the three channels in RGB format
     int colorRed, colorGreen, colorBlue;
     // Loop in order to iterate throughout the color channels
@@ -463,7 +508,7 @@ inline void LandScapeNew::parseColorRoadScene(xml_node<> * child){
  * configuration file of the scene
  * @param child is a node of the xml file that points to the color of the grass information
  */
-inline void LandScapeNew::parseColorGrassScene(xml_node<> * child){
+inline void LandScape::parseColorGrassScene(xml_node<> * child){
     int colorRed, colorGreen, colorBlue;
     // Loop in order to iterate throughout the colors of the grass
     for (xml_node<> *color_node = child->first_node(); color_node; color_node = color_node->next_sibling()){
@@ -482,7 +527,7 @@ inline void LandScapeNew::parseColorGrassScene(xml_node<> * child){
  * configuration file of the scene
  * @param child is a node of the xml file that points to the color of the rumble of road information
  */
-inline void LandScapeNew::parseColorRumbleScene(xml_node<> * child){
+inline void LandScape::parseColorRumbleScene(xml_node<> * child){
     int colorRed, colorGreen, colorBlue;
     // Loop in order to iterate throughout the colors of the rumble of the road
     for (xml_node<> *color_node = child->first_node(); color_node; color_node = color_node->next_sibling()){
@@ -502,7 +547,7 @@ inline void LandScapeNew::parseColorRumbleScene(xml_node<> * child){
  * configuration file of the scene
  * @param child is a node of the xml file that points to the color of the middle of the road information
  */
-inline void LandScapeNew::parseColorMiddleScene(xml_node<> * child){
+inline void LandScape::parseColorMiddleScene(xml_node<> * child){
     int colorRed, colorGreen, colorBlue;
     // Loop in order to iterate throughout the colors of the middle of the road
     for (xml_node<> *color_node = child->first_node(); color_node; color_node = color_node->next_sibling()){
@@ -525,7 +570,7 @@ inline void LandScapeNew::parseColorMiddleScene(xml_node<> * child){
  * @param colorGreen is where is going to be stored the value of the green channel in RGB color space read from the file
  * @param colorBlue is where is going to be stored the value of the blue channel in RGB color space read from the file
  */
-inline void LandScapeNew::parseColors(xml_node<> * color, int& colorRed, int& colorGreen, int& colorBlue){
+inline void LandScape::parseColors(xml_node<> * color, int& colorRed, int& colorGreen, int& colorBlue){
     // Check the upper right coordinate of the background image
     if ((string)color->name() == "R"){
         // Store the lower right coordinate
@@ -546,7 +591,7 @@ inline void LandScapeNew::parseColors(xml_node<> * color, int& colorRed, int& co
 /**
  * Renders all the landscape with all the elements already parsed and stored
  */
-inline void LandScapeNew::renderLandScape(){
+inline void LandScape::renderLandScape(){
     // Iterate throw the vector of curves of the landscape in 2d
     for (IntervalCurve iC : curves){
         // Add the curve in 3d coordinates
@@ -564,6 +609,7 @@ inline void LandScapeNew::renderLandScape(){
         printCurves(i);
         printMountains(i);
         printSprites(i);
+        printCheckpoints(i);
         lines.push_back(lines[i]);
     }
 }
@@ -573,7 +619,7 @@ inline void LandScapeNew::renderLandScape(){
 /**
  * Load the background of the landscape
  */
-inline void LandScapeNew::loadBackground(const string path, const int lowerLeft, const int upperLeft,
+inline void LandScape::loadBackground(const string path, const int lowerLeft, const int upperLeft,
                                   const int lowerRight, const int upperRight, const int x_center,
                                   const int y_center)
 {
@@ -593,7 +639,7 @@ inline void LandScapeNew::loadBackground(const string path, const int lowerLeft,
  * Get the element of the map which the nearest to the actual position
  * @param position_axis_Y is the actual coordinate of the player in the axis Y
  */
-Step LandScapeNew::checkingPossibleCollision(const int position_axis_Y){
+Step LandScape::checkingPossibleCollision(const int position_axis_Y){
     // Indexes of the binary search
     int init = 0, last = stepsWithSprite.size() - 1, medium;
     // Loop for find the sprite
@@ -629,7 +675,7 @@ Step LandScapeNew::checkingPossibleCollision(const int position_axis_Y){
  * @param curve is the possible curve in which interval of coordinates is located pos
  * @param exists is a boolean to control if there is curve to print or not in the position of the map pos
  */
-void LandScapeNew::lookForCurveToPrint(int& pos, IntervalCurve& curve, bool& exist){
+void LandScape::lookForCurveToPrint(int& pos, IntervalCurve& curve, bool& exist){
     // Defect value of the boolean variable
     exist = false;
     // Indexes of the binary search
@@ -673,7 +719,7 @@ void LandScapeNew::lookForCurveToPrint(int& pos, IntervalCurve& curve, bool& exi
  * @param curve is the possible curve in which interval of coordinates is located pos
  * @param exists is a boolean to control if there is curve or not in the position of the map pos
  */
-void LandScapeNew::lookForCurve(int& pos, IntervalCurve& curve, bool& exist){
+void LandScape::lookForCurve(int& pos, IntervalCurve& curve, bool& exist){
     // Defect value of the boolean variable
     exist = false;
     // Indexes of the binary search
@@ -717,7 +763,7 @@ void LandScapeNew::lookForCurve(int& pos, IntervalCurve& curve, bool& exist){
  * @param m is the possible mountain in which interval of coordinates is located pos
  * @param exists is a boolean to control if there is mountain or not in the position of the map pos
  */
-void LandScapeNew::lookForMountain(int& pos, Mountain& m, bool& exist){
+void LandScape::lookForMountain(int& pos, Mountain& m, bool& exist){
     // Defect value of the boolean variable
     exist = false;
     // Indexes of the binary search
@@ -760,7 +806,7 @@ void LandScapeNew::lookForMountain(int& pos, Mountain& m, bool& exist){
  * @param m is a vector where all the possible sprites to print are going to be kept
  * @param exists is a boolean to control if there are sprites or not in the position of the map pos
  */
-void LandScapeNew::lookForMapElement(int& pos, vector<MapElement>& m, bool& exist){
+void LandScape::lookForMapElement(int& pos, vector<MapElement>& m, bool& exist){
     // Defect value of the boolean variable
     for (MapElement mE : elementsOfMap){
         // Check if the pos is in the interval of a sprite
@@ -780,13 +826,52 @@ void LandScapeNew::lookForMapElement(int& pos, vector<MapElement>& m, bool& exis
 
 
 /**
+ * Determines if there is checkpoint or not in the actual step of the map
+ * @param step is the actual step of the map where is going to be evaluated if there
+ * is or not checkpoint
+ * @param c is the possible checkpoint that can be in the actual step of the map
+ * @param exists is a boolean that controls if there is or not a checkpoint in the actual step
+ */
+void LandScape::lookForCheckpoint(int& step, Checkpoint& c, bool& exists){
+    // Limits of the search
+    int start = 0, last = checkpointsScene.size() - 1, medium;
+    // Binary search
+    while (start != last){
+        // Calculation of the center element of the search
+        medium = (start + last) / 2;
+        if (checkpointsScene[medium].stepPosition < step){
+            // Look for the possible checkpoint in the right
+            start = medium + 1;
+        }
+        else {
+            // Look for the possible checkpoint in the left
+            last = medium;
+        }
+    }
+    // Check if the final checkpoint get is the solution
+    if (checkpointsScene[start].stepPosition == step){
+        // Correct
+        exists = true;
+        // Assign the checkpoint
+        c = checkpointsScene[start];
+    }
+    else {
+        // Control if there is checkpoint in the actual step or not
+        exists = false;
+    }
+}
+
+
+
+/**
  * Order the curves and the mountains of the map using the coordinates of the map X and Y
  */
-void LandScapeNew::orderElementsInLandScape(){
+void LandScape::orderElementsInLandScape(){
     // Ordenation of the vector
     sort(curves.begin(), curves.end());
     sort(curvesInScene.begin(), curvesInScene.end());
     sort(mountains.begin(), mountains.end());
+    sort(checkpointsScene.begin(), checkpointsScene.end());
 }
 
 
@@ -796,7 +881,7 @@ void LandScapeNew::orderElementsInLandScape(){
  * @param i is the step or position index of the map where is going to be evaluated if
  * there is or not curve
  */
-void LandScapeNew::printCurves(int i){
+void LandScape::printCurves(int i){
     // Variables to make the search of the curve
     IntervalCurve curve;
     // Control if the coordinate i is in a curve or not
@@ -816,7 +901,7 @@ void LandScapeNew::printCurves(int i){
  * @param i is the step or position index of the map where is going to be evaluated if
  * there is or not mountain
  */
-void LandScapeNew::printMountains(int i){
+void LandScape::printMountains(int i){
     // Variables to make the search of the curve
     Mountain m;
     // Control if the coordinate i is in a curve or not
@@ -836,7 +921,7 @@ void LandScapeNew::printMountains(int i){
  * @param i is the step or position index of the map where is going to be evaluated if
  * there is or not sprite
  */
-void LandScapeNew::printSprites(int i){
+void LandScape::printSprites(int i){
     // Variables to make the search of the curve
     vector<MapElement> m;
     // Control if the coordinate i is in a curve or not
@@ -876,6 +961,31 @@ void LandScapeNew::printSprites(int i){
 
 
 /**
+ * Print the possible checkpoint of the map which can be stored in the position of the map i
+ * @param i is the step or position index of the map where is going to be evaluated if
+ * there is or not a checkpoint
+ */
+void LandScape::printCheckpoints(int i){
+    // Variables to make the search of the curve
+    Checkpoint c;
+    // Control if the coordinate i there is a checkpoint or not
+    bool exits = false;
+    // Check if the curve is on the vector of curves of the scene
+    lookForCheckpoint(i, c, exits);
+    // If there is a checkpoint
+    if (exits){
+        // Load the texture and save it into a sprite
+        if (tCheckpoint.loadFromFile(c.path)){
+            // Set the texture of the sprite
+            lines[i].character.setTexture(tCheckpoint);
+            lines[i].spriteX = c.posX;
+        }
+    }
+}
+
+
+
+/**
  * Render the landscape appearance and the step of the map
  * @param n is the index of the map position to be processed
  * @param grass is the color which is going to be used to paint the grass of the scene
@@ -883,7 +993,7 @@ void LandScapeNew::printSprites(int i){
  * @param middle is the color which is going to be used to paint the middle road of the scene
  * @param road is the color which is going to be used to paint the road of the scene
  */
-void LandScapeNew::paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road){
+void LandScape::paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road){
     // Determination of the color to paint in the screen
     if ((n / 5) % 2){
         grass = colors_grass.at(0);

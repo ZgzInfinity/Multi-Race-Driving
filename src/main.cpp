@@ -26,9 +26,9 @@ void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w
 
 int main(int argc, char* argv[]){
 
-    string name = "Configuration/Scenes/Vancouver.xml";
+    string name = "Configuration/Scenes/SherwoodForest.xml";
     char* n = const_cast<char*>(name.c_str());
-    LandScapeNew L = LandScapeNew(n);
+    LandScape L = LandScape(n);
 
     // Creation of the screen game
     RenderWindow app(VideoMode(WIDTH, HEIGHT), "Super Hang On!");
