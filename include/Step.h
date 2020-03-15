@@ -17,6 +17,7 @@ const int WIDTH_ROAD = 2000;
 
 // Number of steps to complete the map and repeat
 const int MAX_SPACE_DIMENSION = 12000;
+const int NORMAL_HEIGHT = 1500;
 
 
 /*

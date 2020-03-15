@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Circuit> 
+	<Name>Sherwood Forest</Name>
+	<Background>
+		<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/bg.png</Path>
+		<LL>-3000</LL>
+		<UL>0</UL>
+		<LR>5000</LR>
+		<UR>411</UR>
+		<Xcenter>-2000</Xcenter> 
+		<Ycenter>0</Ycenter>
+	</Background>
+	<Curves>
+		<C1 startPosGT="300" finalPosLT="600">
+			<Direction>0.5</Direction>
+		</C1>
+		<C2 startPosGE="1500" finalPosLT="1700">
+			<Direction>1.5</Direction>		
+		</C2>
+		<C3 startPosGT="2300" finalPosLT="2400">
+			<Direction>-1.3</Direction>
+		</C3>
+		<C4 startPosGE="3000" finalPosLT="3500"> 
+			<Direction>2</Direction>
+		</C4>
+		<C5 startPosGE="3500" finalPosLT="3700"> 
+			<Direction>-0.3</Direction>
+		</C5>
+		<C6 startPosGE="3700" finalPosLT="4000"> 
+			<Direction>1.5</Direction>
+		</C6>
+		<C7 startPosGE="4000" finalPosLT="4500"> 
+			<Direction>-0.8</Direction>
+		</C7>
+		<C8 startPosGE="5000" finalPosLT="5300"> 
+			<Direction>0.6</Direction>
+		</C8>
+		<C9 startPosGE="5750" finalPosLT="6600"> 
+			<Direction>-1.5</Direction>
+		</C9>
+		<C10 startPosGE="7900" finalPosLT="8100"> 
+			<Direction>3</Direction>
+		</C10>
+		<C11 startPosGE="8100" finalPosLT="8300"> 
+			<Direction>-3></Direction>
+		</C11>
+		<C12 startPosGE="8800" finalPosLT="9100"> 
+			<Direction>0.9</Direction>
+		</C12>
+		<C13 startPosGE="9400" finalPosLT="9700"> 
+			<Direction>-4</Direction>
+		</C13>
+		<C14 startPosGE="9700" finalPosLT="9900"> 
+			<Direction>4</Direction>
+		</C14>
+		<C15 startPosGE="10200" finalPosLT="11000"> 
+			<Direction>-2</Direction>
+		</C15>
+		<C16 startPosGE="11200" finalPosLT="11500"> 
+			<Direction>2</Direction>
+		</C16>
+		<C17 startPosGE="11600" finalPosLT="11900"> 
+			<Direction>-2.5</Direction>
+		</C17>
+	</Curves>
+	<Mountains>
+		<M1 startPosGT="754" finalPosLE="1600"> 
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M1>
+		<M2 startPosGT="1698" finalPosLT="2546">
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M2>
+		<M3 startPosGE="4618" finalPosLE="5277">
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M3>
+		<M4 startPosGE="5750" finalPosLT="6600"> 
+			<Atenuation>30.0</Atenuation>
+			<Height>1500</Height>
+		</M4>
+		<M5 startPosGE="7790" finalPosLE="8290">
+			<Atenuation>80.0</Atenuation>
+			<Height>2000</Height>
+		</M5>
+		<M6 startPosGE="8295" finalPosLE="8798">
+			<Atenuation>80.0</Atenuation>
+			<Height>-2000</Height>
+		</M6>
+		<M7 startPosGE="9330" finalPosLE="9896">
+			<Atenuation>90.0</Atenuation>
+			<Height>2500</Height>
+		</M7>
+	</Mountains>
+	<Color_grass>
+		<CO1>
+			<R>16</R>
+			<G>200</G>
+			<B>16</B>
+		</CO1>
+		<CO2>
+			<R>0</R>
+			<G>154</G>
+			<B>0</B>
+		</CO2>
+	</Color_grass>
+	<Color_road>
+		<R>77</R>
+		<G>77</G>
+		<B>77</B>
+	</Color_road>
+	<Color_rumble>
+		<CO1>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</CO1>
+		<CO2>
+			<R>255</R>
+			<G>0</G>
+			<B>0</B>
+		</CO2>
+	</Color_rumble>
+	<Color_middle>
+		<CO1>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</CO1>
+		<CO2>
+			<R>77</R>
+			<G>77</G>
+			<B>77</B>
+		</CO2>
+	</Color_middle>
+	<Sprites>
+		<S1 id="1">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/fir_tree.png</Path>
+			<Interval>
+				<I1 startPosGT="800" finalPosLT="10000">
+					<Each>20</Each>
+					<Xpos>-3.2</Xpos>
+				</I1>	
+			</Interval>
+		</S1>	
+		<S2 id="2">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/green_tree.png</Path>
+			<Interval>
+				<I1 startPosGT="800" finalPosLT="10000">
+					<Each>42</Each>
+					<Xpos>0.9</Xpos>
+				</I1>
+			</Interval>
+		</S2>
+		<S3 id="3">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/green_tree2.png</Path>
+			<Interval>
+				<I1 startPosGT="250" finalPosLT="700">
+					<Each>45</Each>
+					<Xpos>-1.6</Xpos>
+				</I1>
+			</Interval>
+		</S3>
+		<S4 id="4">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/green_tree3.png</Path>
+			<Interval>
+				<I1 startPosGE="50" finalPosLT="400">
+					<Each>30</Each>
+					<Xpos>-2</Xpos>
+				</I1>
+				<I2 startPosGT="10500" finalPosLE="12000">
+					<Each>20</Each>
+					<Xpos>-2</Xpos>
+				</I2>
+			</Interval>
+		</S4>
+		<S5 id="5">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/bush.png</Path>
+			<Interval>
+				<I1 startPosGT="50" finalPosLT="700">
+					<Each>17</Each>
+					<Xpos>3.1</Xpos>
+				</I1>
+				<I2 startPosGT="10500" finalPosLE="12000">
+					<Each>17</Each>
+					<Xpos>3.1</Xpos>
+				</I2>
+			</Interval>
+		</S5>
+		<S6 id="6">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/petrol_station.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLE="12000">
+					<Each>201</Each>
+					<Xpos>-1.8</Xpos>
+				</I1>
+				<I2 startPosGE="0" finalPosLE="12000">
+					<Each>703</Each>
+					<Xpos>1.3</Xpos>
+				</I2>
+			</Interval>
+		</S6>
+		<S7 id="7">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/cow_up.png</Path>
+			<Interval>
+				<I1 startPosGE="300" finalPosLE="800">
+					<Each>53</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Left</Margin>
+				</I1>
+				<I2 startPosGE="900" finalPosLE="11500">
+					<Each>57</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Right</Margin>
+				</I2>
+			</Interval>
+		</S7>
+		<S8 id="8">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/cow_down.png</Path>
+			<Interval>
+				<I1 startPosGE="500" finalPosLE="1000">
+					<Each>63</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Right</Margin>
+				</I1>
+				<I2 startPosGE="750" finalPosLE="10500">
+					<Each>47</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Left</Margin>
+				</I2>
+			</Interval>
+		</S8>
+		<S9 id="9">
+			<Path>images/GameModes/SuperHangOn/Scenes/SherwoodForest/windmolen.png</Path>
+			<Interval>
+				<I1 startPosGE="0" finalPosLE="12000">
+					<Each>601</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Right</Margin>
+				</I1>
+				<I2 startPosGE="0" finalPosLE="12000">
+					<Each>303</Each>
+					<Xpos>Random</Xpos>
+					<Margin>Left</Margin>
+				</I2>
+			</Interval>
+		</S9>
+	</Sprites>
+	<StartingPoint>
+		<Path>images/GameModes/SuperHangOn/Decoration/start.png</Path>
+		<Position>39</Position>
+		<Xpos>-0.5</Xpos>
+	</StartingPoint>
+	<GoalPoint>
+		<Path>images/GameModes/SuperHangOn/Decoration/goal.png</Path>
+		<Position>11649</Position>
+		<Xpos>-0.5</Xpos>
+	</GoalPoint>
+	<Checkpoint>
+		<Path>images/GameModes/SuperHangOn/Decoration/checkpoint.png</Path>
+		<Ch1>
+			<Position>2971</Position>
+			<Xpos>-0.5</Xpos>
+		</Ch1>
+		<Ch2>
+			<Position>5750</Position>
+			<Xpos>-0.5</Xpos>
+		</Ch2>
+		<Ch3>
+			<Position>9698</Position>
+			<Xpos>-0.5</Xpos>
+		</Ch3>
+	</Checkpoint>
+</Circuit>

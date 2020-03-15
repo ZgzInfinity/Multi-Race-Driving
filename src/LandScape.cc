@@ -82,6 +82,18 @@ LandScape::LandScape(char* path){
             parseCheckpoints(child);
             continue;
         }
+        // Check if it's the node that contains the star point of the level
+        else if ((string)child->name() == "StartingPoint"){
+            // Parse the information referent to the start point of the levels
+            parseStartPoint(child);
+            continue;
+        }
+        // Check if it's the node that contains the goal point of the level
+        else if ((string)child->name() == "GoalPoint"){
+            // Parse the information referent to the goal point of the levels
+            parseGoalPoint(child);
+            continue;
+        }
     }
     // Order the curves in the landScape
     orderElementsInLandScape();
@@ -472,6 +484,76 @@ inline void LandScape::parseCheckpoints(xml_node<> * child){
 
 
 /**
+ * Parses the information referent to the starting point of the scene
+ * @param child is a node pointer of the xml configuration file that points to the
+ * data of the starting point
+ */
+inline void LandScape::parseStartPoint(xml_node<> * child){
+    // Variables to control the information of the starting point
+    string path; float xPos; int stepPosition;
+    // Loop that iterates in all the attributes of the staring point
+    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
+        // Check if the starting goal point has the attribute path
+        if ((string)grandchild->name() == "Path" ){
+            // Store the path of the starting point
+            path = grandchild->value();
+            continue;
+        }
+        // Check if the starting goal point has the attribute position
+        else if ((string)grandchild->name() == "Position" ){
+            // Store the step of the map where is the starting point
+            stepPosition = stoi(grandchild->value());
+            continue;
+        }
+        // Check if the starting point has the attribute Xpos
+        else if ((string)grandchild->name() == "Xpos" ){
+            // Store the position of the starting point in the axis X
+            xPos = stof(grandchild->value());
+        }
+    }
+
+    // Store the starting point data recovered
+    startPoint = StartingPoint(path, xPos, stepPosition);
+}
+
+
+
+/**
+ * Parses the information referent to the goal point of the scene
+ * @param child is a node pointer of the xml configuration file that points to the
+ * data of the goal point
+ */
+inline void LandScape::parseGoalPoint(xml_node<> * child){
+    // Variables to control the information of the starting point
+    string path; float xPos; int stepPosition;
+    // Loop that iterates in all the attributes of the goal point
+    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
+        // Check if the goal goal point has the attribute path
+        if ((string)grandchild->name() == "Path" ){
+            // Store the path of the goal point
+            path = grandchild->value();
+            continue;
+        }
+        // Check if the goal point has the attribute position
+        else if ((string)grandchild->name() == "Position" ){
+            // Store the step of the map where is the goal point
+            stepPosition = stoi(grandchild->value());
+            continue;
+        }
+        // Check if the goal goal point has the attribute Xpos
+        else if ((string)grandchild->name() == "Xpos" ){
+            // Store the position of the goal point in the axis X
+            xPos = stof(grandchild->value());
+        }
+    }
+
+    // Store the goal point data recovered
+    goalPoint = GoalPoint(path, xPos, stepPosition);
+}
+
+
+
+/**
  * Parses all the configuration of the color of the road written in the xml
  * configuration file of the scene
  * @param child is a node of the xml file that points to the color of the road information
@@ -610,6 +692,8 @@ inline void LandScape::renderLandScape(){
         printMountains(i);
         printSprites(i);
         printCheckpoints(i);
+        printStartingPoints(i);
+        printGoalPoints(i);
         lines.push_back(lines[i]);
     }
 }
@@ -979,6 +1063,44 @@ void LandScape::printCheckpoints(int i){
             // Set the texture of the sprite
             lines[i].character.setTexture(tCheckpoint);
             lines[i].spriteX = c.posX;
+        }
+    }
+}
+
+
+
+/**
+ * Print the possible checkpoint of the map which can be stored in the position of the map i
+ * @param i is the step or position index of the map where is going to be evaluated if
+ * there is or not a checkpoint
+ */
+void LandScape::printStartingPoints(int i){
+    // Check if it's the same step of the scene where the starting point is
+    if (startPoint.stepPosition == i){
+        // Load the texture and save it into a sprite
+        if (tStartingPoint.loadFromFile(startPoint.path)){
+            // Set the texture of the starting point
+            lines[i].character.setTexture(tStartingPoint);
+            lines[i].spriteX = startPoint.posX;
+        }
+    }
+}
+
+
+
+/**
+ * Print the possible checkpoint of the map which can be stored in the position of the map i
+ * @param i is the step or position index of the map where is going to be evaluated if
+ * there is or not a checkpoint
+ */
+void LandScape::printGoalPoints(int i){
+    // Check if it's the same step of the scene where the starting point is
+    if (goalPoint.stepPosition == i){
+        // Load the texture and save it into a sprite
+        if (tGoalPoint.loadFromFile(goalPoint.path)){
+            // Set the texture of the starting point
+            lines[i].character.setTexture(tGoalPoint);
+            lines[i].spriteX = startPoint.posX;
         }
     }
 }

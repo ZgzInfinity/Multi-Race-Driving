@@ -35,8 +35,11 @@ struct Checkpoint{
 
 
     /**
-     * Constructor of the data type IntervalCurve
-     * @return an instance of the data type InternalCurve
+     * Constructor of the data type Checkpoint
+     * @param pathFile is the path that contains the file with the image of the checkpoint
+     * @param positionX is the position in the axis X of the checkpoint
+     * @param stepPos is the step of the map where the checkpoint is going to be stored
+     * @return an instance of the data type Checkpoint
      */
     Checkpoint(const string pathFile, const float positionX, const int stepPos);
 

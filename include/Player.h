@@ -36,7 +36,7 @@ const float BORDER_ROAD_RIGHT = 1.15;
  */
 class Player {
 
-     private:
+     protected:
 
         Texture t;
 
@@ -48,40 +48,6 @@ class Player {
 
         // How to control the motorbike
         int typeControl = 0;
-
-        // Textures of the player while running in normal direction
-        Texture playerTexture_1, playerTexture_2;
-
-        // Textures of the motorbike player while is turned to the left
-        Texture playerTexture_3, playerTexture_4, playerTexture_5,
-                playerTexture_6, playerTexture_7, playerTexture_8;
-
-        // Textures of the motorbike player while is turned to the right
-        Texture playerTexture_9, playerTexture_10, playerTexture_11,
-                playerTexture_12, playerTexture_13, playerTexture_14;
-
-        // Textures of the player while running in normal direction and braking
-        Texture playerTexture_15, playerTexture_16;
-
-        // Textures of the motorbike player while is turned to the left and braking
-        Texture playerTexture_17, playerTexture_18, playerTexture_19,
-                playerTexture_20, playerTexture_21, playerTexture_22;
-
-        // Textures of the motorbike player while is turned to the right and braking
-        Texture playerTexture_23, playerTexture_24, playerTexture_25,
-                playerTexture_26, playerTexture_27, playerTexture_28;
-
-        // Textures of the motorbike player while is crushing A
-        Texture playerTexture_29, playerTexture_30, playerTexture_31, playerTexture_32,
-                playerTexture_33, playerTexture_34, playerTexture_35, playerTexture_36,
-                playerTexture_37, playerTexture_38, playerTexture_39, playerTexture_40,
-                playerTexture_41;
-
-        // Textures of the motorbike player while is crushing with type B
-        Texture playerTexture_42, playerTexture_43, playerTexture_44, playerTexture_45,
-                playerTexture_46, playerTexture_47, playerTexture_48, playerTexture_49,
-                playerTexture_50, playerTexture_51, playerTexture_52, playerTexture_53,
-                playerTexture_54;
 
         // Sprite of the player motorbike
         Sprite playerSprite;
@@ -103,17 +69,30 @@ class Player {
 
     public:
 
+
+
         /**
          * Constructor of the class
          */
-        Player(char* pathFile);
+        Player(char* pathFile){
+            // Assign principal variables
+            filePath = pathFile;
+            // Store actual code of the image
+            actual_code_image = 1;
+            // Initializing the position of the player in the axis X
+            playerX = 0.f;
+            // Mode to show the collision of the motorbike by default
+            mode = -1;
+            // Accumulator to the coordinate of the axis Y to make collision better
+            offset = 0;
+        }
 
 
 
         /**
          * Load the set of sprites of the player
          */
-         void loadSpritesFromPath();
+         virtual void loadSpritesFromPath() = 0;
 
 
 
@@ -121,7 +100,7 @@ class Player {
          * Draw the player sprite in the console render window
          * @param app is the console window game where the sprite is going to be drawn
          */
-        void drawPlayer(RenderWindow& app);
+        virtual void drawPlayer(RenderWindow& app) = 0;
 
 
 
@@ -129,7 +108,7 @@ class Player {
          * Check if the player has to advance in the track
          * @param eventDetected is a boolean to control if an event has occurred
          */
-        void advancePlayer(bool& eventDetected);
+        virtual void advancePlayer(bool& eventDetected) = 0;
 
 
 
@@ -137,7 +116,9 @@ class Player {
          * Get the coordinate of the payer in the axis X
          * @return the position of the motorbike in the axis X
          */
-         float getPlayerX();
+         float getPlayerX(){
+            return playerX;
+         }
 
 
 
@@ -145,7 +126,7 @@ class Player {
           * Get the mode of collision of the motorbike
           * @return the mode to show the collision of the motorbike
           */
-         int getModeCollision();
+         virtual int getModeCollision() = 0;
 
 
 
@@ -155,7 +136,7 @@ class Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app);
+        virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app) = 0;
 
 
 
@@ -165,7 +146,7 @@ class Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app);
+        virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app) = 0;
 
 
 
@@ -175,7 +156,7 @@ class Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app);
+        virtual inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app) = 0;
 
 
 
@@ -185,7 +166,7 @@ class Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app);
+        virtual inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app) = 0;
 
 
 
@@ -195,7 +176,7 @@ class Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app);
+        virtual inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app) = 0;
 
 
 
@@ -205,7 +186,7 @@ class Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app);
+        virtual inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app) = 0;
 
 
 
@@ -215,7 +196,7 @@ class Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app);
+        virtual void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app) = 0;
 
 
 
@@ -225,7 +206,7 @@ class Player {
          * @param lastPos is the last position of the motorbike in the axis Y
          * @param pos is the current position of the motorbike in the axis Y
          */
-        bool controlPossibleCollision(Step& nearestSprite, int& lastPos, int& pos);
+        virtual bool controlPossibleCollision(Step& nearestSprite, int& lastPos, int& pos) = 0;
 
 
 
@@ -235,21 +216,14 @@ class Player {
          * @param curve is the possible curve of the scene where the motorbike is currently now
          * @param speed is the actual speed of the motorbike of the player
          */
-        void controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed);
+        virtual void controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed) = 0;
 
 
 
         /**
          * Shows to the user how the motorbikes crushes
          */
-        void collisionShow();
-
-
-
-        /**
-         * Starts the process to recover the motorbike
-         */
-        void recoverMotorbike();
+        virtual void collisionShow() = 0;
 
 };
 

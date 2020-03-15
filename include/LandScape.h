@@ -11,12 +11,13 @@
 #include "Mountain.h"
 #include "MapElement.h"
 #include "Checkpoint.h"
+#include "StartingPoint.h"
+#include "GoalPoint.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
 using namespace std;
 using namespace sf;
-
 using namespace rapidxml;
 
 const int MAX_ELEMENTS = 20;
@@ -80,6 +81,17 @@ struct LandScape {
         // Texture of the checkpoint
         Texture tCheckpoint;
 
+        // Starting position point of the scene
+        StartingPoint startPoint;
+
+        // Texture of the starting point
+        Texture tStartingPoint;
+
+        // Starting position point of the scene
+        GoalPoint goalPoint;
+
+        // Texture of the starting point
+        Texture tGoalPoint;
 
 
         /**
@@ -155,6 +167,24 @@ struct LandScape {
          * @param path is the relative path of the image that contains the image of the checkpoint
          */
         inline void parseCheckpoints(xml_node<> * child);
+
+
+
+        /**
+         * Parses the information referent to the goal point of the scene
+         * @param child is a node pointer of the xml configuration file that points to the
+         * data of the goal point
+         */
+        inline void parseGoalPoint(xml_node<> * child);
+
+
+
+        /**
+         * Parses the information referent to the starting point of the scene
+         * @param child is a node pointer of the xml configuration file that points to the
+         * data of the starting point
+         */
+        inline void parseStartPoint(xml_node<> * child);
 
 
 
@@ -320,6 +350,24 @@ struct LandScape {
          * there is or not a checkpoint
          */
         void printCheckpoints(int i);
+
+
+
+        /**
+         * Print the possible starting point of the map which can be stored in the position of the map i
+         * @param i is the step or position index of the map where is going to be evaluated if
+         * there is or not a starting point
+         */
+        void printStartingPoints(int i);
+
+
+
+        /**
+         * Print the possible goal point of the map which can be stored in the position of the map i
+         * @param i is the step or position index of the map where is going to be evaluated if
+         * there is or not a goal point
+         */
+        void printGoalPoints(int i);
 
 
 

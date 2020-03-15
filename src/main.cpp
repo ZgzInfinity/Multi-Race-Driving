@@ -2,13 +2,17 @@
 #include <vector>
 #include <iostream>
 #include "../include/Step.h"
-#include "../include/Player.h"
+#include "../include/Motorbike.h"
+#include "../include/Ferrari.h"
 #include "../include/IntervalCurve.h"
 #include "../include/LandScape.h"
+#include "../include/Animation.h"
+#include "../include/Menu.h"
 #include <SFML/Graphics.hpp>
 
 
 const int NUMBER_FPS = 60;
+const int INITIAL_SECS = 100;
 
 
 using namespace std;
@@ -26,7 +30,89 @@ void drawQuad(RenderWindow &w, Color c, int x1,int y1,int w1,int x2,int y2,int w
 
 int main(int argc, char* argv[]){
 
-    string name = "Configuration/Scenes/SherwoodForest.xml";
+    Texture speedPanel;
+    speedPanel.loadFromFile("images/Environment/speedIndicator.png");
+    Sprite basura;
+    basura.setTexture(speedPanel);
+
+    Texture elapsedPanel;
+    elapsedPanel.loadFromFile("images/Environment/elapsedIndicator.png");
+    Sprite timeElapsed;
+    timeElapsed.setTexture(elapsedPanel);
+
+    basura.setPosition(Vector2f(0.f, 660.f)); // absolute position
+    timeElapsed.setPosition(Vector2f(20.f, 50.f));
+
+    Font f;
+    f.loadFromFile("Fonts/digital.ttf");
+
+    Font f2;
+    f2.loadFromFile("Fonts/sgalsbi.ttf");
+
+    Font f3;
+    f3.loadFromFile("Fonts/needForSpeed.ttf");
+
+    Font f4;
+    f4.loadFromFile("Fonts/zorque.ttf");
+
+    // Message used to alert the player where is the next checkpoint to pass
+    string message = "Next checkpoint";
+
+    // Text
+    Text sText;
+    sText.setFillColor(Color::Yellow);
+    sText.setCharacterSize(26);
+    sText.setStyle(Text::Bold);
+    sText.setPosition(80, 668);
+    sText.setFont(f);
+
+
+    Text sText2;
+    sText2.setFillColor(Color(79, 255, 51));
+    sText2.setCharacterSize(30);
+    sText2.setStyle(Text::Bold);
+    sText2.setPosition(90, 75);
+    sText2.setFont(f);
+
+    Text sText3;
+    sText3.setFillColor(Color(255, 255, 255));
+    sText3.setCharacterSize(25);
+    sText3.setStyle(Text::Bold);
+    sText3.setPosition(468, 50);
+    sText3.setFont(f2);
+
+    Text sText4;
+    sText4.setFillColor(Color(255, 153, 51));
+    sText4.setCharacterSize(30);
+    sText4.setStyle(Text::Bold);
+    sText4.setPosition(468, 80);
+    sText4.setFont(f3);
+
+    Text sText5;
+    sText5.setFillColor(Color(255, 255, 255));
+    sText5.setCharacterSize(24);
+    sText5.setStyle(Text::Bold);
+    sText5.setPosition(700, 50);
+    sText5.setFont(f4);
+    sText5.setString(message);
+
+    Text sText6;
+    sText6.setFillColor(Color(255, 255, 255));
+    sText6.setCharacterSize(24);
+    sText6.setStyle(Text::Bold);
+    sText6.setPosition(750, 80);
+    sText6.setFont(f3);
+
+    int minutes = 0, secs = 0, decs_in_sec = 0;
+    int timeToPlay = INITIAL_SECS;
+    Clock gameClock;
+    Time shot_delay = seconds(0.1);
+    Time elapsed1, elapsed2;
+    elapsed1 = gameClock.getElapsedTime();
+    gameClock.restart();
+
+
+    string name = "Configuration/GameModes/SuperHangOn/Scenes/Vancouver.xml";
     char* n = const_cast<char*>(name.c_str());
     LandScape L = LandScape(n);
 
@@ -35,10 +121,22 @@ int main(int argc, char* argv[]){
     // Control the fotograms per second, 60 FPS more less
     app.setFramerateLimit(NUMBER_FPS);
 
-    string path = "images/player/";
+    string animationFile = "Configuration/Animations/Animations.xml";
+    char* animationF = const_cast<char*>(animationFile.c_str());
+    Animation a = Animation(animationF);
+
+    a.loadSegaIcons(app);
+    a.loadGameData(app);
+
+    string menusFile = "Configuration/Menus/Menus.xml";
+    char* menuF = const_cast<char*>(menusFile.c_str());
+    Menu m = Menu(menuF);
+    m.showMainMenu(app);
+
+    string path = "images/Vehicles/Motorbike/";
     char* p = const_cast<char*>(path.c_str());
     // Motorbike of the player
-    Player h = Player(p);
+    Motorbike h = Motorbike(p);
 
     h.loadSpritesFromPath();
 
@@ -46,6 +144,15 @@ int main(int argc, char* argv[]){
     int pos = 0, lastPos = 0;
     // Height position unnecessary
     int H = 1500;
+
+    // Next checkpoint to arrive
+    int indexCheckpoint = 0;
+
+    // Position of the next checkpoint to arrive
+    int posCheckPoint = L.checkpointsScene.at(indexCheckpoint).stepPosition * segL;
+
+    // Not elevation of terrain registered by default
+    int lastCamH = H, camH = H;
 
     // Possible event detected
     bool eventDetected = false;
@@ -76,15 +183,21 @@ int main(int argc, char* argv[]){
         // New speed updated
         if (h.getModeCollision() == -1){
             // Check the advance of the motorbike of the player
+            // h.advancePlayer(eventDetected, lastCamH, camH);
+
             h.advancePlayer(eventDetected);
 
             // Control the possible actions if the user
+            // h.controlActionPlayer(speed, eventDetected, app, lastCamH, camH);
             h.controlActionPlayer(speed, eventDetected, app);
 
             // Store my the actual position before the move
             lastPos = pos;
 
             pos += speed;
+
+            // Store the actual elevation of the terrain
+            lastCamH = camH;
         }
 
         // Get the nearest sprite found to the actual position
@@ -100,10 +213,25 @@ int main(int argc, char* argv[]){
             speed = INITIAL_SPEED;
         }
 
+        // Control if the player passes the checkpoint
+        if (pos >= posCheckPoint){
+            // Increment the index to the next checkpoint
+            if (indexCheckpoint >= (int)L.checkpointsScene.size() - 1){
+                posCheckPoint = L.goalPoint.stepPosition * segL;
+            }
+            else {
+                // Get the position of the next checkpoint to arrive
+                indexCheckpoint++;
+                posCheckPoint = L.checkpointsScene.at(indexCheckpoint).stepPosition * segL;
+            }
+            // Restarted the time to arrive to the next checkpoint
+            timeToPlay = INITIAL_SECS;
+        }
+
         L.lookForCurve(pos, curve, onCurve);
 
         // Control the inertia force of the motorbike
-        h.controlInertiaForce(onCurve, curve, speed);
+        // h.controlInertiaForce(onCurve, curve, speed);
 
         // Check the upper bound limit
         while (pos >=  MAX_SPACE_DIMENSION * segL){
@@ -121,7 +249,9 @@ int main(int argc, char* argv[]){
 
         // Preparing to draw the new elements of the map
         int startPos = pos / segL;
-        int camH = L.lines[startPos].position_3d_y + H;
+        camH = L.lines[startPos].position_3d_y + H;
+
+        // Store the actual elevation of the terrain
 
         // Check if advance
         if (speed > 0 && h.getModeCollision() == -1){
@@ -143,6 +273,7 @@ int main(int argc, char* argv[]){
             Step &l = L.lines[n % MAX_SPACE_DIMENSION];
             // Project the 3d coordinates in 2d coordinates image
             l.project(h.getPlayerX() * WIDTH_ROAD - x, camH, startPos * segL - (n>= MAX_SPACE_DIMENSION ? MAX_SPACE_DIMENSION * segL : 0));
+
             x += dx;
             dx += l.directionCurve;
 
@@ -167,9 +298,68 @@ int main(int argc, char* argv[]){
           L.lines[n % MAX_SPACE_DIMENSION].drawSprite(app);
        }
 
+       // Check the time spent until now
+       elapsed2 = gameClock.getElapsedTime();
+       if (elapsed2 - elapsed1 >= shot_delay){
+            decs_in_sec++;
+            if (decs_in_sec == 10){
+                decs_in_sec = 0;
+                secs++;
+                timeToPlay--;
+                if (secs == 60){
+                    secs = 0;
+                    minutes++;
+                }
+            }
+       }
+       string time = "";
+       time = (minutes < 10) ? time + "0" + to_string(minutes) + ":" : time + to_string(minutes) + ":";
+       time = (secs < 10) ? time + "0" + to_string(secs) + ":" : time + to_string(secs) + ":";
+       time = (minutes < 10) ? time + "0" + to_string(decs_in_sec) : time + to_string(decs_in_sec);
+
+
+
        //Show all the elements in the console game
+       // h.drawPlayer(app, pos);
        h.drawPlayer(app);
+       app.draw(basura);
+       app.draw(timeElapsed);
+       sText.setString(to_string(speed));
+       app.draw(sText);
+
+       sText2.setString(time);
+       app.draw(sText2);
+
+       sText3.setString("TIME");
+       app.draw(sText3);
+
+       sText4.setString(to_string(timeToPlay));
+       app.draw(sText4);
+
+       int difference = (posCheckPoint - pos) / 1000;
+       if (indexCheckpoint <= (int)L.checkpointsScene.size() - 1){
+            // Shows information to the user
+            // Calculation of the distance to arrive
+            if (difference > 250){
+                sText6.setFillColor(Color::Green);
+            }
+            else if (difference >= 100){
+                sText6.setFillColor(Color::Yellow);
+            }
+            else {
+                sText6.setFillColor(Color::Red);
+            }
+       }
+       else {
+            message = "GOAL";
+            sText5.setPosition(775, 50);
+            sText5.setString(message);
+       }
+       sText6.setString(to_string(difference) + " Km");
+       app.draw(sText5);
+       app.draw(sText6);
        app.display();
+
 
        // Sleep loop
        if (h.getModeCollision() == -1){
