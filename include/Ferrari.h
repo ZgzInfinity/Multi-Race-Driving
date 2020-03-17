@@ -22,7 +22,7 @@ using namespace sf;
 /*
  * Class which represents the player
  */
-class Ferrari {
+class Ferrari : public Player {
 
         Texture t;
 
@@ -75,6 +75,7 @@ class Ferrari {
         /**
          * Draw the player sprite in the console render window
          * @param app is the console window game where the sprite is going to be drawn
+         * @param pos is the actual position of the ferrari in the map
          */
         void drawPlayer(RenderWindow& app, int& pos);
 
@@ -189,14 +190,14 @@ class Ferrari {
 
 
         /**
-         * Control if the player has done any of his possible actions
+         * Control if the player has done any of his possible actionsconst int lastHeight, const int height
          * @param speed is the actual speed of the Ferrari of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          * @param lastHeight was the elevation of the terrain where was the ferrari
          * @param height is the actual elevation of the terrain where is the ferrari
          */
-        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app, const int lastCamH, const int camH);
+        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app, const int lastHeight, const int height);
 
 
 

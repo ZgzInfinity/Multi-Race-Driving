@@ -1,14 +1,15 @@
 
-#include "../include/Ferrari.h"
+#include "../include/Truck.h"
 
-Ferrari::Ferrari(char* pathFile) : Player(pathFile){};
+Truck::Truck(char* pathFile) : Player(pathFile){};
+
 
 
 /**
  * Draw the player sprite in the console render window
  * @param app is the console window game where the sprite is going to be drawn
  */
-void Ferrari::drawPlayer(RenderWindow& app, int& pos){
+void Truck::drawPlayer(RenderWindow& app, int& pos){
     // Check what is the offset to apply while is crushing
     if (mode == 0){
         // First mode
@@ -20,8 +21,8 @@ void Ferrari::drawPlayer(RenderWindow& app, int& pos){
         playerX -= 0.05;
         pos -= 200;
     }
-    // Print the ferrari in its actual position
-    playerSprite.setPosition(Vector2f(400.f, HEIGHT - 160.f));
+    // Print the truck in its actual position
+    playerSprite.setPosition(Vector2f(400.f, HEIGHT - 200.f));
     app.draw(playerSprite);
 }
 
@@ -30,10 +31,10 @@ void Ferrari::drawPlayer(RenderWindow& app, int& pos){
 /**
  * Load the set of sprites of the player
  */
-void Ferrari::loadSpritesFromPath(){
+void Truck::loadSpritesFromPath(){
     // Document xml where the document is going to be parsed
     xml_document<> doc;
-    file<> file("Configuration/Vehicles/Ferrari.xml");
+    file<> file("Configuration/Vehicles/Truck.xml");
     // Parsing the content of file
     doc.parse<0>(file.data());
 
@@ -67,10 +68,10 @@ void Ferrari::loadSpritesFromPath(){
 /**
  * Check if the player has to advance in the track
  * @param eventDetected is a boolean to control if an event has occurred
- * @param lastHeight was the elevation of the terrain where was the ferrari
- * @param height is the actual elevation of the terrain where is the ferrari
+ * @param lastHeight was the elevation of the terrain where was the truck
+ * @param height is the actual elevation of the terrain where is the truck
  */
-void Ferrari::advancePlayer(bool& eventDetected, const int lastHeight, const int height){
+void Truck::advancePlayer(bool& eventDetected, const int lastHeight, const int height){
     // Eliminate this event detection
     if (!eventDetected){
         // Check if the car is ascending on a elevation part of the terrain
@@ -78,41 +79,19 @@ void Ferrari::advancePlayer(bool& eventDetected, const int lastHeight, const int
              (height > 0 && height <= NORMAL_HEIGHT)) && height > lastHeight)
         {
             // The car is ascending the landing
-            if (actual_code_image < 21 || actual_code_image > 24){
+            if (actual_code_image < 13 || actual_code_image > 15){
                 // The sprites do not correspond to the ascending
-                actual_code_image = 21;
+                actual_code_image = 13;
             }
             else {
                 // The sprite corresponds to one of the landing
-                if (actual_code_image != 24){
+                if (actual_code_image != 15){
                     // Increment to the next ascending sprite
                     actual_code_image++;
                 }
                 else {
                     // Return to the first one
-                    actual_code_image -= 3;
-                }
-            }
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // Check if the ferrari is descending
-        else if (((height > NORMAL_HEIGHT && height <= 2 * NORMAL_HEIGHT) ||
-                  (height > 0 && height <= NORMAL_HEIGHT)) && height < lastHeight)
-        {
-            // The car is ascending the landing
-            if (actual_code_image < 41 || actual_code_image > 44){
-                // The sprites do not correspond to the ascending
-                actual_code_image = 41;
-            }
-            else {
-                // The sprite corresponds to one of the landing
-                if (actual_code_image != 44){
-                    // Increment to the next ascending sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Return to the first one
-                    actual_code_image -= 3;
+                    actual_code_image -= 2;
                 }
             }
             playerSprite.setTexture(textures[actual_code_image - 1], true);
@@ -144,9 +123,9 @@ void Ferrari::advancePlayer(bool& eventDetected, const int lastHeight, const int
 
 /**
  * Get the coordinate of the payer in the axis X
- * @return the position of the Ferrari in the axis X
+ * @return the position of the truck in the axis X
  */
-float Ferrari::getPlayerX(){
+float Truck::getPlayerX(){
     return playerX;
 }
 
@@ -154,10 +133,10 @@ float Ferrari::getPlayerX(){
 
 
 /**
- * Get the mode of collision of the Ferrari
- * @return the mode to show the collision of the Ferrari
+ * Get the mode of collision of the truck
+ * @return the mode to show the collision of the truck
  */
-int Ferrari::getModeCollision(){
+int Truck::getModeCollision(){
     return mode;
 }
 
@@ -165,13 +144,13 @@ int Ferrari::getModeCollision(){
 
 /**
  * Control if the user has pressed the w keyword to turn to the right
- * @param speed is the actual speed of the Ferrari of the player
+ * @param speed is the actual speed of the truck of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the ferrari
- * @param height is the actual elevation of the terrain where is the ferrari
+ * @param lastHeight was the elevation of the terrain where was the truck
+ * @param height is the actual elevation of the terrain where is the truck
  */
-inline void Ferrari::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Truck::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
                                                       const int lastHeight, const int height)
 {
     // Check if key left pressed
@@ -192,48 +171,21 @@ inline void Ferrari::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDet
              (height > 0 && height <= NORMAL_HEIGHT)) && height > lastHeight)
         {
             // The car is in a elevation
-            if (actual_code_image < 25 || (actual_code_image >= 33 && actual_code_image <= 84) ||
-               (actual_code_image >= 93 && actual_code_image <= 120))
+            if (actual_code_image < 16 || (actual_code_image >= 19 && actual_code_image <= 25) ||
+               (actual_code_image >= 29 && actual_code_image <= 42))
             {
-                actual_code_image = 25;
+                actual_code_image = 16;
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
             }
-            else if (actual_code_image >= 25 && actual_code_image <= 32){
+            else if (actual_code_image >= 16 && actual_code_image <= 18){
                 // Increment the actual code of the sprite
-                if (actual_code_image != 32){
+                if (actual_code_image != 18){
                     // Increment the texture of the sprite
                     actual_code_image++;
                 }
                 else {
                     // Change sprite while the motorbike is turning to left
-                    actual_code_image -= 3;
-                }
-                // Set the texture from the file
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            // Register event
-            eventDetected = true;
-        }
-        // Check if the car is descending in a elevation terrain or not
-        else if ((((height > NORMAL_HEIGHT && height <= 2 * NORMAL_HEIGHT) ||
-                  (height > 0 && height <= NORMAL_HEIGHT)) && height < lastHeight))
-        {
-            // The car is in a elevation
-            if (actual_code_image < 45 || (actual_code_image >= 53 && actual_code_image <= 104) ||
-               (actual_code_image >= 113 && actual_code_image <= 120))
-            {
-                actual_code_image = 45;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            else if (actual_code_image >= 45 && actual_code_image <= 52){
-                // Increment the actual code of the sprite
-                if (actual_code_image != 52){
-                    // Increment the texture of the sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Change sprite while the motorbike is turning to left
-                    actual_code_image -= 3;
+                    actual_code_image -= 2;
                 }
                 // Set the texture from the file
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
@@ -243,15 +195,15 @@ inline void Ferrari::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDet
         }
         else {
             // The car is not in a elevation Change the texture
-            if (actual_code_image < 5 || (actual_code_image >= 13 && actual_code_image <= 64) ||
-               (actual_code_image >= 73 && actual_code_image <= 102))
+            if (actual_code_image < 5 || (actual_code_image >= 9 && actual_code_image <= 25) ||
+               (actual_code_image >= 30 && actual_code_image <= 42))
             {
                 actual_code_image = 5;
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
             }
-            else if (actual_code_image >= 5 && actual_code_image <= 12){
+            else if (actual_code_image >= 5 && actual_code_image <= 8){
                 // Increment the actual code of the sprite
-                if (actual_code_image != 12){
+                if (actual_code_image != 8){
                     // Increment the texture of the sprite
                     actual_code_image++;
                 }
@@ -275,10 +227,10 @@ inline void Ferrari::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDet
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the ferrari
- * @param height is the actual elevation of the terrain where is the ferrari
+ * @param lastHeight was the elevation of the terrain where was the truck
+ * @param height is the actual elevation of the terrain where is the truck
  */
-inline void Ferrari::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Truck::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
                                                        const int lastHeight, const int height){
     // Check if key right pressed
     if (Keyboard::isKeyPressed(Keyboard::W)){
@@ -298,47 +250,20 @@ inline void Ferrari::controlTurningPlayerRightKeyboard(int& speed, bool& eventDe
              (height > 0 && height <= NORMAL_HEIGHT)) && height > lastHeight)
         {
             // The car is in a elevation
-            if (actual_code_image < 33 || (actual_code_image >= 41 && actual_code_image <= 92) ||
-               (actual_code_image >= 101 && actual_code_image <= 120))
+            if (actual_code_image < 19 || (actual_code_image >= 22 && actual_code_image <= 39))
             {
-                actual_code_image = 33;
+                actual_code_image = 19;
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
             }
-            else if (actual_code_image >= 33 && actual_code_image <= 40){
+            else if (actual_code_image >= 19 && actual_code_image <= 21){
                 // Increment the actual code of the sprite
-                if (actual_code_image != 40){
+                if (actual_code_image != 21){
                     // Increment the texture of the sprite
                     actual_code_image++;
                 }
                 else {
                     // Change sprite while the motorbike is turning to left
-                    actual_code_image -= 3;
-                }
-                // Set the texture from the file
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            // Register event
-            eventDetected = true;
-        }
-        // Check if the car is descending in a elevation terrain or not
-        else if ((((height > NORMAL_HEIGHT && height <= 2 * NORMAL_HEIGHT) ||
-                  (height > 0 && height <= NORMAL_HEIGHT)) && height < lastHeight))
-        {
-            // The car is in a elevation
-            if (actual_code_image < 53 || (actual_code_image >= 61 && actual_code_image <= 116))
-            {
-                actual_code_image = 53;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            else if (actual_code_image >= 53 && actual_code_image <= 60){
-                // Increment the actual code of the sprite
-                if (actual_code_image != 60){
-                    // Increment the texture of the sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Change sprite while the motorbike is turning to left
-                    actual_code_image -= 3;
+                    actual_code_image -= 2;
                 }
                 // Set the texture from the file
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
@@ -348,13 +273,15 @@ inline void Ferrari::controlTurningPlayerRightKeyboard(int& speed, bool& eventDe
         }
         else {
             // Change the texture
-            if (actual_code_image < 13 || (actual_code_image >= 21 && actual_code_image <= 72)){
-                actual_code_image = 13;
+            if (actual_code_image < 9 || (actual_code_image >= 13 && actual_code_image <= 29) ||
+               (actual_code_image >= 34 && actual_code_image <= 42))
+            {
+                actual_code_image = 9;
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
             }
-            else if (actual_code_image <= 20){
+            else if (actual_code_image <= 12){
                 // Increment the actual code of the sprite
-                if (actual_code_image != 20){
+                if (actual_code_image != 12){
                     // Increment the texture of the sprite
                     actual_code_image++;
                 }
@@ -375,17 +302,17 @@ inline void Ferrari::controlTurningPlayerRightKeyboard(int& speed, bool& eventDe
 
 /**
  * Control if the user has pressed the q keyword to increase the speed
- * @param speed is the actual speed of the Ferrari of the player
+ * @param speed is the actual speed of the truck of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the ferrari
- * @param height is the actual elevation of the terrain where is the ferrari
+ * @param lastHeight was the elevation of the terrain where was the truck
+ * @param height is the actual elevation of the terrain where is the truck
  */
-inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Truck::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
                                         const int lastHeight, const int height){
     // Check if the user is accelerating
     if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up))){
-        // Control about not acceleration if the Ferrari goes in the grass
+        // Control about not acceleration if the truck goes in the grass
         if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
             // Increment the speed because it is inside the road
             if (speed <= MAX_SPEED){
@@ -402,7 +329,7 @@ inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderW
         }
         // Check if the key to turn left is pressed
         if (!eventDetected){
-            // Check the type of control of the Ferrari
+            // Check the type of control of the truck
             if (typeControl == 0){
                  // Check if the key to turn to the right is pressed
                  controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
@@ -415,7 +342,7 @@ inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderW
         }
         // Check if the key to turn left is pressed
         if (!eventDetected){
-            // Check the type of control of the Ferrari
+            // Check the type of control of the truck
             if (typeControl == 0){
                  // Check if the key to turn to the left is pressed
                  controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
@@ -445,13 +372,13 @@ inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderW
 
 /**
  * Control if the user has pressed the q keyword to increase the speed
- * @param speed is the actual speed of the Ferrari of the player
+ * @param speed is the actual speed of the truck of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the ferrari
- * @param height is the actual elevation of the terrain where is the ferrari
+ * @param lastHeight was the elevation of the terrain where was the truck
+ * @param height is the actual elevation of the terrain where is the truck
  */
-inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Truck::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
                                           const int lastHeight, const int height){
     // Check if the user is braking
     if (Keyboard::isKeyPressed(Keyboard::Down)){
@@ -460,13 +387,13 @@ inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, Rende
             // Control if first the user has accelerated
             controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
         }
-        // The ferrari goes straight
+        // The truck goes straight
         if (actual_code_image >= 1 && actual_code_image <= 4){
-            actual_code_image += 60;
+            actual_code_image += 21;
         }
-        // The ferrari was straight and brake
-        else if (actual_code_image >= 61 && actual_code_image <= 64){
-            if (actual_code_image != 64){
+        // The truck was straight and brake
+        else if (actual_code_image >= 22 && actual_code_image <= 25){
+            if (actual_code_image != 25){
                 actual_code_image++;
             }
             else {
@@ -475,167 +402,86 @@ inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, Rende
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari goes left
-        else if (actual_code_image >= 5 && actual_code_image <= 12){
-            actual_code_image += 60;
+        // The truck goes left
+        else if (actual_code_image >= 5 && actual_code_image <= 8){
+            actual_code_image += 21;
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari goes right
-        else if (actual_code_image >= 13 && actual_code_image <= 20){
-            actual_code_image += 60;
+        // The truck goes right
+        else if (actual_code_image >= 9 && actual_code_image <= 12){
+            actual_code_image += 21;
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        //The ferrari was left and brake
-        else if (actual_code_image >= 65 && actual_code_image <= 72){
+        //The truck was left and brake
+        else if (actual_code_image >= 26 && actual_code_image <= 29){
             // Increment the actual code of the sprite
-            if (actual_code_image != 72){
+            if (actual_code_image != 29){
                 // Increment the texture of the sprite
                 actual_code_image++;
             }
             else {
-                // Change sprite while the ferrari is turning left and braking
+                // Change sprite while the truck is turning left and braking
                 actual_code_image -= 3;
             }
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari was right and brake
-        else if (actual_code_image >= 73 && actual_code_image <= 80){
+        // The truck was right and brake
+        else if (actual_code_image >= 30 && actual_code_image <= 33){
             // Increment the actual code of the sprite
-            if (actual_code_image != 80){
+            if (actual_code_image != 33){
                 // Increment the texture of the sprite
                 actual_code_image++;
             }
             else {
-                // Change sprite while the ferrari is turning right and braking
+                // Change sprite while the truck is turning right and braking
                 actual_code_image -= 3;
             }
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari goes ascending
-        else if (actual_code_image >= 21 && actual_code_image <= 24){
-            actual_code_image += 60;
+        // The truck goes ascending
+        else if (actual_code_image >= 13 && actual_code_image <= 15){
+            actual_code_image += 21;
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari was ascending and brake
-        else if (actual_code_image >= 81 && actual_code_image <= 84){
+        // The truck was ascending and brake
+        else if (actual_code_image >= 34 && actual_code_image <= 36){
             // Increment the actual code of the sprite
-            if (actual_code_image != 84){
+            if (actual_code_image != 36){
                 // Increment the texture of the sprite
                 actual_code_image++;
             }
             else {
-                // Change sprite while the ferrari is ascending and braking
-                actual_code_image -= 3;
+                // Change sprite while the truck is ascending and braking
+                actual_code_image -= 2;
             }
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari goes descending
-        else if (actual_code_image >= 41 && actual_code_image <= 44){
-            actual_code_image += 60;
+        // The truck goes ascending and turning left
+        else if (actual_code_image >= 19 && actual_code_image <= 21){
+            actual_code_image += 21;
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari was descending and brake
-        else if (actual_code_image >= 101 && actual_code_image <= 104){
+        // The truck was descending while it was turning left and brake
+        else if (actual_code_image >= 40 && actual_code_image <= 42){
             // Increment the actual code of the sprite
-            if (actual_code_image != 104){
+            if (actual_code_image != 42){
                 // Increment the texture of the sprite
                 actual_code_image++;
             }
             else {
-                // Change sprite while the ferrari is descending and braking
-                actual_code_image -= 3;
+                // Change sprite while the truck is ascending while is turning left and braking
+                actual_code_image -= 2;
             }
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-        // The ferrari goes ascending and turning left
-        else if (actual_code_image >= 25 && actual_code_image <= 32){
-            actual_code_image += 60;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The ferrari was descending while it was turning left and brake
-        else if (actual_code_image >= 85 && actual_code_image <= 92){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 92){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the ferrari is ascending while is turning left and braking
-                actual_code_image -= 3;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The ferrari goes ascending and turning right
-        else if (actual_code_image >= 33 && actual_code_image <= 40){
-            actual_code_image += 60;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The ferrari was descending while it was turning right and brake
-        else if (actual_code_image >= 93 && actual_code_image <= 100){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 100){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the ferrari is ascending while is turning right and braking
-                actual_code_image -= 3;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The ferrari goes descending and turning left
-        else if (actual_code_image >= 45 && actual_code_image <= 52){
-            actual_code_image += 60;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The ferrari was descending while it was turning left and brake
-        else if (actual_code_image >= 105 && actual_code_image <= 112){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 112){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the ferrari is descending while is turning left and braking
-                actual_code_image -= 3;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The ferrari goes descending and turning right
-        else if (actual_code_image >= 53 && actual_code_image <= 60){
-            actual_code_image += 60;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The ferrari was descending while it was turning right and brake
-        else if (actual_code_image >= 113 && actual_code_image <= 120){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 120){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the ferrari is descending while is turning left and braking
-                actual_code_image -= 3;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-
         // Reduce the speed
         if (speed > INITIAL_SPEED){
             // Increment of the speed
@@ -650,13 +496,13 @@ inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, Rende
 
 /**
  * Control if the player has done any of his possible actions
- * @param speed is the actual speed of the Ferrari of the player
+ * @param speed is the actual speed of the truck of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the ferrari
- * @param height is the actual elevation of the terrain where is the ferrari
+ * @param lastHeight was the elevation of the terrain where was the truck
+ * @param height is the actual elevation of the terrain where is the truck
  */
-void Ferrari::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app, const int lastCamH, const int camH){
+void Truck::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app, const int lastCamH, const int camH){
     if (typeControl == 0){
         // Keyword
         // Check if W keyword has been pressed to turn to the right
@@ -677,7 +523,7 @@ void Ferrari::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow&
     // Check if the Up keyword has been pressed to increase the speed
     controlPlayerSpeed(speed, eventDetected, app, lastCamH, camH);
 
-    //Check if the E keyword has been pressed to brake the Ferrari
+    //Check if the E keyword has been pressed to brake the truck
     controlPlayerBraking(speed, eventDetected, app, lastCamH, camH);
 
     // Check if any event has been registered
@@ -695,10 +541,10 @@ void Ferrari::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow&
 /**
  * Control if the player has have collision with the nearest element of the map to him
  * @param nearestStep is the step of the scene where is located the nearest element to the player
- * @param lastPos is the last position of the Ferrari in the axis Y
- * @param pos is the current position of the Ferrari in the axis Y
+ * @param lastPos is the last position of the truck in the axis Y
+ * @param pos is the current position of the truck in the axis Y
  */
-bool Ferrari::controlPossibleCollision(Step& nearestStep, int& lastPos, int& pos){
+bool Truck::controlPossibleCollision(Step& nearestStep, int& lastPos, int& pos){
     // Calculation of the distance
     float distance = nearestStep.spriteX - playerX;
     // Check the sign of the offset
@@ -741,21 +587,21 @@ bool Ferrari::controlPossibleCollision(Step& nearestStep, int& lastPos, int& pos
 
 
 /**
- * Control if there is there inertia force or not if the Ferrari is on a curve of the scene
- * @param onCurve is a boolean which represents if the Ferrari is on curve or not
- * @param curve is the possible curve of the scene where the Ferrari is currently now
- * @param speed is the actual speed of the Ferrari of the player
+ * Control if there is there inertia force or not if the truck is on a curve of the scene
+ * @param onCurve is a boolean which represents if the truck is on curve or not
+ * @param curve is the possible curve of the scene where the truck is currently now
+ * @param speed is the actual speed of the truck of the player
  */
-void Ferrari::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed){
+void Truck::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed){
     // Check if there has to appear inertia force
     if (onCurve){
-        // The Ferrari is on a curve of the scene
+        // The truck is on a curve of the scene
         onCurve = false;
         // Check the direction of the curve
         if (curve.directionCurve > 0.f){
-            // Check if the Ferrari
+            // Check if the truck
             if (speed >= MEDIUM_SPEED){
-                // Ferrari goes to the left when it is a right curve
+                // truck goes to the left when it is a right curve
                 playerX -= 0.075;
             }
             else if (speed >= CONTROL_SPEED && speed < MEDIUM_SPEED) {
@@ -766,9 +612,9 @@ void Ferrari::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& spee
             }
         }
         else {
-            // Check if the Ferrari
+            // Check if the truck
             if (speed >= MEDIUM_SPEED){
-                // Ferrari goes to the left when it is a right curve
+                // truck goes to the left when it is a right curve
                 playerX += 0.075;
             }
             else if (speed >= CONTROL_SPEED && speed < MEDIUM_SPEED) {
@@ -784,10 +630,10 @@ void Ferrari::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& spee
 
 
 /**
- * Shows to the user how the Ferrari crushes
- * @param pos is the position of the ferrari in the car in the axis Y
+ * Shows to the user how the truck crushes
+ * @param pos is the position of the truck in the car in the axis Y
  */
-void Ferrari::collisionShow(){
+void Truck::collisionShow(){
     // Not collision detected before
     if (mode == -1){
         // Code generated to the way of collision
@@ -797,56 +643,55 @@ void Ferrari::collisionShow(){
         // Establish the first collision sprite
         if (mode == 0){
             // First way to collision
-            actual_code_image = 121;
+            actual_code_image = 43;
         }
         else if (mode == 1) {
             // Second way to collision
-            actual_code_image = 128;
+            actual_code_image = 44;
         }
     }
     else {
         // Collision detected in process
         // Avoid overflow of code number identifier of collision sprite
-        switch(actual_code_image){
-            case 129:
-            case 131:
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-                break;
-            case 130:
-            case 132:
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-                // Check the number of spinning tops done by the car
+        if (mode == 1){
+            // Show the sprite
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
+            actual_code_image++;
+            // Check if it's the final sprite
+            if (actual_code_image == 50){
                 spinningTopsDone++;
+                actual_code_image -= 7;
+                playerSprite.setTexture(textures[actual_code_image - 1], true);
+            }
+            if (spinningTopsDone == 2){
+                actual_code_image = 1;
+                mode = -1;
+                playerX = 0.f;
+                spinningTopsDone = 0;
+            }
+        }
+        else if (mode == 0){
+            if (actual_code_image == 43){
+                playerSprite.setTexture(textures[actual_code_image - 1], true);
+                actual_code_image += 6;
+            }
+            else {
+                playerSprite.setTexture(textures[actual_code_image - 1], true);
+                actual_code_image--;
+                if (actual_code_image == 43){
+                    spinningTopsDone++;
+                }
                 if (spinningTopsDone == 2){
                     actual_code_image = 1;
                     mode = -1;
                     playerX = 0.f;
                     spinningTopsDone = 0;
                 }
-                else if (mode == 0) actual_code_image = 121;
-                else if (mode == 1) actual_code_image = 128;
-        }
-        if (mode == 0){
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-            actual_code_image++;
-             if (actual_code_image == 128){
-                actual_code_image += 3;
-             }
-        }
-        else if (mode == 1){
-            if (actual_code_image == 121){
-                // Increment to avoid the same sprites
-                actual_code_image += 8;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-                actual_code_image++;
-            }
-            else {
-                 playerSprite.setTexture(textures[actual_code_image - 1], true);
-                 actual_code_image--;
             }
         }
     }
 }
+
 
 
 

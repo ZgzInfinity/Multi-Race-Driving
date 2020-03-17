@@ -9,7 +9,7 @@ Motorbike::Motorbike(char* pathFile) : Player(pathFile){};
  * Draw the player sprite in the console render window
  * @param app is the console window game where the sprite is going to be drawn
  */
-void Motorbike::drawPlayer(RenderWindow& app){
+void Motorbike::drawPlayer(RenderWindow& app, int& pos){
     this->offset = (mode == 0 && actual_code_image <= 35) ? offset += 10 : offset += 5;
     this->offset = (mode == 1 && actual_code_image <= 46) ? offset += 20 : offset;
     if (mode == -1) offset = 0;
@@ -60,8 +60,10 @@ void Motorbike::loadSpritesFromPath(){
 /**
  * Check if the player has to advance in the track
  * @param eventDetected is a boolean to control if an event has occurred
+ * @param lastHeight was the elevation of the terrain where was the motorbike
+ * @param height is the actual elevation of the terrain where is the motorbike
  */
-void Motorbike::advancePlayer(bool& eventDetected){
+void Motorbike::advancePlayer(bool& eventDetected, const int lastHeight, const int height){
     // Eliminate this event detection
     if (!eventDetected){
         if (actual_code_image != 1){
@@ -105,12 +107,16 @@ int Motorbike::getModeCollision(){
 
 
 /**
- * Control if the user has pressed the w keyword to turn to the right
+ * Control if the user has pressed the q keyword to turn to the left
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
+ * @param lastHeight was the elevation of the terrain where was the motorbike
+ * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app){
+inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+                                             const int lastHeight, const int height)
+{
     // Check if key left pressed
     if (Keyboard::isKeyPressed(Keyboard::Q)){
         // Check if the motorbike can be moved or not spite of pressing the key
@@ -151,13 +157,17 @@ inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventD
 
 
 
-/**
- * Control if the user has pressed the q keyword to turn to the left
+ /**
+ * Control if the user has pressed the w keyword to turn to the right
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
+ * @param lastHeight was the elevation of the terrain where was the motorbike
+ * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app){
+inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+                                              const int lastHeight, const int height)
+{
     // Check if key right pressed
     if (Keyboard::isKeyPressed(Keyboard::W)){
         // Check if the motorbike can be moved or not spite of pressing the key
@@ -299,8 +309,12 @@ inline void Motorbike::controlTurningPlayerRightMouse(int& speed, bool& eventDet
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
+ * @param lastHeight was the elevation of the terrain where was the motorbike
+ * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app){
+inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+                                          const int lastHeight, const int height)
+{
     // Check if the user is accelerating
     if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up))){
         // Control about not acceleration if the motorbike goes in the grass
@@ -323,7 +337,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             // Check the type of control of the motorbike
             if (typeControl == 0){
                  // Check if the key to turn to the right is pressed
-                 controlTurningPlayerRightKeyboard(speed, eventDetected, app);
+                 controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
             }
             else {
                 // Check if the mouse has been moved to turn to the right
@@ -336,7 +350,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             // Check the type of control of the motorbike
             if (typeControl == 0){
                  // Check if the key to turn to the left is pressed
-                 controlTurningPlayerLeftKeyboard(speed, eventDetected, app);
+                 controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
             }
             else {
                 // Check if the mouse has been moved to turn to the left
@@ -368,14 +382,18 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
+ * @param lastHeight was the elevation of the terrain where was the motorbike
+ * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app){
+inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+                                            const int lastHeight, const int height)
+{
     // Check if the user is braking
     if (Keyboard::isKeyPressed(Keyboard::Down)){
         // Check more events
         if (!eventDetected){
             // Control if first the user has accelerated
-            controlPlayerSpeed(speed, eventDetected, app);
+            controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
         }
         // Selection of the correct sprite of the motorbike
         if (actual_code_image <= 2){
@@ -446,15 +464,19 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
  * @param speed is the actual speed of the motorbike of the player
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
+ * @param lastHeight was the elevation of the terrain where was the motorbike
+ * @param height is the actual elevation of the terrain where is the motorbike
  */
-void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app){
+void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app,
+                                    const int lastHeight, const int height)
+{
     if (typeControl == 0){
         // Keyword
         // Check if W keyword has been pressed to turn to the right
-        controlTurningPlayerRightKeyboard(speed, eventDetected, app);
+        controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
 
         // Check if Q keyword has been pressed to turn to the left
-        controlTurningPlayerLeftKeyboard(speed, eventDetected, app);
+        controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
     }
     else {
         // Mouse
@@ -466,10 +488,10 @@ void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindo
     }
 
     // Check if the Up keyword has been pressed to increase the speed
-    controlPlayerSpeed(speed, eventDetected, app);
+    controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
 
     //Check if the E keyword has been pressed to brake the motorbike
-    controlPlayerBraking(speed, eventDetected, app);
+    controlPlayerBraking(speed, eventDetected, app, lastHeight, height);
 
     // Check if any event has been registered
     if (!eventDetected){

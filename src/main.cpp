@@ -4,12 +4,13 @@
 #include "../include/Step.h"
 #include "../include/Motorbike.h"
 #include "../include/Ferrari.h"
+#include "../include/Minivan.h"
+#include "../include/Truck.h"
 #include "../include/IntervalCurve.h"
 #include "../include/LandScape.h"
 #include "../include/Animation.h"
 #include "../include/Menu.h"
 #include <SFML/Graphics.hpp>
-
 
 const int NUMBER_FPS = 60;
 const int INITIAL_SECS = 100;
@@ -183,13 +184,10 @@ int main(int argc, char* argv[]){
         // New speed updated
         if (h.getModeCollision() == -1){
             // Check the advance of the motorbike of the player
-            // h.advancePlayer(eventDetected, lastCamH, camH);
-
-            h.advancePlayer(eventDetected);
+            h.advancePlayer(eventDetected, lastCamH, camH);
 
             // Control the possible actions if the user
-            // h.controlActionPlayer(speed, eventDetected, app, lastCamH, camH);
-            h.controlActionPlayer(speed, eventDetected, app);
+            h.controlActionPlayer(speed, eventDetected, app, lastCamH, camH);
 
             // Store my the actual position before the move
             lastPos = pos;
@@ -231,7 +229,7 @@ int main(int argc, char* argv[]){
         L.lookForCurve(pos, curve, onCurve);
 
         // Control the inertia force of the motorbike
-        // h.controlInertiaForce(onCurve, curve, speed);
+        h.controlInertiaForce(onCurve, curve, speed);
 
         // Check the upper bound limit
         while (pos >=  MAX_SPACE_DIMENSION * segL){
@@ -320,8 +318,7 @@ int main(int argc, char* argv[]){
 
 
        //Show all the elements in the console game
-       // h.drawPlayer(app, pos);
-       h.drawPlayer(app);
+       h.drawPlayer(app, pos);
        app.draw(basura);
        app.draw(timeElapsed);
        sText.setString(to_string(speed));
@@ -366,7 +363,7 @@ int main(int argc, char* argv[]){
             sleep(milliseconds(70));
        }
        else {
-            sleep(milliseconds(100));
+            sleep(milliseconds(120));
        }
     }
     return 0;

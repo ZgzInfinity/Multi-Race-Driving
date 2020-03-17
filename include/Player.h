@@ -99,16 +99,19 @@ class Player {
         /**
          * Draw the player sprite in the console render window
          * @param app is the console window game where the sprite is going to be drawn
+         * @param pos is the actual position of the player in the map
          */
-        virtual void drawPlayer(RenderWindow& app) = 0;
+        virtual void drawPlayer(RenderWindow& app, int& pos) = 0;
 
 
 
         /**
          * Check if the player has to advance in the track
          * @param eventDetected is a boolean to control if an event has occurred
+         * @param lastHeight was the elevation of the terrain where was the motorbike
+         * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual void advancePlayer(bool& eventDetected) = 0;
+        virtual void advancePlayer(bool& eventDetected, const int lastHeight, const int height) = 0;
 
 
 
@@ -135,8 +138,11 @@ class Player {
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
+         * @param lastHeight was the elevation of the terrain where was the motorbike
+         * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app) = 0;
+        virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+                                                             const int lastHeight, const int height) = 0;
 
 
 
@@ -145,28 +151,11 @@ class Player {
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
+         * @param lastHeight was the elevation of the terrain where was the motorbike
+         * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app) = 0;
-
-
-
-        /**
-         * Control if the user has pressed the q keyword to turn to the left
-         * @param speed is the actual speed of the motorbike of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         */
-        virtual inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app) = 0;
-
-
-
-        /**
-         * Control if the user has pressed the w keyword to turn to the right
-         * @param speed is the actual speed of the motorbike of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         */
-        virtual inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app) = 0;
+        virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+                                                              const int lastHeight, const int height) = 0;
 
 
 
@@ -175,19 +164,24 @@ class Player {
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
+         * @param lastHeight was the elevation of the terrain where was the motorbike
+         * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app) = 0;
+        virtual inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+                                               const int lastHeight, const int height) = 0;
 
 
 
-        /**
+         /**
          * Control if the user has pressed the q keyword to increase the speed
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
+         * @param lastHeight was the elevation of the terrain where was the player
+         * @param height is the actual elevation of the terrain where is the player
          */
-        virtual inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app) = 0;
-
+        virtual inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+                                         const int lastHeight, const int height) = 0;
 
 
         /**
@@ -195,8 +189,11 @@ class Player {
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
+         * @param lastHeight was the elevation of the terrain where was the player
+         * @param height is the actual elevation of the terrain where is the player
          */
-        virtual void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app) = 0;
+        virtual void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app,
+                                         const int lastHeight, const int height) = 0;
 
 
 

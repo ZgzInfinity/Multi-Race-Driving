@@ -1,6 +1,6 @@
 
-#ifndef MOTORBIKE_H
-#define MOTORBIKE_H
+#ifndef MINIVAN_H
+#define MINIVAN_H
 
 #include <iostream>
 #include <cstdio>
@@ -14,19 +14,55 @@
 #include "rapidxml_utils.hpp"
 #include <SFML/Graphics.hpp>
 
+namespace tr {
+    const int MAX_SPINNING_TOPS = 2;
+}
+
 using namespace sf;
 
 /*
  * Class which represents the player
  */
-class Motorbike : public Player {
+class Minivan : public Player {
+
+        Texture t;
+
+        // Code of the actual image texture
+        int actual_code_image;
+
+        // Position of the main character
+        float playerX;
+
+        // How to control the motorbike
+        int typeControl = 0;
+
+        // Sprite of the player motorbike
+        Sprite playerSprite;
+
+        // Mode to show the collision of the motorbike by default
+        int mode;
+
+        // Accumulator to the coordinate of the axis Y to make collision better
+        int offset;
+
+        // Offset added if the collision is with the second type
+        int increment;
+
+        // File path with the sprites
+        char* filePath;
+
+        // Vector of textures of the player
+        vector<Texture> textures;
+
+        // Amount of spinning tops of the car
+        int spinningTopsDone = 0;
 
     public:
 
         /**
          * Constructor of the class
          */
-        Motorbike(char* pathFile);
+        Minivan(char* pathFile);
 
 
 
@@ -40,17 +76,26 @@ class Motorbike : public Player {
         /**
          * Draw the player sprite in the console render window
          * @param app is the console window game where the sprite is going to be drawn
-         * @param pos is the actual position of the motorbike in the map
          */
         void drawPlayer(RenderWindow& app, int& pos);
 
 
 
-        /**
+      /**
+       * Check if the player has to advance in the track
+       * @param eventDetected is a boolean to control if an event has occurred
+       * @param height is the actual elevation of the terrain where is the Minivan
+       * @param lastHeight was the elevation of the terrain where was the Minivan
+       */
+       void advancePlayer(bool& eventDetected);
+
+
+
+       /**
          * Check if the player has to advance in the track
          * @param eventDetected is a boolean to control if an event has occurred
-         * @param lastHeight was the elevation of the terrain where was the motorbike
-         * @param height is the actual elevation of the terrain where is the motorbike
+         * @param lastHeight was the elevation of the terrain where was the Minivan
+         * @param height is the actual elevation of the terrain where is the Minivan
          */
         void advancePlayer(bool& eventDetected, const int lastHeight, const int height);
 
@@ -58,15 +103,15 @@ class Motorbike : public Player {
 
         /**
          * Get the coordinate of the payer in the axis X
-         * @return the position of the motorbike in the axis X
+         * @return the position of the Minivan in the axis X
          */
-         float getPlayerX();
+        float getPlayerX();
 
 
 
          /**
-          * Get the mode of collision of the motorbike
-          * @return the mode to show the collision of the motorbike
+          * Get the mode of collision of the Minivan
+          * @return the mode to show the collision of the Minivan
           */
          int getModeCollision();
 
@@ -74,11 +119,11 @@ class Motorbike : public Player {
 
         /**
          * Control if the user has pressed the q keyword to turn to the left
-         * @param speed is the actual speed of the motorbike of the player
+         * @param speed is the actual speed of the Minivan of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the motorbike
-         * @param height is the actual elevation of the terrain where is the motorbike
+         * @param lastHeight was the elevation of the terrain where was the Minivan
+         * @param height is the actual elevation of the terrain where is the Minivan
          */
         inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
                                                      const int lastHeight, const int height);
@@ -87,11 +132,11 @@ class Motorbike : public Player {
 
          /**
          * Control if the user has pressed the w keyword to turn to the right
-         * @param speed is the actual speed of the motorbike of the player
+         * @param speed is the actual speed of the Minivan of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the motorbike
-         * @param height is the actual elevation of the terrain where is the motorbike
+         * @param lastHeight was the elevation of the terrain where was the Minivan
+         * @param height is the actual elevation of the terrain where is the Minivan
          */
         inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
                                                       const int lastHeight, const int height);
@@ -100,7 +145,7 @@ class Motorbike : public Player {
 
         /**
          * Control if the user has pressed the q keyword to turn to the left
-         * @param speed is the actual speed of the motorbike of the player
+         * @param speed is the actual speed of the Minivan of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
@@ -110,7 +155,7 @@ class Motorbike : public Player {
 
         /**
          * Control if the user has pressed the w keyword to turn to the right
-         * @param speed is the actual speed of the motorbike of the player
+         * @param speed is the actual speed of the Minivan of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
@@ -120,25 +165,25 @@ class Motorbike : public Player {
 
         /**
          * Control if the user has pressed the q keyword to increase the speed
-         * @param speed is the actual speed of the motorbike of the player
+         * @param speed is the actual speed of the Minivan of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the motorbike
-         * @param height is the actual elevation of the terrain where is the motorbike
+         * @param lastHeight was the elevation of the terrain where was the Minivan
+         * @param height is the actual elevation of the terrain where is the Minivan
          */
         inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
                                        const int lastHeight, const int height);
 
 
 
-        /**
-         * Control if the user has pressed the q keyword to increase the speed
-         * @param speed is the actual speed of the motorbike of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the motorbike
-         * @param height is the actual elevation of the terrain where is the motorbike
-         */
+       /**
+        * Control if the user has pressed the q keyword to increase the speed
+        * @param speed is the actual speed of the Minivan of the player
+        * @param eventDetected is a boolean to control if an event has occurred
+        * @param app is the console window game where the sprite is going to be drawn
+        * @param lastHeight was the elevation of the terrain where was the Minivan
+        * @param height is the actual elevation of the terrain where is the Minivan
+        */
         inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
                                          const int lastHeight, const int height);
 
@@ -146,45 +191,44 @@ class Motorbike : public Player {
 
         /**
          * Control if the player has done any of his possible actions
-         * @param speed is the actual speed of the motorbike of the player
+         * @param speed is the actual speed of the Minivan of the player
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the motorbike
-         * @param height is the actual elevation of the terrain where is the motorbike
+         * @param lastHeight was the elevation of the terrain where was the Minivan
+         * @param height is the actual elevation of the terrain where is the Minivan
          */
-        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app,
-                                 const int lastHeight, const int height);
+        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app, const int lastCamH, const int camH);
 
 
 
         /**
          * Control if the player has have collision with the nearest element of the map to him
          * @param nearestStep is the step of the scene where is located the nearest element to the player
-         * @param lastPos is the last position of the motorbike in the axis Y
-         * @param pos is the current position of the motorbike in the axis Y
+         * @param lastPos is the last position of the Minivan in the axis Y
+         * @param pos is the current position of the Minivan in the axis Y
          */
         bool controlPossibleCollision(Step& nearestSprite, int& lastPos, int& pos);
 
 
 
         /**
-         * Control if there is there inertia force or not if the motorbike is on a curve of the scene
-         * @param onCurve is a boolean which represents if the motorbike is on curve or not
-         * @param curve is the possible curve of the scene where the motorbike is currently now
-         * @param speed is the actual speed of the motorbike of the player
+         * Control if there is there inertia force or not if the Minivan is on a curve of the scene
+         * @param onCurve is a boolean which represents if the Minivan is on curve or not
+         * @param curve is the possible curve of the scene where the Minivan is currently now
+         * @param speed is the actual speed of the Minivan of the player
          */
         void controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed);
 
 
 
         /**
-         * Shows to the user how the motorbikes crushes
+         * Shows to the user how the Minivan crushes
+         * @param pos is the position of the Minivan in the car in the axis Y
          */
         void collisionShow();
 
-
 };
 
+#endif // MINIVAN_H
 
-#endif
 
