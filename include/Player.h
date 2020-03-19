@@ -7,10 +7,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
-#include "Step.h"
-#include "IntervalCurve.h"
-#include "rapidxml.hpp"
-#include "rapidxml_utils.hpp"
+#include "../include/Configuration.h"
+#include "../include/Step.h"
+#include "../include/IntervalCurve.h"
+#include "../include/rapidxml.hpp"
+#include "../include/rapidxml_utils.hpp"
 #include <SFML/Graphics.hpp>
 
 
@@ -67,6 +68,9 @@ class Player {
         // Vector of textures of the player
         vector<Texture> textures;
 
+        // Configuration of the player
+        Configuration* c;
+
     public:
 
 
@@ -85,6 +89,8 @@ class Player {
             mode = -1;
             // Accumulator to the coordinate of the axis Y to make collision better
             offset = 0;
+            // Load the default configuration to control the vehicle
+            c = new Configuration();
         }
 
 
@@ -101,7 +107,7 @@ class Player {
          * @param app is the console window game where the sprite is going to be drawn
          * @param pos is the actual position of the player in the map
          */
-        virtual void drawPlayer(RenderWindow& app, int& pos) = 0;
+        virtual void drawPlayer(RenderWindow* app, int& pos) = 0;
 
 
 
@@ -141,7 +147,7 @@ class Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+        virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                              const int lastHeight, const int height) = 0;
 
 
@@ -154,7 +160,7 @@ class Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+        virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                               const int lastHeight, const int height) = 0;
 
 
@@ -167,7 +173,7 @@ class Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+        virtual inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
                                                const int lastHeight, const int height) = 0;
 
 
@@ -180,7 +186,7 @@ class Player {
          * @param lastHeight was the elevation of the terrain where was the player
          * @param height is the actual elevation of the terrain where is the player
          */
-        virtual inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+        virtual inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
                                          const int lastHeight, const int height) = 0;
 
 
@@ -192,7 +198,7 @@ class Player {
          * @param lastHeight was the elevation of the terrain where was the player
          * @param height is the actual elevation of the terrain where is the player
          */
-        virtual void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app,
+        virtual void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app,
                                          const int lastHeight, const int height) = 0;
 
 

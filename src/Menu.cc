@@ -40,7 +40,7 @@ Menu::Menu(char* pathMenuFile){
  * Shows the main cover of the game until the player presses start
  * @param app is the console where the game is displayed to the players
  */
-void Menu::showMainMenu(RenderWindow& app){
+void Menu::showMainMenu(RenderWindow* app){
     // Clean the console of the game
 
     // Set position to the cover sprite
@@ -73,9 +73,9 @@ void Menu::showMainMenu(RenderWindow& app){
             coverText.setFillColor(Color::White);
         }
         // Clean the console of the game
-        app.draw(menuSprite);
-        app.draw(coverText);
-        app.display();
+        app->draw(menuSprite);
+        app->draw(coverText);
+        app->display();
         sleep(milliseconds(400));
     }
 }

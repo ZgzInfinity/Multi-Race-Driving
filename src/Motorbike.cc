@@ -9,12 +9,12 @@ Motorbike::Motorbike(char* pathFile) : Player(pathFile){};
  * Draw the player sprite in the console render window
  * @param app is the console window game where the sprite is going to be drawn
  */
-void Motorbike::drawPlayer(RenderWindow& app, int& pos){
+void Motorbike::drawPlayer(RenderWindow* app, int& pos){
     this->offset = (mode == 0 && actual_code_image <= 35) ? offset += 10 : offset += 5;
     this->offset = (mode == 1 && actual_code_image <= 46) ? offset += 20 : offset;
     if (mode == -1) offset = 0;
     playerSprite.setPosition(Vector2f(465.f, HEIGHT - 190.f - offset));
-    app.draw(playerSprite);
+    app->draw(playerSprite);
 }
 
 
@@ -114,11 +114,11 @@ int Motorbike::getModeCollision(){
  * @param lastHeight was the elevation of the terrain where was the motorbike
  * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                              const int lastHeight, const int height)
 {
     // Check if key left pressed
-    if (Keyboard::isKeyPressed(Keyboard::Q)){
+    if (Keyboard::isKeyPressed(c->getLeftKey())){
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX - 0.1 >= BORDER_LIMIT_ROAD_LEFT){
             // Check if the motorbike is outside the road
@@ -165,11 +165,11 @@ inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventD
  * @param lastHeight was the elevation of the terrain where was the motorbike
  * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                               const int lastHeight, const int height)
 {
     // Check if key right pressed
-    if (Keyboard::isKeyPressed(Keyboard::W)){
+    if (Keyboard::isKeyPressed(c->getRightKey())){
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX + 0.1 <= BORDER_LIMIT_ROAD_RIGHT){
             // Check if the motorbike is outside the road
@@ -212,11 +212,11 @@ inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& event
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
  */
-inline void Motorbike::controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app){
+inline void Motorbike::controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow* app){
     // Get the x coordinate of the mouse in the window
-    int coordinateX = sf::Mouse::getPosition(app).x;
+    int coordinateX = sf::Mouse::getPosition(*app).x;
     // Check if key right pressed
-    if (coordinateX < (int)app.getSize().x / 3  ){
+    if (coordinateX < (int)app->getSize().x / 3  ){
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX - 0.1 >= BORDER_LIMIT_ROAD_LEFT){
             // Check if the motorbike is outside the road
@@ -262,11 +262,11 @@ inline void Motorbike::controlTurningPlayerLeftMouse(int& speed, bool& eventDete
  * @param eventDetected is a boolean to control if an event has occurred
  * @param app is the console window game where the sprite is going to be drawn
  */
-inline void Motorbike::controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app){
+inline void Motorbike::controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow* app){
     // Get the x coordinate of the mouse in the window
-    int coordinateX = sf::Mouse::getPosition(app).x;
+    int coordinateX = sf::Mouse::getPosition(*app).x;
     // Check if key right pressed
-    if (coordinateX > 2 * (int)(app.getSize().x / 3)){
+    if (coordinateX > 2 * (int)(app->getSize().x / 3)){
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX + 0.1 <= BORDER_LIMIT_ROAD_RIGHT){
             // Check if the motorbike is outside the road
@@ -312,11 +312,11 @@ inline void Motorbike::controlTurningPlayerRightMouse(int& speed, bool& eventDet
  * @param lastHeight was the elevation of the terrain where was the motorbike
  * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
                                           const int lastHeight, const int height)
 {
     // Check if the user is accelerating
-    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up))){
+    if ((sf::Keyboard::isKeyPressed(c->getAccelerateKey()))){
         // Control about not acceleration if the motorbike goes in the grass
         if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
             // Increment the speed because it is inside the road
@@ -385,11 +385,11 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
  * @param lastHeight was the elevation of the terrain where was the motorbike
  * @param height is the actual elevation of the terrain where is the motorbike
  */
-inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
                                             const int lastHeight, const int height)
 {
     // Check if the user is braking
-    if (Keyboard::isKeyPressed(Keyboard::Down)){
+    if (Keyboard::isKeyPressed(c->getBrakeKey())){
         // Check more events
         if (!eventDetected){
             // Control if first the user has accelerated
@@ -467,7 +467,7 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
  * @param lastHeight was the elevation of the terrain where was the motorbike
  * @param height is the actual elevation of the terrain where is the motorbike
  */
-void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app,
+void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app,
                                     const int lastHeight, const int height)
 {
     if (typeControl == 0){

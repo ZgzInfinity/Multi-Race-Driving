@@ -37,7 +37,7 @@ void Step::project(int camX, int camY, int camZ){
  * Draw a sprite in the console game
  * @param app is the console game where the user is playing
  */
-void Step::drawSprite(RenderWindow &app){
+void Step::drawSprite(RenderWindow* app){
     // Creation of a new sprite
     Sprite s = character;
     // Get the dimensions of the image which contains the texture of the sprite
@@ -68,7 +68,7 @@ void Step::drawSprite(RenderWindow &app){
         // Assign the position to draw
         s.setPosition(destX, destY);
         // Draw the sprite in the screen
-        app.draw(s);
+        app->draw(s);
     }
 }
 

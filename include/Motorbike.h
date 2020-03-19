@@ -42,7 +42,7 @@ class Motorbike : public Player {
          * @param app is the console window game where the sprite is going to be drawn
          * @param pos is the actual position of the motorbike in the map
          */
-        void drawPlayer(RenderWindow& app, int& pos);
+        void drawPlayer(RenderWindow* app, int& pos);
 
 
 
@@ -80,7 +80,7 @@ class Motorbike : public Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                      const int lastHeight, const int height);
 
 
@@ -93,7 +93,7 @@ class Motorbike : public Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                       const int lastHeight, const int height);
 
 
@@ -104,7 +104,7 @@ class Motorbike : public Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app);
+        inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow* app);
 
 
 
@@ -114,7 +114,7 @@ class Motorbike : public Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app);
+        inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow* app);
 
 
 
@@ -126,7 +126,7 @@ class Motorbike : public Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
                                        const int lastHeight, const int height);
 
 
@@ -139,7 +139,7 @@ class Motorbike : public Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
                                          const int lastHeight, const int height);
 
 
@@ -152,7 +152,7 @@ class Motorbike : public Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app,
+        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app,
                                  const int lastHeight, const int height);
 
 

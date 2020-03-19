@@ -45,7 +45,7 @@ class Menu{
      * Shows the main cover of the game until the player presses start
      * @param app is the console where the game is displayed to the players
      */
-    void showMainMenu(RenderWindow& app);
+    void showMainMenu(RenderWindow* app);
 
 };
 

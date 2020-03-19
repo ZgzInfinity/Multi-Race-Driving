@@ -62,15 +62,15 @@ Animation::Animation(char* pathMenuFile){
  * Shows the different menus with the icons of Sega
  * @param app is the console where the game is displayed to the players
  */
-void Animation::loadSegaIcons(RenderWindow& app){
+void Animation::loadSegaIcons(RenderWindow* app){
     // Iterate thorough the different textures of the sega icons
     for (int i = 0; i < (int)menuTextures.size() - 3; i++){
         // Load the texture in the sprite in order to show it
         menuSprite.setTexture(menuTextures.at(i), true);
         // Store the textures of the menus in the console game
-        app.draw(menuSprite);
+        app->draw(menuSprite);
         // Show the logos in the console
-        app.display();
+        app->display();
         // Sleep the process to see the menu icons correctly
         sleep(milliseconds(35));
     }
@@ -81,30 +81,30 @@ void Animation::loadSegaIcons(RenderWindow& app){
  * Shows the company of the game and also the presents image of the game
  * @param app is the console where the game is displayed to the players
  */
-void Animation::loadGameData(RenderWindow& app){
+void Animation::loadGameData(RenderWindow* app){
     // Clean the console of the game
-    app.clear(Color::Black);
+    app->clear(Color::Black);
     // Set position to the company sprite
     menuSprite.setPosition(220, 100);
     // Load the texture to show it
     menuSprite.setTexture(company, true);
     // Store the textures of the menus in the console game
-    app.draw(menuSprite);
+    app->draw(menuSprite);
     // Show the logos in the console
-    app.display();
+    app->display();
     // Sleep the process to see the menu icons correctly
     sleep(milliseconds(4000));
 
     // Clean the console of the game
-    app.clear(Color::Black);
+    app->clear(Color::Black);
     // Set position to the presents sprite
     menuSprite.setPosition(300, 150);
     // Load the texture to show it
     menuSprite.setTexture(presents, true);
     // Store the textures of the menus in the console game
-    app.draw(menuSprite);
+    app->draw(menuSprite);
     // Show the logos in the console
-    app.display();
+    app->display();
     // Sleep the process to see the menu icons correctly
     sleep(milliseconds(4000));
 }

@@ -68,7 +68,7 @@ struct Step{
      * Draw a sprite in the console game
      * @param app is the console game where the user is playing
      */
-    void drawSprite(RenderWindow &app);
+    void drawSprite(RenderWindow* app);
 
 
 
