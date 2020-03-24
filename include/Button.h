@@ -28,18 +28,24 @@ class Button {
         Color activeColorButton;
 
         bool hover, pressed;
-
-        int buttonState = BUTTON_IDLE;
+        int buttonState;
 
     public:
 
         const bool isPressed() const;
 
-        Button (float x, float y, float width, float height, Font f, string text,
-                Color idleColor, Color hoverColor, Color activeColor);
+        const bool isHovered() const;
 
-        void getPressed (Vector2i mousePosition);
-        void render (RenderWindow& app);
+        Button();
+
+        Button (float x, float y, float width, float height, Font& f, string text,
+                Color idleColor, Color hoverColor, Color activeColor, int initialState);
+
+        void getPressed (Button& otherButton);
+
+        void setButtonState(button_states buttonState);
+
+        void render (RenderWindow* app);
 
 };
 

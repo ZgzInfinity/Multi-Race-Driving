@@ -11,9 +11,7 @@ Game::Game(RenderWindow* app) {
     animationGame = new Animation(animationF);
 
     // Creation of the menus
-    string menusFile = "Configuration/Menus/Menus.xml";
-    char* menuF = const_cast<char*>(menusFile.c_str());
-    menuGame = new Menu(menuF);
+    menuGame = new Menu();
 
     // Showing the animation of the sega logo
     animationGame->loadSegaIcons(application);
@@ -23,6 +21,12 @@ Game::Game(RenderWindow* app) {
 
     // Show the main menu
     menuGame->showMainMenu(application);
+
+    // Show the selector menu of the players
+    menuGame->showPlayerMenu(application);
+
+    // Show the selector menu of the game modes
+    menuGame->showGameModesMenu(application);
 
     // Play the game
     playingGame();
@@ -71,12 +75,6 @@ inline void Game::playingGame(){
 
     // Message used to alert the player where is the next checkpoint to pass
     string message = "Next checkpoint";
-
-
-    /*
-    Button b = Button(100, 100, 150, 50, f4, "Single Player", Color::Yellow,
-                      Color::Red, Color::Green);
-    */
 
     // Text
     Text sText;
