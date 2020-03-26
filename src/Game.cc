@@ -22,11 +22,23 @@ Game::Game(RenderWindow* app) {
     // Show the main menu
     menuGame->showMainMenu(application);
 
-    // Show the selector menu of the players
-    menuGame->showPlayerMenu(application);
+    // Control the player mode selected
+    int modePlayerSelected;
 
-    // Show the selector menu of the game modes
-    menuGame->showGameModesMenu(application);
+    // Control the game mode selected
+    int modeGameSelected;
+
+    // Control the difficult level selected
+    int modeDifficultLevelSelected;
+
+    // Show the selector menu of the players
+    menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml");
+
+    // Show the selector game modes
+    menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml");
+
+    // Show the selector difficult level of the game
+    menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml");
 
     // Play the game
     playingGame();

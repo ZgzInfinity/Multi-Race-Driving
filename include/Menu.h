@@ -22,9 +22,23 @@ class Menu{
 
     private:
 
-    vector<Button> menuButtons;
+        // Vector to keep the buttons of the menus
+        vector<Button> menuButtons;
 
-    vector<Color>color_buttons;
+        // Vector for store the different color buttons
+        vector<Color>color_buttons;
+
+        // Panel for the menus of the game
+        sf::RectangleShape rectangle;
+
+        // Variable to store the texture of the game's presents main cover
+        Texture cover;
+
+        // Sprite where the different textures are loaded
+        Sprite menuSprite;
+
+        // Coordinates of the cover
+        int positionXCover, positionYCover;
 
     public:
 
@@ -59,8 +73,9 @@ class Menu{
      * Load the configuration of the player and game menus
      * @param pathFile is the xml file configuration of the menu to load
      */
-    inline void loadPlayerAndGameMenus(string pathFile);
-
+    inline void loadPlayerAndGameMenus(string pathFile, string& imagePath, string& textContent, string& fontPath,
+                                       Font& f, int& positionXPanel, int& positionYPanel, int& width, int& height,
+                                       int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText);
 
 
     /**
@@ -72,18 +87,11 @@ class Menu{
 
 
     /**
-     * Shows the menu of selecting the number of players
+     * Shows the main cover of the game until the player presses start
      * @param app is the console where the game is displayed to the players
-    */
-    void showPlayerMenu(RenderWindow* app);
+     */
+    void showStandardMenu(RenderWindow* app, string pathFile);
 
-
-
-    /**
-     * Shows the menu of selecting the game modes
-     * @param app is the console where the game is displayed to the players
-    */
-    void showGameModesMenu(RenderWindow* app);
 
 };
 

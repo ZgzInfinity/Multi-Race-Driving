@@ -10,8 +10,8 @@ Button::Button (float x, float y, float width, float height, Font& f,
     shape.setSize(Vector2f(width, height));
     shape.setOutlineColor(Color::Black);
     shape.setOutlineThickness(3);
-    textButton.setFont(f);
     textButton.setString(text);
+    textButton.setFont(f);
     textButton.setFillColor(Color::Blue);
     textButton.setCharacterSize(12);
     textButton.setPosition(

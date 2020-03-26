@@ -126,8 +126,11 @@ inline void Menu::loadMainMenu(string& imagePath, string& fontPath, string& text
  * Load the configuration of the player and game menus
  * @param pathFile is the xml file configuration of the menu to load
  */
-inline void Menu::loadPlayerAndGameMenus(string pathFile){
-
+inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, string& textContent, string& fontPath,
+                                         Font& f, int& positionXPanel, int& positionYPanel, int& width, int& height,
+                                         int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText)
+{
+    // Path of the xml configuration file
     char* menuF = const_cast<char*>(pathFile.c_str());
     xml_document<> doc;
     file<> file(menuF);
@@ -186,7 +189,7 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile){
                 else if ((string)nodeText->name() == "Font"){
                     // Path of the main text font
                     fontPath = nodeText->value();
-                    fontPanel.loadFromFile(fontPath);
+                    f.loadFromFile(fontPath);
                     continue;
                 }
                 // Check the size of the main text
@@ -208,6 +211,8 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile){
                 }
                 // Check the color of the main text
                 else if ((string)nodeText->name() == "Color"){
+                    // Variables to define the color of the text
+                    int channelR, channelG, channelB;
                     // Loop in order to iterate all the children nodes of the text's color
                     for (xml_node<> *colorNode = nodeText->first_node(); colorNode; colorNode = colorNode->next_sibling()){
                         // Check the value of the red channel
@@ -235,6 +240,10 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile){
         }
         // Check if it's the node of the text information
         else if ((string)node->name() == "Buttons"){
+            // Variables to store the information of the buttons
+            int positionXTextButton, positionYTextButton, widthButton, heightButton, initialStateButton;
+            string textContentButton;
+
             // Iterate throughout the different buttons of the menu
             for (xml_node<> *button = node->first_node(); button; button = button->next_sibling()){
                 // Iterate the fields of the buttons
@@ -267,7 +276,7 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile){
                     else if ((string)buttonNode->name() == "Font"){
                         // Get y coordinate of the cover
                         fontPath = buttonNode->value();
-                        fontButton.loadFromFile(fontPath);
+                        f.loadFromFile(fontPath);
                         continue;
                     }
                     // Check if it's the node that controls the main menu of the game
@@ -284,7 +293,10 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile){
                     }
                     // Check the color of the main text
                     else if ((string)buttonNode->name() == "Colors"){
+                        // Clear the color of the last buttons
                         color_buttons.clear();
+                        // Variables to store the color of the buttons
+                        int channelR, channelG, channelB;
                         // Loop in order to iterate all the children nodes of the text's color
                         for (xml_node<> *colorNode = buttonNode->first_node(); colorNode; colorNode = colorNode->next_sibling()){
                             // Get the channel of this color
@@ -310,9 +322,10 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile){
                             }
                         }
                         // Creation of the button and addition to the vector
-                        menuButtons.push_back(Button(positionXTextButton, positionYTextButton, widthButton, heightButton,
-                                                     fontButton, textContentButton, color_buttons[0], color_buttons[1],
-                                                     color_buttons[2], initialStateButton));
+                        Button b = Button(positionXTextButton, positionYTextButton, widthButton, heightButton, f,
+                                                     textContentButton, color_buttons[0], color_buttons[1],
+                                                     color_buttons[2], initialStateButton);
+                        menuButtons.push_back(b);
                     }
                 }
             }
@@ -331,8 +344,8 @@ void Menu::showMainMenu(RenderWindow* app){
     // Variables to store the information read from the file of the menu
     string imagePath, fontPath, textContent;
 
-    // Coordinates of the cover and the main text
-    int positionXCover, positionYCover, positionXText, positionYText, sizeText;
+    // Variables to control the main text of the cover
+    int positionXText, positionYText, sizeText;
 
     // Color channels
     int channelR, channelG, channelB;
@@ -341,12 +354,9 @@ void Menu::showMainMenu(RenderWindow* app){
     loadMainMenu(imagePath, fontPath, textContent, positionXCover, positionYCover,
                  positionXText, positionYText, sizeText, channelR, channelG, channelB);
 
-    // Variable to store the texture of the game's presents main cover
-    Texture cover;
+    // Load the texture of the cover
     cover.loadFromFile(imagePath);
 
-    // Sprite where the different textures are loaded
-    Sprite menuSprite;
 
     // Initial text shown in the main cover of the game
     Text coverText;
@@ -391,6 +401,8 @@ void Menu::showMainMenu(RenderWindow* app){
         app->display();
         sleep(milliseconds(400));
     }
+    Event event;
+    app->pollEvent(event);
 }
 
 
@@ -399,131 +411,41 @@ void Menu::showMainMenu(RenderWindow* app){
  * Shows the menu of selecting the number of players
  * @param app is the console where the game is displayed to the players
 */
-void Menu::showPlayerMenu(RenderWindow* app){
+void Menu::showStandardMenu(RenderWindow* app, string pathFile){
 
-    // Variables to store all the information of the menu panel
-    string imagePath, textContent, fontPath, textContentButton;
-    int positionXPanel, positionYPanel, width, height, border, positionXText, positionYText, sizeText;
-    int positionXTextButton, positionYTextButton, widthButton, heightButton, initialStateButton;
-    Color colorText;
+    // Clean the console window
+    app->clear(Color(0, 0 ,0));
 
-    // Color channels
-    int channelR, channelG, channelB;
-    Font fontPanel, fontButton;
+    sleep(milliseconds(300));
 
-    // Load from file the player menu
-    loadPlayerAndGameMenus("Configuration/Menus/PlayerMenu.xml");
-
-    // Draw the rectangle of the player menu
-    sf::RectangleShape rectangle;
-    rectangle.setPosition(positionXPanel, positionYPanel);
-    rectangle.setSize(sf::Vector2f(width, height));
-    rectangle.setOutlineColor(Color::Green);
-    rectangle.setOutlineThickness(border);
-    Texture background;
-    background.loadFromFile(imagePath);
-    rectangle.setTexture(&background, false);
-    app->draw(rectangle);
-
-    // Draw the text introduction of the menu
-    Text playerText;
-    playerText.setString(textContent);
-    playerText.setFillColor(colorText);
-    playerText.setCharacterSize(sizeText);
-    playerText.setStyle(Text::Bold | Text::Underlined);
-    playerText.setPosition(positionXText, positionYText);
-    playerText.setFont(fontPanel);
-    app->draw(playerText);
-
-    // Identifier of the actual button selected
-    int actualButtonHover = 0;
-
-    // Show the buttons of the menu
-    for (int i = 0; i < menuButtons.size(); i++){
-        menuButtons.at(i).render(app);
-    }
-    // Display the changes of the buttons' appearance
-    app->display();
-
-    // Loop until the player selects a mode pressing enter
-    while (!Keyboard::isKeyPressed(Keyboard::Space)){
-        // Check if the up cursor keyword has been pressed
-        if (Keyboard::isKeyPressed(Keyboard::Up)){
-            // Check if the first button is hovered or not
-            if (actualButtonHover != 0){
-                // Move the button hovered
-                actualButtonHover--;
-                // Change the color appearance of both buttons
-                menuButtons[actualButtonHover].setButtonState(BUTTON_HOVER);
-                menuButtons[actualButtonHover + 1].setButtonState(BUTTON_IDLE);
-
-                // Render the buttons with the changes
-                app->draw(rectangle);
-                app->draw(playerText);
-
-                // Show the buttons of the menu
-                for (int i = 0; i < menuButtons.size(); i++){
-                    menuButtons.at(i).render(app);
-                }
-                app->display();
-            }
-        }
-        // Check if the down cursor keyword has been pressed
-        else if (Keyboard::isKeyPressed(Keyboard::Down)){
-            // Check if the first button is hovered or not
-            if (actualButtonHover != (int)menuButtons.size() - 1){
-                // Move the button hovered
-                actualButtonHover++;
-                // Change the color appearance of both buttons
-                menuButtons[actualButtonHover].setButtonState(BUTTON_HOVER);
-                menuButtons[actualButtonHover - 1].setButtonState(BUTTON_IDLE);
-
-                // Render the buttons with the changes
-                app->draw(rectangle);
-                app->draw(playerText);
-
-                // Show the buttons of the menu
-                for (int i = 0; i < menuButtons.size(); i++){
-                    menuButtons.at(i).render(app);
-                }
-                app->display();
-            }
-        }
-    }
-}
-
-
-
-/**
- * Shows the menu of selecting the game modes
- * @param app is the console where the game is displayed to the players
-*/
-void Menu::showGameModesMenu(RenderWindow* app){
-
+    // Clear the list of buttons of the last possible menus
     menuButtons.clear();
 
     // Variables to store all the information of the menu panel
     string imagePath, textContent, fontPath, textContentButton;
     int positionXPanel, positionYPanel, width, height, border, positionXText, positionYText, sizeText;
-    int positionXTextButton, positionYTextButton, widthButton, heightButton, initialStateButton;
     Color colorText;
-
-    // Color channels
-    int channelR, channelG, channelB;
     Font fontPanel, fontButton;
 
-     // Load from file the player menu
-    loadPlayerAndGameMenus("Configuration/Menus/GameMenu.xml";)
+    // Load from file the player menu
+    loadPlayerAndGameMenus(pathFile, imagePath, textContent, fontPath, fontButton,
+                           positionXPanel, positionYPanel, width, height, border, positionXText,
+                           positionYText, sizeText, colorText);
+
+    // Set position to the cover sprite
+    menuSprite.setPosition(positionXCover, positionYCover);
+    // Load the texture to show it
+    menuSprite.setTexture(cover, true);
+    app->draw(menuSprite);
 
     // Draw the rectangle of the player menu
-    sf::RectangleShape rectangle;
     rectangle.setPosition(positionXPanel, positionYPanel);
     rectangle.setSize(sf::Vector2f(width, height));
     rectangle.setOutlineColor(Color::Green);
     rectangle.setOutlineThickness(border);
     Texture background;
     background.loadFromFile(imagePath);
-    rectangle.setTexture(&background, false);
+    rectangle.setTexture(&background, true);
     app->draw(rectangle);
 
     // Draw the text introduction of the menu
@@ -533,6 +455,7 @@ void Menu::showGameModesMenu(RenderWindow* app){
     playerText.setCharacterSize(sizeText);
     playerText.setStyle(Text::Bold | Text::Underlined);
     playerText.setPosition(positionXText, positionYText);
+    fontPanel.loadFromFile(fontPath);
     playerText.setFont(fontPanel);
     app->draw(playerText);
 
@@ -540,14 +463,14 @@ void Menu::showGameModesMenu(RenderWindow* app){
     int actualButtonHover = 0;
 
     // Show the buttons of the menu
-    for (int i = 0; i < menuButtons.size(); i++){
+    for (int i = 0; i < (int)menuButtons.size(); i++){
         menuButtons.at(i).render(app);
     }
     // Display the changes of the buttons' appearance
     app->display();
 
     // Loop until the player selects a mode pressing enter
-    while (!Keyboard::isKeyPressed(Keyboard::S)){
+    while (!Keyboard::isKeyPressed(Keyboard::Enter)){
         // Check if the up cursor keyword has been pressed
         if (Keyboard::isKeyPressed(Keyboard::Up)){
             // Check if the first button is hovered or not
@@ -563,12 +486,11 @@ void Menu::showGameModesMenu(RenderWindow* app){
                 app->draw(playerText);
 
                 // Show the buttons of the menu
-                for (int i = 0; i < menuButtons.size(); i++){
+                for (int i = 0; i < (int)menuButtons.size(); i++){
                     menuButtons.at(i).render(app);
                 }
                 app->display();
-
-                sleep(milliseconds(200));
+                sleep(milliseconds(150));
             }
         }
         // Check if the down cursor keyword has been pressed
@@ -582,17 +504,23 @@ void Menu::showGameModesMenu(RenderWindow* app){
                 menuButtons[actualButtonHover - 1].setButtonState(BUTTON_IDLE);
 
                 // Render the buttons with the changes
+                app->draw(menuSprite);
                 app->draw(rectangle);
                 app->draw(playerText);
 
                 // Show the buttons of the menu
-                for (int i = 0; i < menuButtons.size(); i++){
+                for (int i = 0; i < (int)menuButtons.size(); i++){
                     menuButtons.at(i).render(app);
                 }
-
                 app->display();
-                sleep(milliseconds(200));
+                sleep(milliseconds(150));
             }
         }
     }
+    Event event;
+    app->pollEvent(event);
 }
+
+
+
+
