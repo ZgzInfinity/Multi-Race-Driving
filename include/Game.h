@@ -10,6 +10,8 @@
 #include "../include/Minivan.h"
 #include "../include/Truck.h"
 #include "../include/LandScape.h"
+#include "../include/GameSelectorMode.h"
+#include "../include/Environment.h"
 #include "SFML/Graphics.hpp"
 
 using namespace std;
@@ -27,6 +29,10 @@ class Game {
         Animation* animationGame;
 
         Menu* menuGame;
+
+        GameSelectorMode gSM;
+
+        Environment e;
 
     public:
 

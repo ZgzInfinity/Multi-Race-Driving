@@ -33,7 +33,7 @@ class Motorbike : public Player {
         /**
          * Load the set of sprites of the player
          */
-         void loadSpritesFromPath();
+         void loadVehicleProperties();
 
 
 

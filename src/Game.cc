@@ -32,13 +32,19 @@ Game::Game(RenderWindow* app) {
     int modeDifficultLevelSelected;
 
     // Show the selector menu of the players
-    menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml");
+    menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml", modePlayerSelected);
 
     // Show the selector game modes
-    menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml");
+    menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml", modeGameSelected);
 
     // Show the selector difficult level of the game
-    menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml");
+    menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml", modeDifficultLevelSelected);
+
+    // Creation of the game selector mode controller
+    gSM = GameSelectorMode(modeDifficultLevelSelected, modeGameSelected);
+
+    // Load the game mode configuration selected by the player
+    gSM.loadFileConfigurationMode(e);
 
     // Play the game
     playingGame();
@@ -60,79 +66,6 @@ void Game::drawQuad(Color c, int x1,int y1,int w1,int x2,int y2,int w2){
 
 inline void Game::playingGame(){
 
-    Texture speedPanel;
-    speedPanel.loadFromFile("images/Environment/speedIndicator.png");
-    Sprite basura;
-    basura.setTexture(speedPanel);
-
-    Texture elapsedPanel;
-    elapsedPanel.loadFromFile("images/Environment/elapsedIndicator.png");
-    Sprite timeElapsed;
-    timeElapsed.setTexture(elapsedPanel);
-
-    basura.setPosition(Vector2f(0.f, 660.f)); // absolute position
-    timeElapsed.setPosition(Vector2f(20.f, 50.f));
-
-    Font f;
-    f.loadFromFile("Fonts/digital.ttf");
-
-    Font f2;
-    f2.loadFromFile("Fonts/sgalsbi.ttf");
-
-    Font f3;
-    f3.loadFromFile("Fonts/needForSpeed.ttf");
-
-    Font f4;
-    f4.loadFromFile("Fonts/zorque.ttf");
-
-    // Message used to alert the player where is the next checkpoint to pass
-    string message = "Next checkpoint";
-
-    // Text
-    Text sText;
-    sText.setFillColor(Color::Yellow);
-    sText.setCharacterSize(26);
-    sText.setStyle(Text::Bold);
-    sText.setPosition(80, 668);
-    sText.setFont(f);
-
-
-    Text sText2;
-    sText2.setFillColor(Color(79, 255, 51));
-    sText2.setCharacterSize(30);
-    sText2.setStyle(Text::Bold);
-    sText2.setPosition(90, 75);
-    sText2.setFont(f);
-
-    Text sText3;
-    sText3.setFillColor(Color(255, 255, 255));
-    sText3.setCharacterSize(25);
-    sText3.setStyle(Text::Bold);
-    sText3.setPosition(468, 50);
-    sText3.setFont(f2);
-
-    Text sText4;
-    sText4.setFillColor(Color(255, 153, 51));
-    sText4.setCharacterSize(30);
-    sText4.setStyle(Text::Bold);
-    sText4.setPosition(468, 80);
-    sText4.setFont(f3);
-
-    Text sText5;
-    sText5.setFillColor(Color(255, 255, 255));
-    sText5.setCharacterSize(24);
-    sText5.setStyle(Text::Bold);
-    sText5.setPosition(700, 50);
-    sText5.setFont(f4);
-    sText5.setString(message);
-
-    Text sText6;
-    sText6.setFillColor(Color(255, 255, 255));
-    sText6.setCharacterSize(24);
-    sText6.setStyle(Text::Bold);
-    sText6.setPosition(750, 80);
-    sText6.setFont(f3);
-
     int minutes = 0, secs = 0, decs_in_sec = 0;
     int timeToPlay = INITIAL_SECS;
     Clock gameClock;
@@ -142,15 +75,15 @@ inline void Game::playingGame(){
     gameClock.restart();
 
 
-    string path = "images/Vehicles/Motorbike/";
+    string path = "images/Vehicles/Ferrari/";
     char* p = const_cast<char*>(path.c_str());
     // Motorbike of the player
-    Motorbike h = Motorbike(p);
+    Ferrari h = Ferrari(p);
 
-    h.loadSpritesFromPath();
+    h.loadVehicleProperties();
 
-    string name = "Configuration/GameModes/SuperHangOn/Scenes/Vancouver.xml";
-    char* n = const_cast<char*>(name.c_str());
+    vector<string> landscapes = gSM.getVectorOfLandScapes();
+    char* n = const_cast<char*>(landscapes[0].c_str());
     LandScape L = LandScape(n);
 
     // Number of steps done
@@ -261,8 +194,6 @@ inline void Game::playingGame(){
         int startPos = pos / segL;
         camH = L.lines[startPos].position_3d_y + H;
 
-        // Store the actual elevation of the terrain
-
         // Check if advance
         if (speed > 0 && h.getModeCollision() == -1){
             // Advance
@@ -327,48 +258,46 @@ inline void Game::playingGame(){
        time = (secs < 10) ? time + "0" + to_string(secs) + ":" : time + to_string(secs) + ":";
        time = (minutes < 10) ? time + "0" + to_string(decs_in_sec) : time + to_string(decs_in_sec);
 
-
-
        //Show all the elements in the console game
        h.drawPlayer(application, pos);
-       application->draw(basura);
-       application->draw(timeElapsed);
-       sText.setString(to_string(speed));
-       application->draw(sText);
+       application->draw(e.spriteSpeedPanel);
+       application->draw(e.spriteElapsedPanel);
+       e.textSpeedIndicator.setString(to_string(int(speed / RATIO)));
+       application->draw( e.textSpeedIndicator);
 
-       sText2.setString(time);
-       application->draw(sText2);
+       e.textElapsedIndicator.setString(time);
+       application->draw(e.textElapsedIndicator);
 
-       sText3.setString("TIME");
-       application->draw(sText3);
+       e.textTimePanel.setString("TIME");
+       application->draw(e.textTimePanel);
 
-       sText4.setString(to_string(timeToPlay));
-       application->draw(sText4);
+       e.textTimeIndicator.setString(to_string(timeToPlay));
+       application->draw(e.textTimeIndicator);
 
        int difference = (posCheckPoint - pos) / 1000;
        if (indexCheckpoint <= (int)L.checkpointsScene.size() - 1){
             // Shows information to the user
             // Calculation of the distance to arrive
             if (difference > 250){
-                sText6.setFillColor(Color::Green);
+                e.textDestinyIndicator.setFillColor(Color::Green);
             }
             else if (difference >= 100){
-                sText6.setFillColor(Color::Yellow);
+                e.textDestinyIndicator.setFillColor(Color::Yellow);
             }
             else {
-                sText6.setFillColor(Color::Red);
+                e.textDestinyIndicator.setFillColor(Color::Red);
             }
        }
        else {
-            message = "GOAL";
-            sText5.setPosition(775, 50);
-            sText5.setString(message);
+            e.message = "GOAL";
+            e.textDestinyPanel.setPosition(e.textDestinyPanel.getPosition().x + 50 , e.textDestinyPanel.getPosition().y);
+            e.textDestinyPanel.setString(e.message);
        }
-       sText6.setString(to_string(difference) + " Km");
-       application->draw(sText5);
-       application->draw(sText6);
-       application->display();
 
+       e.textDestinyIndicator.setString(to_string(difference) + " Km");
+       application->draw(e.textDestinyPanel);
+       application->draw(e.textDestinyIndicator);
+       application->display();
 
        // Sleep loop
        if (h.getModeCollision() == -1){

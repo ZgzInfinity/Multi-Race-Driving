@@ -22,38 +22,6 @@ using namespace sf;
  */
 class Truck : public Player {
 
-        Texture t;
-
-        // Code of the actual image texture
-        int actual_code_image;
-
-        // Position of the main character
-        float playerX;
-
-        // How to control the motorbike
-        int typeControl = 0;
-
-        // Sprite of the player motorbike
-        Sprite playerSprite;
-
-        // Mode to show the collision of the motorbike by default
-        int mode;
-
-        // Accumulator to the coordinate of the axis Y to make collision better
-        int offset;
-
-        // Offset added if the collision is with the second type
-        int increment;
-
-        // File path with the sprites
-        char* filePath;
-
-        // Vector of textures of the player
-        vector<Texture> textures;
-
-        // Amount of spinning tops of the car
-        int spinningTopsDone = 0;
-
     public:
 
         /**
@@ -66,7 +34,7 @@ class Truck : public Player {
         /**
          * Load the set of sprites of the player
          */
-         void loadSpritesFromPath();
+         void loadVehicleProperties();
 
 
 
@@ -74,7 +42,7 @@ class Truck : public Player {
          * Draw the player sprite in the console render window
          * @param app is the console window game where the sprite is going to be drawn
          */
-        void drawPlayer(RenderWindow& app, int& pos);
+        void drawPlayer(RenderWindow* app, int& pos);
 
 
 
@@ -122,7 +90,7 @@ class Truck : public Player {
          * @param lastHeight was the elevation of the terrain where was the truck
          * @param height is the actual elevation of the terrain where is the truck
          */
-        inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                      const int lastHeight, const int height);
 
 
@@ -135,7 +103,7 @@ class Truck : public Player {
          * @param lastHeight was the elevation of the terrain where was the truck
          * @param height is the actual elevation of the terrain where is the truck
          */
-        inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                       const int lastHeight, const int height);
 
 
@@ -146,7 +114,7 @@ class Truck : public Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow& app);
+        inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow* app);
 
 
 
@@ -156,7 +124,7 @@ class Truck : public Player {
          * @param eventDetected is a boolean to control if an event has occurred
          * @param app is the console window game where the sprite is going to be drawn
          */
-        inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow& app);
+        inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow* app);
 
 
 
@@ -168,7 +136,7 @@ class Truck : public Player {
          * @param lastHeight was the elevation of the terrain where was the truck
          * @param height is the actual elevation of the terrain where is the truck
          */
-        inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
                                        const int lastHeight, const int height);
 
 
@@ -181,7 +149,7 @@ class Truck : public Player {
         * @param lastHeight was the elevation of the terrain where was the truck
         * @param height is the actual elevation of the terrain where is the truck
         */
-        inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+        inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
                                          const int lastHeight, const int height);
 
 
@@ -194,7 +162,7 @@ class Truck : public Player {
          * @param lastHeight was the elevation of the terrain where was the truck
          * @param height is the actual elevation of the terrain where is the truck
          */
-        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app, const int lastCamH, const int camH);
+        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastCamH, const int camH);
 
 
 

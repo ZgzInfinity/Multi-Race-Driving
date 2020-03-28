@@ -19,11 +19,7 @@ using namespace sf;
 using namespace std;
 using namespace rapidxml;
 
-const int SPEED_INCREMENT = 50;
-const int INITIAL_SPEED = 200;
-const int MAX_SPEED = 1000;
-const int MEDIUM_SPEED = INITIAL_SPEED + MAX_SPEED / 2;
-const int CONTROL_SPEED = INITIAL_SPEED + MEDIUM_SPEED / 2;
+const int INITIAL_SPEED = 250;
 
 const float BORDER_LIMIT_ROAD_LEFT = -1.4;
 const float BORDER_LIMIT_ROAD_RIGHT = 1.4;
@@ -31,6 +27,9 @@ const float BORDER_LIMIT_ROAD_RIGHT = 1.4;
 
 const float BORDER_ROAD_LEFT = -1.15;
 const float BORDER_ROAD_RIGHT = 1.15;
+
+const float RATIO = 6.25f;
+
 
 /*
  * Class which represents the player
@@ -59,9 +58,6 @@ class Player {
         // Accumulator to the coordinate of the axis Y to make collision better
         int offset;
 
-        // Offset added if the collision is with the second type
-        int increment;
-
         // File path with the sprites
         char* filePath;
 
@@ -70,6 +66,30 @@ class Player {
 
         // Configuration of the player
         Configuration* c;
+
+        // Control if the player is accelerating
+        bool isAccelerating = false;
+
+        // Variable increment of speed
+        int speed_increment = 2;
+
+        // Control the acceleration frequency of the vehicle
+        float acceleration = 5.f;
+
+        // Control the deceleration frequency of the vehicle
+        float deceleration = 10.f;
+
+        // Maximum speed of the vehicle
+        int maxSpeed;
+
+        // Medium speed of the vehicle
+        int mediumSpeed;
+
+        // Control speed of the vehicle to calculate the inertia force
+        int controlSpeed;
+
+        // Number of spinning tops done after collision
+        int spinningTopsDone = 0;
 
     public:
 
@@ -98,7 +118,7 @@ class Player {
         /**
          * Load the set of sprites of the player
          */
-         virtual void loadSpritesFromPath() = 0;
+         virtual void loadVehicleProperties() = 0;
 
 
 

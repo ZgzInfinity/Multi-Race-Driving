@@ -387,7 +387,7 @@ void Menu::showMainMenu(RenderWindow* app){
     // Loop until start is pressed by the user
     while (!sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
         // Time to change the color of the font
-        if (coverText.getColor() == colorMainText){
+        if (coverText.getFillColor() == colorMainText){
             // Change color to transparent
             coverText.setFillColor(Color::Transparent);
         }
@@ -410,8 +410,10 @@ void Menu::showMainMenu(RenderWindow* app){
 /**
  * Shows the menu of selecting the number of players
  * @param app is the console where the game is displayed to the players
+ * @param optionParameter is the flag where is stored the option selected by the
+ * the player in the menu
 */
-void Menu::showStandardMenu(RenderWindow* app, string pathFile){
+void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter){
 
     // Clean the console window
     app->clear(Color(0, 0 ,0));
@@ -460,7 +462,7 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile){
     app->draw(playerText);
 
     // Identifier of the actual button selected
-    int actualButtonHover = 0;
+    optionParameter = 0;
 
     // Show the buttons of the menu
     for (int i = 0; i < (int)menuButtons.size(); i++){
@@ -474,12 +476,12 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile){
         // Check if the up cursor keyword has been pressed
         if (Keyboard::isKeyPressed(Keyboard::Up)){
             // Check if the first button is hovered or not
-            if (actualButtonHover != 0){
+            if (optionParameter != 0){
                 // Move the button hovered
-                actualButtonHover--;
+                optionParameter--;
                 // Change the color appearance of both buttons
-                menuButtons[actualButtonHover].setButtonState(BUTTON_HOVER);
-                menuButtons[actualButtonHover + 1].setButtonState(BUTTON_IDLE);
+                menuButtons[optionParameter].setButtonState(BUTTON_HOVER);
+                menuButtons[optionParameter + 1].setButtonState(BUTTON_IDLE);
 
                 // Render the buttons with the changes
                 app->draw(rectangle);
@@ -496,12 +498,12 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile){
         // Check if the down cursor keyword has been pressed
         else if (Keyboard::isKeyPressed(Keyboard::Down)){
             // Check if the first button is hovered or not
-            if (actualButtonHover != (int)menuButtons.size() - 1){
+            if (optionParameter != (int)menuButtons.size() - 1){
                 // Move the button hovered
-                actualButtonHover++;
+                optionParameter++;
                 // Change the color appearance of both buttons
-                menuButtons[actualButtonHover].setButtonState(BUTTON_HOVER);
-                menuButtons[actualButtonHover - 1].setButtonState(BUTTON_IDLE);
+                menuButtons[optionParameter].setButtonState(BUTTON_HOVER);
+                menuButtons[optionParameter - 1].setButtonState(BUTTON_IDLE);
 
                 // Render the buttons with the changes
                 app->draw(menuSprite);

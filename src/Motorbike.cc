@@ -22,7 +22,7 @@ void Motorbike::drawPlayer(RenderWindow* app, int& pos){
 /**
  * Load the set of sprites of the player
  */
-void Motorbike::loadSpritesFromPath(){
+void Motorbike::loadVehicleProperties(){
     // Document xml where the document is going to be parsed
     xml_document<> doc;
     file<> file("Configuration/Vehicles/Motorbike.xml");
@@ -32,10 +32,16 @@ void Motorbike::loadSpritesFromPath(){
     // Get the principal node of the file
     xml_node<> *nodePlayer = doc.first_node();
 
+    cout << filePath << endl;
+
     // Loop in order to iterate all the children of the principal node
     for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
+        // Check if the actual node is the controller of the max speed of the vehicle
+        if ((string)child->name() == "MaxSpeed"){
+            maxSpeed = RATIO * stoi(child->value());
+        }
         // Check if the actual node is the controller of the paths of the sprites
-        if ((string)child->name() == "SpritePaths"){
+        else if ((string)child->name() == "SpritePaths"){
             // Loop for iterate throughout the path files and add then to the vector
             for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
                 // Add the texture to the vector
@@ -53,6 +59,13 @@ void Motorbike::loadSpritesFromPath(){
     }
     // Load the biggest texture to display the other ones
     playerSprite.setTexture(textures[13]);
+
+    // Initialize the medium speed of the vehicle
+    mediumSpeed = INITIAL_SPEED + maxSpeed / 2;
+
+    // Initialize the control speed of the vehicle to calculate the inertia force
+    controlSpeed = INITIAL_SPEED + mediumSpeed / 2;
+
 }
 
 
@@ -75,6 +88,7 @@ void Motorbike::advancePlayer(bool& eventDetected, const int lastHeight, const i
             actual_code_image = 2;
         }
         playerSprite.setTexture(textures[actual_code_image - 1]);
+        isAccelerating = false;
     }
     else {
         // Elimination of the last event registered
@@ -119,6 +133,14 @@ inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventD
 {
     // Check if key left pressed
     if (Keyboard::isKeyPressed(c->getLeftKey())){
+        if (!isAccelerating){
+            if (speed > INITIAL_SPEED){
+                speed -= int(deceleration * speed_increment);
+                if (speed < INITIAL_SPEED){
+                    speed = INITIAL_SPEED;
+                }
+            }
+        }
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX - 0.1 >= BORDER_LIMIT_ROAD_LEFT){
             // Check if the motorbike is outside the road
@@ -171,6 +193,14 @@ inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& event
     // Check if key right pressed
     if (Keyboard::isKeyPressed(c->getRightKey())){
         // Check if the motorbike can be moved or not spite of pressing the key
+        if (!isAccelerating){
+            if (speed > INITIAL_SPEED){
+                speed -= int(deceleration * speed_increment);
+                if (speed < INITIAL_SPEED){
+                    speed = INITIAL_SPEED;
+                }
+            }
+        }
         if (playerX + 0.1 <= BORDER_LIMIT_ROAD_RIGHT){
             // Check if the motorbike is outside the road
             if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
@@ -317,19 +347,26 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
 {
     // Check if the user is accelerating
     if ((sf::Keyboard::isKeyPressed(c->getAccelerateKey()))){
+        isAccelerating = true;
         // Control about not acceleration if the motorbike goes in the grass
         if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
             // Increment the speed because it is inside the road
-            if (speed <= MAX_SPEED){
+            if (speed <= maxSpeed){
                 // Increment of the speed
-                speed += SPEED_INCREMENT + SPEED_INCREMENT;
+                speed += int(acceleration * (speed_increment + speed_increment));
+                if (speed > maxSpeed){
+                    speed = maxSpeed;
+                }
             }
         }
         else {
             // Increment the speed because it is outside the road
             if (speed >= INITIAL_SPEED){
                 // Decrement of the speed
-                speed -= SPEED_INCREMENT - SPEED_INCREMENT;
+                speed -= int(deceleration * (speed_increment + speed_increment));
+                if (speed < INITIAL_SPEED){
+                    speed = INITIAL_SPEED;
+                }
             }
         }
         // Check if the key to turn left is pressed
@@ -337,6 +374,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             // Check the type of control of the motorbike
             if (typeControl == 0){
                  // Check if the key to turn to the right is pressed
+                 isAccelerating = false;
                  controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
             }
             else {
@@ -350,6 +388,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             // Check the type of control of the motorbike
             if (typeControl == 0){
                  // Check if the key to turn to the left is pressed
+                 isAccelerating = false;
                  controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
             }
             else {
@@ -363,6 +402,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             // Change the sprite;
             actual_code_image = 1;
             // Set the texture from the file
+            isAccelerating = false;
             playerSprite.setTexture(textures[actual_code_image - 1]);
         }
         // Change the sprite of the motorbike
@@ -370,8 +410,12 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             // Change the sprite
             actual_code_image = 2;
             // Set the texture from the file
+            isAccelerating = false;
             playerSprite.setTexture(textures[actual_code_image - 1]);
         }
+    }
+    else {
+        isAccelerating = false;
     }
 }
 
@@ -390,6 +434,7 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
 {
     // Check if the user is braking
     if (Keyboard::isKeyPressed(c->getBrakeKey())){
+        isAccelerating = false;
         // Check more events
         if (!eventDetected){
             // Control if first the user has accelerated
@@ -450,7 +495,10 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
         // Reduce the speed
         if (speed > INITIAL_SPEED){
             // Increment of the speed
-            speed -= SPEED_INCREMENT;
+            speed -= int(deceleration * (speed_increment + speed_increment));
+            if (speed < INITIAL_SPEED){
+                speed = INITIAL_SPEED;
+            }
         }
         // Detect event
         eventDetected = true;
@@ -479,16 +527,12 @@ void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindo
         controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
     }
     else {
-        // Mouse
         // Check if the mouse has has been moved to turn to the right
         controlTurningPlayerRightMouse(speed, eventDetected, app);
 
         // Check if the mouse has has been moved to turn to the left
         controlTurningPlayerLeftMouse(speed, eventDetected, app);
     }
-
-    // Check if the Up keyword has been pressed to increase the speed
-    controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
 
     //Check if the E keyword has been pressed to brake the motorbike
     controlPlayerBraking(speed, eventDetected, app, lastHeight, height);
@@ -498,9 +542,15 @@ void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindo
         // Reduce the speed
         if (speed > INITIAL_SPEED){
             // Increment of the speed
-            speed -= SPEED_INCREMENT;
+            speed -= int(deceleration);
+            if (speed < INITIAL_SPEED){
+                speed = INITIAL_SPEED;
+            }
         }
     }
+
+    // Check if the Up keyword has been pressed to increase the speed
+    controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
 }
 
 
@@ -560,18 +610,17 @@ bool Motorbike::controlPossibleCollision(Step& nearestStep, int& lastPos, int& p
  * @param speed is the actual speed of the motorbike of the player
  */
 void Motorbike::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed){
-    // Check if there has to appear inertia force
     if (onCurve){
-        // The motorbike is on a curve of the scene
+        // The Ferrari is on a curve of the scene
         onCurve = false;
         // Check the direction of the curve
         if (curve.directionCurve > 0.f){
-            // Check if the motorbike
-            if (speed >= MEDIUM_SPEED){
-                // Motorbike goes to the left when it is a right curve
+            // Check if the Ferrari
+            if (speed >= mediumSpeed){
+                // Ferrari goes to the left when it is a right curve
                 playerX -= 0.075;
             }
-            else if (speed >= CONTROL_SPEED && speed < MEDIUM_SPEED) {
+            else if (speed >= controlSpeed && speed < mediumSpeed) {
                 playerX -= 0.045;
             }
             else {
@@ -579,12 +628,12 @@ void Motorbike::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& sp
             }
         }
         else {
-            // Check if the motorbike
-            if (speed >= MEDIUM_SPEED){
-                // Motorbike goes to the left when it is a right curve
+            // Check if the Ferrari
+            if (speed >= mediumSpeed){
+                // Ferrari goes to the left when it is a right curve
                 playerX += 0.075;
             }
-            else if (speed >= CONTROL_SPEED && speed < MEDIUM_SPEED) {
+            else if (speed >= controlSpeed && speed < mediumSpeed) {
                 playerX += 0.045;
             }
             else {

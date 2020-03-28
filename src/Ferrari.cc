@@ -8,7 +8,7 @@ Ferrari::Ferrari(char* pathFile) : Player(pathFile){};
  * Draw the player sprite in the console render window
  * @param app is the console window game where the sprite is going to be drawn
  */
-void Ferrari::drawPlayer(RenderWindow& app, int& pos){
+void Ferrari::drawPlayer(RenderWindow* app, int& pos){
     // Check what is the offset to apply while is crushing
     if (mode == 0){
         // First mode
@@ -22,7 +22,7 @@ void Ferrari::drawPlayer(RenderWindow& app, int& pos){
     }
     // Print the ferrari in its actual position
     playerSprite.setPosition(Vector2f(400.f, HEIGHT - 160.f));
-    app.draw(playerSprite);
+    app->draw(playerSprite);
 }
 
 
@@ -30,7 +30,7 @@ void Ferrari::drawPlayer(RenderWindow& app, int& pos){
 /**
  * Load the set of sprites of the player
  */
-void Ferrari::loadSpritesFromPath(){
+void Ferrari::loadVehicleProperties(){
     // Document xml where the document is going to be parsed
     xml_document<> doc;
     file<> file("Configuration/Vehicles/Ferrari.xml");
@@ -42,8 +42,12 @@ void Ferrari::loadSpritesFromPath(){
 
     // Loop in order to iterate all the children of the principal node
     for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
+        // Check if the actual node is the controller of the max speed of the vehicle
+        if ((string)child->name() == "MaxSpeed"){
+            maxSpeed = RATIO * stoi(child->value());
+        }
         // Check if the actual node is the controller of the paths of the sprites
-        if ((string)child->name() == "SpritePaths"){
+        else if ((string)child->name() == "SpritePaths"){
             // Loop for iterate throughout the path files and add then to the vector
             for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
                 // Add the texture to the vector
@@ -60,6 +64,12 @@ void Ferrari::loadSpritesFromPath(){
         }
     }
     playerSprite.setTexture(textures[19]);
+
+    // Initialize the medium speed of the vehicle
+    mediumSpeed = INITIAL_SPEED + maxSpeed / 2;
+
+    // Initialize the control speed of the vehicle to calculate the inertia force
+    controlSpeed = INITIAL_SPEED + mediumSpeed / 2;
 }
 
 
@@ -171,11 +181,19 @@ int Ferrari::getModeCollision(){
  * @param lastHeight was the elevation of the terrain where was the ferrari
  * @param height is the actual elevation of the terrain where is the ferrari
  */
-inline void Ferrari::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Ferrari::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                       const int lastHeight, const int height)
 {
     // Check if key left pressed
     if (Keyboard::isKeyPressed(Keyboard::Q)){
+        if (!isAccelerating){
+            if (speed > INITIAL_SPEED){
+                speed -= int(deceleration * speed_increment);
+                if (speed < INITIAL_SPEED){
+                    speed = INITIAL_SPEED;
+                }
+            }
+        }
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX - 0.1 >= BORDER_LIMIT_ROAD_LEFT){
             // Check if the motorbike is outside the road
@@ -278,10 +296,18 @@ inline void Ferrari::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDet
  * @param lastHeight was the elevation of the terrain where was the ferrari
  * @param height is the actual elevation of the terrain where is the ferrari
  */
-inline void Ferrari::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Ferrari::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                        const int lastHeight, const int height){
     // Check if key right pressed
     if (Keyboard::isKeyPressed(Keyboard::W)){
+        if (!isAccelerating){
+            if (speed > INITIAL_SPEED){
+                speed -= int(deceleration * speed_increment);
+                if (speed < INITIAL_SPEED){
+                    speed = INITIAL_SPEED;
+                }
+            }
+        }
         // Check if the motorbike can be moved or not spite of pressing the key
         if (playerX + 0.1 <= BORDER_LIMIT_ROAD_RIGHT){
             // Check if the motorbike is outside the road
@@ -381,49 +407,44 @@ inline void Ferrari::controlTurningPlayerRightKeyboard(int& speed, bool& eventDe
  * @param lastHeight was the elevation of the terrain where was the ferrari
  * @param height is the actual elevation of the terrain where is the ferrari
  */
-inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
                                         const int lastHeight, const int height){
     // Check if the user is accelerating
     if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up))){
+        isAccelerating = true;
         // Control about not acceleration if the Ferrari goes in the grass
         if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
             // Increment the speed because it is inside the road
-            if (speed <= MAX_SPEED){
+            if (speed <= maxSpeed){
                 // Increment of the speed
-                speed += SPEED_INCREMENT + SPEED_INCREMENT;
+                speed += int(acceleration * (speed_increment + speed_increment));
+                if (speed > maxSpeed){
+                    speed = maxSpeed;
+                }
             }
         }
         else {
             // Increment the speed because it is outside the road
             if (speed >= INITIAL_SPEED){
                 // Decrement of the speed
-                speed -= SPEED_INCREMENT - SPEED_INCREMENT;
+                speed -= int(deceleration * (speed_increment + speed_increment));
+                if (speed < INITIAL_SPEED){
+                    speed = INITIAL_SPEED;
+                }
             }
         }
         // Check if the key to turn left is pressed
         if (!eventDetected){
-            // Check the type of control of the Ferrari
-            if (typeControl == 0){
-                 // Check if the key to turn to the right is pressed
-                 controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
-            }
-            else {
-                // Check if the mouse has been moved to turn to the right
-                // controlTurningPlayerRightMouse(speed, eventDetected, app, lastHeight, height);
-            }
+            // Check if the key to turn to the right is pressed
+            isAccelerating = false;
+            controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
             return;
         }
         // Check if the key to turn left is pressed
         if (!eventDetected){
-            // Check the type of control of the Ferrari
-            if (typeControl == 0){
-                 // Check if the key to turn to the left is pressed
-                 controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
-            }
-            else {
-                // Check if the mouse has been moved to turn to the left
-                // controlTurningPlayerLeftMouse(speed, eventDetected, app);
-            }
+            // Check if the key to turn to the left is pressed
+            isAccelerating = false;
+            controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
             return;
         }
         // Change the sprite;
@@ -438,6 +459,9 @@ inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderW
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
     }
+    else {
+        isAccelerating = false;
+    }
 }
 
 
@@ -451,10 +475,11 @@ inline void Ferrari::controlPlayerSpeed(int& speed, bool& eventDetected, RenderW
  * @param lastHeight was the elevation of the terrain where was the ferrari
  * @param height is the actual elevation of the terrain where is the ferrari
  */
-inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow& app,
+inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
                                           const int lastHeight, const int height){
     // Check if the user is braking
     if (Keyboard::isKeyPressed(Keyboard::Down)){
+        isAccelerating = false;
         // Check more events
         if (!eventDetected){
             // Control if first the user has accelerated
@@ -635,11 +660,13 @@ inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, Rende
             // Set the texture from the file
             playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
-
         // Reduce the speed
         if (speed > INITIAL_SPEED){
             // Increment of the speed
-            speed -= SPEED_INCREMENT;
+            speed -= int(deceleration * (speed_increment + speed_increment));
+            if (speed < INITIAL_SPEED){
+                speed = INITIAL_SPEED;
+            }
         }
         // Detect event
         eventDetected = true;
@@ -656,26 +683,12 @@ inline void Ferrari::controlPlayerBraking(int& speed, bool& eventDetected, Rende
  * @param lastHeight was the elevation of the terrain where was the ferrari
  * @param height is the actual elevation of the terrain where is the ferrari
  */
-void Ferrari::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow& app, const int lastCamH, const int camH){
-    if (typeControl == 0){
-        // Keyword
-        // Check if W keyword has been pressed to turn to the right
-        controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastCamH, camH);
+void Ferrari::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastCamH, const int camH){
+    // Check if W keyword has been pressed to turn to the right
+    controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastCamH, camH);
 
-        // Check if Q keyword has been pressed to turn to the left
-        controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastCamH, camH);
-    }
-    else {
-        // Mouse
-        // Check if the mouse has has been moved to turn to the right
-        // controlTurningPlayerRightMouse(speed, eventDetected, app);
-
-        // Check if the mouse has has been moved to turn to the left
-        // controlTurningPlayerLeftMouse(speed, eventDetected, app);
-    }
-
-    // Check if the Up keyword has been pressed to increase the speed
-    controlPlayerSpeed(speed, eventDetected, app, lastCamH, camH);
+    // Check if Q keyword has been pressed to turn to the left
+    controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastCamH, camH);
 
     //Check if the E keyword has been pressed to brake the Ferrari
     controlPlayerBraking(speed, eventDetected, app, lastCamH, camH);
@@ -685,9 +698,15 @@ void Ferrari::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow&
         // Reduce the speed
         if (speed > INITIAL_SPEED){
             // Increment of the speed
-            speed -= SPEED_INCREMENT;
+            speed -= int(deceleration);
+            if (speed < INITIAL_SPEED){
+                speed = INITIAL_SPEED;
+            }
         }
     }
+
+    // Check if the Up keyword has been pressed to increase the speed
+    controlPlayerSpeed(speed, eventDetected, app, lastCamH, camH);
 }
 
 
@@ -754,11 +773,11 @@ void Ferrari::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& spee
         // Check the direction of the curve
         if (curve.directionCurve > 0.f){
             // Check if the Ferrari
-            if (speed >= MEDIUM_SPEED){
+            if (speed >= mediumSpeed){
                 // Ferrari goes to the left when it is a right curve
                 playerX -= 0.075;
             }
-            else if (speed >= CONTROL_SPEED && speed < MEDIUM_SPEED) {
+            else if (speed >= controlSpeed && speed < mediumSpeed) {
                 playerX -= 0.045;
             }
             else {
@@ -767,11 +786,11 @@ void Ferrari::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& spee
         }
         else {
             // Check if the Ferrari
-            if (speed >= MEDIUM_SPEED){
+            if (speed >= mediumSpeed){
                 // Ferrari goes to the left when it is a right curve
                 playerX += 0.075;
             }
-            else if (speed >= CONTROL_SPEED && speed < MEDIUM_SPEED) {
+            else if (speed >= controlSpeed && speed < mediumSpeed) {
                 playerX += 0.045;
             }
             else {

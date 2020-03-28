@@ -87,12 +87,14 @@ class Menu{
 
 
     /**
-     * Shows the main cover of the game until the player presses start
+     * Shows the menu of selecting the number of players
      * @param app is the console where the game is displayed to the players
-     */
-    void showStandardMenu(RenderWindow* app, string pathFile);
+     * @param optionParameter is the flag where is stored the option selected by the
+     * the player in the menu
+    */
+    void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter);
 
 
 };
 
-#endif // ANIMATIONS_H
+#endif // MENU_H

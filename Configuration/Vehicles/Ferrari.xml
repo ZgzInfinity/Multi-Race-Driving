@@ -1,4 +1,5 @@
 <player>
+	<MaxSpeed>260</MaxSpeed>
 	<SpritePaths>
 		<S1>c1.png</S1>
 		<S2>c2.png</S2>

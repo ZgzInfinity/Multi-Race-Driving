@@ -22,15 +22,6 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
-    /*
-    while (1){
-        b.getPressed(sf::Mouse::getPosition(app));
-        b.render(app);
-        app.display();
-        sleep(milliseconds(100));
-    }
-    */
-
     // Creation of the screen game
     RenderWindow application(VideoMode(WIDTH, HEIGHT), "Super Hang On!");
     // Control the fotograms per second, 60 FPS more less
