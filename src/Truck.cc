@@ -46,7 +46,6 @@ void Truck::loadVehicleProperties(){
         // Check if the actual node is the controller of the max speed of the vehicle
         if ((string)child->name() == "MaxSpeed"){
             maxSpeed = RATIO * stoi(child->value());
-            cout << maxSpeed << endl;
         }
         // Check if the actual node is the controller of the paths of the sprites
         else if ((string)child->name() == "SpritePaths"){
@@ -54,7 +53,6 @@ void Truck::loadVehicleProperties(){
             for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
                 // Add the texture to the vector
                 if (t.loadFromFile(string(filePath) + pathNode->value())){
-                    cout << string(filePath) + pathNode->value() << endl;
                     // Increment the textures read
                     textures.push_back(t);
                 }
@@ -683,9 +681,9 @@ void Truck::collisionShow(){
             playerSprite.setTexture(textures[actual_code_image - 1], true);
             actual_code_image++;
             // Check if it's the final sprite
-            if (actual_code_image == 50){
+            if (actual_code_image == 51){
                 spinningTopsDone++;
-                actual_code_image -= 7;
+                actual_code_image -= 8;
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
             }
             if (spinningTopsDone == 2){
@@ -698,7 +696,7 @@ void Truck::collisionShow(){
         else if (mode == 0){
             if (actual_code_image == 43){
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
-                actual_code_image += 6;
+                actual_code_image += 7;
             }
             else {
                 playerSprite.setTexture(textures[actual_code_image - 1], true);

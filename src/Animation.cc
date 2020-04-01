@@ -63,8 +63,14 @@ Animation::Animation(char* pathMenuFile){
  * @param app is the console where the game is displayed to the players
  */
 void Animation::loadSegaIcons(RenderWindow* app){
+    // Control possible events
+    Event ev;
     // Iterate thorough the different textures of the sega icons
     for (int i = 0; i < (int)menuTextures.size() - 3; i++){
+        // Detect possible actions of the user on the console game
+        if (app->pollEvent(ev) && ev.type == Event::Closed){
+                app->close();
+        }
         // Load the texture in the sprite in order to show it
         menuSprite.setTexture(menuTextures.at(i), true);
         // Store the textures of the menus in the console game
@@ -82,6 +88,15 @@ void Animation::loadSegaIcons(RenderWindow* app){
  * @param app is the console where the game is displayed to the players
  */
 void Animation::loadGameData(RenderWindow* app){
+
+    // Control possible events
+    Event ev;
+
+    // Detect possible actions of the user on the console game
+    if (app->pollEvent(ev) && ev.type == Event::Closed){
+        app->close();
+    }
+
     // Clean the console of the game
     app->clear(Color::Black);
     // Set position to the company sprite

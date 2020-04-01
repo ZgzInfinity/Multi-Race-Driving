@@ -6,6 +6,8 @@
 #include <cstring>
 #include <SFML/Graphics.hpp>
 #include "../include/Button.h"
+#include "../include/Slot.h"
+#include "../include/VehicleSpecifications.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
@@ -94,6 +96,24 @@ class Menu{
     */
     void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter);
 
+
+
+    void loadVehiclesMenu(Sprite& menuVehicle, Font& fontMainText, Font& fontVehicleName, Font& fontVehicleIndicator, Font& fontTitle,
+                          Text& mainText, Text& propertyText, vector<Slot>& slotsMenu, vector<Text>& vehicleIndicators,
+                          RectangleShape& panelIndicator);
+
+
+
+    void readVehicleSpecifications(char* pathVehicleName, int& topSpeed, float& angle,
+                                   string& motor, float& timeBraking, float& timeAcceleration);
+
+    /**
+     * Shows the menu of selecting vehicle
+     * @param app is the console where the game is displayed to the players
+     * @param typeOfVehicle is the kind of vehicle selected by the user in the menu
+     * @param colorVehicle is the vehicle's color selected by the user in the menu
+     */
+    void showSelectionVehicleMenu(RenderWindow* application, int& typeOfVehicle, int& colorVehicle);
 
 };
 

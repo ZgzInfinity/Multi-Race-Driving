@@ -46,6 +46,12 @@ Game::Game(RenderWindow* app) {
     // Load the game mode configuration selected by the player
     gSM.loadFileConfigurationMode(e);
 
+    // Control the type of vehicle selected with also its color
+    int typeOfVehicle, colorVehicle;
+
+    // Show the menu of selection vehicle
+    menuGame->showSelectionVehicleMenu(application, typeOfVehicle, colorVehicle);
+
     // Play the game
     playingGame();
 }
@@ -74,11 +80,10 @@ inline void Game::playingGame(){
     elapsed1 = gameClock.getElapsedTime();
     gameClock.restart();
 
-
-    string path = "images/Vehicles/Ferrari/";
+    string path = "images/Vehicles/Devastator/";
     char* p = const_cast<char*>(path.c_str());
     // Motorbike of the player
-    Ferrari h = Ferrari(p);
+    Devastator h = Devastator(p);
 
     h.loadVehicleProperties();
 

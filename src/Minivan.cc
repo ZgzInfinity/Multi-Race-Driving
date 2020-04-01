@@ -685,7 +685,7 @@ void Minivan::collisionShow(){
         }
         else if (mode == 1) {
             // Second way to collision
-            actual_code_image = 26;
+            actual_code_image = 27;
         }
     }
     else {
@@ -696,9 +696,9 @@ void Minivan::collisionShow(){
             playerSprite.setTexture(textures[actual_code_image - 1], true);
             actual_code_image++;
             // Check if it's the final sprite
-            if (actual_code_image == 32){
+            if (actual_code_image == 33){
                 spinningTopsDone++;
-                actual_code_image -= 7;
+                actual_code_image -= 8;
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
             }
             if (spinningTopsDone == 2){
@@ -711,7 +711,7 @@ void Minivan::collisionShow(){
         else if (mode == 0){
             if (actual_code_image == 25){
                 playerSprite.setTexture(textures[actual_code_image - 1], true);
-                actual_code_image += 6;
+                actual_code_image += 7;
             }
             else {
                 playerSprite.setTexture(textures[actual_code_image - 1], true);

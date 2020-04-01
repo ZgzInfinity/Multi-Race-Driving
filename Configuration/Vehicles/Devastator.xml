@@ -1,0 +1,39 @@
+<player>
+	<MaxSpeed>260</MaxSpeed>
+	<Angle>0.1</Angle>
+	<Motor>Repsol SX</Motor>
+	<Braking>0.03</Braking>
+	<Acceleration>0.04</Acceleration>
+	<SpritePaths>
+		<S1>f1.png</S1>
+		<S2>f2.png</S2>
+		<S3>f3.png</S3>
+		<S4>f4.png</S4>
+		<S5>f5.png</S5>
+		<S6>f6.png</S6>
+		<S7>f7.png</S7>
+		<S8>f8.png</S8>
+		<S9>f9.png</S9>
+		<S10>f10.png</S10>
+		<S11>f11.png</S11>
+		<S12>f12.png</S12>
+		<S13>f13.png</S13>
+		<S14>f14.png</S14>
+		<S15>f15.png</S15>
+		<S16>f16.png</S16>
+		<S17>f17.png</S17>
+		<S18>f18.png</S18>
+		<S19>f19.png</S19>
+		<S20>f20.png</S20>
+		<S21>f21.png</S21>
+		<S22>f22.png</S22>
+		<S23>f23.png</S23>
+		<S24>f24.png</S24>
+		<S25>f25.png</S25>
+		<S26>f26.png</S26>
+		<S27>f27.png</S27>
+		<S28>f28.png</S28>
+		<S29>f29.png</S29>
+		<S30>f30.png</S30>
+	</SpritePaths>
+</player>

@@ -10,7 +10,7 @@ using namespace sf;
 
 
 /*
- * Step data type
+ * GoalPoint data type
  */
 struct GoalPoint{
 
@@ -46,4 +46,4 @@ struct GoalPoint{
 
 };
 
-#endif // STARTING_POINT_H
+#endif // GOAL_POINT_H

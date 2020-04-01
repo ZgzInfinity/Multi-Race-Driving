@@ -350,13 +350,15 @@ void Menu::showMainMenu(RenderWindow* app){
     // Color channels
     int channelR, channelG, channelB;
 
+    // Control possible events
+    Event ev;
+
     // Load the main menu from the file
     loadMainMenu(imagePath, fontPath, textContent, positionXCover, positionYCover,
                  positionXText, positionYText, sizeText, channelR, channelG, channelB);
 
     // Load the texture of the cover
     cover.loadFromFile(imagePath);
-
 
     // Initial text shown in the main cover of the game
     Text coverText;
@@ -384,8 +386,17 @@ void Menu::showMainMenu(RenderWindow* app){
     coverText.setPosition(positionXText, positionYText);
     coverText.setFont(f);
 
+    // Control the start key is pressed
+    bool startPressed = false;
+
     // Loop until start is pressed by the user
-    while (!sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
+    while (!startPressed){
+
+        // Detect possible actions of the user on the console game
+        if (app->pollEvent(ev) && ev.type == Event::Closed){
+                app->close();
+        }
+
         // Time to change the color of the font
         if (coverText.getFillColor() == colorMainText){
             // Change color to transparent
@@ -400,9 +411,12 @@ void Menu::showMainMenu(RenderWindow* app){
         app->draw(coverText);
         app->display();
         sleep(milliseconds(400));
+
+        // Check if the start key has been pressed or not
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
+            startPressed = true;
+        }
     }
-    Event event;
-    app->pollEvent(event);
 }
 
 
@@ -414,11 +428,13 @@ void Menu::showMainMenu(RenderWindow* app){
  * the player in the menu
 */
 void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter){
-
     // Clean the console window
     app->clear(Color(0, 0 ,0));
 
-    sleep(milliseconds(300));
+    // Control possible events
+    Event ev;
+
+    sleep(milliseconds(100));
 
     // Clear the list of buttons of the last possible menus
     menuButtons.clear();
@@ -471,8 +487,17 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
     // Display the changes of the buttons' appearance
     app->display();
 
+    // Control the start key is pressed
+    bool startPressed = false;
+
     // Loop until the player selects a mode pressing enter
-    while (!Keyboard::isKeyPressed(Keyboard::Enter)){
+    while (!startPressed){
+
+        // Detect possible actions of the user on the console game
+        if (app->pollEvent(ev) && ev.type == Event::Closed){
+                app->close();
+        }
+
         // Check if the up cursor keyword has been pressed
         if (Keyboard::isKeyPressed(Keyboard::Up)){
             // Check if the first button is hovered or not
@@ -492,7 +517,7 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
                     menuButtons.at(i).render(app);
                 }
                 app->display();
-                sleep(milliseconds(150));
+                sleep(milliseconds(180));
             }
         }
         // Check if the down cursor keyword has been pressed
@@ -515,14 +540,909 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
                     menuButtons.at(i).render(app);
                 }
                 app->display();
-                sleep(milliseconds(150));
+                sleep(milliseconds(180));
+            }
+        }
+        // Check if the start key has been pressed or not
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
+            startPressed = true;
+        }
+    }
+}
+
+
+
+void Menu::loadVehiclesMenu(Sprite& menuVehicle, Font& fontMainText, Font& fontVehicleName, Font& fontVehicleIndicator, Font& fontTitle,
+                            Text& mainText, Text& propertyText,vector<Slot>& slotsMenu, vector<Text>& vehicleIndicators,
+                            RectangleShape& panelIndicator){
+    // Control the attributes of the background configuration
+    string imagePath;
+    int positionXBackground, positionYBackground;
+
+    // Control the attributes of the main text of the menu
+    string textContent, fontPath;
+    int sizeText, posXText, posYText;
+    Color colorText;
+
+    // Path of the xml configuration file
+    char* menuF = const_cast<char*>("Configuration/Menus/VehicleMenu.xml");
+    xml_document<> doc;
+    file<> file(menuF);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *nodePanel = doc.first_node()->first_node();
+
+    // Loop for iterate throughout the different nodes of the file
+    for (xml_node<> *node = nodePanel->first_node(); node; node = node->next_sibling()){
+        // Check if it's the node that controls the main menu of the game
+        if ((string)node->name() == "Background"){
+            // Loop for iterate throughout the different nodes of the background
+            for (xml_node<> *nodeBackground = node->first_node(); nodeBackground; nodeBackground = nodeBackground->next_sibling()){
+                // Process the attributes of the background
+                if ((string)nodeBackground->name() == "Path"){
+                    imagePath = nodeBackground->value();
+                    continue;
+                }
+                // Check the coordinate of the background in axis X
+                else if ((string)nodeBackground->name() == "PositionX"){
+                    positionXBackground = stoi(nodeBackground->value());
+                    continue;
+                }
+                // Check the coordinate of the background in the axis Y
+                else if ((string)nodeBackground->name() == "PositionY"){
+                    positionYBackground = stoi(nodeBackground->value());
+                    continue;
+                }
+                // Check the main text of the vehicle menu
+                else if ((string)nodeBackground->name() == "Text"){
+                    // Process the time panel or the destiny panel
+                    for (xml_node<> *textNode = nodeBackground->first_node(); textNode; textNode = textNode->next_sibling()){
+                        // Check if it's the node that controls the speed panel
+                        if ((string)textNode->name() == "Content"){
+                            textContent = textNode->value();
+                            continue;
+                        }
+                        // Check if it's the node that controls the speed panel
+                        else if ((string)textNode->name() == "Font"){
+                            fontPath = textNode->value();
+                            continue;
+                        }
+                        // Check if it's the node that controls the coordinate in axis x of the speed panel
+                        else if ((string)textNode->name() == "Size"){
+                            sizeText = stoi(textNode->value());
+                            continue;
+                        }
+                        // Check if it's the node that controls the coordinate in axis x of the speed panel
+                        else if ((string)textNode->name() == "PositionX"){
+                            posXText = stoi(textNode->value());
+                            continue;
+                        }
+                        // Check if it's the node that controls the coordinate in axis y of the speed panel
+                        else if ((string)textNode->name() == "PositionY"){
+                            posYText = stoi(textNode->value());
+                            continue;
+                        }
+                        // Check if it's the node that controls the text of the speed panel
+                        else if ((string)textNode->name() == "Color"){
+                            // Variables to define the color of the text
+                            int channelR, channelG, channelB;
+                            // Loop in order to iterate all the children nodes of the text's color
+                            for (xml_node<> *colorNode = textNode->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                                // Check the value of the red channel
+                                if ((string)colorNode->name() == "R"){
+                                    // Get y coordinate of the cover
+                                    channelR = stoi(colorNode->value());
+                                    continue;
+                                }
+                                // Check the value of the green channel
+                                else if ((string)colorNode->name() == "G"){
+                                    // Get y coordinate of the cover
+                                    channelG = stoi(colorNode->value());
+                                    continue;
+                                }
+                                // Check the value of the blue channel
+                                else if ((string)colorNode->name() == "B"){
+                                    // Get y coordinate of the cover
+                                    channelB = stoi(colorNode->value());
+                                    colorText = Color(channelR, channelG, channelB);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // Load all the information read from the background with the main text
+            cover.loadFromFile(imagePath);
+            menuVehicle.setPosition(positionXBackground, positionYBackground);
+            menuVehicle.setTexture(cover, true);
+            menuVehicle.setScale(1.8, 2);
+
+            mainText.setString(textContent);
+            mainText.setFillColor(colorText);
+            mainText.setCharacterSize(sizeText);
+            mainText.setStyle(Text::Bold | Text::Underlined);
+            mainText.setPosition(posXText, posYText);
+            fontMainText.loadFromFile(fontPath);
+            mainText.setFont(fontMainText);
+        }
+        // Check the main text of the vehicle menu
+        else if ((string)node->name() == "VehicleSlots"){
+            // Load the configuration of the different slots for the vehicle
+
+            // Attributes for load the different texts of the slots
+            int posXSlot, posYSlot, sizeXSlot, sizeYSlot, border, borderText;
+            // Colors for the slot
+            Color colorSelected, colorUnSelected, colorBorderSelected, colorBorderUnSelected;
+            // Colors for the text of the slot
+            Color colorTextSelected, colorTextUnSelected, colorTextBorderSelected, colorTextBorderUnSelected;
+
+            // Attributes to store the vehicle to show in the slot
+            Texture t;
+            int posXVehicle, posYVehicle;
+            vector<Texture> vehicleTextures;
+
+            // Process the information of the actual slot
+            for (xml_node<> *slotNode = node->first_node(); slotNode; slotNode = slotNode->next_sibling()){
+                // Loop for iterate throughout the different attributes of the slot
+                for (xml_node<> *attributeSlot = slotNode->first_node(); attributeSlot; attributeSlot = attributeSlot->next_sibling()){
+                    // Check if it's the node that stores the position in the axis X
+                    if ((string)attributeSlot->name() == "PositionX"){
+                        posXSlot = stoi(attributeSlot->value());
+                        continue;
+                    }
+                    // Check if it's the node that stores the position in the axis Y
+                    else if ((string)attributeSlot->name() == "PositionY"){
+                        posYSlot = stoi(attributeSlot->value());
+                        continue;
+                    }
+                    // Check if it's the node that stores the size in the axis X
+                    else if ((string)attributeSlot->name() == "SizeX"){
+                        sizeXSlot = stoi(attributeSlot->value());
+                        continue;
+                    }
+                    // Check if it's the node that stores the size in the axis Y
+                    else if ((string)attributeSlot->name() == "SizeY"){
+                        sizeYSlot = stoi(attributeSlot->value());
+                        continue;
+                    }
+                    // Check if it's the node that controls the coordinate in axis y of the speed panel
+                    else if ((string)attributeSlot->name() == "Border"){
+                        border = stoi(attributeSlot->value());
+                        continue;
+                    }
+                    // Check if it's the node that controls the text of the slot that indicates the vehicle
+                    else if ((string)attributeSlot->name() == "Text"){
+                        // Loop for read all the information of the text that indicates the kind of vehicle
+                        for (xml_node<> *textNode = attributeSlot->first_node(); textNode; textNode = textNode->next_sibling()){
+                            // Check if it's the node that controls the text information
+                            if ((string)textNode->name() == "Content"){
+                                textContent = textNode->value();
+                                continue;
+                            }
+                            // Check if it's the node that controls the speed panel
+                            else if ((string)textNode->name() == "Font"){
+                                fontVehicleName.loadFromFile((string)textNode->value());
+                                continue;
+                            }
+                            // Check if it's the node that controls the coordinate in axis x of the speed panel
+                            else if ((string)textNode->name() == "Size"){
+                                sizeText = stoi(textNode->value());
+                                continue;
+                            }
+                            // Check if it's the node that controls the coordinate in axis x of the speed panel
+                            else if ((string)textNode->name() == "PositionX"){
+                                posXText = stoi(textNode->value());
+                                continue;
+                            }
+                            // Check if it's the node that controls the coordinate in axis y of the speed panel
+                            else if ((string)textNode->name() == "PositionY"){
+                                posYText = stoi(textNode->value());
+                                continue;
+                            }
+                            // Check if it's the node that controls the coordinate in axis y of the speed panel
+                            else if ((string)textNode->name() == "Border"){
+                                borderText = stoi(textNode->value());
+                                continue;
+                            }
+                            // Check if it's the node that controls the text of the speed panel
+                            else if ((string)textNode->name() == "ColorInsideSelected" || (string)textNode->name() == "ColorBorderSelected" ||
+                                     (string)textNode->name() == "ColorInsideUnSelected" || (string)textNode->name() == "ColorBorderUnSelected")
+                            {
+                                // Variables to define the color of the text
+                                int channelR, channelG, channelB;
+                                // Loop in order to iterate all the children nodes of the text's color
+                                for (xml_node<> *colorNode = textNode->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                                    // Check the value of the red channel
+                                    if ((string)colorNode->name() == "R"){
+                                        // Get y coordinate of the cover
+                                        channelR = stoi(colorNode->value());
+                                        continue;
+                                    }
+                                    // Check the value of the green channel
+                                    else if ((string)colorNode->name() == "G"){
+                                        // Get y coordinate of the cover
+                                        channelG = stoi(colorNode->value());
+                                        continue;
+                                    }
+                                    // Check the value of the blue channel
+                                    else if ((string)colorNode->name() == "B"){
+                                        // Get y coordinate of the cover
+                                        channelB = stoi(colorNode->value());
+                                        // Store the color in the correct color field
+                                        if ((string)textNode->name() == "ColorInsideSelected"){
+                                            // Store the color of the text when the slot is selected
+                                            colorTextSelected = Color(channelR, channelG, channelB);
+                                        }
+                                        else if ((string)textNode->name() == "ColorBorderSelected"){
+                                            // Store the color of the border when the slot is selected
+                                            colorTextBorderSelected = Color(channelR, channelG, channelB);
+                                        }
+                                        else if ((string)textNode->name() == "ColorInsideUnSelected"){
+                                            // Store the color of the text when the slot is unselected
+                                            colorTextUnSelected = Color(channelR, channelG, channelB);
+                                        }
+                                        else if ((string)textNode->name() == "ColorBorderUnSelected"){
+                                            // Store the color of the border when the slot is unselected
+                                            colorTextBorderUnSelected = Color(channelR, channelG, channelB);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Check if it's the node that controls the text of the speed panel
+                    else if ((string)attributeSlot->name() == "ColorSelected" || (string)attributeSlot->name() == "ColorBorderSelected" ||
+                             (string)attributeSlot->name() == "ColorUnSelected" || (string)attributeSlot->name() == "ColorBorderUnSelected")
+                    {
+                        // Variables to define the color of the text
+                        int channelR, channelG, channelB;
+                        // Loop in order to iterate all the children nodes of the text's color
+                        for (xml_node<> *colorNode = attributeSlot->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                            // Check the value of the red channel
+                            if ((string)colorNode->name() == "R"){
+                                // Get y coordinate of the cover
+                                channelR = stoi(colorNode->value());
+                                continue;
+                            }
+                            // Check the value of the green channel
+                            else if ((string)colorNode->name() == "G"){
+                                // Get y coordinate of the cover
+                                channelG = stoi(colorNode->value());
+                                continue;
+                            }
+                            // Check the value of the blue channel
+                            else if ((string)colorNode->name() == "B"){
+                                // Get y coordinate of the cover
+                                channelB = stoi(colorNode->value());
+
+                                // Store the color in the correct color field
+                                if ((string)attributeSlot->name() == "ColorSelected"){
+                                    // Store the color of the text when the slot is selected
+                                    colorSelected = Color(channelR, channelG, channelB);
+                                }
+                                else if ((string)attributeSlot->name() == "ColorBorderSelected"){
+                                    // Store the color of the border when the slot is selected
+                                    colorBorderSelected = Color(channelR, channelG, channelB);
+                                }
+                                else if ((string)attributeSlot->name() == "ColorUnSelected"){
+                                    // Store the color of the text when the slot is unselected
+                                    colorUnSelected = Color(channelR, channelG, channelB);
+                                }
+                                else if ((string)attributeSlot->name() == "ColorBorderUnSelected"){
+                                    // Store the color of the border when the slot is unselected
+                                    colorBorderUnSelected = Color(channelR, channelG, channelB);
+                                }
+                            }
+                        }
+                    }
+                    // Check it's the node that contains the sprites of the vehicles
+                    else if ((string)attributeSlot->name() == "VehicleSprites"){
+                        // Clear the possible textures of the last vehicle processed
+                        vehicleTextures.clear();
+                        // Loop to process all the sprites of the vehicle to show in the slot
+                        for (xml_node<> *vehicle = attributeSlot->first_node(); vehicle; vehicle = vehicle->next_sibling()){
+                            // Check if it's the attribute that controls the position the axis X
+                            if ((string)vehicle->name() == "PositionX"){
+                                // Get the coordinate in the axis X
+                                posXVehicle = stoi(vehicle->value());
+                                continue;
+                            }
+                            // Check if it's the attribute that controls the position the axis X
+                            else if ((string)vehicle->name() == "PositionY"){
+                                // Get the coordinate in the axis X
+                                posYVehicle = stoi(vehicle->value());
+                                continue;
+                            }
+                            // Check if it's the attribute that controls the paths of the different sprites
+                            else if ((string)vehicle->name() == "Paths"){
+                                // Loop for iterate the paths of the sprites
+                                for (xml_node<> *sprite = vehicle->first_node(); sprite; sprite = sprite->next_sibling()){
+                                    // Load the texture from the path read
+                                    t.loadFromFile((string)sprite->value());
+                                    // Add the texture read to the vector
+                                    vehicleTextures.push_back(t);
+                                }
+                            }
+                        }
+                    }
+                }
+                // Creation of the slot with all the information retrieved
+                Slot s = Slot(posXSlot, posYSlot, sizeXSlot, sizeYSlot, border, textContent, fontVehicleName, posXText, posYText,
+                              borderText, sizeText, colorTextSelected, colorTextBorderSelected, colorTextUnSelected,
+                              colorTextBorderUnSelected, colorSelected, colorBorderSelected, colorUnSelected, colorBorderUnSelected,
+                              posXVehicle, posYVehicle, vehicleTextures);
+
+                // Added the slot to the vector
+                slotsMenu.push_back(s);
+            }
+        }
+        // Check if it's the node that control the panel of the vehicle properties
+        else if ((string)node->name() == "VehiclePropertiesPanel"){
+            // Loop to process all the indicators of the vehicle
+            for (xml_node<> *property = node->first_node(); property; property = property->next_sibling()){
+                // Check if it's the title of the panel
+                if ((string)property->name() == "Title"){
+                    int posX, posY, sizeText;
+                    string textContent;
+                    // Loop to process all the attributes of the title
+                    for (xml_node<> *titleNode = property->first_node(); titleNode; titleNode = titleNode->next_sibling()){
+                        // Check if it's the title of the panel
+                        if ((string)titleNode->name() == "Font"){
+                            fontTitle.loadFromFile((string)titleNode->value());
+                            continue;
+                        }
+                        // Check if it's the title of the panel
+                        else if ((string)titleNode->name() == "PositionX"){
+                            posX = stoi(titleNode->value());
+                            continue;
+                        }
+                        // Check if it's the title of the panel
+                        else if ((string)titleNode->name() == "PositionY"){
+                            posY = stoi(titleNode->value());
+                            continue;
+                        }
+                        else if ((string)titleNode->name() == "Content"){
+                            textContent = string(titleNode->value());
+                            continue;
+                        }
+                        else if ((string)titleNode->name() == "Size"){
+                            sizeText = stoi(titleNode->value());
+                            continue;
+                        }
+                        // Check if it's the node that controls the text of the speed panel
+                        else if ((string)titleNode->name() == "Color"){
+                            // Variables to define the color of the text
+                            int channelR, channelG, channelB;
+                            // Loop in order to iterate all the children nodes of the text's color
+                            for (xml_node<> *colorNode = titleNode->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                                // Check the value of the red channel
+                                if ((string)colorNode->name() == "R"){
+                                    // Get y coordinate of the cover
+                                    channelR = stoi(colorNode->value());
+                                    continue;
+                                }
+                                // Check the value of the green channel
+                                else if ((string)colorNode->name() == "G"){
+                                    // Get y coordinate of the cover
+                                    channelG = stoi(colorNode->value());
+                                    continue;
+                                }
+                                // Check the value of the blue channel
+                                else if ((string)colorNode->name() == "B"){
+                                    // Get y coordinate of the cover
+                                    channelB = stoi(colorNode->value());
+                                    propertyText.setPosition(posX, posY);
+                                    propertyText.setString(textContent);
+                                    propertyText.setCharacterSize(sizeText);
+                                    propertyText.setFillColor(Color(channelR, channelG, channelB));
+                                }
+                            }
+                        }
+                    }
+                }
+                else if ((string)property->name() == "Properties"){
+                    // Loop to process all the indicators of the vehicle
+                    for (xml_node<> *modeProperty = property->first_node(); modeProperty; modeProperty = modeProperty->next_sibling()){
+                        // Check if it's the title of the panel
+                        if ((string)modeProperty->name() == "Panel"){
+                            int posX, posY, width, height, borderPanel;
+                            // Loop to process all the attributes of the panel
+                            for (xml_node<> *infoInd = modeProperty->first_node(); infoInd; infoInd = infoInd->next_sibling()){
+                                // Check if it's the title of the panel
+                                if ((string)infoInd->name() == "PositionX"){
+                                    posX = stoi(infoInd->value());
+                                    continue;
+                                }
+                                // Check if it's the title of the panel
+                                else if ((string)infoInd->name() == "PositionY"){
+                                    posY = stoi(infoInd->value());
+                                    continue;
+                                }
+                                else if ((string)infoInd->name() == "SizeX"){
+                                    width = stoi(infoInd->value());
+                                    continue;
+                                }
+                                else if ((string)infoInd->name() == "SizeY"){
+                                    height = stoi(infoInd->value());
+                                    continue;
+                                }
+                                else if ((string)infoInd->name() == "Border"){
+                                    borderPanel = stoi(infoInd->value());
+                                    continue;
+                                }
+                                else if ((string)infoInd->name() == "ColorPanel" || (string)infoInd->name() == "ColorBorder"){
+                                     // Variables to define the color of the text
+                                    int channelR, channelG, channelB;
+                                    // Loop in order to iterate all the children nodes of the text's color
+                                    for (xml_node<> *colorNode = infoInd->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                                        // Check the value of the red channel
+                                        if ((string)colorNode->name() == "R"){
+                                            // Get y coordinate of the cover
+                                            channelR = stoi(colorNode->value());
+                                            continue;
+                                        }
+                                        // Check the value of the green channel
+                                        else if ((string)colorNode->name() == "G"){
+                                            // Get y coordinate of the cover
+                                            channelG = stoi(colorNode->value());
+                                            continue;
+                                        }
+                                        // Check the value of the blue channel
+                                        else if ((string)colorNode->name() == "B"){
+                                            // Get y coordinate of the cover
+                                            channelB = stoi(colorNode->value());
+                                            if ((string)infoInd->name() == "ColorPanel"){
+                                                panelIndicator.setFillColor(Color(channelR, channelG, channelB));
+                                            }
+                                            else if ((string)infoInd->name() == "ColorBorder"){
+                                                panelIndicator.setOutlineColor(Color(channelR, channelG, channelB));
+                                            }
+                                            panelIndicator.setPosition(posX, posY);
+                                            panelIndicator.setSize(sf::Vector2f(width, height));
+                                            panelIndicator.setOutlineThickness(borderPanel);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // Check if it's the title of the panel
+                        else if ((string)modeProperty->name() == "Font"){
+                            // Load the font to specify the vehicle properties
+                            fontVehicleIndicator.loadFromFile((string)modeProperty->value());
+                            propertyText.setFont(fontVehicleIndicator);
+                            continue;
+                        }
+                        else if ((string)modeProperty->name() == "Indicators"){
+                            // Number of text processed
+                            int posX, posY;
+                            Text indicatorText;
+                            // Loop to process all the indicators of the vehicle
+                            for (xml_node<> *infoInd = modeProperty->first_node(); infoInd; infoInd = infoInd->next_sibling()){
+                                // Loop to process all the indicators of the vehicle
+                                for (xml_node<> *info = infoInd->first_node(); info; info = info->next_sibling()){
+                                    // Check if it's the title of the panel
+                                    if ((string)info->name() == "Content"){
+                                        indicatorText.setString((string)info->value());
+                                        continue;
+                                    }
+                                    // Check if it's the title of the panel
+                                    else if ((string)info->name() == "PositionX"){
+                                        posX = stoi(info->value());
+                                        continue;
+                                    }
+                                    // Check if it's the title of the panel
+                                    if ((string)info->name() == "PositionY"){
+                                        posY = stoi(info->value());
+                                        indicatorText.setPosition(posX, posY);
+                                        continue;
+                                    }
+                                    // Check if it's the title of the panel
+                                    else if ((string)info->name() == "Size"){
+                                        indicatorText.setCharacterSize(stoi(info->value()));
+                                        continue;
+                                    }
+                                    // Check if it's the node that controls the text of the speed panel
+                                    else if ((string)info->name() == "Color"){
+                                        // Variables to define the color of the text
+                                        int channelR, channelG, channelB;
+                                        // Loop in order to iterate all the children nodes of the text's color
+                                        for (xml_node<> *colorNode = info->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                                            // Check the value of the red channel
+                                            if ((string)colorNode->name() == "R"){
+                                                // Get y coordinate of the cover
+                                                channelR = stoi(colorNode->value());
+                                                continue;
+                                            }
+                                            // Check the value of the green channel
+                                            else if ((string)colorNode->name() == "G"){
+                                                // Get y coordinate of the cover
+                                                channelG = stoi(colorNode->value());
+                                                continue;
+                                            }
+                                            // Check the value of the blue channel
+                                            else if ((string)colorNode->name() == "B"){
+                                                // Get y coordinate of the cover
+                                                channelB = stoi(colorNode->value());
+                                                indicatorText.setFillColor(Color(channelR, channelG, channelB));
+                                                vehicleIndicators.push_back(indicatorText);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-    Event event;
-    app->pollEvent(event);
 }
 
+
+
+void Menu::readVehicleSpecifications(char* pathVehicleName, int& topSpeed, float& angle,
+                                     string& motor, float& timeBraking, float& timeAcceleration){
+
+    // Path of the xml configuration file
+    xml_document<> doc;
+    file<> file(pathVehicleName);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *vehicle = doc.first_node();
+
+    // Read the attributes of the vehicle
+    for (xml_node<> *attributeVehicle = vehicle->first_node(); attributeVehicle; attributeVehicle = attributeVehicle->next_sibling()){
+        // Check the value of the red channel
+        if ((string)attributeVehicle->name() == "MaxSpeed"){
+            // Get y coordinate of the cover
+            topSpeed = stoi(attributeVehicle->value());
+            continue;
+        }
+        // Check the value of the green channel
+        else if ((string)attributeVehicle->name() == "Angle"){
+            // Get y coordinate of the cover
+            angle = stof(attributeVehicle->value());
+            continue;
+        }
+        // Check the value of the red channel
+        else if ((string)attributeVehicle->name() == "Motor"){
+            // Get y coordinate of the cover
+            motor = attributeVehicle->value();
+            continue;
+        }
+        // Check the value of the green channel
+        else if ((string)attributeVehicle->name() == "Braking"){
+            // Get y coordinate of the cover
+            timeBraking = stof(attributeVehicle->value());
+            continue;
+        }
+        // Check the value of the green channel
+        else if ((string)attributeVehicle->name() == "Acceleration"){
+            // Get y coordinate of the cover
+            timeAcceleration = stof(attributeVehicle->value());
+        }
+    }
+}
+
+
+
+/**
+ * Shows the menu of selecting vehicle
+ * @param app is the console where the game is displayed to the players
+ * @param typeOfVehicle is the kind of vehicle selected by the user in the menu
+ * @param colorVehicle is the vehicle's color selected by the user in the menu
+ */
+void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& colorVehicle){
+
+    // Clean the console window
+    app->clear(Color(0, 0 ,0));
+
+    // Control possible events
+    Event ev;
+
+    // Vector of the slots of the menu
+    vector<Slot> slotsMenu;
+
+    // Vector of the slots of the menu
+    vector<Text> vehicleIndicators;
+
+    // Vector of the texts for present the vehicle specifications
+    vector<Text> vehicleSpecifications(5);
+
+    // Variables to store the specifications of the vehicles
+    int topSpeed;
+    float angle, timeBraking, timeAcceleration;
+    string motor;
+
+    // Vector of vehicle specification values
+    vector<VehicleSpecifications> specifications;
+
+    VehicleSpecifications vH;
+
+    // For each vehicle read it's specifications
+    readVehicleSpecifications("Configuration/Vehicles/Motorbike.xml", topSpeed, angle, motor, timeBraking, timeAcceleration);
+    vH = VehicleSpecifications(topSpeed, angle, motor, timeBraking, timeAcceleration);
+    specifications.push_back(vH);
+
+    readVehicleSpecifications("Configuration/Vehicles/Devastator.xml", topSpeed, angle, motor, timeBraking, timeAcceleration);
+    vH = VehicleSpecifications(topSpeed, angle, motor, timeBraking, timeAcceleration);
+    specifications.push_back(vH);
+
+    readVehicleSpecifications("Configuration/Vehicles/Minivan.xml", topSpeed, angle, motor, timeBraking, timeAcceleration);
+    vH = VehicleSpecifications(topSpeed, angle, motor, timeBraking, timeAcceleration);
+    specifications.push_back(vH);
+
+    readVehicleSpecifications("Configuration/Vehicles/Truck.xml", topSpeed, angle, motor, timeBraking, timeAcceleration);
+    vH = VehicleSpecifications(topSpeed, angle, motor, timeBraking, timeAcceleration);
+    specifications.push_back(vH);
+
+    Sprite menuVehicle;
+    Font fontMainText, fontVehicleName, fontVehicleIndicator, fontTitle;
+    Text mainText, propertyText;
+
+    RectangleShape panelIndicator;
+
+    // Load the configuration of the vehicle's menu
+    loadVehiclesMenu(menuVehicle, fontMainText, fontVehicleName, fontVehicleIndicator, fontTitle,
+                     mainText, propertyText, slotsMenu, vehicleIndicators, panelIndicator);
+
+
+    // Initialize the fonts of all the text
+    for (int i = 0; i < (int)vehicleIndicators.size(); i++){
+        vehicleIndicators[i].setFont(fontVehicleIndicator);
+    }
+
+    // Change the texture of the cover
+    app->draw(menuVehicle);
+    app->draw(mainText);
+    app->draw(panelIndicator);
+    app->draw(propertyText);
+
+    // Initialize the fonts of all the text
+    for (int i = 0; i < (int)vehicleIndicators.size(); i++){
+        app->draw(vehicleIndicators[i]);
+    }
+
+    string value;
+    // Fill the specifications of the actual vehicle selected
+    for (int i = 0; i < (int)vehicleSpecifications.size(); i++){
+        vehicleSpecifications[i].setPosition(vehicleIndicators[i].getPosition().x + vehicleIndicators[i].getGlobalBounds().width + 10,
+                                             vehicleIndicators[i].getPosition().y);
+
+        vehicleSpecifications[i].setCharacterSize(vehicleIndicators[i].getCharacterSize());
+        vehicleSpecifications[i].setFont(*vehicleIndicators[i].getFont());
+        vehicleSpecifications[i].setFillColor(vehicleIndicators[i].getFillColor());
+        switch(i){
+            case 0:
+                vehicleSpecifications[i].setString(to_string(specifications[0].speed));
+                break;
+            case 1:
+                value = to_string(specifications[0].angle);
+                vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3));
+                break;
+            case 2:
+                vehicleSpecifications[i].setString(specifications[0].motor);
+                break;
+             case 3:
+                value = to_string(specifications[0].timeToBrake);
+                vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3) + " seconds");
+                break;
+            case 4:
+                value = to_string(specifications[0].timeAccelerate);
+                vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3) + " seconds");
+        }
+        app->draw(vehicleSpecifications[i]);
+    }
+
+    app->display();
+
+    for (int i = 0; i < (int)slotsMenu.size(); i++){
+        // Paint the slots with their initial colors
+        if (i == 0){
+            // The first is been selected
+            slotsMenu[i].shape.setFillColor(slotsMenu[i].colorSelected);
+            slotsMenu[i].shape.setOutlineColor(slotsMenu[i].colorBorderSelected);
+            slotsMenu[i].vehicleName.setFillColor(slotsMenu[i].colorTextSelected);
+            slotsMenu[i].vehicleName.setOutlineColor(slotsMenu[i].colorTextBorderSelected);
+            slotsMenu[i].vehicleSprite.setTexture(slotsMenu[i].texturesOfVehicle[slotsMenu[i].actualTextureVehicle + 1]);
+        }
+        else {
+            // The rest are not selected
+            slotsMenu[i].shape.setFillColor(slotsMenu[i].colorUnSelected);
+            slotsMenu[i].shape.setOutlineColor(slotsMenu[i].colorBorderUnSelected);
+            slotsMenu[i].vehicleName.setFillColor(slotsMenu[i].colorTextUnSelected);
+            slotsMenu[i].vehicleName.setOutlineColor(slotsMenu[i].colorTextBorderUnSelected);
+            slotsMenu[i].vehicleSprite.setTexture(slotsMenu[i].texturesOfVehicle[slotsMenu[i].actualTextureVehicle]);
+        }
+        app->draw(slotsMenu[i].shape);
+        app->draw(slotsMenu[i].vehicleName);
+        app->draw(slotsMenu[i].vehicleSprite);
+        app->draw(slotsMenu[i].vehicleName);
+    }
+
+    app->display();
+
+    // Identifier of the actual button selected
+    int optionParameter = 0;
+
+    // Control the start key is pressed
+    bool startPressed = false;
+
+    // While there is no vehicle selected
+    // Loop until the player selects a mode pressing enter
+    while (!startPressed){
+
+        // Detect possible actions of the user on the console game
+        if (app->pollEvent(ev) && ev.type == Event::Closed){
+                app->close();
+        }
+
+        // Check if the left cursor keyword has been pressed
+        if (Keyboard::isKeyPressed(Keyboard::Left)){
+            // Check if the first slot is hovered or not
+            if (optionParameter != 0){
+                // Move the button hovered
+                optionParameter--;
+                // Change the color appearance of both buttons
+                slotsMenu[optionParameter].shape.setOutlineColor(slotsMenu[optionParameter].colorBorderSelected);
+                slotsMenu[optionParameter].shape.setFillColor(slotsMenu[optionParameter].colorSelected);
+                slotsMenu[optionParameter + 1].shape.setOutlineColor(slotsMenu[optionParameter].colorBorderUnSelected);
+                slotsMenu[optionParameter + 1].shape.setFillColor(slotsMenu[optionParameter].colorUnSelected);
+
+                slotsMenu[optionParameter].vehicleName.setOutlineColor(slotsMenu[optionParameter].colorTextBorderSelected);
+                slotsMenu[optionParameter].vehicleName.setFillColor(slotsMenu[optionParameter].colorTextSelected);
+                slotsMenu[optionParameter + 1].vehicleName.setOutlineColor(slotsMenu[optionParameter].colorTextBorderUnSelected);
+                slotsMenu[optionParameter + 1].vehicleName.setFillColor(slotsMenu[optionParameter].colorTextUnSelected);
+
+                // Fill the specifications of the actual vehicle selected
+                for (int i = 0; i < (int)vehicleSpecifications.size(); i++){
+                    vehicleSpecifications[i].setPosition(vehicleIndicators[i].getPosition().x +
+                                             vehicleIndicators[i].getGlobalBounds().width + 10, vehicleIndicators[i].getPosition().y);
+
+                    vehicleSpecifications[i].setCharacterSize(vehicleIndicators[i].getCharacterSize());
+                    vehicleSpecifications[i].setFont(*vehicleIndicators[i].getFont());
+                    vehicleSpecifications[i].setFillColor(vehicleIndicators[i].getFillColor());
+                    switch(i){
+                        case 0:
+                            vehicleSpecifications[i].setString(to_string(specifications[optionParameter].speed));
+                            break;
+                        case 1:
+                            value = to_string(specifications[optionParameter].angle);
+                            vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3));
+                            break;
+                        case 2:
+                            vehicleSpecifications[i].setString(specifications[optionParameter].motor);
+                            break;
+                        case 3:
+                            value = to_string(specifications[optionParameter].timeToBrake);
+                            vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3) + " seconds");
+                            break;
+                        case 4:
+                            value = to_string(specifications[optionParameter].timeAccelerate);
+                            vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3) + " seconds");
+                    }
+                    app->draw(vehicleSpecifications[i]);
+                }
+            }
+        }
+        // Check if the down cursor keyword has been pressed
+        else if (Keyboard::isKeyPressed(Keyboard::Right)){
+            // Check if the first button is hovered or not
+            if (optionParameter != (int)slotsMenu.size() - 1){
+                // Move the button hovered
+                optionParameter++;
+                // Change the color appearance of both buttons
+                slotsMenu[optionParameter].shape.setOutlineColor(slotsMenu[optionParameter].colorBorderSelected);
+                slotsMenu[optionParameter].shape.setFillColor(slotsMenu[optionParameter].colorSelected);
+                slotsMenu[optionParameter - 1].shape.setOutlineColor(slotsMenu[optionParameter].colorBorderUnSelected);
+                slotsMenu[optionParameter - 1].shape.setFillColor(slotsMenu[optionParameter].colorUnSelected);
+
+                slotsMenu[optionParameter].vehicleName.setOutlineColor(slotsMenu[optionParameter].colorTextBorderSelected);
+                slotsMenu[optionParameter].vehicleName.setFillColor(slotsMenu[optionParameter].colorTextSelected);
+                slotsMenu[optionParameter - 1].vehicleName.setOutlineColor(slotsMenu[optionParameter].colorTextBorderUnSelected);
+                slotsMenu[optionParameter - 1].vehicleName.setFillColor(slotsMenu[optionParameter].colorTextUnSelected);
+
+                // Fill the specifications of the actual vehicle selected
+                for (int i = 0; i < (int)vehicleSpecifications.size(); i++){
+                    vehicleSpecifications[i].setPosition(vehicleIndicators[i].getPosition().x +
+                                             vehicleIndicators[i].getGlobalBounds().width + 10, vehicleIndicators[i].getPosition().y);
+
+                    vehicleSpecifications[i].setCharacterSize(vehicleIndicators[i].getCharacterSize());
+                    vehicleSpecifications[i].setFont(*vehicleIndicators[i].getFont());
+                    vehicleSpecifications[i].setFillColor(vehicleIndicators[i].getFillColor());
+                    switch(i){
+                        case 0:
+                            vehicleSpecifications[i].setString(to_string(specifications[optionParameter].speed));
+                            break;
+                        case 1:
+                            value = to_string(specifications[optionParameter].angle);
+                            vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3));
+                            break;
+                        case 2:
+                            vehicleSpecifications[i].setString(specifications[optionParameter].motor);
+                            break;
+                        case 3:
+                            value = to_string(specifications[optionParameter].timeToBrake);
+                            vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3) + " seconds");
+                            break;
+                        case 4:
+                            value = to_string(specifications[optionParameter].timeAccelerate);
+                            vehicleSpecifications[i].setString(value.substr(0, value.find(".") + 3) + " seconds");
+                    }
+                    app->draw(vehicleSpecifications[i]);
+                }
+            }
+        }
+
+        // Get the number of sprites of the vehicle currently selected
+        int numberOfSprites = (int)slotsMenu[optionParameter].texturesOfVehicle.size();
+
+        // Control the sprite to turn
+        switch(optionParameter){
+            case 0:
+                // Motorbike
+                slotsMenu[optionParameter + 1].actualTextureVehicle = 0;
+                slotsMenu[optionParameter + 1].vehicleSprite.setTexture(slotsMenu[optionParameter + 1].
+                                        texturesOfVehicle[slotsMenu[optionParameter + 1].actualTextureVehicle]);
+                break;
+            case 1:
+            case 2:
+                // Devastator and minivan
+                slotsMenu[optionParameter - 1].actualTextureVehicle = 0;
+                slotsMenu[optionParameter + 1].actualTextureVehicle = 0;
+
+                slotsMenu[optionParameter - 1].vehicleSprite.setTexture(slotsMenu[optionParameter - 1].
+                                       texturesOfVehicle[slotsMenu[optionParameter - 1].actualTextureVehicle]);
+                slotsMenu[optionParameter + 1].vehicleSprite.setTexture(slotsMenu[optionParameter + 1].
+                                       texturesOfVehicle[slotsMenu[optionParameter + 1].actualTextureVehicle]);
+                break;
+            case 3:
+                // Truck
+                slotsMenu[optionParameter - 1].actualTextureVehicle = 0;
+
+                slotsMenu[optionParameter - 1].vehicleSprite.setTexture(slotsMenu[optionParameter - 1].
+                                       texturesOfVehicle[slotsMenu[optionParameter - 1].actualTextureVehicle]);
+        }
+
+        if (slotsMenu[optionParameter].actualTextureVehicle != numberOfSprites - 1){
+            slotsMenu[optionParameter].actualTextureVehicle++;
+        }
+        else {
+            slotsMenu[optionParameter].actualTextureVehicle = 1;
+        }
+
+        slotsMenu[optionParameter].vehicleSprite.setTexture(slotsMenu[optionParameter].
+                                   texturesOfVehicle[slotsMenu[optionParameter].actualTextureVehicle]);
+
+        app->draw(menuVehicle);
+        app->draw(mainText);
+        app->draw(panelIndicator);
+        app->draw(propertyText);
+
+        // Initialize the fonts of all the text
+        for (int i = 0; i < (int)vehicleIndicators.size(); i++){
+            app->draw(vehicleIndicators[i]);
+            app->draw(vehicleSpecifications[i]);
+        }
+
+        // Show the buttons of the menu
+        for (int i = 0; i < (int)slotsMenu.size(); i++){
+            app->draw(slotsMenu[i].shape);
+            app->draw(slotsMenu[i].vehicleSprite);
+            app->draw(slotsMenu[i].vehicleName);
+        }
+
+        app->display();
+        sleep(milliseconds(180));
+
+        // Check if the start key has been pressed or not
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
+            startPressed = true;
+        }
+    }
+}
 
 
 

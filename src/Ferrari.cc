@@ -1,5 +1,5 @@
 
-#include "../include/Ferrari.h"
+#include "../include/Devastator.h"
 
 Ferrari::Ferrari(char* pathFile) : Player(pathFile){};
 
