@@ -484,6 +484,7 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
     for (int i = 0; i < (int)menuButtons.size(); i++){
         menuButtons.at(i).render(app);
     }
+
     // Display the changes of the buttons' appearance
     app->display();
 
@@ -547,6 +548,149 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
             startPressed = true;
         }
+    }
+}
+
+
+
+
+/**
+ * Shows the menu of selecting the number of players
+ * @param app is the console where the game is displayed to the players
+ * @param c stores the current configuration of the game
+ */
+void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& control, Configuration* c, KeywordMapper* kM){
+    // Clean the console window
+    app->clear(Color(0, 0 ,0));
+
+    // Control possible events
+    Event ev;
+
+    sleep(milliseconds(100));
+
+    // Clear the list of buttons of the last possible menus
+    menuButtons.clear();
+
+    // Variables to store all the information of the menu panel
+    string imagePath, textContent, fontPath, textContentButton;
+    int positionXPanel, positionYPanel, width, height, border, positionXText, positionYText, sizeText;
+    Color colorText;
+    Font fontPanel, fontButton;
+
+    // Load from file the player menu
+    loadPlayerAndGameMenus(pathFile, imagePath, textContent, fontPath, fontButton,
+                           positionXPanel, positionYPanel, width, height, border, positionXText,
+                           positionYText, sizeText, colorText);
+
+    // Set position to the cover sprite
+    menuSprite.setPosition(positionXCover, positionYCover);
+    // Load the texture to show it
+    menuSprite.setTexture(cover, true);
+    app->draw(menuSprite);
+
+    // Draw the rectangle of the player menu
+    rectangle.setPosition(positionXPanel, positionYPanel);
+    rectangle.setSize(sf::Vector2f(width, height));
+    rectangle.setOutlineColor(Color::Green);
+    rectangle.setOutlineThickness(border);
+    Texture background;
+    background.loadFromFile(imagePath);
+    rectangle.setTexture(&background, true);
+    app->draw(rectangle);
+
+    // Draw the text introduction of the menu
+    Text playerText;
+    playerText.setString(textContent);
+    playerText.setFillColor(colorText);
+    playerText.setCharacterSize(sizeText);
+    playerText.setStyle(Text::Bold | Text::Underlined);
+    playerText.setPosition(positionXText, positionYText);
+    fontPanel.loadFromFile(fontPath);
+    playerText.setFont(fontPanel);
+    app->draw(playerText);
+
+    // Identifier of the actual button selected
+    int optionParameter = 0;
+
+    // Show the buttons of the menu
+    for (int i = 0; i < (int)menuButtons.size(); i++){
+        menuButtons.at(i).render(app);
+    }
+
+    // Display the changes of the buttons' appearance
+    app->display();
+
+    // Control the start key is pressed
+    bool startPressed = false;
+
+    // Loop until the player selects a mode pressing enter
+    while (!startPressed){
+
+        // Detect possible actions of the user on the console game
+        if (app->pollEvent(ev) && ev.type == Event::Closed){
+                app->close();
+        }
+
+        // Check if the up cursor keyword has been pressed
+        if (Keyboard::isKeyPressed(Keyboard::Up)){
+            // Check if the first button is hovered or not
+            if (optionParameter != 0){
+                // Move the button hovered
+                optionParameter--;
+                // Change the color appearance of both buttons
+                menuButtons[optionParameter].setButtonState(BUTTON_HOVER);
+                menuButtons[optionParameter + 9].setButtonState(BUTTON_HOVER);
+                menuButtons[optionParameter + 1].setButtonState(BUTTON_IDLE);
+                menuButtons[optionParameter + 10].setButtonState(BUTTON_IDLE);
+            }
+        }
+        // Check if the down cursor keyword has been pressed
+        else if (Keyboard::isKeyPressed(Keyboard::Down)){
+            // Check if the first button is hovered or not
+            if (optionParameter != ((int)menuButtons.size() / 2) - 1){
+                // Move the button hovered
+                optionParameter++;
+                // Change the color appearance of both buttons
+                menuButtons[optionParameter].setButtonState(BUTTON_HOVER);
+                menuButtons[optionParameter + 9].setButtonState(BUTTON_HOVER);
+                menuButtons[optionParameter - 1].setButtonState(BUTTON_IDLE);
+                menuButtons[optionParameter + 8].setButtonState(BUTTON_IDLE);
+            }
+        }
+        // Check if the start key has been pressed or not
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
+            startPressed = true;
+        }
+
+        // Check where is the button selected
+        switch(optionParameter){
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                // Change one of the three first configuration parameters
+                modifyOptionConfiguration(optionParameter, control, c, kM);
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                modifyOptionConfigurationPlayer(app, optionParameter, c, kM);
+                break;
+        }
+
+        // Render the buttons with the changes
+        app->draw(menuSprite);
+        app->draw(rectangle);
+        app->draw(playerText);
+
+        // Show the buttons of the menu
+        for (int i = 0; i < (int)menuButtons.size(); i++){
+            menuButtons.at(i).render(app);
+        }
+        app->display();
+        sleep(milliseconds(90));
     }
 }
 
@@ -1440,6 +1584,170 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
         // Check if the start key has been pressed or not
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
             startPressed = true;
+        }
+    }
+}
+
+
+
+/**
+ * Change a configuration parameter of the game that it's not relative to the player
+ * @param optionParameter is the code of the parameter to modify
+ */
+void Menu::modifyOptionConfiguration(const int optionParameter, Type_control& control, Configuration* c, KeywordMapper* kM){
+    int volumeMusic;
+    // Check if the left cursor keyword has been pressed
+    if (Keyboard::isKeyPressed(Keyboard::Left)){
+        // Control which configuration button is currently selected
+        switch(optionParameter){
+            case 0:
+                // Check the control with mouse or keyword or joystick
+                if (control == KEYBOARD){
+                    // Control with keyword
+                    menuButtons[optionParameter + 9].setTextButton("Mouse");
+                    control = MOUSE;
+                }
+                else if (control == JOYSTICK){
+                    // Control with keyboard
+                    menuButtons[optionParameter + 9].setTextButton("Keyboard");
+                    control = KEYBOARD;
+                }
+                // Check if the new type control is with the mouse
+                if (control == MOUSE){
+                    // Change the mode of the control to turn left and turn right
+                    menuButtons[optionParameter + 16].setTextButton("Mouse to left");
+                    menuButtons[optionParameter + 17].setTextButton("Mouse to right");
+                }
+                else {
+                    // Change the mode of the control to turn left and turn right
+                    int codeLeftKey = kM->lookForIdKeyWord(c->getLeftKey());
+                    int codeRightKey = kM->lookForIdKeyWord(c->getRightKey());
+                    string codeLeft = kM->mapperIdKeyWord[codeLeftKey];
+                    string codeRight = kM->mapperIdKeyWord[codeRightKey];
+                    menuButtons[optionParameter + 16].setTextButton(codeLeft);
+                    menuButtons[optionParameter + 17].setTextButton(codeRight);
+                }
+                break;
+            case 1:
+                // Check the state of the traffic
+                if (menuButtons[optionParameter + 9].getTextButton() == "No"){
+                    // Desactivate the traffic in the game
+                    menuButtons[optionParameter + 9].setTextButton("Yes");
+                }
+                break;
+            case 2:
+            case 3:
+                // Check the state of the traffic
+                volumeMusic = stoi(menuButtons[optionParameter + 9].getTextButton()) - 1;
+                if (volumeMusic >= 0){
+                    // Desactivate the traffic in the game
+                    menuButtons[optionParameter + 9].setTextButton(to_string(volumeMusic));
+                }
+        }
+    }
+    // Check if the left cursor keyword has been pressed
+    else if (Keyboard::isKeyPressed(Keyboard::Right)){
+        // Control which configuration button is currently selected
+        switch(optionParameter){
+            case 0:
+                // Check the control with mouse or keyword or joystick
+                if (control == MOUSE){
+                    // Control with keyboard
+                    menuButtons[optionParameter + 9].setTextButton("Keyboard");
+                    control = KEYBOARD;
+                }
+                else if (menuButtons[optionParameter + 9].getTextButton() == "Keyboard"){
+                    // Control with joystick
+                    menuButtons[optionParameter + 9].setTextButton("Joystick");
+                    control = JOYSTICK;
+                }
+                // Check if the new type control is with the mouse
+                if (control == MOUSE){
+                    // Change the mode of the control to turn left and turn right
+                    menuButtons[optionParameter + 16].setTextButton("Mouse to left");
+                    menuButtons[optionParameter + 17].setTextButton("Mouse to right");
+                }
+                else {
+                    // Change the mode of the control to turn left and turn right
+                    int codeLeftKey = kM->lookForIdKeyWord(c->getLeftKey());
+                    int codeRightKey = kM->lookForIdKeyWord(c->getRightKey());
+                    string codeLeft = kM->mapperIdKeyWord[codeLeftKey];
+                    string codeRight = kM->mapperIdKeyWord[codeRightKey];
+                    menuButtons[optionParameter + 16].setTextButton(codeLeft);
+                    menuButtons[optionParameter + 17].setTextButton(codeRight);
+                }
+                break;
+            case 1:
+                // Check the state of the traffic
+                if (menuButtons[optionParameter + 9].getTextButton() == "Yes"){
+                    // Desactivate the traffic in the game
+                    menuButtons[optionParameter + 9].setTextButton("No");
+                }
+                break;
+            case 2:
+            case 3:
+                // Check the state of the traffic
+                volumeMusic = stoi(menuButtons[optionParameter + 9].getTextButton()) + 1;
+                if (volumeMusic <= 100){
+                    // Desactivate the traffic in the game
+                    menuButtons[optionParameter + 9].setTextButton(to_string(volumeMusic));
+                }
+        }
+    }
+}
+
+
+
+/**
+ * Change a configuration parameter of the game that it's  relative to the player
+ * @param optionParameter is the code of the parameter to modify
+ */
+void Menu::modifyOptionConfigurationPlayer(RenderWindow* app, const int optionParameter, Configuration* c, KeywordMapper* kM){
+    // Check what key is going to be modified
+    // Check if any recognized keyword has been pressed or not
+    Event e;
+    app->waitEvent(e);
+    if (e.type == Event::KeyPressed && e.key.code != -1 && e.key.code != Keyboard::Enter &&
+        e.key.code != Keyboard::Up && e.key.code != Keyboard::Down){
+        // Check the configuration option that has to be changed
+        Keyboard::Key key = kM->mapperCodeKeyWord[e.key.code];
+        string codeKeyWord = kM->mapperIdKeyWord[e.key.code];
+        // Change the configuration parameter if all is correct
+        switch(optionParameter){
+            case 4:
+                // Change music selector
+                if (!c->isRepeated(key)){
+                    c->setChangeSoundtrack(key);
+                    menuButtons[optionParameter + 9].setTextButton(codeKeyWord);
+                }
+                break;
+            case 5:
+                // Acceleration
+                if (!c->isRepeated(key)){
+                    c->setAccelerateKey(key);
+                    menuButtons[optionParameter + 9].setTextButton(codeKeyWord);
+                }
+                break;
+            case 6:
+                // Braking
+                if (!c->isRepeated(key)){
+                    c->setBrakeKey(key);
+                    menuButtons[optionParameter + 9].setTextButton(codeKeyWord);
+                }
+                break;
+            case 7:
+                // Turning left
+                if (!c->isRepeated(key)){
+                    c->setLeftKey(key);
+                    menuButtons[optionParameter + 9].setTextButton(codeKeyWord);
+                }
+                break;
+            case 8:
+                // Turning right
+                if (!c->isRepeated(key)){
+                    c->setRightKey(key);
+                    menuButtons[optionParameter + 9].setTextButton(codeKeyWord);
+                }
         }
     }
 }

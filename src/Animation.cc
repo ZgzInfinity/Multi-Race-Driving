@@ -108,7 +108,7 @@ void Animation::loadGameData(RenderWindow* app){
     // Show the logos in the console
     app->display();
     // Sleep the process to see the menu icons correctly
-    sleep(milliseconds(4000));
+    sleep(milliseconds(2500));
 
     // Clean the console of the game
     app->clear(Color::Black);
@@ -121,5 +121,5 @@ void Animation::loadGameData(RenderWindow* app){
     // Show the logos in the console
     app->display();
     // Sleep the process to see the menu icons correctly
-    sleep(milliseconds(4000));
+    sleep(milliseconds(2500));
 }

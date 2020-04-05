@@ -29,7 +29,7 @@ class Devastator : public Player {
         /**
          * Constructor of the class
          */
-        Devastator(char* pathFile);
+        Devastator(char* pathFile, Configuration* c);
 
 
 

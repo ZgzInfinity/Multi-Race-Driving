@@ -1,59 +1,264 @@
 
 #include "../include/Game.h"
 
-Game::Game(RenderWindow* app) {
 
+
+/**
+ * Constructor of the data type Game
+ * @param app is the console window where it's going to be displayed
+ */
+Game::Game(RenderWindow* app) {
+    // Initializing the console window of the game
     application = app;
 
-    // Creation of the animation
-    string animationFile = "Configuration/Animations/Animations.xml";
-    char* animationF = const_cast<char*>(animationFile.c_str());
-    animationGame = new Animation(animationF);
+    // First state of the game
+    status = ANIMATION;
+
+    // Reproduce sega sound for the animation
+    mR = new MusicReproductor();
+
+    // Load the default configuration of the game
+    c = new Configuration();
+
+    // Initialize the keyword mapper module
+    kM = new KeywordMapper();
+
+    // Load the soundtracks from the xml configuration file
+    mR->loadSoundtracksOfGame("Configuration/Soundtracks/Soundtracks.xml");
+
+    // Initialize the soundtrack list in the first position
+    mR->startSoundtrackList();
 
     // Creation of the menus
     menuGame = new Menu();
 
+}
+
+
+
+/**
+ * Execute the game throughout its different states
+ */
+void Game::runningGame(){
+    // While the game is opened
+    while (application->isOpen()) {
+        // Check the status of the game and pass to the next one
+        switch(status){
+            case ANIMATION:
+                // Starts the animation
+                status = showStartingAnimation();
+                break;
+            case MAIN_MENU:
+                // Displays the main menu
+                status = showMainMenu();
+                break;
+            case PLAYER_MENU:
+                // Displays the player menu
+                status = showPlayerMenu();
+                break;
+            case SINGLE_GAME_MODE:
+                // Display the game modes available in the single player mode
+                status = showSinglePlayerMenu();
+                break;
+            case MULTI_GAME_MODE:
+                // Display the game modes available in the multi player mode
+                break;
+            case LEVEL_MENU:
+                // Displays the game mode selected
+                status = showDifficultLevelMenu();
+                break;
+            case PREPARING_GAME_MODE:
+                // Prepare the configuration of the game mode selected
+                status = prepareGameMode();
+                break;
+            case VEHICLE_MENU:
+                // Displays the vehicle menu
+                status = showVehicleMenu();
+                break;
+            case OPTIONS:
+                status = showOptionsMenu();
+                break;
+            case PLAYING:
+                // Starts with the game mode execution
+                status = playingGame();
+        }
+    }
+}
+
+
+
+/**
+ * Displays the initial animations when the game starts
+ */
+Game_status Game::showStartingAnimation(){
+    // Creation of the animation
+    string animationFile = "Configuration/Animations/Animations.xml";
+    char* animationF = const_cast<char*>(animationFile.c_str());
+    this->animationGame = new Animation(animationF);
+
+    // Reproduce the sound of the sega icons animation
+    mR->reproduceSound("SoundEffects/segaSound.ogg", false, 100);
+
     // Showing the animation of the sega logo
     animationGame->loadSegaIcons(application);
+
+    // Stop the sega sound for the animation
+    mR->stopSound();
+
+    // Get the actual soundtrack
+    Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
+
+    // Reproduce the main soundtrack of the game
+    mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
 
     // Shwoing the company and the presents logo of the game
     animationGame->loadGameData(application);
 
+    // Advance the soundtrack list
+    mR->advanceSoundtrack();
+
+    // Advance the state machine of the game to present the main menu of the game
+    return MAIN_MENU;
+}
+
+
+
+/**
+ * Show the main menu of the game
+ */
+Game_status Game::showMainMenu(){
     // Show the main menu
     menuGame->showMainMenu(application);
 
-    // Control the player mode selected
-    int modePlayerSelected;
+    // Stop the intro sound of the main menu
+    mR->stopSound();
 
-    // Control the game mode selected
-    int modeGameSelected;
+    // Advance the state machine of the game to present the player mode menu
+    return PLAYER_MENU;
+}
 
-    // Control the difficult level selected
-    int modeDifficultLevelSelected;
+
+
+/**
+ * Show the player menu of the game
+ */
+Game_status Game::showPlayerMenu(){
+    // Get the actual soundtrack
+    Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
+
+    // Reproduce sound of the player, selection game mode and difficult level menus
+    mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
 
     // Show the selector menu of the players
     menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml", modePlayerSelected);
 
-    // Show the selector game modes
+    // Check what kind of mode has chosen the player
+    if (modePlayerSelected == 0){
+        // Single player
+        return SINGLE_GAME_MODE;
+    }
+    else if (modePlayerSelected == 1){
+        // Multi player
+        return MULTI_GAME_MODE;
+    }
+    else if (modePlayerSelected == 2){
+        // Options
+        return OPTIONS;
+    }
+}
+
+
+
+/**
+ * Show the different game modes when the payer
+ * chooses the single player mode
+ */
+Game_status Game::showSinglePlayerMenu(){
+    // Show the selector game modes available for only one player
     menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml", modeGameSelected);
 
-    // Show the selector difficult level of the game
+    // Advance the state machine of the game in order to display the menu where the player
+    // must select a difficult level to play
+    return LEVEL_MENU;
+}
+
+
+
+/**
+ * Show the different available difficult level
+ * to play in the game mode selected
+ */
+Game_status Game::showDifficultLevelMenu(){
+    // Show the selector difficult level of the game where the user must select one of them
     menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml", modeDifficultLevelSelected);
 
+    // Advance the state machine of the game in order to start the loading configuration
+    // from the xml file of the game selected with the difficult chosen
+    return PREPARING_GAME_MODE;
+}
+
+
+
+/**
+ * Prepares all the configurations of the game mode selected
+ */
+Game_status Game::prepareGameMode(){
     // Creation of the game selector mode controller
     gSM = GameSelectorMode(modeDifficultLevelSelected, modeGameSelected);
 
-    // Load the game mode configuration selected by the player
+    // Load the game mode configuration selected by the player with the difficult selected
     gSM.loadFileConfigurationMode(e);
 
-    // Control the type of vehicle selected with also its color
-    int typeOfVehicle, colorVehicle;
+    // Stop the intro sound
+    mR->stopSound();
 
-    // Show the menu of selection vehicle
+    // Advance to the next soundtrack of the list
+    mR->advanceSoundtrack();
+
+    // Advance the state of the game in order to display the menu where the
+    // player selects a vehicle to play
+    return VEHICLE_MENU;
+}
+
+
+
+/**
+ * Show the menu for choose the vehicle and play
+ */
+Game_status Game::showVehicleMenu(){
+    // Get the actual soundtrack
+    Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
+
+    // Reproduce sound of the player, selection game mode and difficult level menus
+    mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
+
+    // Show the menu of selection vehicle where the player must select one
     menuGame->showSelectionVehicleMenu(application, typeOfVehicle, colorVehicle);
 
-    // Play the game
-    playingGame();
+    // Stop the music of the vehicle selector menu
+    mR->stopSound();
+
+    // Advance the soundtrack list
+    mR->advanceSoundtrack();
+
+    // Advance the state of the virtual machine in order to start the game mode
+    // selected with the difficult level and the car chosen
+    return PLAYING;
+
+}
+
+
+
+/**
+ * Show the options menu with the game configuration
+ */
+Game_status Game::showOptionsMenu(){
+    // Show the menu of selection vehicle where the player must select one
+    menuGame->showMenuOptions(application, "Configuration/Menus/OptionsMenu.xml", control, c, kM);
+
+    // Advance the state of the virtual machine in order to start the game mode
+    // selected with the difficult level and the car chosen
+    return PLAYER_MENU;
 }
 
 
@@ -70,7 +275,19 @@ void Game::drawQuad(Color c, int x1,int y1,int w1,int x2,int y2,int w2){
 
 
 
-inline void Game::playingGame(){
+/**
+ * Execute the game mode selected by the user with the difficult selected
+ * and also with the vehicle chosen
+ */
+inline Game_status Game::playingGame(){
+    // Get the actual soundtrack
+    mR->getRandomSoundtrack();
+
+    // Get the actual soundtrack
+    Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
+
+    // Reproduce sound of the player, selection game mode and difficult level menus
+    mR->reproduceLevelSoundtrack();
 
     int minutes = 0, secs = 0, decs_in_sec = 0;
     int timeToPlay = INITIAL_SECS;
@@ -83,7 +300,7 @@ inline void Game::playingGame(){
     string path = "images/Vehicles/Devastator/";
     char* p = const_cast<char*>(path.c_str());
     // Motorbike of the player
-    Devastator h = Devastator(p);
+    Devastator h = Devastator(p, c);
 
     h.loadVehicleProperties();
 
@@ -119,6 +336,9 @@ inline void Game::playingGame(){
 
     // Variable to control the different possible curves
     IntervalCurve curve;
+
+    // Controller displayer of the title music
+    int timerMusic;
 
     // Controlling possible events in the console of the game
     Event ev;
@@ -297,6 +517,24 @@ inline void Game::playingGame(){
             e.message = "GOAL";
             e.textDestinyPanel.setPosition(e.textDestinyPanel.getPosition().x + 50 , e.textDestinyPanel.getPosition().y);
             e.textDestinyPanel.setString(e.message);
+       }
+
+
+       // Check if the player has pressed the key to change the music of the level
+       if (h.getConfiguration()->checkChangeMusic() || timerMusic > 0){
+            // Check if it's now when the soundtrack has been changed
+            if (timerMusic == 0){
+                mR->advanceSoundtrackLevel();
+            }
+            if (timerMusic < 30){
+                // Advance the time
+                timerMusic++;
+                application->draw(mR->getTitleSoundtrack());
+            }
+            else {
+                // Change the music
+                timerMusic = 0;
+            }
        }
 
        e.textDestinyIndicator.setString(to_string(difference) + " Km");

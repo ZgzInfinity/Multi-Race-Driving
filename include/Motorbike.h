@@ -26,7 +26,7 @@ class Motorbike : public Player {
         /**
          * Constructor of the class
          */
-        Motorbike(char* pathFile);
+        Motorbike(char* pathFile, Configuration* c);
 
 
 

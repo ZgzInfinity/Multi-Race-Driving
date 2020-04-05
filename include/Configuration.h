@@ -2,6 +2,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include <iostream>
 #include "SFML/Graphics.hpp"
 
 using namespace std;
@@ -23,12 +24,22 @@ class Configuration {
         // Turning right of the player's vehicle
         Keyboard::Key rightKey;
 
+        // Change the soundtrack level
+        Keyboard::Key changeSoundtrackLevel;
+
     public:
 
         /**
          * Default constructor of the data type configuration
          */
         Configuration();
+
+
+
+        /**
+         * Assign the accelerate control key
+         */
+        void setAccelerateKey(const Keyboard::Key key);
 
 
 
@@ -40,9 +51,23 @@ class Configuration {
 
 
         /**
+         * Assign the brake control key
+         */
+        void setBrakeKey(const Keyboard::Key key);
+
+
+
+        /**
          * Returns the key used to brake the player's vehicle
          */
         Keyboard::Key getBrakeKey();
+
+
+
+        /**
+         * Assign the left control key
+         */
+        void setLeftKey(const Keyboard::Key key);
 
 
 
@@ -54,16 +79,46 @@ class Configuration {
 
 
         /**
+         * Assign the right control key
+         */
+        void setRightKey(const Keyboard::Key key);
+
+
+
+        /**
          * Returns the key used to turn to the right the player's vehicle
          */
         Keyboard::Key getRightKey();
 
 
 
-        /**
-         * Change the configuration of the
+         /**
+         * Assign the key used to change the level soundtrack
          */
-        void changeConfiguration();
+         void setChangeSoundtrack(const Keyboard::Key key);
+
+
+
+        /**
+         * Returns the key used to change the level soundtrack
+         */
+        Keyboard::Key getChangeSoundtrack();
+
+
+
+        /**
+         * Check if the player has pressed the key to change the actual level
+         * soundtrack
+         */
+        bool checkChangeMusic();
+
+
+
+        /**
+         * Check if the key that is going to be assign is already selected
+         * @param key is the candidate keyword
+         */
+        bool isRepeated(const Keyboard::Key key);
 
 };
 

@@ -47,6 +47,10 @@ class Button {
 
         void render (RenderWindow* app);
 
+        void setTextButton(string newString);
+
+        string getTextButton();
+
 };
 
 

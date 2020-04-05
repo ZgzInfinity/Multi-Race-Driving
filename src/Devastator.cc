@@ -1,7 +1,7 @@
 
 #include "../include/Devastator.h"
 
-Devastator::Devastator(char* pathFile) : Player(pathFile){};
+Devastator::Devastator(char* pathFile, Configuration* conf) : Player(pathFile, conf){};
 
 
 /**
@@ -42,12 +42,8 @@ void Devastator::loadVehicleProperties(){
 
     // Loop in order to iterate all the children of the principal node
     for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
-        // Check if the actual node is the controller of the max speed of the vehicle
-        if ((string)child->name() == "MaxSpeed"){
-            maxSpeed = RATIO * stoi(child->value());
-        }
         // Check if the actual node is the controller of the paths of the sprites
-        else if ((string)child->name() == "SpritePaths"){
+        if ((string)child->name() == "SpritePaths"){
             // Loop for iterate throughout the path files and add then to the vector
             for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
                 // Add the texture to the vector
@@ -57,10 +53,9 @@ void Devastator::loadVehicleProperties(){
                 }
             }
         }
-        else {
-            // Error the tag has not been found
-            cerr << "The file must have the tag SpritePaths defined" << endl;
-            exit(12);
+        // Check if the actual node is the controller of the max speed of the vehicle
+        else if ((string)child->name() == "MaxSpeed"){
+            maxSpeed = RATIO * stoi(child->value());
         }
     }
     playerSprite.setTexture(textures[19]);
@@ -163,7 +158,7 @@ inline void Devastator::controlTurningPlayerLeftKeyboard(int& speed, bool& event
                                                       const int lastHeight, const int height)
 {
     // Check if key left pressed
-    if (Keyboard::isKeyPressed(Keyboard::Q)){
+    if (Keyboard::isKeyPressed(c->getLeftKey())){
         if (!isAccelerating){
             if (speed > INITIAL_SPEED){
                 speed -= int(deceleration * speed_increment);
@@ -221,7 +216,7 @@ inline void Devastator::controlTurningPlayerLeftKeyboard(int& speed, bool& event
 inline void Devastator::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                        const int lastHeight, const int height){
     // Check if key right pressed
-    if (Keyboard::isKeyPressed(Keyboard::W)){
+    if (Keyboard::isKeyPressed(c->getRightKey())){
         if (!isAccelerating){
             if (speed > INITIAL_SPEED){
                 speed -= int(deceleration * speed_increment);
@@ -277,7 +272,7 @@ inline void Devastator::controlTurningPlayerRightKeyboard(int& speed, bool& even
 inline void Devastator::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
                                         const int lastHeight, const int height){
     // Check if the user is accelerating
-    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up))){
+    if ((Keyboard::isKeyPressed(c->getAccelerateKey()))){
         isAccelerating = true;
         // Control about not acceleration if the Devastator goes in the grass
         if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
@@ -345,7 +340,7 @@ inline void Devastator::controlPlayerSpeed(int& speed, bool& eventDetected, Rend
 inline void Devastator::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
                                           const int lastHeight, const int height){
     // Check if the user is braking
-    if (Keyboard::isKeyPressed(Keyboard::Down)){
+    if (Keyboard::isKeyPressed(c->getBrakeKey())){
         isAccelerating = false;
         // Check more events
         if (!eventDetected){

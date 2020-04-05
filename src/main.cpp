@@ -3,7 +3,6 @@
 #include <iostream>
 #include "../include/Step.h"
 #include "../include/Motorbike.h"
-#include "../include/Ferrari.h"
 #include "../include/Minivan.h"
 #include "../include/Truck.h"
 #include "../include/IntervalCurve.h"
@@ -27,9 +26,11 @@ int main(int argc, char* argv[]){
     // Control the fotograms per second, 60 FPS more less
     application.setFramerateLimit(NUMBER_FPS);
 
+    // Creation of the game
     Game g = Game(&application);
 
-    g.playingGame();
+    // Control the sate machine of the game
+    g.runningGame();
 
     return 0;
 }

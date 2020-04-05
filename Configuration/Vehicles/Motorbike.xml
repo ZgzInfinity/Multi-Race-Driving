@@ -1,9 +1,4 @@
 <Player>
-	<MaxSpeed>240</MaxSpeed>
-	<Angle>0.1</Angle>
-	<Motor>Repsol SX</Motor>
-	<Braking>0.03</Braking>
-	<Acceleration>0.04</Acceleration>
 	<SpritePaths>
 		<S1>p1.png</S1>
 		<S2>p2.png</S2>
@@ -58,4 +53,9 @@
 		<S51>p51.png</S51>
 		<S52>p52.png</S52>
 	</SpritePaths>
+	<MaxSpeed>240</MaxSpeed>
+	<Angle>0.1</Angle>
+	<Motor>Repsol SX</Motor>
+	<Braking>0.03</Braking>
+	<Acceleration>0.04</Acceleration>
 </Player>

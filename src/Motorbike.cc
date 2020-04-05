@@ -1,7 +1,7 @@
 
 #include "../include/Motorbike.h"
 
-Motorbike::Motorbike(char* pathFile) : Player(pathFile){};
+Motorbike::Motorbike(char* pathFile, Configuration* conf) : Player(pathFile, conf){};
 
 
 
@@ -36,12 +36,8 @@ void Motorbike::loadVehicleProperties(){
 
     // Loop in order to iterate all the children of the principal node
     for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
-        // Check if the actual node is the controller of the max speed of the vehicle
-        if ((string)child->name() == "MaxSpeed"){
-            maxSpeed = RATIO * stoi(child->value());
-        }
         // Check if the actual node is the controller of the paths of the sprites
-        else if ((string)child->name() == "SpritePaths"){
+        if ((string)child->name() == "SpritePaths"){
             // Loop for iterate throughout the path files and add then to the vector
             for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
                 // Add the texture to the vector
@@ -50,11 +46,11 @@ void Motorbike::loadVehicleProperties(){
                     textures.push_back(t);
                 }
             }
+            continue;
         }
-        else {
-            // Error the tag has not been found
-            cerr << "The file must have the tag SpritePaths defined" << endl;
-            exit(12);
+        // Check if the actual node is the controller of the max speed of the vehicle
+        else if ((string)child->name() == "MaxSpeed"){
+            maxSpeed = RATIO * stoi(child->value());
         }
     }
     // Load the biggest texture to display the other ones

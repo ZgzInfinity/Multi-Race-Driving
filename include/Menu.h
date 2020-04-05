@@ -7,6 +7,8 @@
 #include <SFML/Graphics.hpp>
 #include "../include/Button.h"
 #include "../include/Slot.h"
+#include "../include/Configuration.h"
+#include "../include/KeywordMapper.h"
 #include "../include/VehicleSpecifications.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
@@ -15,6 +17,12 @@ using namespace std;
 using namespace sf;
 using namespace rapidxml;
 
+
+enum Type_control {
+    MOUSE = 0,
+    KEYBOARD,
+    JOYSTICK,
+};
 
 
 /*
@@ -93,8 +101,17 @@ class Menu{
      * @param app is the console where the game is displayed to the players
      * @param optionParameter is the flag where is stored the option selected by the
      * the player in the menu
-    */
+     */
     void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter);
+
+
+
+    /**
+     * Shows the menu of selecting the number of players
+     * @param app is the console where the game is displayed to the players
+     * @param c stores the current configuration of the game
+     */
+    void showMenuOptions(RenderWindow* app, string pathFile, Type_control& control, Configuration* c, KeywordMapper* kM);
 
 
 
@@ -114,6 +131,23 @@ class Menu{
      * @param colorVehicle is the vehicle's color selected by the user in the menu
      */
     void showSelectionVehicleMenu(RenderWindow* application, int& typeOfVehicle, int& colorVehicle);
+
+
+
+    /**
+     * Change a configuration parameter of the game that it's not relative to the player
+     * @param optionParameter is the code of the parameter to modify
+     */
+    void modifyOptionConfiguration(const int optionParameter, Type_control& control, Configuration* c, KeywordMapper* kM);
+
+
+
+    /**
+     * Change a configuration parameter of the game that it's  relative to the player
+     * @param optionParameter is the code of the parameter to modify
+     * @param c stores the current configuration of the game
+     */
+    void modifyOptionConfigurationPlayer(RenderWindow* app, const int optionParameter, Configuration* c, KeywordMapper* kM);
 
 };
 

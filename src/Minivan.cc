@@ -1,7 +1,7 @@
 
 #include "../include/Minivan.h"
 
-Minivan::Minivan(char* pathFile) : Player(pathFile){};
+Minivan::Minivan(char* pathFile, Configuration* conf) : Player(pathFile, conf){};
 
 
 
@@ -164,7 +164,7 @@ inline void Minivan::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDet
                                                       const int lastHeight, const int height)
 {
     // Check if key left pressed
-    if (Keyboard::isKeyPressed(Keyboard::Q)){
+    if (Keyboard::isKeyPressed(c->getLeftKey())){
         if (!isAccelerating){
             if (speed > INITIAL_SPEED){
                 speed -= int(deceleration * speed_increment);
@@ -251,7 +251,7 @@ inline void Minivan::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDet
 inline void Minivan::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                        const int lastHeight, const int height){
     // Check if key right pressed
-    if (Keyboard::isKeyPressed(Keyboard::W)){
+    if (Keyboard::isKeyPressed(c->getRightKey())){
         if (!isAccelerating){
             if (speed > INITIAL_SPEED){
                 speed -= int(deceleration * speed_increment);
@@ -337,7 +337,7 @@ inline void Minivan::controlTurningPlayerRightKeyboard(int& speed, bool& eventDe
 inline void Minivan::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
                                         const int lastHeight, const int height){
     // Check if the user is accelerating
-    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up))){
+    if ((Keyboard::isKeyPressed(c->getAccelerateKey()))){
         isAccelerating = true;
         // Control about not acceleration if the Minivan goes in the grass
         if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
@@ -403,7 +403,7 @@ inline void Minivan::controlPlayerSpeed(int& speed, bool& eventDetected, RenderW
 inline void Minivan::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
                                           const int lastHeight, const int height){
     // Check if the user is braking
-    if (Keyboard::isKeyPressed(Keyboard::Down)){
+    if (Keyboard::isKeyPressed(c->getBrakeKey())){
         isAccelerating = false;
         // Check more events
         if (!eventDetected){

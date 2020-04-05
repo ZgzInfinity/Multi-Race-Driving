@@ -30,7 +30,7 @@ class Minivan : public Player {
         /**
          * Constructor of the class
          */
-        Minivan(char* pathFile);
+        Minivan(char* pathFile, Configuration* c);
 
 
 

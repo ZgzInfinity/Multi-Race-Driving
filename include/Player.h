@@ -98,7 +98,7 @@ class Player {
         /**
          * Constructor of the class
          */
-        Player(char* pathFile){
+        Player(char* pathFile, Configuration* conf){
             // Assign principal variables
             filePath = pathFile;
             // Store actual code of the image
@@ -111,6 +111,7 @@ class Player {
             offset = 0;
             // Load the default configuration to control the vehicle
             c = new Configuration();
+            c = conf;
         }
 
 
@@ -159,20 +160,30 @@ class Player {
 
 
 
-        /**
-         * Control if the user has pressed the q keyword to turn to the left
-         * @param speed is the actual speed of the motorbike of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the motorbike
-         * @param height is the actual elevation of the terrain where is the motorbike
-         */
-        virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                             const int lastHeight, const int height) = 0;
+          /**
+          * Get the mode of collision of the motorbike
+          * @return the mode to show the collision of the motorbike
+          */
+         Configuration* getConfiguration(){
+            return c;
+         }
 
 
 
          /**
+          * Control if the user has pressed the q keyword to turn to the left
+          * @param speed is the actual speed of the motorbike of the player
+          * @param eventDetected is a boolean to control if an event has occurred
+          * @param app is the console window game where the sprite is going to be drawn
+          * @param lastHeight was the elevation of the terrain where was the motorbike
+          * @param height is the actual elevation of the terrain where is the motorbike
+          */
+         virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
+                                                              const int lastHeight, const int height) = 0;
+
+
+
+        /**
          * Control if the user has pressed the w keyword to turn to the right
          * @param speed is the actual speed of the motorbike of the player
          * @param eventDetected is a boolean to control if an event has occurred
@@ -180,7 +191,7 @@ class Player {
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
+         virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
                                                               const int lastHeight, const int height) = 0;
 
 

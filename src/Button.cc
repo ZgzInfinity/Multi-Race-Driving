@@ -60,3 +60,17 @@ void Button::render (RenderWindow* app){
     app->draw(shape);
     app->draw(textButton);
 }
+
+
+void Button::setTextButton(string newString){
+    textButton.setString(newString);
+    textButton.setPosition(
+        shape.getPosition().x + (shape.getGlobalBounds().width / 2.f)  - textButton.getGlobalBounds().width / 2.f,
+        shape.getPosition().y + (shape.getGlobalBounds().height / 2.f)  - textButton.getGlobalBounds().height / 2.f - 5
+    );
+}
+
+
+string Button::getTextButton(){
+    return textButton.getString();
+}

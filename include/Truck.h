@@ -27,7 +27,7 @@ class Truck : public Player {
         /**
          * Constructor of the class
          */
-        Truck(char* pathFile);
+        Truck(char* pathFile, Configuration* c);
 
 
 
