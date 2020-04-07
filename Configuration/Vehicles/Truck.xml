@@ -52,8 +52,8 @@
 		<S50>t50.png</S50>
 	</SpritePaths>
 	<MaxSpeed>180</MaxSpeed>
-	<Angle>0.1</Angle>
-	<Motor>Repsol SX</Motor>
-	<Braking>0.03</Braking>
-	<Acceleration>0.04</Acceleration>
+	<Angle>0.045</Angle>
+	<Motor>DAF 95XF 430</Motor>
+	<Braking>17.2</Braking>
+	<Acceleration>14.5</Acceleration>
 </Player>

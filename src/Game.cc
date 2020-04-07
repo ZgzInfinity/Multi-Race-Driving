@@ -96,9 +96,6 @@ Game_status Game::showStartingAnimation(){
     char* animationF = const_cast<char*>(animationFile.c_str());
     this->animationGame = new Animation(animationF);
 
-    // Reproduce the sound of the sega icons animation
-    mR->reproduceSound("SoundEffects/segaSound.ogg", false, 100);
-
     // Showing the animation of the sega logo
     animationGame->loadSegaIcons(application);
 
@@ -150,21 +147,22 @@ Game_status Game::showPlayerMenu(){
     mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
 
     // Show the selector menu of the players
-    menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml", modePlayerSelected);
+    menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml", modePlayerSelected, status);
 
-    // Check what kind of mode has chosen the player
-    if (modePlayerSelected == 0){
-        // Single player
-        return SINGLE_GAME_MODE;
+    // Check the status of the game
+    if (status == MAIN_MENU){
+        // Stop the actual soundtrack
+        mR->stopSound();
+        mR->backSoundtrack();
+
+        // Get the actual soundtrack
+        s = mR->getSoundtrack(mR->getIndexPosition());
+        mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
+        mR->advanceSoundtrack();
     }
-    else if (modePlayerSelected == 1){
-        // Multi player
-        return MULTI_GAME_MODE;
-    }
-    else if (modePlayerSelected == 2){
-        // Options
-        return OPTIONS;
-    }
+
+    // Check if the backspace keyword has been modified
+    return status;
 }
 
 
@@ -175,26 +173,26 @@ Game_status Game::showPlayerMenu(){
  */
 Game_status Game::showSinglePlayerMenu(){
     // Show the selector game modes available for only one player
-    menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml", modeGameSelected);
+    menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml", modeGameSelected, status);
 
     // Advance the state machine of the game in order to display the menu where the player
     // must select a difficult level to play
-    return LEVEL_MENU;
+    return status;
 }
 
 
 
 /**
  * Show the different available difficult level
- * to play in the game mode selected
+ * to play in the game mode selecte
  */
 Game_status Game::showDifficultLevelMenu(){
     // Show the selector difficult level of the game where the user must select one of them
-    menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml", modeDifficultLevelSelected);
+    menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml", modeDifficultLevelSelected, status);
 
     // Advance the state machine of the game in order to start the loading configuration
     // from the xml file of the game selected with the difficult chosen
-    return PREPARING_GAME_MODE;
+    return status;
 }
 
 
@@ -212,9 +210,6 @@ Game_status Game::prepareGameMode(){
     // Stop the intro sound
     mR->stopSound();
 
-    // Advance to the next soundtrack of the list
-    mR->advanceSoundtrack();
-
     // Advance the state of the game in order to display the menu where the
     // player selects a vehicle to play
     return VEHICLE_MENU;
@@ -226,6 +221,9 @@ Game_status Game::prepareGameMode(){
  * Show the menu for choose the vehicle and play
  */
 Game_status Game::showVehicleMenu(){
+    // Advance to the next soundtrack of the list
+    mR->advanceSoundtrack();
+
     // Get the actual soundtrack
     Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
 
@@ -233,17 +231,24 @@ Game_status Game::showVehicleMenu(){
     mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
 
     // Show the menu of selection vehicle where the player must select one
-    menuGame->showSelectionVehicleMenu(application, typeOfVehicle, colorVehicle);
+    menuGame->showSelectionVehicleMenu(application, typeOfVehicle, colorVehicle, status);
 
     // Stop the music of the vehicle selector menu
     mR->stopSound();
 
-    // Advance the soundtrack list
-    mR->advanceSoundtrack();
+    if (status == LEVEL_MENU){
+        mR->backSoundtrack();
+
+        // Get the actual soundtrack
+        Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
+
+        // Reproduce sound of the player, selection game mode and difficult level menus
+        mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
+    }
 
     // Advance the state of the virtual machine in order to start the game mode
     // selected with the difficult level and the car chosen
-    return PLAYING;
+    return status;
 
 }
 
@@ -296,6 +301,18 @@ inline Game_status Game::playingGame(){
     Time elapsed1, elapsed2;
     elapsed1 = gameClock.getElapsedTime();
     gameClock.restart();
+
+    // Select the kind of vehicle selected by the player
+    switch(typeOfVehicle){
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+    }
 
     string path = "images/Vehicles/Devastator/";
     char* p = const_cast<char*>(path.c_str());

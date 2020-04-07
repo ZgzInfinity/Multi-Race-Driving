@@ -34,8 +34,8 @@
 		<S32>m32.png</S32>
 	</SpritePaths>
 	<MaxSpeed>200</MaxSpeed>
-	<Angle>0.1</Angle>
-	<Motor>Repsol SX</Motor>
-	<Braking>0.03</Braking>
-	<Acceleration>0.04</Acceleration>
+	<Angle>0.055</Angle>
+	<Motor>Buick Lacrosse xsf</Motor>
+	<Braking>20.2</Braking>
+	<Acceleration>16.7</Acceleration>
 </Player>

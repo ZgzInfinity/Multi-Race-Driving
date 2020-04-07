@@ -21,21 +21,6 @@ using namespace sf;
 const int INITIAL_SECS = 100;
 
 
-enum Game_status {
-    ANIMATION = 0,
-    MAIN_MENU,
-    PLAYER_MENU,
-    OPTIONS,
-    SINGLE_GAME_MODE,
-    MULTI_GAME_MODE,
-    LEVEL_MENU,
-    PREPARING_GAME_MODE,
-    VEHICLE_MENU,
-    PLAYING,
-};
-
-
-
 class Game {
 
     private:

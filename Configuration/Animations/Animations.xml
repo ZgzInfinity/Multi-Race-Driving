@@ -1,44 +1,6 @@
 <Animations>
 	<SegaAnimation>
-		<S1>images/Menus/segaLogo1.png</S1>
-		<S2>images/Menus/segaLogo2.png</S2>
-		<S3>images/Menus/segaLogo3.png</S3>
-		<S4>images/Menus/segaLogo4.png</S4>
-		<S5>images/Menus/segaLogo5.png</S5>
-		<S6>images/Menus/segaLogo6.png</S6>
-		<S7>images/Menus/segaLogo7.png</S7>
-		<S8>images/Menus/segaLogo8.png</S8>
-		<S9>images/Menus/segaLogo9.png</S9>
-		<S10>images/Menus/segaLogo10.png</S10>
-		<S11>images/Menus/segaLogo11.png</S11>
-		<S12>images/Menus/segaLogo12.png</S12>
-		<S13>images/Menus/segaLogo13.png</S13>
-		<S14>images/Menus/segaLogo14.png</S14>
-		<S15>images/Menus/segaLogo15.png</S15>
-		<S16>images/Menus/segaLogo16.png</S16>
-		<S17>images/Menus/segaLogo17.png</S17>
-		<S18>images/Menus/segaLogo18.png</S18>
-		<S19>images/Menus/segaLogo19.png</S19>
-		<S20>images/Menus/segaLogo20.png</S20>
-		<S21>images/Menus/segaLogo21.png</S21>
-		<S22>images/Menus/segaLogo22.png</S22>
-		<S23>images/Menus/segaLogo23.png</S23>
-		<S24>images/Menus/segaLogo24.png</S24>
-		<S25>images/Menus/segaLogo25.png</S25>
-		<S26>images/Menus/segaLogo26.png</S26>
-		<S27>images/Menus/segaLogo27.png</S27>
-		<S28>images/Menus/segaLogo28.png</S28>
-		<S29>images/Menus/segaLogo29.png</S29>
-		<S30>images/Menus/segaLogo30.png</S30>
-		<S31>images/Menus/segaLogo31.png</S31>
-		<S32>images/Menus/segaLogo32.png</S32>
-		<S33>images/Menus/segaLogo33.png</S33>
-		<S34>images/Menus/segaLogo34.png</S34>
-		<S35>images/Menus/segaLogo35.png</S35>
-		<S36>images/Menus/segaLogo36.png</S36>
-		<S37>images/Menus/segaLogo37.png</S37>
-		<S38>images/Menus/segaLogo38.png</S38>
-		<S39>images/Menus/segaLogo39.png</S39>
+		<S1>images/Menus/sega_Logo.png</S1>
 	</SegaAnimation>
 	<CompanyAnimation>
 		<Path>images/Menus/InfinityGames.png</Path>

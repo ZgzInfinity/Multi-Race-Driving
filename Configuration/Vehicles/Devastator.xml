@@ -32,8 +32,8 @@
 		<S30>f30.png</S30>
 	</SpritePaths>
 	<MaxSpeed>260</MaxSpeed>
-	<Angle>0.1</Angle>
-	<Motor>Repsol SX</Motor>
-	<Braking>0.03</Braking>
-	<Acceleration>0.04</Acceleration>
+	<Angle>0.075</Angle>
+	<Motor>Kia Stinguer V6</Motor>
+	<Braking>20.6</Braking>
+	<Acceleration>17.9</Acceleration>
 </player>

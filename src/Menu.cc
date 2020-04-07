@@ -427,7 +427,7 @@ void Menu::showMainMenu(RenderWindow* app){
  * @param optionParameter is the flag where is stored the option selected by the
  * the player in the menu
 */
-void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter){
+void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter, Game_status& status){
     // Clean the console window
     app->clear(Color(0, 0 ,0));
 
@@ -491,8 +491,11 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
     // Control the start key is pressed
     bool startPressed = false;
 
+    // Control if backspace key is pressed
+    bool backspacePressed = false;
+
     // Loop until the player selects a mode pressing enter
-    while (!startPressed){
+    while (!startPressed && !backspacePressed){
 
         // Detect possible actions of the user on the console game
         if (app->pollEvent(ev) && ev.type == Event::Closed){
@@ -545,8 +548,39 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
             }
         }
         // Check if the start key has been pressed or not
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
+        else if (Keyboard::isKeyPressed(sf::Keyboard::Enter)){
             startPressed = true;
+            if (status == PLAYER_MENU){
+                switch(optionParameter){
+                    case 0:
+                        status = SINGLE_GAME_MODE;
+                        break;
+                    case 1:
+                        status = MULTI_GAME_MODE;
+                        break;
+                    case 2:
+                        status = OPTIONS;
+                }
+            }
+            else if (status == SINGLE_GAME_MODE || status == MULTI_GAME_MODE){
+                status = LEVEL_MENU;
+            }
+            else if (status == LEVEL_MENU){
+                status = PREPARING_GAME_MODE;
+            }
+        }
+        // Check if the start key has been pressed or not
+        else if (Keyboard::isKeyPressed(sf::Keyboard::Backspace)){
+            backspacePressed = true;
+            if (status == PLAYER_MENU){
+                status = MAIN_MENU;
+            }
+            else if (status == SINGLE_GAME_MODE || MULTI_GAME_MODE){
+                status = PLAYER_MENU;
+            }
+            else if (status == LEVEL_MENU){
+                status == SINGLE_GAME_MODE;
+            }
         }
     }
 }
@@ -609,8 +643,59 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
     playerText.setFont(fontPanel);
     app->draw(playerText);
 
+    Text info1;
+    info1.setString("Press Space to select a controller");
+    info1.setFillColor(Color(10, 201, 235));
+    info1.setOutlineColor(Color(3, 39, 8));
+    info1.setOutlineThickness(3);
+    info1.setCharacterSize(sizeText - 10);
+    info1.setStyle(Text::Bold);
+    info1.setPosition(positionXText - 130, positionYText + 50);
+    info1.setFont(fontPanel);
+    app->draw(info1);
+
+    Text info2;
+    info2.setString("Then the key to change its configuration");
+    info2.setFillColor(Color(10, 201, 235));
+    info2.setOutlineColor(Color(3, 39, 8));
+    info2.setCharacterSize(sizeText - 10);
+    info2.setOutlineThickness(3);
+    info2.setCharacterSize(sizeText - 10);
+    info2.setStyle(Text::Bold);
+    info2.setPosition(positionXText - 160, positionYText + 70);
+    info2.setFont(fontPanel);
+    app->draw(info2);
+
+
     // Identifier of the actual button selected
     int optionParameter = 0;
+
+    // Show the buttons of the menu
+    for (int i = 0; i < (int)menuButtons.size(); i++){
+        // Get the configuration of the controller
+        int code;
+        switch(i){
+            case 13:
+                code = kM->lookForIdKeyWord(c->getChangeSoundtrack());
+                menuButtons[i].setTextButton(kM->mapperIdKeyWord[code]);
+                break;
+            case 14:
+                code = kM->lookForIdKeyWord(c->getAccelerateKey());
+                menuButtons[i].setTextButton(kM->mapperIdKeyWord[code]);
+                break;
+            case 15:
+                code = kM->lookForIdKeyWord(c->getBrakeKey());
+                menuButtons[i].setTextButton(kM->mapperIdKeyWord[code]);
+                break;
+            case 16:
+                code = kM->lookForIdKeyWord(c->getLeftKey());
+                menuButtons[i].setTextButton(kM->mapperIdKeyWord[code]);
+                break;
+            case 17:
+                code = kM->lookForIdKeyWord(c->getRightKey());
+                menuButtons[i].setTextButton(kM->mapperIdKeyWord[code]);
+        }
+    }
 
     // Show the buttons of the menu
     for (int i = 0; i < (int)menuButtons.size(); i++){
@@ -658,32 +743,37 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
             }
         }
         // Check if the start key has been pressed or not
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
+        else if (Keyboard::isKeyPressed(Keyboard::Enter)){
             startPressed = true;
         }
 
-        // Check where is the button selected
-        switch(optionParameter){
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                // Change one of the three first configuration parameters
-                modifyOptionConfiguration(optionParameter, control, c, kM);
-                break;
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-                modifyOptionConfigurationPlayer(app, optionParameter, c, kM);
-                break;
+        // Press keyword space in order to change the control
+        if (Keyboard::isKeyPressed(Keyboard::Space)){
+            // Check where is the button selected
+            switch(optionParameter){
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    // Change one of the three first configuration parameters
+                    modifyOptionConfiguration(optionParameter, control, c, kM);
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    modifyOptionConfigurationPlayer(app, optionParameter, c, kM);
+                    break;
+            }
         }
 
         // Render the buttons with the changes
         app->draw(menuSprite);
         app->draw(rectangle);
         app->draw(playerText);
+        app->draw(info1);
+        app->draw(info2);
 
         // Show the buttons of the menu
         for (int i = 0; i < (int)menuButtons.size(); i++){
@@ -800,7 +890,6 @@ void Menu::loadVehiclesMenu(Sprite& menuVehicle, Font& fontMainText, Font& fontV
             cover.loadFromFile(imagePath);
             menuVehicle.setPosition(positionXBackground, positionYBackground);
             menuVehicle.setTexture(cover, true);
-            menuVehicle.setScale(1.8, 2);
 
             mainText.setString(textContent);
             mainText.setFillColor(colorText);
@@ -1278,7 +1367,7 @@ void Menu::readVehicleSpecifications(char* pathVehicleName, int& topSpeed, float
  * @param typeOfVehicle is the kind of vehicle selected by the user in the menu
  * @param colorVehicle is the vehicle's color selected by the user in the menu
  */
-void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& colorVehicle){
+void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& colorVehicle, Game_status& status){
 
     // Clean the console window
     app->clear(Color(0, 0 ,0));
@@ -1414,9 +1503,12 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
     // Control the start key is pressed
     bool startPressed = false;
 
+    // Control the backspace key is pressed
+    bool backspacePressed = false;
+
     // While there is no vehicle selected
     // Loop until the player selects a mode pressing enter
-    while (!startPressed){
+    while (!startPressed && !backspacePressed){
 
         // Detect possible actions of the user on the console game
         if (app->pollEvent(ev) && ev.type == Event::Closed){
@@ -1584,8 +1676,16 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
         // Check if the start key has been pressed or not
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
             startPressed = true;
+            status = PLAYING;
+        }
+        // Check if the start key has been pressed or not
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace)){
+            backspacePressed = true;
+            status = LEVEL_MENU;
         }
     }
+    // Store the type of vehicle selected
+    optionParameter = typeOfVehicle;
 }
 
 
@@ -1707,8 +1807,7 @@ void Menu::modifyOptionConfigurationPlayer(RenderWindow* app, const int optionPa
     // Check if any recognized keyword has been pressed or not
     Event e;
     app->waitEvent(e);
-    if (e.type == Event::KeyPressed && e.key.code != -1 && e.key.code != Keyboard::Enter &&
-        e.key.code != Keyboard::Up && e.key.code != Keyboard::Down){
+    if (e.type == Event::KeyPressed && e.key.code != -1 && e.key.code != Keyboard::Enter){
         // Check the configuration option that has to be changed
         Keyboard::Key key = kM->mapperCodeKeyWord[e.key.code];
         string codeKeyWord = kM->mapperIdKeyWord[e.key.code];

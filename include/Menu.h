@@ -18,6 +18,20 @@ using namespace sf;
 using namespace rapidxml;
 
 
+enum Game_status {
+    ANIMATION = 0,
+    MAIN_MENU,
+    PLAYER_MENU,
+    OPTIONS,
+    SINGLE_GAME_MODE,
+    MULTI_GAME_MODE,
+    LEVEL_MENU,
+    PREPARING_GAME_MODE,
+    VEHICLE_MENU,
+    PLAYING,
+};
+
+
 enum Type_control {
     MOUSE = 0,
     KEYBOARD,
@@ -102,7 +116,7 @@ class Menu{
      * @param optionParameter is the flag where is stored the option selected by the
      * the player in the menu
      */
-    void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter);
+    void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter, Game_status& status);
 
 
 
@@ -130,7 +144,7 @@ class Menu{
      * @param typeOfVehicle is the kind of vehicle selected by the user in the menu
      * @param colorVehicle is the vehicle's color selected by the user in the menu
      */
-    void showSelectionVehicleMenu(RenderWindow* application, int& typeOfVehicle, int& colorVehicle);
+    void showSelectionVehicleMenu(RenderWindow* application, int& typeOfVehicle, int& colorVehicle, Game_status& statu);
 
 
 

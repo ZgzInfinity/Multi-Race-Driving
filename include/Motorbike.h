@@ -19,7 +19,7 @@ using namespace sf;
 /*
  * Class which represents the player
  */
-class Motorbike : public Player {
+class Motorbike : public Player{
 
     public:
 

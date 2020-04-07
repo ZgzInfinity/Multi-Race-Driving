@@ -12,6 +12,8 @@ Configuration::Configuration(){
     leftKey = Keyboard::Q;
     rightKey = Keyboard::W;
     changeSoundtrackLevel = Keyboard::Tab;
+    goBackKey = Keyboard::Backspace;
+    startKey = Keyboard::Enter;
 }
 
 
@@ -83,6 +85,15 @@ void Configuration::setRightKey(const Keyboard::Key key){
  */
 Keyboard::Key Configuration::getRightKey(){
     return rightKey;
+}
+
+
+
+/**
+ * Returns the key used to turn to the right the player's vehicle
+ */
+Keyboard::Key Configuration::getStart(){
+    return startKey;
 }
 
 

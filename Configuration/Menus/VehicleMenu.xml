@@ -1,7 +1,7 @@
 <Menus>
 	<MenuVehicle>
 		<Background>
-			<Path>images/Menus/selectionVehicleBackground.png</Path>
+			<Path>images/Menus/cover.png</Path>
 			<PositionX>0</PositionX>
 			<PositionY>0</PositionY>
 			<Text>

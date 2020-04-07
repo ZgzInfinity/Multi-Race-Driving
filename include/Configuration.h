@@ -27,6 +27,12 @@ class Configuration {
         // Change the soundtrack level
         Keyboard::Key changeSoundtrackLevel;
 
+        // Go back keyword
+        Keyboard::Key goBackKey;
+
+        // Start keyword
+        Keyboard::Key startKey;
+
     public:
 
         /**
@@ -89,6 +95,13 @@ class Configuration {
          * Returns the key used to turn to the right the player's vehicle
          */
         Keyboard::Key getRightKey();
+
+
+
+        /**
+         * Returns the key used to turn to the right the player's vehicle
+         */
+        Keyboard::Key getStart();
 
 
 

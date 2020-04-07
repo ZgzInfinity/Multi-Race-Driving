@@ -34,7 +34,7 @@ const float RATIO = 6.25f;
 /*
  * Class which represents the player
  */
-class Player {
+class Player{
 
      protected:
 
@@ -93,8 +93,6 @@ class Player {
 
     public:
 
-
-
         /**
          * Constructor of the class
          */
@@ -110,7 +108,6 @@ class Player {
             // Accumulator to the coordinate of the axis Y to make collision better
             offset = 0;
             // Load the default configuration to control the vehicle
-            c = new Configuration();
             c = conf;
         }
 

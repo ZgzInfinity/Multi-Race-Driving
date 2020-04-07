@@ -24,10 +24,7 @@ Animation::Animation(char* pathMenuFile){
             // Loop for iterate throughout the path files and add then to the vector
             for (xml_node<> * pathNode = texture->first_node(); pathNode; pathNode = pathNode->next_sibling()){
                 // Add the texture to the vector
-                if (t.loadFromFile(pathNode->value())){
-                    // Increment the textures read
-                    menuTextures.push_back(t);
-                }
+                segaIcon.loadFromFile(pathNode->value());
             }
             continue;
         }
@@ -63,23 +60,35 @@ Animation::Animation(char* pathMenuFile){
  * @param app is the console where the game is displayed to the players
  */
 void Animation::loadSegaIcons(RenderWindow* app){
-    // Control possible events
-    Event ev;
-    // Iterate thorough the different textures of the sega icons
-    for (int i = 0; i < (int)menuTextures.size() - 3; i++){
-        // Detect possible actions of the user on the console game
-        if (app->pollEvent(ev) && ev.type == Event::Closed){
-                app->close();
-        }
-        // Load the texture in the sprite in order to show it
-        menuSprite.setTexture(menuTextures.at(i), true);
-        // Store the textures of the menus in the console game
-        app->draw(menuSprite);
-        // Show the logos in the console
-        app->display();
-        // Sleep the process to see the menu icons correctly
-        sleep(milliseconds(35));
-    }
+
+    app->setVerticalSyncEnabled(true);
+
+	// create animation
+	SfmlLogoAnimation logoAnim(*app);
+
+	// load sound and texture
+	logoAnim.soundBuffer.loadFromFile("SoundEffects/Animation.ogg");
+    logoAnim.logo.setTexture(segaIcon);
+
+	// set texture rects
+	logoAnim.logo.setTextureRect({ 0, 0, 400, 304 });
+
+	logoAnim.volume = 0.5f; // default is 1.f
+	logoAnim.shakeStrength = 75.f; // default is 50.f
+	logoAnim.letterScale = 1.f; // default is 0.7f
+	logoAnim.shakeLength = sf::seconds(1.7f); // default is 0.6 seconds
+	logoAnim.fadeStart = sf::seconds(6.f); // default is 11 seconds
+	logoAnim.length = sf::seconds(13.f); // default is 13 seconds (approx. length of sound)
+
+	// play animation
+	logoAnim.play();
+
+	app->clear(Color(0, 0, 0));
+    app->display();
+
+	// wait for sound to finish playing
+	while (!logoAnim.isSoundFinished());
+
 }
 
 
@@ -91,6 +100,8 @@ void Animation::loadGameData(RenderWindow* app){
 
     // Control possible events
     Event ev;
+
+    app->setView(View(Vector2f(app->getSize().x / 2.f, app->getSize().y / 2.f), Vector2f(app->getSize().x, app->getSize().y)));
 
     // Detect possible actions of the user on the console game
     if (app->pollEvent(ev) && ev.type == Event::Closed){

@@ -54,8 +54,8 @@
 		<S52>p52.png</S52>
 	</SpritePaths>
 	<MaxSpeed>240</MaxSpeed>
-	<Angle>0.1</Angle>
-	<Motor>Repsol SX</Motor>
-	<Braking>0.03</Braking>
-	<Acceleration>0.04</Acceleration>
+	<Angle>0.085</Angle>
+	<Motor>Yamaha yzWR 250</Motor>
+	<Braking>17.8</Braking>
+	<Acceleration>15.1</Acceleration>
 </Player>

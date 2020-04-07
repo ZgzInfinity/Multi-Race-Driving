@@ -3,16 +3,16 @@
 		<MenuPanel>
 			<Background>images/Menus/crono.png</Background>
 			<PositionX>200</PositionX>
-			<PositionY>70</PositionY>
+			<PositionY>50</PositionY>
 			<Width>633</Width>
-			<Height>630</Height>
+			<Height>660</Height>
 			<Border>5</Border>
 			<Text>
 				<Content>OPTIONS</Content>
 				<Font>Fonts/needForSpeed.ttf</Font>
 				<Size>25</Size>
 				<PositionX>430</PositionX>
-				<PositionY>90</PositionY>
+				<PositionY>70</PositionY>
 				<Color>
 					<R>255</R>
 					<G>255</G>
@@ -22,7 +22,7 @@
 			<Buttons>
 				<B1>
 					<PositionX>260</PositionX>
-					<PositionY>140</PositionY>
+					<PositionY>170</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -48,7 +48,7 @@
 				</B1>
 				<B2>
 					<PositionX>260</PositionX>
-					<PositionY>200</PositionY>
+					<PositionY>230</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -74,7 +74,7 @@
 				</B2>
 				<B3>
 					<PositionX>260</PositionX>
-					<PositionY>260</PositionY>
+					<PositionY>290</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -100,7 +100,7 @@
 				</B3>
 				<B4>
 					<PositionX>260</PositionX>
-					<PositionY>320</PositionY>
+					<PositionY>350</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -126,7 +126,7 @@
 				</B4>
 				<B5>
 					<PositionX>260</PositionX>
-					<PositionY>380</PositionY>
+					<PositionY>410</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -152,7 +152,7 @@
 				</B5>
 				<B6>
 					<PositionX>260</PositionX>
-					<PositionY>440</PositionY>
+					<PositionY>470</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -178,7 +178,7 @@
 				</B6>
 				<B7>
 					<PositionX>260</PositionX>
-					<PositionY>500</PositionY>
+					<PositionY>530</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -204,7 +204,7 @@
 				</B7>
 				<B8>
 					<PositionX>260</PositionX>
-					<PositionY>560</PositionY>
+					<PositionY>590</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -230,7 +230,7 @@
 				</B8>
 				<B9>
 					<PositionX>260</PositionX>
-					<PositionY>620</PositionY>
+					<PositionY>650</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -256,7 +256,7 @@
 				</B9>
 				<B10>
 					<PositionX>564</PositionX>
-					<PositionY>140</PositionY>
+					<PositionY>170</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -282,7 +282,7 @@
 				</B10>
 				<B11>
 					<PositionX>564</PositionX>
-					<PositionY>200</PositionY>
+					<PositionY>230</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -308,7 +308,7 @@
 				</B11>
 				<B12>
 					<PositionX>564</PositionX>
-					<PositionY>260</PositionY>
+					<PositionY>290</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -334,7 +334,7 @@
 				</B12>
 				<B13>
 					<PositionX>564</PositionX>
-					<PositionY>320</PositionY>
+					<PositionY>350</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -360,7 +360,7 @@
 				</B13>
 				<B14>
 					<PositionX>564</PositionX>
-					<PositionY>380</PositionY>
+					<PositionY>410</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -386,7 +386,7 @@
 				</B14>
 				<B15>
 					<PositionX>564</PositionX>
-					<PositionY>440</PositionY>
+					<PositionY>470</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -412,7 +412,7 @@
 				</B15>
 				<B16>
 					<PositionX>564</PositionX>
-					<PositionY>500</PositionY>
+					<PositionY>530</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -438,7 +438,7 @@
 				</B16>
 				<B17>
 					<PositionX>564</PositionX>
-					<PositionY>560</PositionY>
+					<PositionY>590</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
@@ -464,7 +464,7 @@
 				</B17>
 				<B18>
 					<PositionX>564</PositionX>
-					<PositionY>620</PositionY>
+					<PositionY>650</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>

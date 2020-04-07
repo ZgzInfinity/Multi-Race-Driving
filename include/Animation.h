@@ -4,7 +4,9 @@
 
 #include <iostream>
 #include <cstring>
+#include "../include/MusicReproductor.h"
 #include <SFML/Graphics.hpp>
+#include "../include/SfmlLogoAnimation.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
@@ -31,7 +33,7 @@ class Animation{
         Texture presents;
 
         // Vector where the textures of the menus are stored
-        vector<Texture> menuTextures;
+        Texture segaIcon;
 
         // Sprite where the different textures are loaded
         Sprite menuSprite;
