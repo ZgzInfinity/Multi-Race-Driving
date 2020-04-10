@@ -14,8 +14,11 @@ Game::Game(RenderWindow* app) {
     // First state of the game
     status = ANIMATION;
 
-    // Reproduce sega sound for the animation
+    // Creation of the soundtrack reproductor
     mR = new MusicReproductor();
+
+    // Creation of the sound effects reproductor
+    eR = new EffectReproductor();
 
     // Load the default configuration of the game
     c = new Configuration();
@@ -25,6 +28,9 @@ Game::Game(RenderWindow* app) {
 
     // Load the soundtracks from the xml configuration file
     mR->loadSoundtracksOfGame("Configuration/Soundtracks/Soundtracks.xml");
+
+    // Load the sound effects from the xml configuration file
+    eR->loadEffectsOfGame("Configuration/SoundEffects/SoundEffects.xml");
 
     // Initialize the soundtrack list in the first position
     mR->startSoundtrackList();
@@ -97,7 +103,7 @@ Game_status Game::showStartingAnimation(){
     this->animationGame = new Animation(animationF);
 
     // Showing the animation of the sega logo
-    animationGame->loadSegaIcons(application);
+    animationGame->loadSegaIcons(application, eR);
 
     // Stop the sega sound for the animation
     mR->stopSound();
@@ -125,7 +131,7 @@ Game_status Game::showStartingAnimation(){
  */
 Game_status Game::showMainMenu(){
     // Show the main menu
-    menuGame->showMainMenu(application);
+    menuGame->showMainMenu(application, eR);
 
     // Stop the intro sound of the main menu
     mR->stopSound();
@@ -140,6 +146,9 @@ Game_status Game::showMainMenu(){
  * Show the player menu of the game
  */
 Game_status Game::showPlayerMenu(){
+    // Advance the soundtrack
+    mR->advanceSoundtrack();
+
     // Get the actual soundtrack
     Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
 
@@ -147,7 +156,7 @@ Game_status Game::showPlayerMenu(){
     mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
 
     // Show the selector menu of the players
-    menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml", modePlayerSelected, status);
+    menuGame->showStandardMenu(application, "Configuration/Menus/PlayerMenu.xml", modePlayerSelected, status, eR);
 
     // Check the status of the game
     if (status == MAIN_MENU){
@@ -173,7 +182,7 @@ Game_status Game::showPlayerMenu(){
  */
 Game_status Game::showSinglePlayerMenu(){
     // Show the selector game modes available for only one player
-    menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml", modeGameSelected, status);
+    menuGame->showStandardMenu(application, "Configuration/Menus/GameMenu.xml", modeGameSelected, status, eR);
 
     // Advance the state machine of the game in order to display the menu where the player
     // must select a difficult level to play
@@ -188,7 +197,7 @@ Game_status Game::showSinglePlayerMenu(){
  */
 Game_status Game::showDifficultLevelMenu(){
     // Show the selector difficult level of the game where the user must select one of them
-    menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml", modeDifficultLevelSelected, status);
+    menuGame->showStandardMenu(application, "Configuration/Menus/DifficultLevelMenu.xml", modeDifficultLevelSelected, status, eR);
 
     // Advance the state machine of the game in order to start the loading configuration
     // from the xml file of the game selected with the difficult chosen
@@ -231,7 +240,7 @@ Game_status Game::showVehicleMenu(){
     mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
 
     // Show the menu of selection vehicle where the player must select one
-    menuGame->showSelectionVehicleMenu(application, typeOfVehicle, colorVehicle, status);
+    menuGame->showSelectionVehicleMenu(application, typeOfVehicle, colorVehicle, status, eR);
 
     // Stop the music of the vehicle selector menu
     mR->stopSound();
@@ -258,8 +267,16 @@ Game_status Game::showVehicleMenu(){
  * Show the options menu with the game configuration
  */
 Game_status Game::showOptionsMenu(){
+    // Stop the actual sound
+    mR->stopSound();
+
+    // Back to the options soundtrack and reproduce
+    mR->backSoundtrack();
+    Soundtrack s = mR->getSoundtrack(mR->getIndexPosition());
+    mR->reproduceSound(s.getTitle(), s.isInLoop() ,s.getVolume());
+
     // Show the menu of selection vehicle where the player must select one
-    menuGame->showMenuOptions(application, "Configuration/Menus/OptionsMenu.xml", control, c, kM);
+    menuGame->showMenuOptions(application, "Configuration/Menus/OptionsMenu.xml", control, c, kM, eR);
 
     // Advance the state of the virtual machine in order to start the game mode
     // selected with the difficult level and the car chosen

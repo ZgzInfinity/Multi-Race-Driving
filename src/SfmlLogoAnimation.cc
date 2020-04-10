@@ -13,7 +13,6 @@ inline T linearInterpolation(const T& start, const T& end, const float alpha)
 
 SfmlLogoAnimation::SfmlLogoAnimation(sf::RenderWindow& theWindow)
 	: window(theWindow)
-	, sound(soundBuffer)
 	, widescreenSize(960.f, 540.f)
 	, startingView({ 0.f, 0.f }, { widescreenSize.y * (theWindow.getView().getSize().x / theWindow.getView().getSize().y), widescreenSize.y })
 	, shakeStart(sf::seconds(1.944f))
@@ -33,7 +32,6 @@ bool SfmlLogoAnimation::play()
 	priv_prepareSound();
 	priv_prepareSprites();
 	priv_prepareAnimations();
-	sound.play();
 	clock.restart();
 	const sf::Time syncOffset{ sound.getPlayingOffset() - clock.getElapsedTime() };
 	bool inAnim{ true };

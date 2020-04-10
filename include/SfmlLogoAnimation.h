@@ -2,6 +2,7 @@
 #ifndef SFMLLOGOANIMATION_H
 #define SFMLLOGOANIMATION_H
 
+#include "../include/EffectReproductor.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -16,7 +17,6 @@ class SfmlLogoAnimation
 public:
 	sf::Texture texture;
 	sf::Sprite logo, theS, theF, theM, theL;
-	sf::SoundBuffer soundBuffer;
 	std::vector<sf::Keyboard::Key> exitKeys;
 	std::vector<sf::Keyboard::Key> skipKeys;
 

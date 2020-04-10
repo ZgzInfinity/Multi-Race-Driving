@@ -59,7 +59,7 @@ Animation::Animation(char* pathMenuFile){
  * Shows the different menus with the icons of Sega
  * @param app is the console where the game is displayed to the players
  */
-void Animation::loadSegaIcons(RenderWindow* app){
+void Animation::loadSegaIcons(RenderWindow* app, EffectReproductor* eR){
 
     app->setVerticalSyncEnabled(true);
 
@@ -67,7 +67,7 @@ void Animation::loadSegaIcons(RenderWindow* app){
 	SfmlLogoAnimation logoAnim(*app);
 
 	// load sound and texture
-	logoAnim.soundBuffer.loadFromFile("SoundEffects/Animation.ogg");
+	eR->reproduceEffect(0);
     logoAnim.logo.setTexture(segaIcon);
 
 	// set texture rects
@@ -88,7 +88,7 @@ void Animation::loadSegaIcons(RenderWindow* app){
 
 	// wait for sound to finish playing
 	while (!logoAnim.isSoundFinished());
-
+    eR->stopEffect(0);
 }
 
 

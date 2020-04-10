@@ -10,6 +10,7 @@
 #include "../include/Configuration.h"
 #include "../include/KeywordMapper.h"
 #include "../include/VehicleSpecifications.h"
+#include "../include/EffectReproductor.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
@@ -106,7 +107,7 @@ class Menu{
      * Shows the main cover of the game until the player presses start
      * @param app is the console where the game is displayed to the players
      */
-    void showMainMenu(RenderWindow* app);
+    void showMainMenu(RenderWindow* app, EffectReproductor* eR);
 
 
 
@@ -116,7 +117,7 @@ class Menu{
      * @param optionParameter is the flag where is stored the option selected by the
      * the player in the menu
      */
-    void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter, Game_status& status);
+    void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter, Game_status& status, EffectReproductor* eR);
 
 
 
@@ -125,7 +126,7 @@ class Menu{
      * @param app is the console where the game is displayed to the players
      * @param c stores the current configuration of the game
      */
-    void showMenuOptions(RenderWindow* app, string pathFile, Type_control& control, Configuration* c, KeywordMapper* kM);
+    void showMenuOptions(RenderWindow* app, string pathFile, Type_control& control, Configuration* c, KeywordMapper* kM, EffectReproductor* eR);
 
 
 
@@ -144,7 +145,7 @@ class Menu{
      * @param typeOfVehicle is the kind of vehicle selected by the user in the menu
      * @param colorVehicle is the vehicle's color selected by the user in the menu
      */
-    void showSelectionVehicleMenu(RenderWindow* application, int& typeOfVehicle, int& colorVehicle, Game_status& statu);
+    void showSelectionVehicleMenu(RenderWindow* application, int& typeOfVehicle, int& colorVehicle, Game_status& statu, EffectReproductor* eR);
 
 
 
@@ -152,7 +153,8 @@ class Menu{
      * Change a configuration parameter of the game that it's not relative to the player
      * @param optionParameter is the code of the parameter to modify
      */
-    void modifyOptionConfiguration(const int optionParameter, Type_control& control, Configuration* c, KeywordMapper* kM);
+    void modifyOptionConfiguration(const int optionParameter, Type_control& control, Configuration* c, KeywordMapper* kM,
+                                   EffectReproductor* eR);
 
 
 
@@ -161,7 +163,8 @@ class Menu{
      * @param optionParameter is the code of the parameter to modify
      * @param c stores the current configuration of the game
      */
-    void modifyOptionConfigurationPlayer(RenderWindow* app, const int optionParameter, Configuration* c, KeywordMapper* kM);
+    void modifyOptionConfigurationPlayer(RenderWindow* app, const int optionParameter, Configuration* c, KeywordMapper* kM,
+                                         EffectReproductor* eR);
 
 };
 

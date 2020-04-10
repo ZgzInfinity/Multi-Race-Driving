@@ -53,7 +53,7 @@ class Animation{
      * Shows the different menus with the icons of Sega
      * @param app is the console where the game is displayed to the players
      */
-     void loadSegaIcons(RenderWindow* app);
+     void loadSegaIcons(RenderWindow* app, EffectReproductor* eR);
 
 
 

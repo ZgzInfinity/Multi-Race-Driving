@@ -43,6 +43,9 @@ class Game {
         // Music reproductor controller of the game
         MusicReproductor* mR;
 
+        // Effects reproductor controller of the game
+        EffectReproductor* eR;
+
         // Status of the state machine which compose the game
         Game_status status;
 

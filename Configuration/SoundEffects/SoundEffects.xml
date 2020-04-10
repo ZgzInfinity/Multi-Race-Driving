@@ -1,0 +1,9 @@
+<SoundEffects>
+	<SegaAnimation>SoundEffects/Animation.ogg</SegaAnimation>
+	<StartMenu>SoundEffects/StartPressed.ogg</StartMenu>
+	<MoveButton>SoundEffects/moveSelect.ogg</MoveButton>
+	<ConfirmButton>SoundEffects/selected.ogg</ConfirmButton>
+	<SelectButton>SoundEffects/confirmed.ogg</SelectButton>
+	<BackSelection>SoundEffects/back.ogg</BackSelection>
+	<BackSelection>SoundEffects/car.ogg</BackSelection>
+</SoundEffects>

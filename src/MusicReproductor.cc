@@ -32,7 +32,8 @@ void MusicReproductor::loadSoundtracksOfGame(char* soundtrackFile){
     for (xml_node<> *soundtrack = soundtrackNode->first_node(); soundtrack; soundtrack = soundtrack->next_sibling()){
         // Check if the actual node control the animation at the beginning
         if ((string)soundtrack->name() == "headAnimationMainMenu" || (string)soundtrack->name() == "PlayerGameDifficultMenu" ||
-            (string)soundtrack->name() == "VehicleMenu" || (string)soundtrack->name() == "ResultsMenu")
+            (string)soundtrack->name() == "VehicleMenu" || (string)soundtrack->name() == "ResultsMenu" ||
+            (string)soundtrack->name() == "Options")
         {
             // Variables to control the attributes of the soundtrack
             string name; int volume, loop; bool inLoop;

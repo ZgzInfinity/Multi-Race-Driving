@@ -4,6 +4,11 @@
 		<Loop>1</Loop>
 		<Volume>40</Volume>
 	</headAnimationMainMenu>
+	<Options>
+		<Path>Soundtrack/Options.ogg</Path>
+		<Loop>1</Loop>
+		<Volume>100</Volume>
+	</Options>
 	<PlayerGameDifficultMenu>
 		<Path>Soundtrack/MainMenu.ogg</Path>
 		<Loop>1</Loop>

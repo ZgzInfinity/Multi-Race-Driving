@@ -339,7 +339,7 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, str
  * Shows the main cover of the game until the player presses start
  * @param app is the console where the game is displayed to the players
  */
-void Menu::showMainMenu(RenderWindow* app){
+void Menu::showMainMenu(RenderWindow* app, EffectReproductor* eR){
 
     // Variables to store the information read from the file of the menu
     string imagePath, fontPath, textContent;
@@ -415,6 +415,9 @@ void Menu::showMainMenu(RenderWindow* app){
         // Check if the start key has been pressed or not
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
             startPressed = true;
+            eR->stopEffect(1);
+            eR->reproduceEffect(1);
+            sleep(milliseconds(100));
         }
     }
 }
@@ -427,7 +430,7 @@ void Menu::showMainMenu(RenderWindow* app){
  * @param optionParameter is the flag where is stored the option selected by the
  * the player in the menu
 */
-void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter, Game_status& status){
+void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter, Game_status& status, EffectReproductor* eR){
     // Clean the console window
     app->clear(Color(0, 0 ,0));
 
@@ -512,6 +515,10 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
                 menuButtons[optionParameter].setButtonState(BUTTON_HOVER);
                 menuButtons[optionParameter + 1].setButtonState(BUTTON_IDLE);
 
+                // Reproduce the sound
+                eR->stopEffect(2);
+                eR->reproduceEffect(2);
+
                 // Render the buttons with the changes
                 app->draw(rectangle);
                 app->draw(playerText);
@@ -533,6 +540,10 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
                 // Change the color appearance of both buttons
                 menuButtons[optionParameter].setButtonState(BUTTON_HOVER);
                 menuButtons[optionParameter - 1].setButtonState(BUTTON_IDLE);
+
+                // Reproduce the sound
+                eR->stopEffect(2);
+                eR->reproduceEffect(2);
 
                 // Render the buttons with the changes
                 app->draw(menuSprite);
@@ -568,6 +579,9 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
             else if (status == LEVEL_MENU){
                 status = PREPARING_GAME_MODE;
             }
+            // Reproduce the sound
+            eR->stopEffect(3);
+            eR->reproduceEffect(3);
         }
         // Check if the start key has been pressed or not
         else if (Keyboard::isKeyPressed(sf::Keyboard::Backspace)){
@@ -581,6 +595,10 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
             else if (status == LEVEL_MENU){
                 status == SINGLE_GAME_MODE;
             }
+
+            // Reproduce the sound
+            eR->stopEffect(5);
+            eR->reproduceEffect(5);
         }
     }
 }
@@ -593,7 +611,8 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
  * @param app is the console where the game is displayed to the players
  * @param c stores the current configuration of the game
  */
-void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& control, Configuration* c, KeywordMapper* kM){
+void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& control, Configuration* c,
+                           KeywordMapper* kM, EffectReproductor* eR){
     // Clean the console window
     app->clear(Color(0, 0 ,0));
 
@@ -727,6 +746,10 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
                 menuButtons[optionParameter + 9].setButtonState(BUTTON_HOVER);
                 menuButtons[optionParameter + 1].setButtonState(BUTTON_IDLE);
                 menuButtons[optionParameter + 10].setButtonState(BUTTON_IDLE);
+
+                // Reproduce the sound
+                eR->stopEffect(2);
+                eR->reproduceEffect(2);
             }
         }
         // Check if the down cursor keyword has been pressed
@@ -740,11 +763,18 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
                 menuButtons[optionParameter + 9].setButtonState(BUTTON_HOVER);
                 menuButtons[optionParameter - 1].setButtonState(BUTTON_IDLE);
                 menuButtons[optionParameter + 8].setButtonState(BUTTON_IDLE);
+
+                // Reproduce the sound
+                eR->stopEffect(2);
+                eR->reproduceEffect(2);
             }
         }
         // Check if the start key has been pressed or not
         else if (Keyboard::isKeyPressed(Keyboard::Enter)){
             startPressed = true;
+            // Reproduce the sound
+            eR->stopEffect(4);
+            eR->reproduceEffect(4);
         }
 
         // Press keyword space in order to change the control
@@ -756,14 +786,14 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
                 case 2:
                 case 3:
                     // Change one of the three first configuration parameters
-                    modifyOptionConfiguration(optionParameter, control, c, kM);
+                    modifyOptionConfiguration(optionParameter, control, c, kM, eR);
                     break;
                 case 4:
                 case 5:
                 case 6:
                 case 7:
                 case 8:
-                    modifyOptionConfigurationPlayer(app, optionParameter, c, kM);
+                    modifyOptionConfigurationPlayer(app, optionParameter, c, kM, eR);
                     break;
             }
         }
@@ -1367,7 +1397,7 @@ void Menu::readVehicleSpecifications(char* pathVehicleName, int& topSpeed, float
  * @param typeOfVehicle is the kind of vehicle selected by the user in the menu
  * @param colorVehicle is the vehicle's color selected by the user in the menu
  */
-void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& colorVehicle, Game_status& status){
+void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& colorVehicle, Game_status& status, EffectReproductor* eR){
 
     // Clean the console window
     app->clear(Color(0, 0 ,0));
@@ -1426,6 +1456,10 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
     for (int i = 0; i < (int)vehicleIndicators.size(); i++){
         vehicleIndicators[i].setFont(fontVehicleIndicator);
     }
+
+    // Reproduce the sound
+    eR->stopEffect(6);
+    eR->reproduceEffect(6);
 
     // Change the texture of the cover
     app->draw(menuVehicle);
@@ -1561,6 +1595,8 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
                     }
                     app->draw(vehicleSpecifications[i]);
                 }
+                eR->stopEffect(2);
+                eR->reproduceEffect(2);
             }
         }
         // Check if the down cursor keyword has been pressed
@@ -1609,6 +1645,8 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
                     }
                     app->draw(vehicleSpecifications[i]);
                 }
+                eR->stopEffect(2);
+                eR->reproduceEffect(2);
             }
         }
 
@@ -1677,11 +1715,15 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
             startPressed = true;
             status = PLAYING;
+            eR->stopEffect(4);
+            eR->reproduceEffect(4);
         }
         // Check if the start key has been pressed or not
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace)){
             backspacePressed = true;
             status = LEVEL_MENU;
+            eR->stopEffect(5);
+            eR->reproduceEffect(5);
         }
     }
     // Store the type of vehicle selected
@@ -1694,7 +1736,9 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
  * Change a configuration parameter of the game that it's not relative to the player
  * @param optionParameter is the code of the parameter to modify
  */
-void Menu::modifyOptionConfiguration(const int optionParameter, Type_control& control, Configuration* c, KeywordMapper* kM){
+void Menu::modifyOptionConfiguration(const int optionParameter, Type_control& control, Configuration* c,
+                                     KeywordMapper* kM, EffectReproductor* eR)
+{
     int volumeMusic;
     // Check if the left cursor keyword has been pressed
     if (Keyboard::isKeyPressed(Keyboard::Left)){
@@ -1802,7 +1846,9 @@ void Menu::modifyOptionConfiguration(const int optionParameter, Type_control& co
  * Change a configuration parameter of the game that it's  relative to the player
  * @param optionParameter is the code of the parameter to modify
  */
-void Menu::modifyOptionConfigurationPlayer(RenderWindow* app, const int optionParameter, Configuration* c, KeywordMapper* kM){
+void Menu::modifyOptionConfigurationPlayer(RenderWindow* app, const int optionParameter, Configuration* c,
+                                           KeywordMapper* kM, EffectReproductor* eR)
+{
     // Check what key is going to be modified
     // Check if any recognized keyword has been pressed or not
     Event e;
@@ -1848,6 +1894,8 @@ void Menu::modifyOptionConfigurationPlayer(RenderWindow* app, const int optionPa
                     menuButtons[optionParameter + 9].setTextButton(codeKeyWord);
                 }
         }
+        eR->stopEffect(3);
+        eR->reproduceEffect(3);
     }
 }
 
