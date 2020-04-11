@@ -7,7 +7,7 @@
  * Constructor of the data type Game
  * @param app is the console window where it's going to be displayed
  */
-Game::Game(RenderWindow* app) {
+Game::Game(RenderWindow* app) : player(300.0f, 100.0f, 0.01f, 1.0f, 132, 10, "Ferrari") {
     // Initializing the console window of the game
     application = app;
 
@@ -37,7 +37,6 @@ Game::Game(RenderWindow* app) {
 
     // Creation of the menus
     menuGame = new Menu();
-
 }
 
 
@@ -297,11 +296,7 @@ void Game::drawQuad(Color c, int x1,int y1,int w1,int x2,int y2,int w2){
 
 
 
-/**
- * Execute the game mode selected by the user with the difficult selected
- * and also with the vehicle chosen
- */
-inline Game_status Game::playingGame(){
+void Game::playWorldTourMode(){
     // Get the actual soundtrack
     mR->getRandomSoundtrack();
 
@@ -583,6 +578,123 @@ inline Game_status Game::playingGame(){
        else {
             sleep(milliseconds(120));
        }
+    }
+}
+
+
+
+void Game::playOutRunMode(){
+    int nm = 2;
+    int nobjects[] = {6, 15, 15}; // TODO: Más mapas
+    for (int i = 0; i < 5; i++) {
+        vector<Map> vm;
+        for (int j = 0; j <= i; j++) {
+            vector<string> objectNames;
+            objectNames.reserve(nobjects[nm]);
+            for (int no = 1; no <= nobjects[nm]; no++)
+                objectNames.push_back(to_string(no) + ".png");
+
+            Map m("resources/map" + to_string(nm) + "/", "bg.png", objectNames, false);
+            vm.push_back(m);
+
+            // nm++; // TODO: Añadir más mapas y descomentar
+        }
+        maps.emplace_back(vm);
+
+        // nm++; // TODO: Añadir más mapas y borrar línea
+        // nm = nm % 2; // TODO: Añadir más mapas y borrar línea
+    }
+
+    mapId = make_pair(0, 0);
+    currentMap = &maps[mapId.first][mapId.second];
+    currentMap->addNextMap(&maps[mapId.first + 1][mapId.second]); // TODO: Añadir bifurcación
+
+
+    while (!finalGame && application->isOpen()) {
+        application->clear();
+        mapControl(c);
+
+        Event e{};
+        while (application->pollEvent(e)) {
+            if (e.type == Event::Closed)
+                application->close();
+        }
+
+        // Player update and draw
+        Vehicle::Action action = Vehicle::CRASH;
+        Vehicle::Direction direction = Vehicle::RIGHT;
+        if (!player.isCrashing()) { // If not has crashed
+            action = player.accelerationControl(c, currentMap->hasGotOut(player.getPosition().first));
+            direction = player.rotationControl(c, currentMap->getCurveCoefficient(player.getPosY()));
+        }
+
+        player.draw(c, action, direction, currentMap->getElevation(player.getPosY()), application);
+
+        application->display();
+
+         if (currentMap->hasCrashed(player.getPreviousY(), player.getPosY(), player.getMinScreenX(),
+                player.getMaxScreenX(), c) || player.isCrashing())
+            player.hitControl();
+    }
+}
+
+
+
+
+void Game::mapControl(Configuration* c) {
+    // Update camera
+    currentMap->updateView(player.getPosition());
+
+    if (currentMap->isOver()) {
+        // TODO: Añadir bifurcación
+        mapId.first++;
+        if (mapId.first < maps.size()) {
+            currentMap = &maps[mapId.first][mapId.second];
+
+            if (mapId.first < maps.size() - 1)
+                currentMap->addNextMap(&maps[mapId.first + 1][mapId.second]);
+
+            player.setPosition(player.getPosition().first, 0);
+            currentMap->updateView(player.getPosition());
+        }
+        else {
+            finalGame = true;
+        }
+    }
+
+    // Draw map
+    if (!finalGame)
+        currentMap->draw(application, c);
+}
+
+
+
+
+
+
+
+
+/**
+ * Execute the game mode selected by the user with the difficult selected
+ * and also with the vehicle chosen
+ */
+inline Game_status Game::playingGame(){
+
+    // Select what kind of game has select the player
+    switch(modeGameSelected){
+        case 0:
+            playWorldTourMode();
+            break;
+        case 1:
+            playOutRunMode();
+            break;
+        case 2:
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
     }
 }
 

@@ -307,6 +307,95 @@ void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e){
 
 
 
+void GameSelectorMode::loadOutRun(char* pathFile, Environment& e){
+    // Read the xml configuration file from the world tour mode
+    xml_document<> doc;
+    file<> file(pathFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *mainNode = doc.first_node();
+
+    // Variables to store the information of the speed indicator
+    string pathSpeedIndicator, fontPathSpeedPanel;
+    int posXSpeedPanel, posYSpeedPanel, sizeTextSpeedPanel, posXTextSpeedPanel, posYTextSpeedPanel;
+
+    // Variables to store the information of the elapsed indicator
+    string pathElapsedIndicator, fontPathElapsedPanel;
+    int posXElapsedPanel, posYElapsedPanel, sizeTextElapsedPanel, posXTextElapsedPanel, posYTextElapsedPanel;
+
+    // Variables to store the information of the time panel
+    string fontPathTimeText;
+    int sizeTimeText, posXTimeText, posYTimeText;
+
+    string fontPathTimeIndicator;
+    int sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator;
+
+    // Variables to store the information of the destiny panel
+    string fontPathDestinyText;
+    int sizeDestinyText, posXDestinyText, posYDestinyText;
+
+    string fontPathDestinyIndicator;
+    int sizeDestinyIndicator, posXDestinyIndicator, posYDestinyIndicator;
+
+    // Color of the different texts of the panels
+    Color colorSpeedPanel, colorElapsedPanel, colorTimeText, colorTimeIndicator,
+          colorDestinyText, colorDestinyIndicator;
+
+    // Iteration throughout the nodes of the file
+    for (xml_node<> *worldTourNode = mainNode->first_node(); worldTourNode; worldTourNode = worldTourNode->next_sibling()){
+        // Check if it's the node that controls the available vehicles of the game mode
+        if ((string)worldTourNode->name() == "Vehicles"){
+            // Control the vehicles which are available
+            controlAvailableVehicles(worldTourNode);
+        }
+        // Check if it's the node that control the game information panel
+        else if ((string)worldTourNode->name() == "GamePanel"){
+            // Iteration of all the sub panels of the main panel
+            for (xml_node<> *panel = worldTourNode->first_node(); panel; panel = panel->next_sibling()){
+                // Check the actual node read and process the speed panel
+                if ((string)panel->name() == "SpeedPanel"){
+                    // Check the speed panel
+                    processFirstPanel(panel, pathSpeedIndicator, posXSpeedPanel, posYSpeedPanel, fontPathSpeedPanel,
+                                      sizeTextSpeedPanel, posXTextSpeedPanel, posYTextSpeedPanel, colorSpeedPanel);
+                }
+                // Check the actual node read and process the elapsed panel
+                else if ((string)panel->name() == "ElapsedPanel"){
+                    // Check the elapsed panel
+                    processFirstPanel(panel, pathElapsedIndicator, posXElapsedPanel, posYElapsedPanel, fontPathElapsedPanel,
+                                      sizeTextElapsedPanel, posXTextElapsedPanel, posYTextElapsedPanel, colorElapsedPanel);
+                }
+                // Check the actual node read and process the time panel
+                else if ((string)panel->name() == "TimePanel"){
+                    // Check the speed panel
+                    processSecondPanel(panel, fontPathTimeText, sizeTimeText, posXTimeText, posYTimeText, fontPathTimeIndicator,
+                                       sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText,
+                                       posXDestinyText, posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator,
+                                       posXDestinyIndicator, posYDestinyIndicator, colorTimeText, colorTimeIndicator,
+                                       colorDestinyText, colorDestinyIndicator);
+                }
+                // Check the actual node read and process the destiny panel
+                else if ((string)panel->name() == "DestinyPanel"){
+                    // Check the destiny panel
+                    processSecondPanel(panel, fontPathTimeText, sizeTimeText, posXTimeText, posYTimeText, fontPathTimeIndicator,
+                                       sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText,
+                                       posXDestinyText, posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator,
+                                       posXDestinyIndicator, posYDestinyIndicator, colorTimeText, colorTimeIndicator,
+                                       colorDestinyText, colorDestinyIndicator);
+                }
+            }
+        }
+    }
+    // Configuration of the environment with all the information read
+    e.configure(pathSpeedIndicator, fontPathSpeedPanel, posXSpeedPanel, posYSpeedPanel, sizeTextSpeedPanel, posXTextSpeedPanel,
+                posYTextSpeedPanel, pathElapsedIndicator, fontPathElapsedPanel, posXElapsedPanel, posYElapsedPanel, sizeTextElapsedPanel,
+                posXTextElapsedPanel, posYTextElapsedPanel, fontPathTimeText, sizeTimeText, posXTimeText, posYTimeText, fontPathTimeIndicator,
+                sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText, posXDestinyText,
+                posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator, posXDestinyIndicator, posYDestinyIndicator,
+                colorSpeedPanel, colorElapsedPanel, colorTimeText, colorTimeIndicator, colorDestinyText, colorDestinyIndicator);
+}
+
+
 /**
 * Load the game mode from the correspondent xml file of configuration
 * @param gameMode is the mode selected by the player to play
@@ -325,9 +414,9 @@ void GameSelectorMode::loadFileConfigurationMode(Environment& e){
         case 1:
             // Executing the out run mode
             gameStatus = OUT_RUN;
-            pathFile = "Configuration/GameModes/OutRun.xml";
+            // pathFile = "Configuration/GameModes/OutRun.xml";
             // Load the xml configuration file of out run mode
-            // loadOutRun();
+            // loadOutRun(pathFile, e);
             break;
         case 2:
             // Executing the pole position mode

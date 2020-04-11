@@ -135,3 +135,14 @@ bool Configuration::isRepeated(const Keyboard::Key key){
     return (key == accelerateKey || key == brakeKey || key == leftKey ||
             key == rightKey || key == changeSoundtrackLevel);
 }
+
+
+
+int Configuration::getRenderLen(){
+    return renderLen;
+}
+
+
+int Configuration::getCamD(){
+    return camD;
+}

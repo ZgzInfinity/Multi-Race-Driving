@@ -115,7 +115,7 @@ class GameSelectorMode {
          /**
           * Load the configuration xml file from the out run game mode
           */
-          void loadOutRun();
+          void loadOutRun(char* pathFile, Environment& e);
 
 
 

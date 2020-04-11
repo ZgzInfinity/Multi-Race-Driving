@@ -13,6 +13,9 @@
 #include "../include/GameSelectorMode.h"
 #include "../include/Environment.h"
 #include "../include/MusicReproductor.h"
+#include "../include/WorldTour.h"
+#include "../include/Map.h"
+#include "../include/Vehicle.h"
 #include "SFML/Graphics.hpp"
 
 using namespace std;
@@ -70,6 +73,14 @@ class Game {
         // Control the type of vehicle selected with also its color
         int typeOfVehicle, colorVehicle;
 
+        // Map info
+        std::vector<std::vector<Map>> maps; // 5 blocks of 15 maps {(0), (1, 2), (3, 4, 5), (6, 7, 8, 9), (10, 11, 12, 13, 14))}
+        std::pair<int, int> mapId; // (Block, num. map), ex: map0 = (0, 0); map1 = (1, 0); map2 = (1, 1); map14 = (4, 4)
+        Map *currentMap;
+
+        bool finalGame = false;
+
+        Vehicle player;
 
     public:
 
@@ -155,6 +166,16 @@ class Game {
          * and also with the vehicle chosen
          */
         Game_status playingGame();
+
+
+        void playWorldTourMode();
+
+
+        void playOutRunMode();
+
+
+        void mapControl(Configuration* c);
+
 
 };
 

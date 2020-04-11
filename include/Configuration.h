@@ -33,6 +33,10 @@ class Configuration {
         // Start keyword
         Keyboard::Key startKey;
 
+        float camD = 0.84;   // Camera depth
+        int renderLen = 300; // Length rendered
+
+
     public:
 
         /**
@@ -132,6 +136,13 @@ class Configuration {
          * @param key is the candidate keyword
          */
         bool isRepeated(const Keyboard::Key key);
+
+
+
+        int getRenderLen();
+
+
+        int getCamD();
 
 };
 
