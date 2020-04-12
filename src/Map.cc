@@ -23,26 +23,16 @@ using namespace sf;
 #define ROADW 2000 // Road Width
 #define RUMBLECOEFF 0.1f // Ruble size = Road size * Rumble coeff
 
-Map::SpriteInfo::SpriteInfo() {
-    spriteNum = -1;
-    offset = spriteMinX = spriteMaxX = 0.0f;
-    repetitive = false;
-}
-
-Map::Line::Line() {
-    curve = x = y = z = 0;
-    mainColor = false;
-}
 
 void Map::addLine(float x, float y, float &z, float prevY, float curve, bool mainColor,
-        const Map::SpriteInfo &spriteLeft, const Map::SpriteInfo &spriteRight) {
+        const Step::SpriteInfo &spriteLeft, const Step::SpriteInfo &spriteRight) {
     float yInc = (y - prevY) / 5.0f; // 5 is total lines number will be added
 
-    Line line, lineAux;
-    line.x = x;
-    line.y = prevY;
+    Step line, lineAux;
+    line.position_3d_x = x;
+    line.position_3d_y = prevY;
     line.mainColor = mainColor;
-    line.curve = curve;
+    line.directionCurve = curve;
 
     lineAux = line; // without objects
 
@@ -50,55 +40,55 @@ void Map::addLine(float x, float y, float &z, float prevY, float curve, bool mai
     line.spriteRight = spriteRight;
 
     // For each normal line, 4 extras without objects for better visualization
-    lineAux.z = z;
+    lineAux.position_3d_z = z;
     z += SEGL;
-    lineAux.y += yInc;
+    lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 
-    lineAux.z = z;
+    lineAux.position_3d_z = z;
     z += SEGL;
-    lineAux.y += yInc;
+    lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 
-    line.z = z;
+    line.position_3d_z = z;
     z += SEGL;
-    lineAux.y += yInc;
-    line.y = lineAux.y;
+    lineAux.position_3d_y += yInc;
+    line.position_3d_y = lineAux.position_3d_y;
     lines.push_back(line);
 
-    lineAux.z = z;
+    lineAux.position_3d_z = z;
     z += SEGL;
-    lineAux.y += yInc;
+    lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 
-    lineAux.z = z;
+    lineAux.position_3d_z = z;
     z += SEGL;
-    lineAux.y += yInc;
+    lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 }
 
-Map::Line *Map::getLine(const int n) {
+Step *Map::getLine(const int n) {
     if (n < lines.size() || next == nullptr)
         return &lines[n % lines.size()];
     else
         return &next->lines[(n - lines.size()) % next->lines.size()];
 }
 
-Map::Line Map::getLine(const int n) const {
+Step Map::getLine(const int n) const {
     if (n < lines.size() || next == nullptr)
         return lines[n % lines.size()];
     else
         return next->lines[(n - lines.size()) % next->lines.size()];
 }
 
-Map::Line *Map::getPreviousLine(const int n) {
+Step *Map::getPreviousLine(const int n) {
     if ((n > 0 && n - 1 < lines.size()) || next == nullptr)
         return &lines[(n - 1) % lines.size()];
     else
         return &next->lines[(n - 1 - lines.size()) % next->lines.size()];
 }
 
-Map::Line Map::getPreviousLine(const int n) const {
+Step Map::getPreviousLine(const int n) const {
     if ((n > 0 && n - 1 < lines.size()) || next == nullptr)
         return lines[(n - 1) % lines.size()];
     else
@@ -342,7 +332,7 @@ void Map::addLines(float x, float y, float &z, const vector<vector<string>> &ins
             elevationIndex = 0;
         }
         else if (inst[0] == "ROAD") {
-            SpriteInfo spriteLeft, spriteRight;
+            Step::SpriteInfo spriteLeft, spriteRight;
 
             // Elevation
             float yAux = y;
@@ -352,7 +342,7 @@ void Map::addLines(float x, float y, float &z, const vector<vector<string>> &ins
                 elevationIndex++;
             }
             if (!lines.empty() && elevationIndex == elevationLines) {
-                y = lines[lines.size() - 1].y;
+                y = lines[lines.size() - 1].position_3d_y;
                 yAux = y;
                 elevationLines = -1;
             }
@@ -391,7 +381,7 @@ void Map::addLines(float x, float y, float &z, const vector<vector<string>> &ins
                 fileError(inst[0] + " tiene argumentos incorrectos.");
             }
 
-            addLine(x, yAux, z, lines.empty() ? y : lines[lines.size() - 1].y, curveCoeff, mainColor,
+            addLine(x, yAux, z, lines.empty() ? y : lines[lines.size() - 1].position_3d_y, curveCoeff, mainColor,
                     spriteLeft, spriteRight);
             mainColor = !mainColor;
         }
@@ -453,14 +443,14 @@ void Map::addNextMap(Map *map) {
     this->next = map;
     float yOffset = 0.0f;
     if (!lines.empty())
-        yOffset = lines[lines.size() - 1].y;
+        yOffset = lines[lines.size() - 1].position_3d_y;
     this->next->setOffset(yOffset);
 }
 
 
 void Map::setOffset(float yOffset) {
-    for (Line &l : lines) {
-        l.y += yOffset;
+    for (Step &l : lines) {
+        l.position_3d_y += yOffset;
     }
 }
 
@@ -470,60 +460,6 @@ void Map::updateView(pair<float, float> pos) {
     this->posY = pos.second;
 }
 
-
-void Map::Line::project(float camX, float camY, float camZ, float camD, float width, float height, float rW, float zOffset) {
-    scale = camD / (1.0f + z + zOffset - camZ);
-    X = (1.0f + scale * (x - camX)) * width / 2.0f;
-    Y = (1.0f - scale * (y - camY)) * height / 2.0f;
-    W = scale * rW  * width / 2.0f;
-}
-
-
-void Map::Line::drawSprite(RenderWindow* w, const vector<Texture> &objs, const vector<float> &coeff, SpriteInfo &object,
-                           bool left) {
-    Sprite s(objs[object.spriteNum]);
-    const int width = s.getTextureRect().width;
-    const int h = s.getTextureRect().height;
-
-    float destY = Y + 4.0f;
-    float destW = float(width) * W / 266.0f;
-    float destH = float(h) * W / 266.0f;
-
-    destY += destH * (-1.0f); //offsetY
-
-    float clipH = destY + destH - clip;
-    if (clipH < 0)
-        clipH = 0;
-
-    if (clipH >= destH) return;
-    s.setTextureRect(IntRect(0, 0, width, float(h) - float(h) * clipH / destH));
-    s.setScale(destW / float(width), destH / float(h));
-
-    float destX = X + W + object.offset * s.getGlobalBounds().width; // Right road side
-    if (left)
-        destX = X - W - s.getGlobalBounds().width - object.offset * s.getGlobalBounds().width; // Left road side
-    s.setPosition(destX, destY);
-    w->draw(s);
-
-    // Repetitive drawing
-    object.spriteMinX = destX + (s.getGlobalBounds().width - s.getGlobalBounds().width * coeff[object.spriteNum]) / 2.0f;
-    if (left && object.repetitive) {
-        while (destX >= 0.0f) {
-            destX -= s.getGlobalBounds().width;
-            s.setPosition(destX, destY);
-            w->draw(s);
-        }
-    }
-
-    object.spriteMaxX = object.spriteMinX + s.getGlobalBounds().width * coeff[object.spriteNum];
-    if (!left && object.repetitive) {
-        while (destX <= w->getSize().x) {
-            destX += s.getGlobalBounds().width;
-            s.setPosition(destX, destY);
-            w->draw(s);
-        }
-    }
-}
 
 void drawQuad(RenderWindow* w, Color c, int x1, int y1, int w1, int x2, int y2, int w2) {
     ConvexShape shape(4);
@@ -537,7 +473,7 @@ void drawQuad(RenderWindow* w, Color c, int x1, int y1, int w1, int x2, int y2, 
 
 
 void Map::draw(RenderWindow* app, Configuration* c) {
-    Line *l = getLine(int(posY)), *p;
+    Step *l = getLine(int(posY)), *p;
     int N = lines.size();
 
     // Background
@@ -547,14 +483,14 @@ void Map::draw(RenderWindow* app, Configuration* c) {
     sbg.setScale(Vector2f(2.0f * (float)app->getSize().x / bg.getSize().x, (float)app->getSize().y * BGS / bg.getSize().y));
     sbg.setPosition(0, 0);
     sbg.move(-sbg.getGlobalBounds().width / 3.0f - posX, 0);
-    if (l->curve > 0.0f)
+    if (l->directionCurve > 0.0f)
         sbg.move(XINC / 2.0f, 0);
-    else if (l->curve < 0.0f)
+    else if (l->directionCurve < 0.0f)
         sbg.move(-XINC / 2.0f, 0);
     app->draw(sbg);
 
     int startPos = int(posY) % N;
-    float camH = l->y + 1500.0f;
+    float camH = l->position_3d_y + 1500.0f;
 
     float maxy = app->getSize().y;
     float x = 0, dx = 0;
@@ -564,13 +500,13 @@ void Map::draw(RenderWindow* app, Configuration* c) {
         l = getLine(n);
 
         l->project(posX * ROADW - x, camH, float(startPos * SEGL), 0.84,
-                  app->getSize().x, app->getSize().y, ROADW, n < N ? 0.0f : lines[lines.size() - 1].z);
+                  app->getSize().x, app->getSize().y, ROADW, n < N ? 0.0f : lines[lines.size() - 1].position_3d_z);
         x += dx;
-        dx += l->curve;
+        dx += l->directionCurve;
 
         l->clip = maxy;
-        if (l->Y < maxy) {
-            maxy = l->Y;
+        if (l->position_2d_y < maxy) {
+            maxy = l->position_2d_y;
 
             Color grass, road;
             if (n < N || next == nullptr) {
@@ -587,12 +523,12 @@ void Map::draw(RenderWindow* app, Configuration* c) {
             p = getPreviousLine(n);
 
             // Draw grass
-            drawQuad(app, grass, 0, int(p->Y), app->getSize().x, 0, int(l->Y), app->getSize().x);
+            drawQuad(app, grass, 0, int(p->position_2d_y), app->getSize().x, 0, int(l->position_2d_y), app->getSize().x);
 
             // Draw road
-            const int x1 = int(p->X - p->W), y1 = int(p->Y), w1 = int(2.0f * p->W),
-                      x2 = int(l->X - l->W), y2 = int(l->Y), w2 = int(2.0f * l->W),
-                      rw1 = int(p->W * RUMBLECOEFF), rw2 = int(l->W * RUMBLECOEFF),
+            const int x1 = int(p->position_2d_x - p->position_2d_w), y1 = int(p->position_2d_y), w1 = int(2.0f * p->position_2d_w),
+                      x2 = int(l->position_2d_x - l->position_2d_w), y2 = int(l->position_2d_y), w2 = int(2.0f * l->position_2d_w),
+                      rw1 = int(p->position_2d_w * RUMBLECOEFF), rw2 = int(l->position_2d_w * RUMBLECOEFF),
                       dw1 = rw1 / 2, dw2 = rw2 / 2;
             drawQuad(app, road, x1, y1, w1, x2, y2, w2);
             drawQuad(app, rumble, x1, y1, rw1, x2, y2, rw2); // Left rumble
@@ -634,7 +570,7 @@ void Map::draw(RenderWindow* app, Configuration* c) {
 
 
 bool Map::hasCrashed(float prevY, float currentY, float minX, float maxX, Configuration* c) const {
-    Line l;
+    Step l;
     for (int n = int(posY); n < int(posY) + c->getRenderLen(); n++) {
         l = getLine(n);
 
@@ -662,16 +598,16 @@ bool Map::hasGotOut(float currentX) const {
 }
 
 float Map::getCurveCoefficient(float currentY) const {
-    return getLine(int(currentY)).curve;
+    return getLine(int(currentY)).directionCurve;
 }
 
 Map::Elevation Map::getElevation(float currentY) const {
     const int n = int(currentY);
-    const Line currentLine = getLine(n);
-    const Line prevLine = getPreviousLine(n);
-    if (n != 0 && abs(currentLine.y) > 1000 && currentLine.y > prevLine.y + 1.0f)
+    const Step currentLine = getLine(n);
+    const Step prevLine = getPreviousLine(n);
+    if (n != 0 && abs(currentLine.position_3d_y) > 1000 && currentLine.position_3d_y > prevLine.position_3d_y + 1.0f)
         return UP;
-    else if (n != 0 && abs(currentLine.y) > 1000 && currentLine.y < prevLine.y - 1.0f)
+    else if (n != 0 && abs(currentLine.position_3d_y) > 1000 && currentLine.position_3d_y < prevLine.position_3d_y - 1.0f)
         return DOWN;
     else
         return FLAT;

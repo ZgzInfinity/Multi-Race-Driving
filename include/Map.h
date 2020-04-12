@@ -6,13 +6,14 @@
  * @coms    Videojuegos - OutRun
  ******************************************************************************/
 
-#ifndef OUTRUN_MAP_HPP
-#define OUTRUN_MAP_HPP
+#ifndef MAP_H
+#define MAP_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 #include "Menu.h"
+#include "Step.h"
 
 #define XINC 0.05f // x increment
 
@@ -26,65 +27,6 @@
  * verán más grandes si están más cerca de la pantalla o más pequeños si están más lejos.
  */
 class Map {
-    /**
-     * Información de un objeto correspondiente a objects[spriteNum] si spriteNum != -1, con un offset en x.
-     * Si repetitive es true el objeto se repetirá hasta el borde de la pantalla.
-     */
-    struct SpriteInfo {
-        int spriteNum;
-        float offset, spriteMinX, spriteMaxX;
-        bool repetitive;
-
-        /**
-         * Inicializa el sprite.
-         */
-        SpriteInfo();
-    };
-
-    /**
-     * Rectángulo horizontal cuyo centro está ubicado en las coordenadas (x, y, z), es decir, puede tener elevación (z).
-     * En el centro del rectángulo estará la carretera que puede tener una curvatura dependiendo del coeficiente de
-     * curvatura (curve) que tenga.
-     * Además, puede contener un objeto en cada lateral de la carretera (spriteLeft, spriteRight).
-     */
-    struct Line {
-        float x, y, z; // 3d center of line
-        float X{}, Y{}, W{}; // screen coord
-        float curve, clip{}, scale{};
-        bool mainColor;
-        SpriteInfo spriteLeft, spriteRight;
-
-        /**
-         * Inicializa el rectángulo.
-         */
-        Line();
-
-        /**
-         * Establece las coordenadas en la pantalla que corresponen al rectángulo y su escala. Esta función debe ser
-         * llamada para actualizar el rectángulo si se ha variado la posición del mapa y.
-         * @param camX
-         * @param camY
-         * @param camZ
-         * @param camD
-         * @param width
-         * @param height
-         * @param rW
-         * @param zOffset
-         */
-        void project(float camX, float camY, float camZ, float camD, float width, float height, float rW, float zOffset);
-
-
-        /**
-         * Dibuja el objeto en la pantalla. Esta función debe ser llamada después de project().
-         * @param w
-         * @param objs
-         * @param coeff
-         * @param object
-         * @param left indica si el objeto está a la izquierda de la pantalla
-         */
-        void drawSprite(sf::RenderWindow* w, const std::vector<sf::Texture> &objs, const std::vector<float> &coeff,
-                SpriteInfo &object, bool left);
-    };
 
     // Background
     sf::Texture bg;
@@ -92,7 +34,7 @@ class Map {
     // Objects
     std::vector<sf::Texture> objects;
     std::vector<float> hitCoeff;
-    std::vector<Line> lines;
+    std::vector<Step> lines;
 
     // Colors
     Color roadColor[2], grassColor[2];
@@ -108,28 +50,28 @@ class Map {
      * @param n
      * @return
      */
-    Line* getLine(int n);
+    Step* getLine(int n);
 
     /**
      * Devuelve Line n
      * @param n
      * @return
      */
-    Line getLine(int n) const;
+    Step getLine(int n) const;
 
     /**
      * Devuelve Line anterior a n
      * @param n
      * @return
      */
-    Line* getPreviousLine(int n);
+    Step* getPreviousLine(int n);
 
     /**
      * Devuelve Line anterior a n
      * @param n
      * @return
      */
-    Line getPreviousLine(int n) const;
+    Step getPreviousLine(int n) const;
 
     /**
      * Añade un rectángulo al mapa. Actualiza z para una nueva línea.
@@ -141,8 +83,8 @@ class Map {
      * @param spriteLeft
      * @param spriteRight
      */
-    void addLine(float x, float y, float &z, float prevY, float curve, bool mainColor, const SpriteInfo &spriteLeft,
-            const SpriteInfo &spriteRight);
+    void addLine(float x, float y, float &z, float prevY, float curve, bool mainColor, const Step::SpriteInfo &spriteLeft,
+            const Step::SpriteInfo &spriteRight);
 
     /**
      * Añade rectángulos desde las instrucciones al mapa desde (x, y, z). Actualiza z para una nueva línea.
@@ -290,4 +232,4 @@ public:
 };
 
 
-#endif //OUTRUN_MAP_HPP
+#endif // MAP_H

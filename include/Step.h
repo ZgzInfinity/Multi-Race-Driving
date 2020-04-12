@@ -2,8 +2,11 @@
 #ifndef STEP_H
 #define STEP_H
 
+#include <vector>
+#include <iostream>
 #include <SFML/Graphics.hpp>
 
+using namespace std;
 using namespace sf;
 
 // Dimension of the road lines black or white
@@ -25,6 +28,21 @@ const int NORMAL_HEIGHT = 1500;
  */
 struct Step{
 
+    /**
+     * Información de un objeto correspondiente a objects[spriteNum] si spriteNum != -1, con un offset en x.
+     * Si repetitive es true el objeto se repetirá hasta el borde de la pantalla.
+     */
+    struct SpriteInfo {
+        int spriteNum;
+        float offset, spriteMinX, spriteMaxX;
+        bool repetitive;
+
+        /**
+         * Inicializa el sprite.
+         */
+        SpriteInfo();
+    };
+
     // Attributes of the type of data
     // 3d coordinates of the line in three axis X, Y and Z
     float position_3d_x, position_3d_y, position_3d_z;
@@ -45,6 +63,9 @@ struct Step{
     // Possible sprite to draw
     Sprite character;
 
+    SpriteInfo spriteLeft, spriteRight;
+
+    bool mainColor;
 
     /**
      * Constructor of the data type Step
@@ -79,6 +100,33 @@ struct Step{
      *         Otherwise returns false
      */
      bool operator < (Step& line_2);
+
+
+     /**
+         * Establece las coordenadas en la pantalla que corresponen al rectángulo y su escala. Esta función debe ser
+         * llamada para actualizar el rectángulo si se ha variado la posición del mapa y.
+         * @param camX
+         * @param camY
+         * @param camZ
+         * @param camD
+         * @param width
+         * @param height
+         * @param rW
+         * @param zOffset
+         */
+        void project(float camX, float camY, float camZ, float camD, float width, float height, float rW, float zOffset);
+
+
+        /**
+         * Dibuja el objeto en la pantalla. Esta función debe ser llamada después de project().
+         * @param w
+         * @param objs
+         * @param coeff
+         * @param object
+         * @param left indica si el objeto está a la izquierda de la pantalla
+         */
+        void drawSprite(sf::RenderWindow* w, const std::vector<sf::Texture> &objs, const std::vector<float> &coeff,
+                Step::SpriteInfo &object, bool left);
 
 };
 
