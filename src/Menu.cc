@@ -1727,7 +1727,7 @@ void Menu::showSelectionVehicleMenu(RenderWindow* app, int& typeOfVehicle, int& 
         }
     }
     // Store the type of vehicle selected
-    optionParameter = typeOfVehicle;
+    typeOfVehicle = optionParameter;
 }
 
 

@@ -37,7 +37,7 @@ class Minivan : public Player {
         /**
          * Load the set of sprites of the player
          */
-         void loadVehicleProperties();
+         void loadVehicleProperties(const string path);
 
 
 
@@ -45,7 +45,7 @@ class Minivan : public Player {
          * Draw the player sprite in the console render window
          * @param app is the console window game where the sprite is going to be drawn
          */
-        void drawPlayer(RenderWindow* app, int& pos);
+        void drawPlayer(RenderWindow* app, int pos);
 
 
 
@@ -65,8 +65,16 @@ class Minivan : public Player {
          * @param lastHeight was the elevation of the terrain where was the Minivan
          * @param height is the actual elevation of the terrain where is the Minivan
          */
-        void advancePlayer(bool& eventDetected, const int lastHeight, const int height);
+        void advancePlayer(bool& eventDetected, const int lastHeight, const int height, Elevation& e);
 
+
+
+         /**
+         * Establish the coordinate X and Y of the vehicle
+         * @param pX is the coordinate of the vehicle in the axis X
+         * @param pY is the coordinate of the vehicle in the axis Y
+         */
+        void setPosition(float pX, float pY);
 
 
         /**
@@ -74,6 +82,52 @@ class Minivan : public Player {
          * @return the position of the Minivan in the axis X
          */
         float getPlayerX();
+
+
+
+        /**
+         * Get the coordinate of the payer in the axis Y
+         * @return the position of the truck in the axis Y
+         */
+        float getPlayerY();
+
+
+
+        /**
+         * Get the coordinate of the payer in the axis X
+         * @return the position of the motorbike in the axis X
+         */
+        float getPreviousY();
+
+
+
+         /**
+          * Get the coordinate of the payer in the axis X
+          * @return the position of the motorbike in the axis X
+          */
+        float getMinScreenX();
+
+
+
+         /**
+          * Get the coordinate of the payer in the axis X
+          * @return the position of the motorbike in the axis X
+          */
+        float getMaxScreenX();
+
+
+
+        /**
+          * Uodate the position of the vehicle
+          */
+         void updatePositionY(const float speed);
+
+
+
+        /**
+         * Uodate the position of the vehicle
+         */
+        void updatePosition(const float speed);
 
 
 
@@ -94,7 +148,7 @@ class Minivan : public Player {
          * @param height is the actual elevation of the terrain where is the Minivan
          */
         inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                     const int lastHeight, const int height);
+                                                     const int lastHeight, const int height, Elevation& e);
 
 
 
@@ -107,7 +161,7 @@ class Minivan : public Player {
          * @param height is the actual elevation of the terrain where is the Minivan
          */
         inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                      const int lastHeight, const int height);
+                                                      const int lastHeight, const int height, Elevation& e);
 
 
 
@@ -140,7 +194,7 @@ class Minivan : public Player {
          * @param height is the actual elevation of the terrain where is the Minivan
          */
         inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
-                                       const int lastHeight, const int height);
+                                       const int lastHeight, const int height, Elevation& e);
 
 
 
@@ -153,7 +207,7 @@ class Minivan : public Player {
         * @param height is the actual elevation of the terrain where is the Minivan
         */
         inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
-                                         const int lastHeight, const int height);
+                                         const int lastHeight, const int height, Elevation& e);
 
 
 
@@ -165,7 +219,7 @@ class Minivan : public Player {
          * @param lastHeight was the elevation of the terrain where was the Minivan
          * @param height is the actual elevation of the terrain where is the Minivan
          */
-        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastCamH, const int camH);
+        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastCamH, const int camH, Elevation& e);
 
 
 
@@ -175,7 +229,7 @@ class Minivan : public Player {
          * @param lastPos is the last position of the Minivan in the axis Y
          * @param pos is the current position of the Minivan in the axis Y
          */
-        bool controlPossibleCollision(Step& nearestSprite, int& lastPos, int& pos);
+        bool controlPossibleCollision(Step& nearestSprite, int lastPos, int pos);
 
 
 
@@ -194,6 +248,10 @@ class Minivan : public Player {
          * @param pos is the position of the Minivan in the car in the axis Y
          */
         void collisionShow();
+
+
+
+        bool hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m);
 
 };
 

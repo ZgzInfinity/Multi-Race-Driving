@@ -8,7 +8,7 @@ Devastator::Devastator(char* pathFile, Configuration* conf) : Player(pathFile, c
  * Draw the player sprite in the console render window
  * @param app is the console window game where the sprite is going to be drawn
  */
-void Devastator::drawPlayer(RenderWindow* app, int& pos){
+void Devastator::drawPlayer(RenderWindow* app, int pos){
     // Check what is the offset to apply while is crushing
     if (mode == 0){
         // First mode
@@ -30,41 +30,8 @@ void Devastator::drawPlayer(RenderWindow* app, int& pos){
 /**
  * Load the set of sprites of the player
  */
-void Devastator::loadVehicleProperties(){
-    // Document xml where the document is going to be parsed
-    xml_document<> doc;
-    file<> file("Configuration/Vehicles/Devastator.xml");
-    // Parsing the content of file
-    doc.parse<0>(file.data());
-
-    // Get the principal node of the file
-    xml_node<> *nodePlayer = doc.first_node();
-
-    // Loop in order to iterate all the children of the principal node
-    for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
-        // Check if the actual node is the controller of the paths of the sprites
-        if ((string)child->name() == "SpritePaths"){
-            // Loop for iterate throughout the path files and add then to the vector
-            for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
-                // Add the texture to the vector
-                if (t.loadFromFile(string(filePath) + pathNode->value())){
-                    // Increment the textures read
-                    textures.push_back(t);
-                }
-            }
-        }
-        // Check if the actual node is the controller of the max speed of the vehicle
-        else if ((string)child->name() == "MaxSpeed"){
-            maxSpeed = RATIO * stoi(child->value());
-        }
-    }
-    playerSprite.setTexture(textures[19]);
-
-    // Initialize the medium speed of the vehicle
-    mediumSpeed = INITIAL_SPEED + maxSpeed / 2;
-
-    // Initialize the control speed of the vehicle to calculate the inertia force
-    controlSpeed = INITIAL_SPEED + mediumSpeed / 2;
+void Devastator::loadVehicleProperties(const string path){
+    Player::loadVehicleProperties(path);
 }
 
 
@@ -75,12 +42,12 @@ void Devastator::loadVehicleProperties(){
  * @param lastHeight was the elevation of the terrain where was the Devastator
  * @param height is the actual elevation of the terrain where is the Devastator
  */
-void Devastator::advancePlayer(bool& eventDetected, const int lastHeight, const int height){
+void Devastator::advancePlayer(bool& eventDetected, const int lastHeight, const int height, Elevation& e){
     // Eliminate this event detection
     if (!eventDetected){
         // Check if the car is ascending on a elevation part of the terrain
         if (((height > NORMAL_HEIGHT && height <= 2 * NORMAL_HEIGHT) ||
-             (height > 0 && height <= NORMAL_HEIGHT)) && height > lastHeight)
+             (height > 0 && height <= NORMAL_HEIGHT)) && (e == Elevation::UP))
         {
             // The car is ascending the landing
             if (actual_code_image < 7 || actual_code_image > 9){
@@ -124,15 +91,82 @@ void Devastator::advancePlayer(bool& eventDetected, const int lastHeight, const 
 
 
 
+/**
+ * Establish the coordinate X and Y of the vehicle
+ * @param pX is the coordinate of the vehicle in the axis X
+ * @param pY is the coordinate of the vehicle in the axis Y
+ */
+void Devastator::setPosition(float pX, float pY){
+    Player::setPosition(pX, pY);
+}
+
+
 
 /**
  * Get the coordinate of the payer in the axis X
- * @return the position of the Devastator in the axis X
+ * @return the position of the Minivan in the axis X
  */
 float Devastator::getPlayerX(){
     return Player::getPlayerX();
 }
 
+
+
+/**
+ * Get the coordinate of the payer in the axis Y
+ * @return the position of the truck in the axis Y
+ */
+float Devastator::getPlayerY(){
+    return Player::getPlayerY();
+}
+
+
+
+/**
+ * Get the coordinate of the payer in the axis X
+ * @return the position of the motorbike in the axis X
+ */
+float Devastator::getPreviousY(){
+    return Player::getPreviousY();
+}
+
+
+
+ /**
+  * Get the coordinate of the payer in the axis X
+  * @return the position of the motorbike in the axis X
+  */
+float Devastator::getMinScreenX(){
+    return Player::getMinScreenX();
+}
+
+
+
+ /**
+  * Get the coordinate of the payer in the axis X
+  * @return the position of the motorbike in the axis X
+  */
+float Devastator::getMaxScreenX(){
+    return Player::getMaxScreenX();
+}
+
+
+
+/**
+ * Uodate the position of the vehicle
+ */
+void Devastator::updatePositionY(const float speed){
+    Player::updatePositionY(speed);
+}
+
+
+
+/**
+ * Uodate the position of the vehicle
+ */
+void Devastator::updatePosition(const float speed){
+    Player::updatePosition(speed);
+}
 
 
 
@@ -155,7 +189,7 @@ int Devastator::getModeCollision(){
  * @param height is the actual elevation of the terrain where is the Devastator
  */
 inline void Devastator::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                      const int lastHeight, const int height)
+                                                      const int lastHeight, const int height, Elevation& e)
 {
     // Check if key left pressed
     if (Keyboard::isKeyPressed(c->getLeftKey())){
@@ -214,7 +248,7 @@ inline void Devastator::controlTurningPlayerLeftKeyboard(int& speed, bool& event
  * @param height is the actual elevation of the terrain where is the Devastator
  */
 inline void Devastator::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                       const int lastHeight, const int height){
+                                                       const int lastHeight, const int height, Elevation& e){
     // Check if key right pressed
     if (Keyboard::isKeyPressed(c->getRightKey())){
         if (!isAccelerating){
@@ -270,7 +304,7 @@ inline void Devastator::controlTurningPlayerRightKeyboard(int& speed, bool& even
  * @param height is the actual elevation of the terrain where is the Devastator
  */
 inline void Devastator::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
-                                        const int lastHeight, const int height){
+                                        const int lastHeight, const int height, Elevation& e){
     // Check if the user is accelerating
     if ((Keyboard::isKeyPressed(c->getAccelerateKey()))){
         isAccelerating = true;
@@ -299,14 +333,14 @@ inline void Devastator::controlPlayerSpeed(int& speed, bool& eventDetected, Rend
         if (!eventDetected){
             // Check if the key to turn to the right is pressed
             isAccelerating = false;
-            controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
+            controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height, e);
             return;
         }
         // Check if the key to turn left is pressed
         if (!eventDetected){
             // Check if the key to turn to the left is pressed
             isAccelerating = false;
-            controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
+            controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height, e);
             return;
         }
         // Change the sprite;
@@ -338,14 +372,14 @@ inline void Devastator::controlPlayerSpeed(int& speed, bool& eventDetected, Rend
  * @param height is the actual elevation of the terrain where is the Devastator
  */
 inline void Devastator::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
-                                          const int lastHeight, const int height){
+                                          const int lastHeight, const int height, Elevation& e){
     // Check if the user is braking
     if (Keyboard::isKeyPressed(c->getBrakeKey())){
         isAccelerating = false;
         // Check more events
         if (!eventDetected){
             // Control if first the user has accelerated
-            controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
+            controlPlayerSpeed(speed, eventDetected, app, lastHeight, height, e);
         }
         // The Devastator goes straight
         if (actual_code_image >= 1 && actual_code_image <= 2){
@@ -445,15 +479,15 @@ inline void Devastator::controlPlayerBraking(int& speed, bool& eventDetected, Re
  * @param lastHeight was the elevation of the terrain where was the Devastator
  * @param height is the actual elevation of the terrain where is the Devastator
  */
-void Devastator::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastCamH, const int camH){
+void Devastator::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastCamH, const int camH, Elevation& e){
     // Check if W keyword has been pressed to turn to the right
-    controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastCamH, camH);
+    controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastCamH, camH, e);
 
     // Check if Q keyword has been pressed to turn to the left
-    controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastCamH, camH);
+    controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastCamH, camH, e);
 
     //Check if the E keyword has been pressed to brake the Devastator
-    controlPlayerBraking(speed, eventDetected, app, lastCamH, camH);
+    controlPlayerBraking(speed, eventDetected, app, lastCamH, camH, e);
 
     // Check if any event has been registered
     if (!eventDetected){
@@ -468,7 +502,7 @@ void Devastator::controlActionPlayer(int& speed, bool& eventDetected, RenderWind
     }
 
     // Check if the Up keyword has been pressed to increase the speed
-    controlPlayerSpeed(speed, eventDetected, app, lastCamH, camH);
+    controlPlayerSpeed(speed, eventDetected, app, lastCamH, camH, e);
 }
 
 
@@ -479,7 +513,7 @@ void Devastator::controlActionPlayer(int& speed, bool& eventDetected, RenderWind
  * @param lastPos is the last position of the Devastator in the axis Y
  * @param pos is the current position of the Devastator in the axis Y
  */
-bool Devastator::controlPossibleCollision(Step& nearestStep, int& lastPos, int& pos){
+bool Devastator::controlPossibleCollision(Step& nearestStep, int lastPos, int pos){
     // Calculation of the distance
     float distance = nearestStep.spriteX - playerX;
     // Check the sign of the offset
@@ -625,6 +659,30 @@ void Devastator::collisionShow(){
             }
         }
     }
+}
+
+
+
+bool Devastator::hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m)  {
+    Step* l;
+    for (int n = int(playerY); n < int(playerY) + 300; n++) {
+        l = m->getLine(n);
+        if (l->spriteLeft.spriteNum != -1 && l->spriteLeft.spriteMinX != l->spriteLeft.spriteMaxX && // l has an object that can crash
+                prevY <= float(n) && currentY >= float(n) && // y matches
+                ((minX >= l->spriteLeft.spriteMinX && minX <= l->spriteLeft.spriteMaxX) ||
+                 (maxX >= l->spriteLeft.spriteMinX && maxX <= l->spriteLeft.spriteMaxX) ||
+                 (l->spriteLeft.spriteMinX >= minX && l->spriteLeft.spriteMinX <= maxX) ||
+                 (l->spriteLeft.spriteMaxX >= minX && l->spriteLeft.spriteMaxX <= maxX))) // x matches
+            return true;
+        if (l->spriteRight.spriteNum != -1 && l->spriteRight.spriteMinX != l->spriteRight.spriteMaxX && // l has an object that can crash
+                prevY <= float(n) && currentY >= float(n) && // y matches
+                ((minX >= l->spriteRight.spriteMinX && minX <= l->spriteRight.spriteMaxX) ||
+                 (maxX >= l->spriteRight.spriteMinX && maxX <= l->spriteRight.spriteMaxX) ||
+                 (l->spriteRight.spriteMinX >= minX && l->spriteRight.spriteMinX <= maxX) ||
+                 (l->spriteRight.spriteMaxX >= minX && l->spriteRight.spriteMaxX <= maxX))) // x matches
+            return true;
+    }
+    return false;
 }
 
 

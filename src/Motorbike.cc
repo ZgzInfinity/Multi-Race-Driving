@@ -9,7 +9,7 @@ Motorbike::Motorbike(char* pathFile, Configuration* conf) : Player(pathFile, con
  * Draw the player sprite in the console render window
  * @param app is the console window game where the sprite is going to be drawn
  */
-void Motorbike::drawPlayer(RenderWindow* app, int& pos){
+void Motorbike::drawPlayer(RenderWindow* app, int pos){
     this->offset = (mode == 0 && actual_code_image <= 35) ? offset += 10 : offset += 5;
     this->offset = (mode == 1 && actual_code_image <= 46) ? offset += 20 : offset;
     if (mode == -1) offset = 0;
@@ -22,46 +22,8 @@ void Motorbike::drawPlayer(RenderWindow* app, int& pos){
 /**
  * Load the set of sprites of the player
  */
-void Motorbike::loadVehicleProperties(){
-    // Document xml where the document is going to be parsed
-    xml_document<> doc;
-    file<> file("Configuration/Vehicles/Motorbike.xml");
-    // Parsing the content of file
-    doc.parse<0>(file.data());
-
-    // Get the principal node of the file
-    xml_node<> *nodePlayer = doc.first_node();
-
-    cout << filePath << endl;
-
-    // Loop in order to iterate all the children of the principal node
-    for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
-        // Check if the actual node is the controller of the paths of the sprites
-        if ((string)child->name() == "SpritePaths"){
-            // Loop for iterate throughout the path files and add then to the vector
-            for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
-                // Add the texture to the vector
-                if (t.loadFromFile(string(filePath) + pathNode->value())){
-                    // Increment the textures read
-                    textures.push_back(t);
-                }
-            }
-            continue;
-        }
-        // Check if the actual node is the controller of the max speed of the vehicle
-        else if ((string)child->name() == "MaxSpeed"){
-            maxSpeed = RATIO * stoi(child->value());
-        }
-    }
-    // Load the biggest texture to display the other ones
-    playerSprite.setTexture(textures[13]);
-
-    // Initialize the medium speed of the vehicle
-    mediumSpeed = INITIAL_SPEED + maxSpeed / 2;
-
-    // Initialize the control speed of the vehicle to calculate the inertia force
-    controlSpeed = INITIAL_SPEED + mediumSpeed / 2;
-
+void Motorbike::loadVehicleProperties(const string path){
+    Player::loadVehicleProperties(path);
 }
 
 
@@ -72,7 +34,7 @@ void Motorbike::loadVehicleProperties(){
  * @param lastHeight was the elevation of the terrain where was the motorbike
  * @param height is the actual elevation of the terrain where is the motorbike
  */
-void Motorbike::advancePlayer(bool& eventDetected, const int lastHeight, const int height){
+void Motorbike::advancePlayer(bool& eventDetected, const int lastHeight, const int height, Elevation& e){
     // Eliminate this event detection
     if (!eventDetected){
         if (actual_code_image != 1){
@@ -83,7 +45,7 @@ void Motorbike::advancePlayer(bool& eventDetected, const int lastHeight, const i
             // Second advance sprite loaded
             actual_code_image = 2;
         }
-        playerSprite.setTexture(textures[actual_code_image - 1]);
+        playerSprite.setTexture(textures[actual_code_image - 1], true);
         isAccelerating = false;
     }
     else {
@@ -92,6 +54,16 @@ void Motorbike::advancePlayer(bool& eventDetected, const int lastHeight, const i
     }
 }
 
+
+
+/**
+ * Establish the coordinate X and Y of the vehicle
+ * @param pX is the coordinate of the vehicle in the axis X
+ * @param pY is the coordinate of the vehicle in the axis Y
+ */
+void Motorbike::setPosition(float pX, float pY){
+    Player::setPosition(pX, pY);
+}
 
 
 
@@ -103,6 +75,63 @@ float Motorbike::getPlayerX(){
     return Player::getPlayerX();
 }
 
+
+
+/**
+ * Get the coordinate of the payer in the axis X
+ * @return the position of the motorbike in the axis X
+ */
+float Motorbike::getPlayerY(){
+    return Player::getPlayerY();
+}
+
+
+
+/**
+ * Get the coordinate of the payer in the axis X
+ * @return the position of the motorbike in the axis X
+ */
+float Motorbike::getPreviousY(){
+    return Player::getPreviousY();
+}
+
+
+
+ /**
+  * Get the coordinate of the payer in the axis X
+  * @return the position of the motorbike in the axis X
+  */
+float Motorbike::getMinScreenX(){
+    return Player::getMinScreenX();
+}
+
+
+
+ /**
+  * Get the coordinate of the payer in the axis X
+  * @return the position of the motorbike in the axis X
+  */
+float Motorbike::getMaxScreenX(){
+    return Player::getMaxScreenX();
+}
+
+
+
+/**
+ * Uodate the position of the vehicle
+ */
+void Motorbike::updatePositionY(const float speed){
+    Player::updatePositionY(speed);
+}
+
+
+
+/**
+ * Uodate the position of the vehicle
+ */
+void Motorbike::updatePosition(const float speed){
+    Player::updatePosition(speed);
+}
 
 
 
@@ -125,7 +154,7 @@ int Motorbike::getModeCollision(){
  * @param height is the actual elevation of the terrain where is the motorbike
  */
 inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                             const int lastHeight, const int height)
+                                             const int lastHeight, const int height, Elevation& e)
 {
     // Check if key left pressed
     if (Keyboard::isKeyPressed(c->getLeftKey())){
@@ -153,7 +182,7 @@ inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventD
            (actual_code_image >= 23 && actual_code_image <= 28))
         {
             actual_code_image = 3;
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image >= 3 && actual_code_image <= 8){
             // Increment the actual code of the sprite
@@ -166,7 +195,7 @@ inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventD
                 actual_code_image--;
             }
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         // Register event
         eventDetected = true;
@@ -184,7 +213,7 @@ inline void Motorbike::controlTurningPlayerLeftKeyboard(int& speed, bool& eventD
  * @param height is the actual elevation of the terrain where is the motorbike
  */
 inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                              const int lastHeight, const int height)
+                                              const int lastHeight, const int height, Elevation& e)
 {
     // Check if key right pressed
     if (Keyboard::isKeyPressed(c->getRightKey())){
@@ -210,7 +239,7 @@ inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& event
         // Change the texture
         if (actual_code_image < 9 || (actual_code_image >= 15 && actual_code_image <= 22)){
             actual_code_image = 9;
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image <= 14){
             // Increment the actual code of the sprite
@@ -223,7 +252,7 @@ inline void Motorbike::controlTurningPlayerRightKeyboard(int& speed, bool& event
                 actual_code_image--;
             }
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         // Register event
         eventDetected = true;
@@ -260,7 +289,7 @@ inline void Motorbike::controlTurningPlayerLeftMouse(int& speed, bool& eventDete
         {
             actual_code_image = 3;
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image >= 3 && actual_code_image <= 8){
             // Increment the actual code of the sprite
@@ -273,7 +302,7 @@ inline void Motorbike::controlTurningPlayerLeftMouse(int& speed, bool& eventDete
                 actual_code_image--;
             }
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         // Register event
         eventDetected = true;
@@ -308,7 +337,7 @@ inline void Motorbike::controlTurningPlayerRightMouse(int& speed, bool& eventDet
         if (actual_code_image < 9 || (actual_code_image >= 15 && actual_code_image <= 22)){
             actual_code_image = 9;
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image <= 14){
             // Increment the actual code of the sprite
@@ -321,7 +350,7 @@ inline void Motorbike::controlTurningPlayerRightMouse(int& speed, bool& eventDet
                 actual_code_image--;
             }
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         // Register event
         eventDetected = true;
@@ -339,7 +368,7 @@ inline void Motorbike::controlTurningPlayerRightMouse(int& speed, bool& eventDet
  * @param height is the actual elevation of the terrain where is the motorbike
  */
 inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
-                                          const int lastHeight, const int height)
+                                          const int lastHeight, const int height, Elevation& e)
 {
     // Check if the user is accelerating
     if ((sf::Keyboard::isKeyPressed(c->getAccelerateKey()))){
@@ -371,7 +400,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             if (typeControl == 0){
                  // Check if the key to turn to the right is pressed
                  isAccelerating = false;
-                 controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
+                 controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height, e);
             }
             else {
                 // Check if the mouse has been moved to turn to the right
@@ -385,7 +414,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             if (typeControl == 0){
                  // Check if the key to turn to the left is pressed
                  isAccelerating = false;
-                 controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
+                 controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height, e);
             }
             else {
                 // Check if the mouse has been moved to turn to the left
@@ -399,7 +428,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             actual_code_image = 1;
             // Set the texture from the file
             isAccelerating = false;
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         // Change the sprite of the motorbike
         else if (actual_code_image == 1 && eventDetected){
@@ -407,7 +436,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
             actual_code_image = 2;
             // Set the texture from the file
             isAccelerating = false;
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
     }
     else {
@@ -426,7 +455,7 @@ inline void Motorbike::controlPlayerSpeed(int& speed, bool& eventDetected, Rende
  * @param height is the actual elevation of the terrain where is the motorbike
  */
 inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
-                                            const int lastHeight, const int height)
+                                            const int lastHeight, const int height, Elevation& e)
 {
     // Check if the user is braking
     if (Keyboard::isKeyPressed(c->getBrakeKey())){
@@ -434,33 +463,33 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
         // Check more events
         if (!eventDetected){
             // Control if first the user has accelerated
-            controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
+            controlPlayerSpeed(speed, eventDetected, app, lastHeight, height, e);
         }
         // Selection of the correct sprite of the motorbike
         if (actual_code_image <= 2){
             actual_code_image = 15;
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image == 15){
             actual_code_image = 16;
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image == 16){
             actual_code_image = 15;
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image >= 3 && actual_code_image <= 8){
             actual_code_image += 14;
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image >= 9 && actual_code_image <= 14){
             actual_code_image += 14;
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image >= 17 && actual_code_image <= 22){
             // Increment the actual code of the sprite
@@ -473,7 +502,7 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
                 actual_code_image--;
             }
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         else if (actual_code_image >= 23 && actual_code_image <= 28){
             // Increment the actual code of the sprite
@@ -486,7 +515,7 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
                 actual_code_image--;
             }
             // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1]);
+            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
         // Reduce the speed
         if (speed > INITIAL_SPEED){
@@ -512,15 +541,15 @@ inline void Motorbike::controlPlayerBraking(int& speed, bool& eventDetected, Ren
  * @param height is the actual elevation of the terrain where is the motorbike
  */
 void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app,
-                                    const int lastHeight, const int height)
+                                    const int lastHeight, const int height, Elevation& e)
 {
     if (typeControl == 0){
         // Keyword
         // Check if W keyword has been pressed to turn to the right
-        controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height);
+        controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height, e);
 
         // Check if Q keyword has been pressed to turn to the left
-        controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height);
+        controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height, e);
     }
     else {
         // Check if the mouse has has been moved to turn to the right
@@ -531,7 +560,7 @@ void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindo
     }
 
     //Check if the E keyword has been pressed to brake the motorbike
-    controlPlayerBraking(speed, eventDetected, app, lastHeight, height);
+    controlPlayerBraking(speed, eventDetected, app, lastHeight, height, e);
 
     // Check if any event has been registered
     if (!eventDetected){
@@ -546,7 +575,7 @@ void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindo
     }
 
     // Check if the Up keyword has been pressed to increase the speed
-    controlPlayerSpeed(speed, eventDetected, app, lastHeight, height);
+    controlPlayerSpeed(speed, eventDetected, app, lastHeight, height, e);
 }
 
 
@@ -557,7 +586,7 @@ void Motorbike::controlActionPlayer(int& speed, bool& eventDetected, RenderWindo
  * @param lastPos is the last position of the motorbike in the axis Y
  * @param pos is the current position of the motorbike in the axis Y
  */
-bool Motorbike::controlPossibleCollision(Step& nearestStep, int& lastPos, int& pos){
+bool Motorbike::controlPossibleCollision(Step& nearestStep, int lastPos, int pos){
     // Calculation of the distance
     float distance = nearestStep.spriteX - playerX;
     // Check the sign of the offset
@@ -688,6 +717,36 @@ void Motorbike::collisionShow(){
             }
         }
     }
+}
+
+
+
+bool Motorbike::hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m)  {
+    Step* l;
+    for (int n = int(m->getPosY()); n < int(m->getPosY()) + 300; n++) {
+        l = m->getLine(n);
+        if (l->spriteLeft.spriteNum != -1 && l->spriteLeft.spriteMinX != l->spriteLeft.spriteMaxX && // l has an object that can crash
+                prevY <= float(n) && currentY >= float(n) && // y matches
+                ((minX >= l->spriteLeft.spriteMinX && minX <= l->spriteLeft.spriteMaxX) ||
+                 (maxX >= l->spriteLeft.spriteMinX && maxX <= l->spriteLeft.spriteMaxX) ||
+                 (l->spriteLeft.spriteMinX >= minX && l->spriteLeft.spriteMinX <= maxX) ||
+                 (l->spriteLeft.spriteMaxX >= minX && l->spriteLeft.spriteMaxX <= maxX)))
+            {
+                mode = 1;
+                return true;
+            }
+        if (l->spriteRight.spriteNum != -1 && l->spriteRight.spriteMinX != l->spriteRight.spriteMaxX && // l has an object that can crash
+                prevY <= float(n) && currentY >= float(n) && // y matches
+                ((minX >= l->spriteRight.spriteMinX && minX <= l->spriteRight.spriteMaxX) ||
+                 (maxX >= l->spriteRight.spriteMinX && maxX <= l->spriteRight.spriteMaxX) ||
+                 (l->spriteRight.spriteMinX >= minX && l->spriteRight.spriteMinX <= maxX) ||
+                 (l->spriteRight.spriteMaxX >= minX && l->spriteRight.spriteMaxX <= maxX)))
+            {
+                mode = 0;
+                return true;
+            }
+    }
+    return false;
 }
 
 

@@ -7,7 +7,7 @@
  * Constructor of the data type Game
  * @param app is the console window where it's going to be displayed
  */
-Game::Game(RenderWindow* app) : player(300.0f, 100.0f, 0.01f, 1.0f, 132, 10, "Ferrari") {
+Game::Game(RenderWindow* app) {
     // Initializing the console window of the game
     application = app;
 
@@ -314,31 +314,57 @@ void Game::playWorldTourMode(){
     elapsed1 = gameClock.getElapsedTime();
     gameClock.restart();
 
+    string pathDevastator = "images/Vehicles/Devastator/";
+    char* pDevastator = const_cast<char*>(pathDevastator.c_str());
+    // Devastator of the player
+    Devastator d = Devastator(pDevastator, c);
+
+    string pathMinivan = "images/Vehicles/Minivan/";
+    char* pMinivan = const_cast<char*>(pathMinivan.c_str());
+    // Minivan of the player
+    Minivan mV = Minivan(pMinivan, c);
+
+    string pathMotorbike = "images/Vehicles/Motorbike/";
+    char* pMotorbike = const_cast<char*>(pathMotorbike.c_str());
+    // Motorbike of the player
+    Motorbike mB = Motorbike(pMotorbike, c);
+
+    string pathTruck = "images/Vehicles/Truck/";
+    char* pTruck = const_cast<char*>(pathTruck.c_str());
+    // Truck of the player
+    Truck t = Truck(pTruck, c);
+
+    Elevation el = Elevation::FLAT;
+    string path;
+
     // Select the kind of vehicle selected by the player
     switch(typeOfVehicle){
         case 0:
+            // Load vehicle properties of the motorbike
+            path = "Configuration/Vehicles/Motorbike.xml";
+            mB.loadVehicleProperties(path);
             break;
         case 1:
+            // Load vehicle properties of the devastator
+            path = "Configuration/Vehicles/Devastator.xml";
+            d.loadVehicleProperties(path);
             break;
         case 2:
+            // Load vehicle properties of the minivan
+            path = "Configuration/Vehicles/Minivan.xml";
+            mV.loadVehicleProperties(path);
             break;
         case 3:
+            // Load vehicle properties of the truck
+            path = "Configuration/Vehicles/Truck.xml";
+            t.loadVehicleProperties(path);
             break;
     }
-
-    string path = "images/Vehicles/Devastator/";
-    char* p = const_cast<char*>(path.c_str());
-    // Motorbike of the player
-    Devastator h = Devastator(p, c);
-
-    h.loadVehicleProperties();
 
     vector<string> landscapes = gSM.getVectorOfLandScapes();
     char* n = const_cast<char*>(landscapes[0].c_str());
     LandScape L = LandScape(n);
 
-    // Number of steps done
-    int pos = 0, lastPos = 0;
     // Height position unnecessary
     int H = 1500;
 
@@ -372,6 +398,12 @@ void Game::playWorldTourMode(){
     // Controlling possible events in the console of the game
     Event ev;
 
+    // Get the nearest sprite found to the actual position
+    Step nearestStep;
+
+    // Actual position of the vehicle
+    int pos;
+
     // While the game console is opened
     while (application->isOpen()){
 
@@ -380,35 +412,109 @@ void Game::playWorldTourMode(){
                 application->close();
         }
 
-        // New speed updated
-        if (h.getModeCollision() == -1){
-            // Check the advance of the motorbike of the player
-            h.advancePlayer(eventDetected, lastCamH, camH);
+        // Check the possible collision of the vehicle
+        int collision;
+        switch(typeOfVehicle){
+            case 0:
+                // Load vehicle properties of the motorbike
+                collision = mB.getModeCollision();
+                break;
+            case 1:
+                // Load vehicle properties of the devastator
+                collision = d.getModeCollision();
+                break;
+            case 2:
+                // Load vehicle properties of the minivan
+                collision = mV.getModeCollision();
+                break;
+            case 3:
+                // Load vehicle properties of the truck
+                collision = t.getModeCollision();
+                break;
+        }
 
-            // Control the possible actions if the user
-            h.controlActionPlayer(speed, eventDetected, application, lastCamH, camH);
-
-            // Store my the actual position before the move
-            lastPos = pos;
-
-            pos += speed;
-
+        // If there is no collision
+        if (collision == -1){
+            switch(typeOfVehicle){
+                case 0:
+                    // Check the advance of the motorbike of the player
+                    mB.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    mB.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    mB.updatePositionY(speed);
+                    // Checking of the motorbike is in a curve of the scene
+                    nearestStep = L.checkingPossibleCollision(mB.getPlayerY());
+                    break;
+                case 1:
+                    // Check the advance of the motorbike of the player
+                    d.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    d.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    d.updatePositionY(speed);
+                    // Checking of the motorbike is in a curve of the scene
+                    nearestStep = L.checkingPossibleCollision(d.getPlayerY());
+                    break;
+                case 2:
+                    // Check the advance of the motorbike of the player
+                    mV.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    mV.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    mV.updatePositionY(speed);
+                    // Checking of the motorbike is in a curve of the scene
+                    nearestStep = L.checkingPossibleCollision(mV.getPlayerY());
+                    break;
+                case 3:
+                    // Check the advance of the motorbike of the player
+                    t.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    t.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    t.updatePositionY(speed);
+                    // Checking of the motorbike is in a curve of the scene
+                    nearestStep = L.checkingPossibleCollision(t.getPlayerY());
+            }
             // Store the actual elevation of the terrain
             lastCamH = camH;
         }
 
-        // Get the nearest sprite found to the actual position
-        Step nearestStep;
-
-        // Checking of the motorbike is in a curve of the scene
-        nearestStep = L.checkingPossibleCollision(pos);
-
-        // Check possible collisions of the motorbike or if there is a collision been processed now
-        if (h.controlPossibleCollision(nearestStep, lastPos, pos) || h.getModeCollision() != -1){
-            // There is collision
-            h.collisionShow();
-            speed = INITIAL_SPEED;
+        // Show the collision of the vehicle
+        switch(typeOfVehicle){
+            case 0:
+                pos = mB.getPlayerY();
+                if (mB.controlPossibleCollision(nearestStep, mB.getPreviousY(), pos) || mB.getModeCollision() != -1){
+                    // There is collision
+                    mB.collisionShow();
+                    speed = INITIAL_SPEED;
+                }
+                break;
+            case 1:
+                pos = d.getPlayerY();
+                if (d.controlPossibleCollision(nearestStep, d.getPreviousY(), pos) || d.getModeCollision() != -1){
+                    // There is collision
+                    d.collisionShow();
+                    speed = INITIAL_SPEED;
+                }
+                break;
+            case 2:
+                pos = mV.getPlayerY();
+                if (mV.controlPossibleCollision(nearestStep, mV.getPreviousY(), pos) || mV.getModeCollision() != -1){
+                    // There is collision
+                    mV.collisionShow();
+                    speed = INITIAL_SPEED;
+                }
+                break;
+            case 3:
+                pos = t.getPlayerY();
+                if (t.controlPossibleCollision(nearestStep, t.getPreviousY(), pos) || t.getModeCollision() != -1){
+                    // There is collision
+                    t.collisionShow();
+                    speed = INITIAL_SPEED;
+                }
         }
+
 
         // Control if the player passes the checkpoint
         if (pos >= posCheckPoint){
@@ -427,8 +533,24 @@ void Game::playWorldTourMode(){
 
         L.lookForCurve(pos, curve, onCurve);
 
-        // Control the inertia force of the motorbike
-        h.controlInertiaForce(onCurve, curve, speed);
+        // Show the collision of the vehicle
+        switch(typeOfVehicle){
+            case 0:
+                // Control the inertia force of the motorbike
+                mB.controlInertiaForce(onCurve, curve, speed);
+                break;
+            case 1:
+                // Control the inertia force of the motorbike
+                d.controlInertiaForce(onCurve, curve, speed);
+                break;
+            case 2:
+                // Control the inertia force of the motorbike
+                mV.controlInertiaForce(onCurve, curve, speed);
+                break;
+            case 3:
+                // Control the inertia force of the motorbike
+                t.controlInertiaForce(onCurve, curve, speed);
+        }
 
         // Check the upper bound limit
         while (pos >=  MAX_SPACE_DIMENSION * segL){
@@ -448,26 +570,87 @@ void Game::playWorldTourMode(){
         int startPos = pos / segL;
         camH = L.lines[startPos].position_3d_y + H;
 
-        // Check if advance
-        if (speed > 0 && h.getModeCollision() == -1){
-            // Advance
-            // Checking of the motorbike is in a curve of the scene
-            Sprite newBack;
-            newBack = L.getBackGround();
-            newBack.move(-(L.lines[startPos].directionCurve) * 2, 0);
-            L.setBackGround(newBack);
+
+        if (camH > lastCamH){
+            el = Elevation::UP;
         }
+        else if (camH < lastCamH){
+            el = Elevation::DOWN;
+        }
+        else {
+            el = Elevation::FLAT;
+        }
+
+        // Check if advance
+        if (speed > 0)
+            switch(typeOfVehicle){
+                case 0:
+                    if (mB.getModeCollision() == -1){
+                        // Advance
+                        // Checking of the motorbike is in a curve of the scene
+                        Sprite newBack;
+                        newBack = L.getBackGround();
+                        newBack.move(-(L.lines[startPos].directionCurve) * 2, 0);
+                        L.setBackGround(newBack);
+                    }
+                    break;
+                case 1:
+                    if (d.getModeCollision() == -1){
+                        // Advance
+                        // Checking of the motorbike is in a curve of the scene
+                        Sprite newBack;
+                        newBack = L.getBackGround();
+                        newBack.move(-(L.lines[startPos].directionCurve) * 2, 0);
+                        L.setBackGround(newBack);
+                    }
+                    break;
+                case 2:
+                    if (mV.getModeCollision() == -1){
+                        // Advance
+                        // Checking of the motorbike is in a curve of the scene
+                        Sprite newBack;
+                        newBack = L.getBackGround();
+                        newBack.move(-(L.lines[startPos].directionCurve) * 2, 0);
+                        L.setBackGround(newBack);
+                    }
+                    break;
+                case 3:
+                    if (t.getModeCollision() == -1){
+                        // Advance
+                        // Checking of the motorbike is in a curve of the scene
+                        Sprite newBack;
+                        newBack = L.getBackGround();
+                        newBack.move(-(L.lines[startPos].directionCurve) * 2, 0);
+                        L.setBackGround(newBack);
+                    }
+            }
 
         // Variables
         int maxy = HEIGHT;
         float x = 0, dx = 0;
+
+        // Show the collision of the vehicle
+        int posVehicleX;
 
         // Drawing the road
         for(int n = startPos; n < startPos + 300; n++){
             // Create a new line
             Step &l = L.lines[n % MAX_SPACE_DIMENSION];
             // Project the 3d coordinates in 2d coordinates image
-            l.project(h.getPlayerX() * WIDTH_ROAD - x, camH, startPos * segL - (n>= MAX_SPACE_DIMENSION ? MAX_SPACE_DIMENSION * segL : 0));
+
+            switch(typeOfVehicle){
+                case 0:
+                    l.project(mB.getPlayerX() * WIDTH_ROAD - x, camH, startPos * segL - (n>= MAX_SPACE_DIMENSION ? MAX_SPACE_DIMENSION * segL : 0));
+                    break;
+                case 1:
+                    l.project(d.getPlayerX() * WIDTH_ROAD - x, camH, startPos * segL - (n>= MAX_SPACE_DIMENSION ? MAX_SPACE_DIMENSION * segL : 0));
+                    break;
+                case 2:
+                    l.project(mV.getPlayerX() * WIDTH_ROAD - x, camH, startPos * segL - (n>= MAX_SPACE_DIMENSION ? MAX_SPACE_DIMENSION * segL : 0));
+                    break;
+                case 3:
+                    l.project(t.getPlayerX() * WIDTH_ROAD - x, camH, startPos * segL - (n>= MAX_SPACE_DIMENSION ? MAX_SPACE_DIMENSION * segL : 0));
+            }
 
             x += dx;
             dx += l.directionCurve;
@@ -512,8 +695,20 @@ void Game::playWorldTourMode(){
        time = (secs < 10) ? time + "0" + to_string(secs) + ":" : time + to_string(secs) + ":";
        time = (minutes < 10) ? time + "0" + to_string(decs_in_sec) : time + to_string(decs_in_sec);
 
-       //Show all the elements in the console game
-       h.drawPlayer(application, pos);
+       switch(typeOfVehicle){
+            case 0:
+                mB.drawPlayer(application, pos);
+                break;
+            case 1:
+                d.drawPlayer(application, pos);
+                break;
+            case 2:
+                mV.drawPlayer(application, pos);
+                break;
+            case 3:
+                t.drawPlayer(application, pos);
+        }
+
        application->draw(e.spriteSpeedPanel);
        application->draw(e.spriteElapsedPanel);
        e.textSpeedIndicator.setString(to_string(int(speed / RATIO)));
@@ -550,7 +745,9 @@ void Game::playWorldTourMode(){
 
 
        // Check if the player has pressed the key to change the music of the level
-       if (h.getConfiguration()->checkChangeMusic() || timerMusic > 0){
+       if (d.getConfiguration()->checkChangeMusic()  || mV.getConfiguration()->checkChangeMusic() ||
+           mB.getConfiguration()->checkChangeMusic() || t.getConfiguration()->checkChangeMusic() || timerMusic > 0)
+       {
             // Check if it's now when the soundtrack has been changed
             if (timerMusic == 0){
                 mR->advanceSoundtrackLevel();
@@ -571,13 +768,45 @@ void Game::playWorldTourMode(){
        application->draw(e.textDestinyIndicator);
        application->display();
 
-       // Sleep loop
-       if (h.getModeCollision() == -1){
-            sleep(milliseconds(70));
-       }
-       else {
-            sleep(milliseconds(120));
-       }
+
+       // Contrl if there is collision in any of the vehicles
+       switch(typeOfVehicle){
+            case 0:
+                // Sleep loop
+                if (mB.getModeCollision() == -1){
+                     sleep(milliseconds(70));
+                }
+                else {
+                     sleep(milliseconds(120));
+                }
+                break;
+            case 1:
+                // Sleep loop
+                if (d.getModeCollision() == -1){
+                     sleep(milliseconds(70));
+                }
+                else {
+                     sleep(milliseconds(120));
+                }
+                break;
+            case 2:
+                // Sleep loop
+                if (mV.getModeCollision() == -1){
+                     sleep(milliseconds(70));
+                }
+                else {
+                     sleep(milliseconds(120));
+                }
+                break;
+            case 3:
+                // Sleep loop
+                if (t.getModeCollision() == -1){
+                     sleep(milliseconds(70));
+                }
+                else {
+                     sleep(milliseconds(120));
+                }
+        }
     }
 }
 
@@ -600,77 +829,267 @@ void Game::playOutRunMode(){
             // nm++; // TODO: Añadir más mapas y descomentar
         }
         maps.emplace_back(vm);
-
-        // nm++; // TODO: Añadir más mapas y borrar línea
-        // nm = nm % 2; // TODO: Añadir más mapas y borrar línea
     }
 
     mapId = make_pair(0, 0);
     currentMap = &maps[mapId.first][mapId.second];
     currentMap->addNextMap(&maps[mapId.first + 1][mapId.second]); // TODO: Añadir bifurcación
 
+    // Select the kind of vehicle chosen by the player
+    string pathDevastator = "images/Vehicles/Devastator/";
+    char* pDevastator = const_cast<char*>(pathDevastator.c_str());
+    // Devastator of the player
+    Devastator d = Devastator(pDevastator, c);
 
+    string pathMinivan = "images/Vehicles/Minivan/";
+    char* pMinivan = const_cast<char*>(pathMinivan.c_str());
+    // Minivan of the player
+    Minivan mV = Minivan(pMinivan, c);
+
+    string pathMotorbike = "images/Vehicles/Motorbike/";
+    char* pMotorbike = const_cast<char*>(pathMotorbike.c_str());
+    // Motorbike of the player
+    Motorbike mB = Motorbike(pMotorbike, c);
+
+    string pathTruck = "images/Vehicles/Truck/";
+    char* pTruck = const_cast<char*>(pathTruck.c_str());
+    // Truck of the player
+    Truck t = Truck(pTruck, c);
+
+    // Velocity
+    int speed = INITIAL_SPEED;
+
+    // Height position unnecessary
+    int H = 1500;
+    // Not elevation of terrain registered by default
+    int lastCamH = H, camH = H;
+
+    // Possible event detected
+    bool eventDetected = false;
+
+    int pos;
+    string path;
+
+    Elevation el;
+
+    // Select the kind of vehicle selected by the player
+    switch(typeOfVehicle){
+        case 0:
+            // Load vehicle properties of the motorbike
+            path = "Configuration/Vehicles/Motorbike.xml";
+            mB.loadVehicleProperties(path);
+            break;
+        case 1:
+            // Load vehicle properties of the devastator
+            path = "Configuration/Vehicles/Devastator.xml";
+            d.loadVehicleProperties(path);
+            break;
+        case 2:
+            // Load vehicle properties of the minivan
+            path = "Configuration/Vehicles/Minivan.xml";
+            mV.loadVehicleProperties(path);
+            break;
+        case 3:
+            // Load vehicle properties of the truck
+            path = "Configuration/Vehicles/Truck.xml";
+            t.loadVehicleProperties(path);
+            break;
+    }
+
+    // Loop of the game until the user end or the console is closed
     while (!finalGame && application->isOpen()) {
+        // Clean the console window
         application->clear();
-        mapControl(c);
 
-        Event e{};
-        while (application->pollEvent(e)) {
-            if (e.type == Event::Closed)
+        // Update camera depending of the vehicle selected by the player
+        switch(typeOfVehicle){
+            case 0:
+                currentMap->updateView(mB.getPosition());
+                break;
+            case 1:
+                currentMap->updateView(d.getPosition());
+                break;
+            case 2:
+                currentMap->updateView(mV.getPosition());
+                break;
+            case 3:
+                currentMap->updateView(t.getPosition());
+        }
+
+        // Control the possible transitions to other maps
+        if (currentMap->isOver()) {
+            // TODO: Añadir bifurcación
+            mapId.first++;
+            if (mapId.first < maps.size()) {
+                currentMap = &maps[mapId.first][mapId.second];
+
+                if (mapId.first < maps.size() - 1)
+                    currentMap->addNextMap(&maps[mapId.first + 1][mapId.second]);
+
+
+                // Update the position in the map of the vehicle
+                switch(typeOfVehicle){
+                    case 0:
+                        mB.setPosition(mB.getPosition().first, 0);
+                        currentMap->updateView(mB.getPosition());
+                        break;
+                    case 1:
+                        d.setPosition(d.getPosition().first, 0);
+                        currentMap->updateView(d.getPosition());
+                        break;
+                    case 2:
+                        mV.setPosition(mV.getPosition().first, 0);
+                        currentMap->updateView(mV.getPosition());
+                        break;
+                    case 3:
+                        t.setPosition(t.getPosition().first, 0);
+                        currentMap->updateView(t.getPosition());
+                }
+            }
+            else {
+                finalGame = true;
+            }
+        }
+
+        // Draw map
+        if (!finalGame){
+            currentMap->draw(application, c);
+        }
+
+        // Detect possible events in the console window
+        Event ev{};
+        while (application->pollEvent(ev)) {
+            if (ev.type == Event::Closed){
                 application->close();
+            }
         }
 
-        // Player update and draw
-        Vehicle::Action action = Vehicle::CRASH;
-        Vehicle::Direction direction = Vehicle::RIGHT;
-        if (!player.isCrashing()) { // If not has crashed
-            action = player.accelerationControl(c, currentMap->hasGotOut(player.getPosition().first));
-            direction = player.rotationControl(c, currentMap->getCurveCoefficient(player.getPosY()));
+        // Check the possible collision of the vehicle
+        int collision;
+        switch(typeOfVehicle){
+            case 0:
+                // Load vehicle properties of the motorbike
+                collision = mB.getModeCollision();
+                break;
+            case 1:
+                // Load vehicle properties of the devastator
+                collision = d.getModeCollision();
+                break;
+            case 2:
+                // Load vehicle properties of the minivan
+                collision = mV.getModeCollision();
+                break;
+            case 3:
+                // Load vehicle properties of the truck
+                collision = t.getModeCollision();
+                break;
         }
 
-        player.draw(c, action, direction, currentMap->getElevation(player.getPosY()), application);
-
-        application->display();
-
-         if (currentMap->hasCrashed(player.getPreviousY(), player.getPosY(), player.getMinScreenX(),
-                player.getMaxScreenX(), c) || player.isCrashing())
-            player.hitControl();
+        // If there is no collision
+        if (collision == -1){
+            switch(typeOfVehicle){
+                case 0:
+                    // Get the new elevation of the terrain
+                    el = currentMap->getElevation(mB.getPlayerY());
+                    // Check the advance of the motorbike of the player
+                    mB.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    mB.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    mB.updatePosition(speed);
+                    // Check if there is a new collision
+                    if (mB.hasCrashed(mB.getPreviousY(), mB.getPlayerY(), mB.getMinScreenX(), mB.getMaxScreenX(), currentMap) || collision != -1){
+                        mB.collisionShow();
+                    }
+                    mB.drawPlayer(application, pos);
+                    // Display the console window
+                    application->display();
+                    // Sleep loop
+                    if (mB.getModeCollision() == -1){
+                         sleep(milliseconds(25));
+                    }
+                    else {
+                         sleep(milliseconds(120));
+                    }
+                    break;
+                case 1:
+                    // Get the new elevation of the terrain
+                    el = currentMap->getElevation(d.getPlayerY());
+                    // Check the advance of the motorbike of the player
+                    d.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    d.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    d.updatePosition(speed);
+                    // Check if there is a new collision
+                    if (d.hasCrashed(d.getPreviousY(), d.getPlayerY(), d.getMinScreenX(), d.getMaxScreenX(), currentMap) || collision != -1){
+                        d.collisionShow();
+                    }
+                    pos = (int)d.getPlayerY();
+                    d.drawPlayer(application, pos);
+                    // Display the console window
+                    application->display();
+                    // Sleep loop
+                    if (mB.getModeCollision() == -1){
+                         sleep(milliseconds(25));
+                    }
+                    else {
+                         sleep(milliseconds(120));
+                    }
+                    break;
+                case 2:
+                    // Get the new elevation of the terrain
+                    el = currentMap->getElevation(mV.getPlayerY());
+                    // Check the advance of the motorbike of the player
+                    mV.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    mV.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    mV.updatePosition(speed);
+                    // Check if there is a new collision
+                    if (mV.hasCrashed(mV.getPreviousY(), mV.getPlayerY(), mV.getMinScreenX(), mV.getMaxScreenX(), currentMap) || collision != -1){
+                        mV.collisionShow();
+                    }
+                    pos = (int)mV.getPlayerY();
+                    mV.drawPlayer(application, pos);
+                    // Display the console window
+                    application->display();
+                    // Sleep loop
+                    if (mB.getModeCollision() == -1){
+                         sleep(milliseconds(25));
+                    }
+                    else {
+                         sleep(milliseconds(120));
+                    }
+                    break;
+                case 3:
+                    // Get the new elevation of the terrain
+                    el = currentMap->getElevation(t.getPlayerY());
+                    // Check the advance of the motorbike of the player
+                    t.advancePlayer(eventDetected, lastCamH, camH, el);
+                    // Control the possible actions if the user
+                    t.controlActionPlayer(speed, eventDetected, application, lastCamH, camH, el);
+                    // Update the position of the vehicle
+                    t.updatePosition(speed);
+                    // Check if there is a new collision
+                    if (t.hasCrashed(t.getPreviousY(), t.getPlayerY(), t.getMinScreenX(), t.getMaxScreenX(), currentMap) || collision != -1){
+                        t.collisionShow();
+                    }
+                    pos = (int)t.getPlayerY();
+                    t.drawPlayer(application, pos);
+                    // Display the console window
+                    application->display();
+                    // Sleep loop
+                    if (mB.getModeCollision() == -1){
+                         sleep(milliseconds(25));
+                    }
+                    else {
+                         sleep(milliseconds(120));
+                    }
+            }
+        }
     }
 }
-
-
-
-
-void Game::mapControl(Configuration* c) {
-    // Update camera
-    currentMap->updateView(player.getPosition());
-
-    if (currentMap->isOver()) {
-        // TODO: Añadir bifurcación
-        mapId.first++;
-        if (mapId.first < maps.size()) {
-            currentMap = &maps[mapId.first][mapId.second];
-
-            if (mapId.first < maps.size() - 1)
-                currentMap->addNextMap(&maps[mapId.first + 1][mapId.second]);
-
-            player.setPosition(player.getPosition().first, 0);
-            currentMap->updateView(player.getPosition());
-        }
-        else {
-            finalGame = true;
-        }
-    }
-
-    // Draw map
-    if (!finalGame)
-        currentMap->draw(application, c);
-}
-
-
-
-
-
 
 
 

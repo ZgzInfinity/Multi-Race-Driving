@@ -10,6 +10,7 @@
 #include "../include/Configuration.h"
 #include "../include/Step.h"
 #include "../include/IntervalCurve.h"
+#include "../include/Map.h"
 #include "../include/rapidxml.hpp"
 #include "../include/rapidxml_utils.hpp"
 #include <SFML/Graphics.hpp>
@@ -44,7 +45,7 @@ class Player{
         int actual_code_image;
 
         // Position of the main character
-        float playerX;
+        float playerX = 0, playerY = 0, previousY = 0, minScreenX = 0, maxScreenX = 0;
 
         // How to control the motorbike
         int typeControl = 0;
@@ -116,7 +117,41 @@ class Player{
         /**
          * Load the set of sprites of the player
          */
-         virtual void loadVehicleProperties() = 0;
+        void loadVehicleProperties(const string path){
+            // Document xml where the document is going to be parsed
+            xml_document<> doc;
+            const char *pch = path.c_str();
+            file<> file(pch);
+            // Parsing the content of file
+            doc.parse<0>(file.data());
+
+            // Get the principal node of the file
+            xml_node<> *nodePlayer = doc.first_node();
+
+            // Loop in order to iterate all the children of the principal node
+            for (xml_node<> *child = nodePlayer->first_node(); child; child = child->next_sibling()){
+                // Check if the actual node is the controller of the paths of the sprites
+                if ((string)child->name() == "SpritePaths"){
+                    // Loop for iterate throughout the path files and add then to the vector
+                    for (xml_node<> * pathNode = child->first_node(); pathNode; pathNode = pathNode->next_sibling()){
+                        // Add the texture to the vector
+                        if (t.loadFromFile(string(filePath) + pathNode->value())){
+                            // Increment the textures read
+                            textures.push_back(t);
+                        }
+                    }
+                }
+                // Check if the actual node is the controller of the max speed of the vehicle
+                else if ((string)child->name() == "MaxSpeed"){
+                    maxSpeed = RATIO * stoi(child->value());
+                }
+            }
+            // Initialize the medium speed of the vehicle
+            mediumSpeed = INITIAL_SPEED + maxSpeed / 2;
+
+            // Initialize the control speed of the vehicle to calculate the inertia force
+            controlSpeed = INITIAL_SPEED + mediumSpeed / 2;
+        }
 
 
 
@@ -125,7 +160,7 @@ class Player{
          * @param app is the console window game where the sprite is going to be drawn
          * @param pos is the actual position of the player in the map
          */
-        virtual void drawPlayer(RenderWindow* app, int& pos) = 0;
+        virtual void drawPlayer(RenderWindow* app, int pos) = 0;
 
 
 
@@ -135,7 +170,19 @@ class Player{
          * @param lastHeight was the elevation of the terrain where was the motorbike
          * @param height is the actual elevation of the terrain where is the motorbike
          */
-        virtual void advancePlayer(bool& eventDetected, const int lastHeight, const int height) = 0;
+        virtual void advancePlayer(bool& eventDetected, const int lastHeight, const int height, Elevation& e) = 0;
+
+
+
+        /**
+         * Establish the coordinate X and Y of the vehicle
+         * @param pX is the coordinate of the vehicle in the axis X
+         * @param pY is the coordinate of the vehicle in the axis Y
+         */
+        void setPosition(float pX, float pY){
+            playerX = pX;
+            playerY = pY;
+        }
 
 
 
@@ -145,6 +192,46 @@ class Player{
          */
          float getPlayerX(){
             return playerX;
+         }
+
+
+
+         /**
+         * Get the coordinate of the payer in the axis X
+         * @return the position of the motorbike in the axis X
+         */
+         float getPlayerY(){
+            return playerY;
+         }
+
+
+
+         /**
+         * Get the coordinate of the payer in the axis X
+         * @return the position of the motorbike in the axis X
+         */
+         float getPreviousY(){
+            return previousY;
+         }
+
+
+
+         /**
+          * Get the coordinate of the payer in the axis X
+          * @return the position of the motorbike in the axis X
+          */
+         float getMinScreenX(){
+            return minScreenX;
+         }
+
+
+
+         /**
+          * Get the coordinate of the payer in the axis X
+          * @return the position of the motorbike in the axis X
+          */
+         float getMaxScreenX(){
+            return maxScreenX;
          }
 
 
@@ -168,6 +255,35 @@ class Player{
 
 
          /**
+          * Return the position of the vehicle in a tuple
+          */
+         pair<float, float> getPosition() const {
+            return make_pair(playerX, playerY);
+         }
+
+
+
+         /**
+          * Uodate the position of the vehicle
+          */
+         void updatePositionY(const float speed){
+            previousY = playerY;
+            playerY += (speed);
+         }
+
+
+
+         /**
+          * Uodate the position of the vehicle
+          */
+         void updatePosition(const float speed){
+            previousY = playerY;
+            playerY += (speed / 190.f);
+         }
+
+
+
+         /**
           * Control if the user has pressed the q keyword to turn to the left
           * @param speed is the actual speed of the motorbike of the player
           * @param eventDetected is a boolean to control if an event has occurred
@@ -176,7 +292,7 @@ class Player{
           * @param height is the actual elevation of the terrain where is the motorbike
           */
          virtual inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                              const int lastHeight, const int height) = 0;
+                                                              const int lastHeight, const int height, Elevation& e) = 0;
 
 
 
@@ -189,7 +305,7 @@ class Player{
          * @param height is the actual elevation of the terrain where is the motorbike
          */
          virtual inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                              const int lastHeight, const int height) = 0;
+                                                              const int lastHeight, const int height, Elevation& e) = 0;
 
 
 
@@ -202,7 +318,7 @@ class Player{
          * @param height is the actual elevation of the terrain where is the motorbike
          */
         virtual inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
-                                               const int lastHeight, const int height) = 0;
+                                               const int lastHeight, const int height, Elevation& e) = 0;
 
 
 
@@ -215,7 +331,7 @@ class Player{
          * @param height is the actual elevation of the terrain where is the player
          */
         virtual inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
-                                         const int lastHeight, const int height) = 0;
+                                         const int lastHeight, const int height,  Elevation& e) = 0;
 
 
         /**
@@ -227,7 +343,7 @@ class Player{
          * @param height is the actual elevation of the terrain where is the player
          */
         virtual void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app,
-                                         const int lastHeight, const int height) = 0;
+                                         const int lastHeight, const int height, Elevation& e) = 0;
 
 
 
@@ -237,7 +353,7 @@ class Player{
          * @param lastPos is the last position of the motorbike in the axis Y
          * @param pos is the current position of the motorbike in the axis Y
          */
-        virtual bool controlPossibleCollision(Step& nearestSprite, int& lastPos, int& pos) = 0;
+        virtual bool controlPossibleCollision(Step& nearestSprite, int lastPos, int pos) = 0;
 
 
 
@@ -255,6 +371,12 @@ class Player{
          * Shows to the user how the motorbikes crushes
          */
         virtual void collisionShow() = 0;
+
+
+
+        virtual bool hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m) = 0;
+
+
 
 };
 

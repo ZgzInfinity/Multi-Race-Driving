@@ -19,7 +19,6 @@ using namespace std;
 using namespace sf;
 
 #define BGS 0.525F // Background size
-#define SEGL 100 // Segment length
 #define ROADW 2000 // Road Width
 #define RUMBLECOEFF 0.1f // Ruble size = Road size * Rumble coeff
 
@@ -41,31 +40,43 @@ void Map::addLine(float x, float y, float &z, float prevY, float curve, bool mai
 
     // For each normal line, 4 extras without objects for better visualization
     lineAux.position_3d_z = z;
-    z += SEGL;
+    z += segL - 50;
     lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 
     lineAux.position_3d_z = z;
-    z += SEGL;
+    z += segL - 50;
     lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 
     line.position_3d_z = z;
-    z += SEGL;
+    z += segL - 50;
     lineAux.position_3d_y += yInc;
     line.position_3d_y = lineAux.position_3d_y;
     lines.push_back(line);
 
     lineAux.position_3d_z = z;
-    z += SEGL;
+    z += segL - 50;
     lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 
     lineAux.position_3d_z = z;
-    z += SEGL;
+    z += segL - 50;
     lineAux.position_3d_y += yInc;
     lines.push_back(lineAux);
 }
+
+
+float Map::getPosX(){
+    return posX;
+}
+
+
+
+float Map::getPosY(){
+    return posY;
+}
+
 
 Step *Map::getLine(const int n) {
     if (n < lines.size() || next == nullptr)
@@ -74,7 +85,7 @@ Step *Map::getLine(const int n) {
         return &next->lines[(n - lines.size()) % next->lines.size()];
 }
 
-Step Map::getLine(const int n) const {
+Step Map::getLine(const int n) const{
     if (n < lines.size() || next == nullptr)
         return lines[n % lines.size()];
     else
@@ -499,7 +510,7 @@ void Map::draw(RenderWindow* app, Configuration* c) {
     for (int n = startPos; n < startPos + 300; n++) {
         l = getLine(n);
 
-        l->project(posX * ROADW - x, camH, float(startPos * SEGL), 0.84,
+        l->project(posX * ROADW - x, camH, float(startPos * (segL - 50)), 0.84,
                   app->getSize().x, app->getSize().y, ROADW, n < N ? 0.0f : lines[lines.size() - 1].position_3d_z);
         x += dx;
         dx += l->directionCurve;
@@ -568,31 +579,6 @@ void Map::draw(RenderWindow* app, Configuration* c) {
 }
 
 
-
-bool Map::hasCrashed(float prevY, float currentY, float minX, float maxX, Configuration* c) const {
-    Step l;
-    for (int n = int(posY); n < int(posY) + c->getRenderLen(); n++) {
-        l = getLine(n);
-
-        if (l.spriteLeft.spriteNum != -1 && l.spriteLeft.spriteMinX != l.spriteLeft.spriteMaxX && // l has an object that can crash
-                prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l.spriteLeft.spriteMinX && minX <= l.spriteLeft.spriteMaxX) ||
-                 (maxX >= l.spriteLeft.spriteMinX && maxX <= l.spriteLeft.spriteMaxX) ||
-                 (l.spriteLeft.spriteMinX >= minX && l.spriteLeft.spriteMinX <= maxX) ||
-                 (l.spriteLeft.spriteMaxX >= minX && l.spriteLeft.spriteMaxX <= maxX))) // x matches
-            return true;
-        if (l.spriteRight.spriteNum != -1 && l.spriteRight.spriteMinX != l.spriteRight.spriteMaxX && // l has an object that can crash
-                prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l.spriteRight.spriteMinX && minX <= l.spriteRight.spriteMaxX) ||
-                 (maxX >= l.spriteRight.spriteMinX && maxX <= l.spriteRight.spriteMaxX) ||
-                 (l.spriteRight.spriteMinX >= minX && l.spriteRight.spriteMinX <= maxX) ||
-                 (l.spriteRight.spriteMaxX >= minX && l.spriteRight.spriteMaxX <= maxX))) // x matches
-            return true;
-    }
-    return false;
-}
-
-
 bool Map::hasGotOut(float currentX) const {
     return abs(currentX) > 1.0f;
 }
@@ -601,7 +587,7 @@ float Map::getCurveCoefficient(float currentY) const {
     return getLine(int(currentY)).directionCurve;
 }
 
-Map::Elevation Map::getElevation(float currentY) const {
+Elevation Map::getElevation(float currentY) const {
     const int n = int(currentY);
     const Step currentLine = getLine(n);
     const Step prevLine = getPreviousLine(n);

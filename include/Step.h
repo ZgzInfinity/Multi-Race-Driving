@@ -23,6 +23,14 @@ const int MAX_SPACE_DIMENSION = 12000;
 const int NORMAL_HEIGHT = 1500;
 
 
+// Current elevation type of the Step
+enum Elevation {
+    UP,
+    FLAT,
+    DOWN
+};
+
+
 /*
  * Step data type
  */

@@ -28,22 +28,36 @@
  */
 class Map {
 
-    // Background
-    sf::Texture bg;
+    private:
 
-    // Objects
-    std::vector<sf::Texture> objects;
-    std::vector<float> hitCoeff;
-    std::vector<Step> lines;
+        // Background
+        sf::Texture bg;
 
-    // Colors
-    Color roadColor[2], grassColor[2];
+        // Objects
+        std::vector<sf::Texture> objects;
+        std::vector<float> hitCoeff;
+        std::vector<Step> lines;
 
-    // Camera
-    float posX, posY;
+        // Colors
+        Color roadColor[2], grassColor[2];
 
-    // Next map
-    Map *next;
+        // Camera
+        float posX, posY;
+
+        // Next map
+        Map *next;
+
+    public:
+
+
+
+    float getPosX();
+
+
+
+    float getPosY();
+
+
 
     /**
      * Devuelve Line n
@@ -52,6 +66,8 @@ class Map {
      */
     Step* getLine(int n);
 
+
+
     /**
      * Devuelve Line n
      * @param n
@@ -59,12 +75,16 @@ class Map {
      */
     Step getLine(int n) const;
 
+
+
     /**
      * Devuelve Line anterior a n
      * @param n
      * @return
      */
     Step* getPreviousLine(int n);
+
+
 
     /**
      * Devuelve Line anterior a n
@@ -96,12 +116,6 @@ class Map {
     void addLines(float x, float y, float &z, const std::vector<std::vector<std::string>> &instructions);
 
 public:
-    // Current elevation type
-    enum Elevation {
-        UP,
-        FLAT,
-        DOWN
-    };
 
     // Crea un mapa con un paisaje dado el nombre del fichero de la imagen y con unos objetos dados los nombres de los
     // ficheros de las imágenes. El contenido del mapa debe encontrarse en la ruta path. Si random es true se crea el
@@ -190,17 +204,6 @@ public:
      */
     void draw(RenderWindow* app, Configuration* c);
 
-
-    /**
-     * Devuelve true si pos corresponde a algún objeto del fragmento del mapa actual.
-     * @param c
-     * @param currentY
-     * @param prevY
-     * @param minX
-     * @param maxX
-     * @return
-     */
-    bool hasCrashed(float prevY, float currentY, float minX, float maxX, Configuration* c) const;
 
     /**
      * Devuelve true si currentX está fuera de la carretera.

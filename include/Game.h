@@ -15,7 +15,6 @@
 #include "../include/MusicReproductor.h"
 #include "../include/WorldTour.h"
 #include "../include/Map.h"
-#include "../include/Vehicle.h"
 #include "SFML/Graphics.hpp"
 
 using namespace std;
@@ -79,8 +78,6 @@ class Game {
         Map *currentMap;
 
         bool finalGame = false;
-
-        Vehicle player;
 
     public:
 
@@ -172,9 +169,6 @@ class Game {
 
 
         void playOutRunMode();
-
-
-        void mapControl(Configuration* c);
 
 
 };
