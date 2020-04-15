@@ -118,6 +118,15 @@ float Motorbike::getMaxScreenX(){
 
 
 /**
+ * Get the maximum speed of the vehicle
+ */
+int Motorbike::getMaxSpeed(){
+    return Player::getMaxSpeed();
+}
+
+
+
+/**
  * Uodate the position of the vehicle
  */
 void Motorbike::updatePositionY(const float speed){
@@ -721,7 +730,7 @@ void Motorbike::collisionShow(){
 
 
 
-bool Motorbike::hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m)  {
+bool Motorbike::hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m)  {
     Step* l;
     for (int n = int(m->getPosY()); n < int(m->getPosY()) + 300; n++) {
         l = m->getLine(n);

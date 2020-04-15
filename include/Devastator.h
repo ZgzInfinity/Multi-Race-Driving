@@ -118,6 +118,12 @@ class Devastator : public Player {
 
 
 
+         /**
+          * Get the maximum speed of the vehicle
+          */
+         int getMaxSpeed();
+
+
 
         /**
           * Uodate the position of the vehicle
@@ -254,7 +260,7 @@ class Devastator : public Player {
 
 
 
-        bool hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m);
+        bool hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m);
 
 };
 

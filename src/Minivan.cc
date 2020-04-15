@@ -154,6 +154,15 @@ float Minivan::getMaxScreenX(){
 
 
 /**
+ * Get the maximum speed of the vehicle
+ */
+int Minivan::getMaxSpeed(){
+    return Player::getMaxSpeed();
+}
+
+
+
+/**
  * Uodate the position of the vehicle
  */
 void Minivan::updatePositionY(const float speed){
@@ -761,7 +770,7 @@ void Minivan::collisionShow(){
 
 
 
-bool Minivan::hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m)  {
+bool Minivan::hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m)  {
     Step* l;
     for (int n = int(playerY); n < int(playerY) + 300; n++) {
         l = m->getLine(n);

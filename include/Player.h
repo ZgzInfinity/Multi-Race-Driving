@@ -10,9 +10,9 @@
 #include "../include/Configuration.h"
 #include "../include/Step.h"
 #include "../include/IntervalCurve.h"
-#include "../include/Map.h"
 #include "../include/rapidxml.hpp"
 #include "../include/rapidxml_utils.hpp"
+#include "LandScape.h"
 #include <SFML/Graphics.hpp>
 
 
@@ -264,6 +264,15 @@ class Player{
 
 
          /**
+          * Get the maximum speed of the vehicle
+          */
+         int getMaxSpeed(){
+            return maxSpeed;
+         }
+
+
+
+         /**
           * Uodate the position of the vehicle
           */
          void updatePositionY(const float speed){
@@ -374,7 +383,7 @@ class Player{
 
 
 
-        virtual bool hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m) = 0;
+        virtual bool hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m) = 0;
 
 
 

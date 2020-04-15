@@ -116,6 +116,13 @@ class Truck : public Player {
 
 
          /**
+          * Get the maximum speed of the vehicle
+          */
+         int getMaxSpeed();
+
+
+
+         /**
           * Uodate the position of the vehicle
           */
          void updatePositionY(const float speed);
@@ -249,7 +256,7 @@ class Truck : public Player {
 
 
 
-        bool hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m);
+        bool hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m);
 
 };
 

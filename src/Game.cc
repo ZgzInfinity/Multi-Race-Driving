@@ -816,14 +816,14 @@ void Game::playOutRunMode(){
     int nm = 2;
     int nobjects[] = {6, 15, 15}; // TODO: Más mapas
     for (int i = 0; i < 5; i++) {
-        vector<Map> vm;
+        vector<LandScape> vm;
         for (int j = 0; j <= i; j++) {
             vector<string> objectNames;
             objectNames.reserve(nobjects[nm]);
             for (int no = 1; no <= nobjects[nm]; no++)
                 objectNames.push_back(to_string(no) + ".png");
 
-            Map m("resources/map" + to_string(nm) + "/", "bg.png", objectNames, false);
+            LandScape m("resources/map" + to_string(nm) + "/", "bg.png", objectNames, false);
             vm.push_back(m);
 
             // nm++; // TODO: Añadir más mapas y descomentar
@@ -1002,6 +1002,15 @@ void Game::playOutRunMode(){
                         mB.collisionShow();
                     }
                     mB.drawPlayer(application, pos);
+                    // Check the inertia force
+                    if (speed > 0) {
+                        if (currentMap->getCurveCoefficient(mB.getPlayerY()) > 0.f) {
+                            mB.setPosition(mB.getPlayerX() - (0.05f * speed / (mB.getMaxSpeed())) , mB.getPlayerY());
+                        }
+                        else if (currentMap->getCurveCoefficient(mB.getPlayerY()) < 0.f){
+                            mB.setPosition(mB.getPlayerX() + (0.05f * speed / (mB.getMaxSpeed())) , mB.getPlayerY());
+                        }
+                    }
                     // Display the console window
                     application->display();
                     // Sleep loop
@@ -1026,6 +1035,15 @@ void Game::playOutRunMode(){
                         d.collisionShow();
                     }
                     pos = (int)d.getPlayerY();
+                    // Check the inertia force
+                    if (speed > 0) {
+                        if (currentMap->getCurveCoefficient(d.getPlayerY()) > 0.f) {
+                            d.setPosition(d.getPlayerX() - (0.05f * speed / (d.getMaxSpeed() * 2.0f)) , d.getPlayerY());
+                        }
+                        else if (currentMap->getCurveCoefficient(d.getPlayerY()) < 0.f){
+                            d.setPosition(d.getPlayerX() + (0.05f * speed / (d.getMaxSpeed() * 2.0f)) , d.getPlayerY());
+                        }
+                    }
                     d.drawPlayer(application, pos);
                     // Display the console window
                     application->display();
@@ -1051,6 +1069,15 @@ void Game::playOutRunMode(){
                         mV.collisionShow();
                     }
                     pos = (int)mV.getPlayerY();
+                    // Check the inertia force
+                    if (speed > 0) {
+                        if (currentMap->getCurveCoefficient(mV.getPlayerY()) > 0.f) {
+                            mV.setPosition(mV.getPlayerX() - (0.05f * speed / (mV.getMaxSpeed() * 2.0f)) , mV.getPlayerY());
+                        }
+                        else if (currentMap->getCurveCoefficient(mV.getPlayerY()) < 0.f){
+                            mV.setPosition(mV.getPlayerX() + (0.05f * speed / (mV.getMaxSpeed() * 2.0f)) , mV.getPlayerY());
+                        }
+                    }
                     mV.drawPlayer(application, pos);
                     // Display the console window
                     application->display();
@@ -1076,6 +1103,15 @@ void Game::playOutRunMode(){
                         t.collisionShow();
                     }
                     pos = (int)t.getPlayerY();
+                    // Check the inertia force
+                    if (speed > 0) {
+                        if (currentMap->getCurveCoefficient(t.getPlayerY()) > 0.f) {
+                            t.setPosition(t.getPlayerX() - (0.05f * speed / (t.getMaxSpeed() * 2.0f)) , t.getPlayerY());
+                        }
+                        else if (currentMap->getCurveCoefficient(t.getPlayerY()) < 0.f){
+                            t.setPosition(t.getPlayerX() + (0.05f * speed / (t.getMaxSpeed() * 2.0f)) , t.getPlayerY());
+                        }
+                    }
                     t.drawPlayer(application, pos);
                     // Display the console window
                     application->display();

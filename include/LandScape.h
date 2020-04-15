@@ -13,6 +13,7 @@
 #include "Checkpoint.h"
 #include "StartingPoint.h"
 #include "GoalPoint.h"
+#include "Configuration.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
@@ -22,6 +23,11 @@ using namespace rapidxml;
 
 const int MAX_ELEMENTS = 20;
 
+
+#define BGS 0.525F // Background size
+#define ROADW 2000 // Road Width
+#define RUMBLECOEFF 0.1f // Ruble size = Road size * Rumble coeff
+#define M_PI 3.1415926535897932384
 
 
 struct LandScape {
@@ -93,6 +99,21 @@ struct LandScape {
         // Texture of the starting point
         Texture tGoalPoint;
 
+        // NEW ELEMENTS
+
+        // Objects
+        std::vector<sf::Texture> objects;
+        std::vector<float> hitCoeff;
+        std::vector<Step> newLines;
+
+        // Colors
+        Color roadColor[2], grassColor[2];
+
+        // Camera
+        float posX, posY;
+
+        // Next map
+        LandScape *next;
 
         /**
          * Constructor of the data type
@@ -380,6 +401,146 @@ struct LandScape {
          * @param road is the color which is going to be used to paint the road of the scene
          */
         void paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road);
+
+
+
+        float getPosX();
+
+
+
+        float getPosY();
+
+
+
+        /**
+         * Devuelve Line n
+         * @param n
+         * @return
+         */
+        Step* getLine(int n);
+
+
+
+        /**
+         * Devuelve Line n
+         * @param n
+         * @return
+         */
+        Step getLine(int n) const;
+
+
+
+        /**
+         * Devuelve Line anterior a n
+         * @param n
+         * @return
+         */
+        Step* getPreviousLine(int n);
+
+
+
+        /**
+         * Devuelve Line anterior a n
+         * @param n
+         * @return
+         */
+        Step getPreviousLine(int n) const;
+
+        /**
+         * Añade un rectángulo al mapa. Actualiza z para una nueva línea.
+         * @param x
+         * @param y
+         * @param z
+         * @param curve
+         * @param mainColor
+         * @param spriteLeft
+         * @param spriteRight
+         */
+        void addLine(float x, float y, float &z, float prevY, float curve, bool mainColor, const Step::SpriteInfo &spriteLeft,
+                const Step::SpriteInfo &spriteRight);
+
+        /**
+         * Añade rectángulos desde las instrucciones al mapa desde (x, y, z). Actualiza z para una nueva línea.
+         * @param x
+         * @param y
+         * @param z
+         * @param instructions
+         */
+        void addLines(float x, float y, float &z, const std::vector<std::vector<std::string>> &instructions);
+
+
+        /**
+         * @param c
+         * @param path
+         * @param bgName
+         * @param objectNames
+         * @param random
+         */
+        LandScape(const std::string &path, const std::string &bgName, const std::vector<std::string> &objectNames, bool random);
+
+
+        void fileError(const string &error);
+
+
+        vector<vector<string>> randomMap(const int numLines, const vector<int> &objectIndexes);
+
+
+        vector<vector<string>> readMapFile(const std::string &file);
+
+
+        /**
+         * Añade un mapa a continuación del actual.
+         * @param map
+         */
+        void addNextMap(LandScape *map);
+
+        /**
+         * Añade el offset al mapa.
+         * @param yOffset
+         */
+        void setOffset(float yOffset);
+
+        /**
+         * Establece la posición de la cámara.
+         * @param pos = {x, y}, donde x = 0 es el medio de la carretera, y >= 0 AND y <= MAXLINES
+         */
+        void updateView(std::pair<float, float> pos);
+
+
+        /**
+         * Dibuja el fragmento del mapa actual dada la posición de la cámara establecida con la función updateView().
+         * @param c
+         */
+        void draw(RenderWindow* app, Configuration* c);
+
+
+        /**
+         * Devuelve true si currentX está fuera de la carretera.
+         * @param currentX
+         * @return
+         */
+        bool hasGotOut(float currentX) const;
+
+        /**
+         * Devuelve el coeficiente de curvatura correspondiente al rectángulo currentY. El coeficiente es positivo si la
+         * curva es hacia la derecha, negativo si es hacia la izquierda y 0 si es una recta.
+         * @param currentY
+         * @return coeff pertenece [-0.9, 0.9]
+         */
+        float getCurveCoefficient(float currentY) const;
+
+        /**
+         * Devuelve la elevación correspondiente al rectángulo currentY en base al rectángulo previo.
+         * @param currentY
+         * @return
+         */
+        Elevation getElevation(float currentY) const;
+
+        /**
+         * Devuelve cierto si se ha alcanzado el final del mapa
+         * @return
+         */
+        bool isOver() const;
 };
 
 #endif // LAND_SCAPE_H

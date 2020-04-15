@@ -154,6 +154,15 @@ float Truck::getMaxScreenX(){
 
 
 /**
+ * Get the maximum speed of the vehicle
+ */
+int Truck::getMaxSpeed(){
+    return Player::getMaxSpeed();
+}
+
+
+
+/**
  * Uodate the position of the vehicle
  */
 void Truck::updatePositionY(const float speed){
@@ -744,7 +753,7 @@ void Truck::collisionShow(){
 
 
 
-bool Truck::hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m)  {
+bool Truck::hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m)  {
     Step* l;
     for (int n = int(playerY); n < int(playerY) + 300; n++) {
         l = m->getLine(n);

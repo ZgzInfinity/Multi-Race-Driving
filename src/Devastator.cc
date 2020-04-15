@@ -153,6 +153,15 @@ float Devastator::getMaxScreenX(){
 
 
 /**
+ * Get the maximum speed of the vehicle
+ */
+int Devastator::getMaxSpeed(){
+    return Player::getMaxSpeed();
+}
+
+
+
+/**
  * Uodate the position of the vehicle
  */
 void Devastator::updatePositionY(const float speed){
@@ -663,7 +672,7 @@ void Devastator::collisionShow(){
 
 
 
-bool Devastator::hasCrashed(float prevY, float currentY, float minX, float maxX, Map* m)  {
+bool Devastator::hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m)  {
     Step* l;
     for (int n = int(playerY); n < int(playerY) + 300; n++) {
         l = m->getLine(n);
