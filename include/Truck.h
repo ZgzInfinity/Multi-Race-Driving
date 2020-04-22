@@ -9,7 +9,6 @@
 #include <cstring>
 #include "Step.h"
 #include "Player.h"
-#include "IntervalCurve.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include <SFML/Graphics.hpp>
@@ -235,16 +234,6 @@ class Truck : public Player {
          * @param pos is the current position of the truck in the axis Y
          */
         bool controlPossibleCollision(Step& nearestSprite, int lastPos, int pos);
-
-
-
-        /**
-         * Control if there is there inertia force or not if the truck is on a curve of the scene
-         * @param onCurve is a boolean which represents if the truck is on curve or not
-         * @param curve is the possible curve of the scene where the truck is currently now
-         * @param speed is the actual speed of the truck of the player
-         */
-        void controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed);
 
 
 

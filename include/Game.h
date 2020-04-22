@@ -5,15 +5,14 @@
 #include <iostream>
 #include "Animation.h"
 #include "Menu.h"
-#include "../include/Motorbike.h"
-#include "../include/Devastator.h"
-#include "../include/Minivan.h"
-#include "../include/Truck.h"
-#include "../include/LandScape.h"
-#include "../include/GameSelectorMode.h"
-#include "../include/Environment.h"
-#include "../include/MusicReproductor.h"
-#include "../include/WorldTour.h"
+#include "Motorbike.h"
+#include "Devastator.h"
+#include "Minivan.h"
+#include "Truck.h"
+#include "LandScape.h"
+#include "GameSelectorMode.h"
+#include "Environment.h"
+#include "MusicReproductor.h"
 #include "SFML/Graphics.hpp"
 
 using namespace std;
@@ -72,11 +71,13 @@ class Game {
         int typeOfVehicle, colorVehicle;
 
         // Map info
-        std::vector<std::vector<LandScape>> maps; // 5 blocks of 15 maps {(0), (1, 2), (3, 4, 5), (6, 7, 8, 9), (10, 11, 12, 13, 14))}
-        std::pair<int, int> mapId; // (Block, num. map), ex: map0 = (0, 0); map1 = (1, 0); map2 = (1, 1); map14 = (4, 4)
+        std::vector<std::vector<LandScape>> maps;
+        std::pair<int, int> mapId;
         LandScape *currentMap;
 
         bool finalGame = false;
+
+        vector<string> landscapePaths;
 
     public:
 
@@ -164,10 +165,8 @@ class Game {
         Game_status playingGame();
 
 
-        void playWorldTourMode();
 
-
-        void playOutRunMode();
+        void playGameSelectedMode();
 
 
 };

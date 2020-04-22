@@ -210,7 +210,7 @@ inline void GameSelectorMode::processSecondPanel(xml_node<> *panel, string& font
 
 
 
-void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e){
+void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e, vector<string>& landscapePaths){
     // Read the xml configuration file from the world tour mode
     xml_document<> doc;
     file<> file(pathFile);
@@ -288,11 +288,12 @@ void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e){
                 }
             }
         }
-        // Check the different landscapes available to run
+        // Check the actual node read and process the destiny panel
         else if ((string)worldTourNode->name() == "LandScapes"){
-            // Iteration throughout the landscapes
-            for (xml_node<> *landscapeNode = worldTourNode->first_node(); landscapeNode; landscapeNode = landscapeNode->next_sibling()){
-                 pathLandScapeFiles.push_back(landscapeNode->value());
+            // Store the paths of all the landscapes to play
+            for (xml_node<> *panel = worldTourNode->first_node(); panel; panel = panel->next_sibling()){
+                // Store the path to play
+                landscapePaths.push_back((string)panel->value());
             }
         }
     }
@@ -307,7 +308,7 @@ void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e){
 
 
 
-void GameSelectorMode::loadOutRun(char* pathFile, Environment& e){
+void GameSelectorMode::loadOutRun(char* pathFile, Environment& e, vector<string>& landscapePaths){
     // Read the xml configuration file from the world tour mode
     xml_document<> doc;
     file<> file(pathFile);
@@ -383,6 +384,14 @@ void GameSelectorMode::loadOutRun(char* pathFile, Environment& e){
                                        posXDestinyIndicator, posYDestinyIndicator, colorTimeText, colorTimeIndicator,
                                        colorDestinyText, colorDestinyIndicator);
                 }
+            }
+        }
+        // Check the actual node read and process the destiny panel
+        else if ((string)worldTourNode->name() == "LandScapes"){
+            // Store the paths of all the landscapes to play
+            for (xml_node<> *panel = worldTourNode->first_node(); panel; panel = panel->next_sibling()){
+                // Store the path to play
+                landscapePaths.push_back((string)panel->value());
             }
         }
     }
@@ -401,7 +410,7 @@ void GameSelectorMode::loadOutRun(char* pathFile, Environment& e){
 * @param gameMode is the mode selected by the player to play
 * @param e is the environment of the game which is going to be configured
 */
-void GameSelectorMode::loadFileConfigurationMode(Environment& e){
+void GameSelectorMode::loadFileConfigurationMode(Environment& e, vector<string>& landscapePaths){
     // Check the game mode selected by the user to load the correct configuration file
     switch(gameMode){
         case 0:
@@ -409,14 +418,14 @@ void GameSelectorMode::loadFileConfigurationMode(Environment& e){
             gameStatus = WORLD_TOUR;
             pathFile = "Configuration/GameModes/WorldTour.xml";
             // Load the xml configuration file of world tour mode
-            loadWorldTourMode(pathFile, e);
+            loadWorldTourMode(pathFile, e, landscapePaths);
             break;
         case 1:
             // Executing the out run mode
             gameStatus = OUT_RUN;
-            // pathFile = "Configuration/GameModes/OutRun.xml";
+            pathFile = "Configuration/GameModes/OutRun.xml";
             // Load the xml configuration file of out run mode
-            // loadOutRun(pathFile, e);
+            loadOutRun(pathFile, e, landscapePaths);
             break;
         case 2:
             // Executing the pole position mode

@@ -2,7 +2,7 @@
 #ifndef SFMLLOGOANIMATION_H
 #define SFMLLOGOANIMATION_H
 
-#include "../include/EffectReproductor.h"
+#include "EffectReproductor.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Texture.hpp>

@@ -647,48 +647,6 @@ bool Truck::controlPossibleCollision(Step& nearestStep, int lastPos, int pos){
 
 
 /**
- * Control if there is there inertia force or not if the truck is on a curve of the scene
- * @param onCurve is a boolean which represents if the truck is on curve or not
- * @param curve is the possible curve of the scene where the truck is currently now
- * @param speed is the actual speed of the truck of the player
- */
-void Truck::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed){
-    if (onCurve){
-        // The Ferrari is on a curve of the scene
-        onCurve = false;
-        // Check the direction of the curve
-        if (curve.directionCurve > 0.f){
-            // Check if the Ferrari
-            if (speed >= mediumSpeed){
-                // Ferrari goes to the left when it is a right curve
-                playerX -= 0.075;
-            }
-            else if (speed >= controlSpeed && speed < mediumSpeed) {
-                playerX -= 0.045;
-            }
-            else {
-                playerX -= 0.015;
-            }
-        }
-        else {
-            // Check if the Ferrari
-            if (speed >= mediumSpeed){
-                // Ferrari goes to the left when it is a right curve
-                playerX += 0.075;
-            }
-            else if (speed >= controlSpeed && speed < mediumSpeed) {
-                playerX += 0.045;
-            }
-            else {
-                playerX += 0.015;
-            }
-        }
-    }
-}
-
-
-
-/**
  * Shows to the user how the truck crushes
  * @param pos is the position of the truck in the car in the axis Y
  */
@@ -757,19 +715,19 @@ bool Truck::hasCrashed(float prevY, float currentY, float minX, float maxX, Land
     Step* l;
     for (int n = int(playerY); n < int(playerY) + 300; n++) {
         l = m->getLine(n);
-        if (l->spriteLeft.spriteNum != -1 && l->spriteLeft.spriteMinX != l->spriteLeft.spriteMaxX && // l has an object that can crash
+        if (l->spriteNearLeft.spriteNum != -1 && l->spriteNearLeft.spriteMinX != l->spriteNearLeft.spriteMaxX && // l has an object that can crash
                 prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l->spriteLeft.spriteMinX && minX <= l->spriteLeft.spriteMaxX) ||
-                 (maxX >= l->spriteLeft.spriteMinX && maxX <= l->spriteLeft.spriteMaxX) ||
-                 (l->spriteLeft.spriteMinX >= minX && l->spriteLeft.spriteMinX <= maxX) ||
-                 (l->spriteLeft.spriteMaxX >= minX && l->spriteLeft.spriteMaxX <= maxX))) // x matches
+                ((minX >= l->spriteNearLeft.spriteMinX && minX <= l->spriteNearLeft.spriteMaxX) ||
+                 (maxX >= l->spriteNearLeft.spriteMinX && maxX <= l->spriteNearLeft.spriteMaxX) ||
+                 (l->spriteNearLeft.spriteMinX >= minX && l->spriteNearLeft.spriteMinX <= maxX) ||
+                 (l->spriteNearLeft.spriteMaxX >= minX && l->spriteNearLeft.spriteMaxX <= maxX))) // x matches
             return true;
-        if (l->spriteRight.spriteNum != -1 && l->spriteRight.spriteMinX != l->spriteRight.spriteMaxX && // l has an object that can crash
+        if (l->spriteNearRight.spriteNum != -1 && l->spriteNearRight.spriteMinX != l->spriteNearRight.spriteMaxX && // l has an object that can crash
                 prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l->spriteRight.spriteMinX && minX <= l->spriteRight.spriteMaxX) ||
-                 (maxX >= l->spriteRight.spriteMinX && maxX <= l->spriteRight.spriteMaxX) ||
-                 (l->spriteRight.spriteMinX >= minX && l->spriteRight.spriteMinX <= maxX) ||
-                 (l->spriteRight.spriteMaxX >= minX && l->spriteRight.spriteMaxX <= maxX))) // x matches
+                ((minX >= l->spriteNearRight.spriteMinX && minX <= l->spriteNearRight.spriteMaxX) ||
+                 (maxX >= l->spriteNearRight.spriteMinX && maxX <= l->spriteNearRight.spriteMaxX) ||
+                 (l->spriteNearRight.spriteMinX >= minX && l->spriteNearRight.spriteMinX <= maxX) ||
+                 (l->spriteNearRight.spriteMaxX >= minX && l->spriteNearRight.spriteMaxX <= maxX))) // x matches
             return true;
     }
     return false;

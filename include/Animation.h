@@ -4,9 +4,9 @@
 
 #include <iostream>
 #include <cstring>
-#include "../include/MusicReproductor.h"
+#include "MusicReproductor.h"
 #include <SFML/Graphics.hpp>
-#include "../include/SfmlLogoAnimation.h"
+#include "SfmlLogoAnimation.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 

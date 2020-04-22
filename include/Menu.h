@@ -5,12 +5,12 @@
 #include <iostream>
 #include <cstring>
 #include <SFML/Graphics.hpp>
-#include "../include/Button.h"
-#include "../include/Slot.h"
-#include "../include/Configuration.h"
-#include "../include/KeywordMapper.h"
-#include "../include/VehicleSpecifications.h"
-#include "../include/EffectReproductor.h"
+#include "Button.h"
+#include "Slot.h"
+#include "Configuration.h"
+#include "KeywordMapper.h"
+#include "VehicleSpecifications.h"
+#include "EffectReproductor.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 

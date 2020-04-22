@@ -638,48 +638,6 @@ bool Motorbike::controlPossibleCollision(Step& nearestStep, int lastPos, int pos
 
 
 /**
- * Control if there is there inertia force or not if the motorbike is on a curve of the scene
- * @param onCurve is a boolean which represents if the motorbike is on curve or not
- * @param curve is the possible curve of the scene where the motorbike is currently now
- * @param speed is the actual speed of the motorbike of the player
- */
-void Motorbike::controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed){
-    if (onCurve){
-        // The Ferrari is on a curve of the scene
-        onCurve = false;
-        // Check the direction of the curve
-        if (curve.directionCurve > 0.f){
-            // Check if the Ferrari
-            if (speed >= mediumSpeed){
-                // Ferrari goes to the left when it is a right curve
-                playerX -= 0.075;
-            }
-            else if (speed >= controlSpeed && speed < mediumSpeed) {
-                playerX -= 0.045;
-            }
-            else {
-                playerX -= 0.015;
-            }
-        }
-        else {
-            // Check if the Ferrari
-            if (speed >= mediumSpeed){
-                // Ferrari goes to the left when it is a right curve
-                playerX += 0.075;
-            }
-            else if (speed >= controlSpeed && speed < mediumSpeed) {
-                playerX += 0.045;
-            }
-            else {
-                playerX += 0.015;
-            }
-        }
-    }
-}
-
-
-
-/**
  * Shows to the user how the motorbikes crushes
  */
 void Motorbike::collisionShow(){
@@ -687,8 +645,9 @@ void Motorbike::collisionShow(){
     if (mode == -1){
         // Code generated to the way of collision
         // Pseudo generator of aleatory number in order to generate randomly the way of collision
-        srand(time(NULL));
-        mode = rand() % 2;
+        mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+        uniform_real_distribution<float> typeAnimation(0.0f, 1.0f);
+        mode = (int)typeAnimation(rng);
         // Establish the first collision sprite
         if (mode == 0){
             // First way to collision
@@ -708,7 +667,7 @@ void Motorbike::collisionShow(){
             // Check what is the way to see the collision
             if (mode == 0){
                 // Set the texture from the file
-                playerSprite.setTexture(textures[actual_code_image - 1]);
+                playerSprite.setTexture(textures[actual_code_image - 1], true);
                 if (actual_code_image == 41){
                     actual_code_image = 1;
                     mode = -1;
@@ -717,7 +676,7 @@ void Motorbike::collisionShow(){
             }
             else if (mode == 1) {
                 // Change the actual sprite of the collision with the second mode
-                playerSprite.setTexture(textures[actual_code_image - 1]);
+                playerSprite.setTexture(textures[actual_code_image - 1], true);
                 if (actual_code_image == 52){
                     actual_code_image = 1;
                     mode = -1;
@@ -732,28 +691,22 @@ void Motorbike::collisionShow(){
 
 bool Motorbike::hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m)  {
     Step* l;
-    for (int n = int(m->getPosY()); n < int(m->getPosY()) + 300; n++) {
+    for (int n = int(playerY); n < int(playerY) + 300; n++) {
         l = m->getLine(n);
-        if (l->spriteLeft.spriteNum != -1 && l->spriteLeft.spriteMinX != l->spriteLeft.spriteMaxX && // l has an object that can crash
+        if (l->spriteNearLeft.spriteNum != -1 && l->spriteNearLeft.spriteMinX != l->spriteNearLeft.spriteMaxX && // l has an object that can crash
                 prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l->spriteLeft.spriteMinX && minX <= l->spriteLeft.spriteMaxX) ||
-                 (maxX >= l->spriteLeft.spriteMinX && maxX <= l->spriteLeft.spriteMaxX) ||
-                 (l->spriteLeft.spriteMinX >= minX && l->spriteLeft.spriteMinX <= maxX) ||
-                 (l->spriteLeft.spriteMaxX >= minX && l->spriteLeft.spriteMaxX <= maxX)))
-            {
-                mode = 1;
-                return true;
-            }
-        if (l->spriteRight.spriteNum != -1 && l->spriteRight.spriteMinX != l->spriteRight.spriteMaxX && // l has an object that can crash
+                ((minX >= l->spriteNearLeft.spriteMinX && minX <= l->spriteNearLeft.spriteMaxX) ||
+                 (maxX >= l->spriteNearLeft.spriteMinX && maxX <= l->spriteNearLeft.spriteMaxX) ||
+                 (l->spriteNearLeft.spriteMinX >= minX && l->spriteNearLeft.spriteMinX <= maxX) ||
+                 (l->spriteNearLeft.spriteMaxX >= minX && l->spriteNearLeft.spriteMaxX <= maxX))) // x matches
+            return true;
+        if (l->spriteNearRight.spriteNum != -1 && l->spriteNearRight.spriteMinX != l->spriteNearRight.spriteMaxX && // l has an object that can crash
                 prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l->spriteRight.spriteMinX && minX <= l->spriteRight.spriteMaxX) ||
-                 (maxX >= l->spriteRight.spriteMinX && maxX <= l->spriteRight.spriteMaxX) ||
-                 (l->spriteRight.spriteMinX >= minX && l->spriteRight.spriteMinX <= maxX) ||
-                 (l->spriteRight.spriteMaxX >= minX && l->spriteRight.spriteMaxX <= maxX)))
-            {
-                mode = 0;
-                return true;
-            }
+                ((minX >= l->spriteNearRight.spriteMinX && minX <= l->spriteNearRight.spriteMaxX) ||
+                 (maxX >= l->spriteNearRight.spriteMinX && maxX <= l->spriteNearRight.spriteMaxX) ||
+                 (l->spriteNearRight.spriteMinX >= minX && l->spriteNearRight.spriteMinX <= maxX) ||
+                 (l->spriteNearRight.spriteMaxX >= minX && l->spriteNearRight.spriteMaxX <= maxX))) // x matches
+            return true;
     }
     return false;
 }

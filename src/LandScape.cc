@@ -5,181 +5,6 @@
 using namespace rapidxml;
 
 
-/**
- * Constructor of the data type
- * @param path is the path of the xml file which contains the scene to render
- */
-LandScape::LandScape(char* path){
-    // Document xml where the document is going to be parsed
-    xml_document<> doc;
-    file<> file(path);
-    // Parsing the content of file
-    doc.parse<0>(file.data());
-
-    // Get the principal node of the file
-    xml_node<> *nodeCircuit = doc.first_node();
-
-    // Loop in order to iterate all the children of the principal node
-    for (xml_node<> *child = nodeCircuit->first_node(); child; child = child->next_sibling()){
-        // Process the child node found
-        // Check if it's the node that contains the name of the circuit
-        if ((string)child->name() == "Name"){
-            // Store the name of the circuit
-            name = child->value();
-            continue;
-        }
-        // Check if it's the node that contains the information of the background
-        else if ((string)child->name() == "Background"){
-            // Parse the background information of the file
-            parseBackgroundScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the different sprites of the scene
-        else if ((string)child->name() == "Sprites"){
-            // Parse the sprites of the landscape
-            parseSpritesScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the different curves of the scene
-        else if ((string)child->name() == "Curves"){
-            // Parse the information of the curves of the xml file
-            parseCurvesScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the different mountains of the scene
-        else if ((string)child->name() == "Mountains"){
-            // Parse the information of the mountains of the xml file
-            parseMountainsScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the different colors of the road
-        else if ((string)child->name() == "Color_road"){
-            // Parse the information of the color of the road
-            parseColorRoadScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the different colors of the grass
-        else if ((string)child->name() == "Color_grass"){
-            parseColorGrassScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the different colors of the rumble
-        else if ((string)child->name() == "Color_rumble"){
-            // Parse the information of the color rumble of the road
-            parseColorRumbleScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the different colors of the middle
-        else if ((string)child->name() == "Color_middle"){
-            // Parse the information of the color middle of the road
-            parseColorMiddleScene(child);
-            continue;
-        }
-        // Check if it's the node that contains the checkpoints of the level
-        else if ((string)child->name() == "Checkpoint"){
-            // Parse the information referent to the checkpoints of the levels
-            parseCheckpoints(child);
-            continue;
-        }
-        // Check if it's the node that contains the star point of the level
-        else if ((string)child->name() == "StartingPoint"){
-            // Parse the information referent to the start point of the levels
-            parseStartPoint(child);
-            continue;
-        }
-        // Check if it's the node that contains the goal point of the level
-        else if ((string)child->name() == "GoalPoint"){
-            // Parse the information referent to the goal point of the levels
-            parseGoalPoint(child);
-            continue;
-        }
-    }
-    // Order the curves in the landScape
-    orderElementsInLandScape();
-
-    // Rendering all the landscape
-    renderLandScape();
-}
-
-
-
-/**
- * Get the sprite which contains the background
- */
-Sprite LandScape::getBackGround(){
-    return sBackground;
-}
-
-
-
-/**
- * Assigns the sprite of the background
- * @param sBack is the sprite which contains the background to assign
- */
-void LandScape::setBackGround(Sprite sBack){
-    sBackground = sBack;
-}
-
-
-
-/**
- * Parses all the configuration of the background written in the xml
- * configuration file of the scene
- * @param child is a node of the xml file that points to the background information
- */
-inline void LandScape::parseBackgroundScene(xml_node<> * child){
-    // Get the value of the path node if it exists
-    string path;
-    // Coordinates of the rectangle that contains the background and its center
-    int LLcord, ULcord, LRcord, URcord, xCenter, yCenter;
-    // Loop in order to iterate all the the children of the node Background
-    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
-        // Check the path of the background image
-        if ((string)grandchild->name() == "Path"){
-            // Store the name of the circuit
-            path = grandchild->value();
-            continue;
-        }
-        // Check the lower left coordinate of the background image
-        else if ((string)grandchild->name() == "LL"){
-            // Store the lower left coordinate
-            LLcord = stoi(grandchild->value());
-            continue;
-        }
-        // Check the upper left coordinate of the background image
-        else if ((string)grandchild->name() == "UL"){
-            // Store the upper left coordinate
-            ULcord = stoi(grandchild->value());
-            continue;
-        }
-        // Check the upper right coordinate of the background image
-        else if ((string)grandchild->name() == "LR"){
-            // Store the lower right coordinate
-            LRcord = stoi(grandchild->value());
-            continue;
-        }
-        // Check the upper right coordinate of the background image
-        else if ((string)grandchild->name() == "UR"){
-            // Store the upper right coordinate
-            URcord = stoi(grandchild->value());
-            continue;
-        }
-        // Check the image center in axis X
-        else if ((string)grandchild->name() == "Xcenter"){
-            // Store the center of the image in the axis X
-            xCenter = stoi(grandchild->value());
-            continue;
-        }
-        // Check the image center in axis Y
-        else if ((string)grandchild->name() == "Ycenter"){
-            // Store the center of the image in the axis Y
-            yCenter = stoi(grandchild->value());
-        }
-    }
-    // All the attributes to configure the background are correct
-    loadBackground(path, LLcord, ULcord, LRcord, URcord, xCenter, yCenter);
-}
-
 
 
 /**
@@ -287,309 +112,11 @@ inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode,
 
 
 /**
- * Parses all the information referent to the sprites of the landscape
- * @param child is a pointer to a node of the xml file that contains the all the
- * information of the sprites
- */
-inline void LandScape::parseSpritesScene(xml_node<> * child){
-    // Established the code number to indicate that curves are in process
-    int objectCode = 1;
-    // Loop in order to iterate all the children of the Sprite node
-    int spritesRead = 0;
-    // Variable to store the possible attributes
-    xml_attribute<>* attr;
-    // Variables to control the interval position of the sprite
-    int startPos, finalPos;
-    // Loop in order to iterate the sprites of all the scene
-    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
-        // Increment the number of sprites read
-        spritesRead++;
-        // Read the path attribute of the sprite
-        attr = grandchild->first_attribute("id");
-        string id = (attr != nullptr) ? attr->value() : "Unknown";
-        // Check if the attribute id is or not in the file
-        if (id == "Unknown"){
-            cerr << "Unknown id for the sprite " <<  spritesRead << endl;
-            exit(8);
-        }
-        else {
-            // Iteration in the fields of the sprite
-            for (xml_node<> *spriteNode = grandchild->first_node(); spriteNode; spriteNode = spriteNode->next_sibling()){
-                if ((string)spriteNode->name() == "Path"){
-                    // Store the path
-                    spritePaths.push_back((string)spriteNode->value());
-                    continue;
-                }
-                // Check the node interval of the sprite
-                else if ((string)spriteNode->name() == "Interval"){
-                    string frequency, xPos;
-                    float posX;
-                    // Loop throughout the intervals of the sprite
-                    for (xml_node<> *intervalNode = spriteNode->first_node(); intervalNode; intervalNode = intervalNode->next_sibling()){
-                        // Get the coordinates of the interval
-                        getIntervalCoordinates(intervalNode, objectCode, startPos, finalPos);
-                        // Loop for iterate the properties of the interval of the sprite
-                        for (xml_node<> *newNode = intervalNode->first_node(); newNode; newNode = newNode->next_sibling()){
-                            if ((string)newNode->name() == "Each"){
-                                frequency = (string)newNode->value();
-                                continue;
-                            }
-                            if ((string)newNode->name() == "Xpos"){
-                                xPos = (string)newNode->value();
-                            }
-                            if (xPos != "Random"){
-                                posX = stof(xPos);
-                            }
-                            else {
-                                newNode = newNode->next_sibling();
-                                if ((string)newNode->name() == "Margin"){
-                                    if ((string)newNode->value() == "Left"){
-                                        posX = -(rand() % 8 + 3.f);
-                                    }
-                                    else if ((string)newNode->value() == "Right"){
-                                        posX = rand() % 8 + 3.f;
-                                    }
-                                    else {
-                                        cerr << "Invalid specification in Margin attribute" << endl;
-                                        exit(20);
-                                    }
-                                }
-                            }
-                        }
-                        // Store the sprite of the scene with all its information
-                        MapElement mE = MapElement(stoi(id), startPos, finalPos, stoi(frequency), posX);
-                        elementsOfMap.push_back(mE);
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-
-/**
- * Parses all the configuration of the curves written in the xml configuration file of the scene
- * @param child is a node of the xml file that points to the curves information
- */
-inline void LandScape::parseCurvesScene(xml_node<> * child){
-    // Established the code number to indicate that curves are in process
-    int objectCode = 2;
-    // Variables to control the intervals of the elements
-    int startPos, finalPos;
-    // Number of curves read already
-    int curvesRead = 0;
-    // Loop in order to iterate the curve nodes
-    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
-        // Increment the number of curves read
-        curvesRead++;
-        // Get interval coordinate of the sprite
-        getIntervalCoordinates(grandchild, objectCode, startPos, finalPos);
-        // Check the direction of the curve
-        xml_node<> *nodeDirection = grandchild->first_node();
-        if ((string)nodeDirection->name() == "Direction"){
-            string direction = (string)nodeDirection->value();
-            IntervalCurve iC = IntervalCurve(startPos, finalPos, stof(direction));
-            curves.push_back(iC);
-        }
-        else {
-            cerr << "Error, the direction of the curve " << curvesRead << "has not been specified " << endl;
-            exit(1);
-        }
-    }
-}
-
-
-
-/**
- * Parses all the configuration of the mountains written in the xml configuration file of the scene
- * @param child is a node of the xml file that points to the mountains information
- */
-inline void LandScape::parseMountainsScene(xml_node<> * child){
-    // Established the code number to indicate that mountains are in process
-    int objectCode = 3;
-    // Variables to control the intervals of the elements
-    int startPos, finalPos;
-    // Number of mountains read already
-    int mountainsRead = 0;
-    // Loop in order to iterate the curve nodes
-    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
-        // Increment the number of mountains read
-        mountainsRead++;
-        // Get interval coordinate of the sprite
-        getIntervalCoordinates(grandchild, objectCode, startPos, finalPos);
-        // Check the direction of the mountain
-        xml_node<> *nodeAtenuation = grandchild->first_node();
-        xml_node<> *nodeHeight = nodeAtenuation->next_sibling();
-        float atenuation; int height;
-        if ((string)nodeAtenuation->name() == "Atenuation"){
-            atenuation = stof(nodeAtenuation->value());
-        }
-        else {
-            cerr << "Error, the atenuation of the mountain " << mountainsRead << "has not been specified " << endl;
-            exit(1);
-        }
-        if ((string)nodeHeight->name() == "Height"){
-            height = stoi(nodeHeight->value());
-        }
-        else {
-            cerr << "Error, the height of the mountain " << mountainsRead << "has not been specified " << endl;
-            exit(1);
-        }
-        Mountain m = Mountain(startPos, finalPos, atenuation, height);
-        mountains.push_back(m);
-    }
-}
-
-
-
-/**
- * Parses the configuration of the checkpoints of the scene which stored in its configuration file
- * @param child is a node of the xml file that points to the mountains information
- * @param path is the relative path of the image that contains the image of the checkpoint
- */
-inline void LandScape::parseCheckpoints(xml_node<> * child){
-    // Variables to store the attributes of the checkpoint
-    float posX; int stepPosition, checkpointsRead = 0; string path;
-    // Iterate throughout the different checkpoints of the scene
-    for (xml_node<> *checkpointNode = child->first_node(); checkpointNode; checkpointNode = checkpointNode->next_sibling()){
-        // Increment the number of checkpoints read
-        checkpointsRead++;
-        // Check the attribute path of the file
-        if ((string)checkpointNode->name() == "Path"){
-            // Store the step of the checkpoint
-            path = checkpointNode->value();
-            continue;
-        }
-        // Looping parsing the information contained in its tag fields
-        for (xml_node<> *actualCheckpoint = checkpointNode->first_node(); actualCheckpoint; actualCheckpoint = actualCheckpoint->next_sibling()){
-            // Getting all the information of the checkpoint
-            if ((string)actualCheckpoint->name() == "Position"){
-                // Store the step of the checkpoint
-                stepPosition = stoi(actualCheckpoint->value());
-                continue;
-            }
-            if ((string)actualCheckpoint->name() == "Xpos"){
-                // Store the position of the checkpoint in the axis X
-                posX = stof(actualCheckpoint->value());
-            }
-        }
-        // Store the checkpoint read into the vector
-        Checkpoint c = Checkpoint(path, posX, stepPosition);
-        checkpointsScene.push_back(c);
-    }
-}
-
-
-
-/**
- * Parses the information referent to the starting point of the scene
- * @param child is a node pointer of the xml configuration file that points to the
- * data of the starting point
- */
-inline void LandScape::parseStartPoint(xml_node<> * child){
-    // Variables to control the information of the starting point
-    string path; float xPos; int stepPosition;
-    // Loop that iterates in all the attributes of the staring point
-    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
-        // Check if the starting goal point has the attribute path
-        if ((string)grandchild->name() == "Path" ){
-            // Store the path of the starting point
-            path = grandchild->value();
-            continue;
-        }
-        // Check if the starting goal point has the attribute position
-        else if ((string)grandchild->name() == "Position" ){
-            // Store the step of the map where is the starting point
-            stepPosition = stoi(grandchild->value());
-            continue;
-        }
-        // Check if the starting point has the attribute Xpos
-        else if ((string)grandchild->name() == "Xpos" ){
-            // Store the position of the starting point in the axis X
-            xPos = stof(grandchild->value());
-        }
-    }
-
-    // Store the starting point data recovered
-    startPoint = StartingPoint(path, xPos, stepPosition);
-}
-
-
-
-/**
- * Parses the information referent to the goal point of the scene
- * @param child is a node pointer of the xml configuration file that points to the
- * data of the goal point
- */
-inline void LandScape::parseGoalPoint(xml_node<> * child){
-    // Variables to control the information of the starting point
-    string path; float xPos; int stepPosition;
-    // Loop that iterates in all the attributes of the goal point
-    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
-        // Check if the goal goal point has the attribute path
-        if ((string)grandchild->name() == "Path" ){
-            // Store the path of the goal point
-            path = grandchild->value();
-            continue;
-        }
-        // Check if the goal point has the attribute position
-        else if ((string)grandchild->name() == "Position" ){
-            // Store the step of the map where is the goal point
-            stepPosition = stoi(grandchild->value());
-            continue;
-        }
-        // Check if the goal goal point has the attribute Xpos
-        else if ((string)grandchild->name() == "Xpos" ){
-            // Store the position of the goal point in the axis X
-            xPos = stof(grandchild->value());
-        }
-    }
-
-    // Store the goal point data recovered
-    goalPoint = GoalPoint(path, xPos, stepPosition);
-}
-
-
-
-/**
- * Parses all the configuration of the color of the road written in the xml
- * configuration file of the scene
- * @param child is a node of the xml file that points to the color of the road information
- */
-inline void LandScape::parseColorRoadScene(xml_node<> * child){
-    // Colors of the three channels in RGB format
-    int colorRed, colorGreen, colorBlue;
-    // Loop in order to iterate throughout the color channels
-    for (xml_node<> *grandchild = child->first_node(); grandchild; grandchild = grandchild->next_sibling()){
-        // Check the upper right coordinate of the background image
-        if ((string)grandchild->name() == "R"){
-            // Store the lower right coordinate
-            colorRed = stoi(grandchild->value());
-            continue;
-        }
-        else if ((string)grandchild->name() == "G"){
-            // Store the lower right coordinate
-            colorGreen = stoi(grandchild->value());
-            continue;
-        }
-        else if ((string)grandchild->name() == "B"){
-            // Store the lower right coordinate
-            colorBlue = stoi(grandchild->value());
-        }
-    }
-    // Store the color of the road
-    color_road = Color(colorRed, colorGreen, colorBlue);
-}
-
-
-
-/**
  * Parses all the configuration of the color of the road written in the xml
  * configuration file of the scene
  * @param child is a node of the xml file that points to the color of the grass information
  */
-inline void LandScape::parseColorGrassScene(xml_node<> * child){
+inline void LandScape::parseColorGrassRoadScene(xml_node<> * child){
     int colorRed, colorGreen, colorBlue;
     // Loop in order to iterate throughout the colors of the grass
     for (xml_node<> *color_node = child->first_node(); color_node; color_node = color_node->next_sibling()){
@@ -597,49 +124,19 @@ inline void LandScape::parseColorGrassScene(xml_node<> * child){
         for (xml_node<> *color = color_node->first_node(); color; color = color->next_sibling()){
             parseColors(color, colorRed, colorGreen, colorBlue);
         }
-        colors_grass.push_back(Color(colorRed, colorGreen, colorBlue));
-    }
-}
-
-
-
-/**
- * Parses all the configuration of the color of the rumble of the road written in the xml
- * configuration file of the scene
- * @param child is a node of the xml file that points to the color of the rumble of road information
- */
-inline void LandScape::parseColorRumbleScene(xml_node<> * child){
-    int colorRed, colorGreen, colorBlue;
-    // Loop in order to iterate throughout the colors of the rumble of the road
-    for (xml_node<> *color_node = child->first_node(); color_node; color_node = color_node->next_sibling()){
-        // Loop for iterate the three color channels in RGB format
-        for (xml_node<> *color = color_node->first_node(); color; color = color->next_sibling()){
-            // Store the color of the road
-            parseColors(color, colorRed, colorGreen, colorBlue);
+        // Check where the color has been stored
+        if ((string)child->name() == "Color_grass"){
+            grassColor.push_back(Color(colorRed, colorGreen, colorBlue));
         }
-        colors_rumble.push_back(Color(colorRed, colorGreen, colorBlue));
-    }
-}
-
-
-
-/**
- * Parses all the configuration of the color of the middle of the road written in the xml
- * configuration file of the scene
- * @param child is a node of the xml file that points to the color of the middle of the road information
- */
-inline void LandScape::parseColorMiddleScene(xml_node<> * child){
-    int colorRed, colorGreen, colorBlue;
-    // Loop in order to iterate throughout the colors of the middle of the road
-    for (xml_node<> *color_node = child->first_node(); color_node; color_node = color_node->next_sibling()){
-        // Loop for iterate the three color channels in RGB format
-        for (xml_node<> *color = color_node->first_node(); color; color = color->next_sibling()){
-            // Store the color of the road
-            parseColors(color, colorRed, colorGreen, colorBlue);
+        else if ((string)child->name() == "Color_road"){
+            roadColor.push_back(Color(colorRed, colorGreen, colorBlue));
         }
-        colors_middle.push_back(Color(colorRed, colorGreen, colorBlue));
+        else if ((string)child->name() == "Color_rumble"){
+            rumbleColor.push_back(Color(colorRed, colorGreen, colorBlue));
+        }
     }
 }
+
 
 
 
@@ -669,509 +166,86 @@ inline void LandScape::parseColors(xml_node<> * color, int& colorRed, int& color
 
 
 
-/**
- * Renders all the landscape with all the elements already parsed and stored
- */
-inline void LandScape::renderLandScape(){
-    // Iterate throw the vector of curves of the landscape in 2d
-    for (IntervalCurve iC : curves){
-        // Add the curve in 3d coordinates
-        IntervalCurve iCin3d = IntervalCurve(iC.startCurvePosition * segL, iC.finalCurvePosition * segL, iC.directionCurve);
-        // Necessary to control the inertia force
-        curvesInScene.push_back(iCin3d);
-    }
-    for (int i = 0; i < MAX_ELEMENTS; i++){
-        textures[i] = false;
-    }
-    // All the curves have been processed correctly
-    for (int i = 0; i < MAX_SPACE_DIMENSION - 1; i++){
-        // Store the curves in the scene
-        lines[i].position_3d_z = i * segL;
-        printCurves(i);
-        printMountains(i);
-        printSprites(i);
-        printCheckpoints(i);
-        printStartingPoints(i);
-        printGoalPoints(i);
-        lines.push_back(lines[i]);
-    }
-}
-
-
-
-/**
- * Load the background of the landscape
- */
-inline void LandScape::loadBackground(const string path, const int lowerLeft, const int upperLeft,
-                                  const int lowerRight, const int upperRight, const int x_center,
-                                  const int y_center)
-{
-    bg.loadFromFile(path);
-    // Set repetition of texture active and assignation
-    bg.setRepeated(true);
-    sBackground.setTexture(bg);
-    // Fix the dimensions of the rectangle which contains the texture
-    sBackground.setTextureRect(IntRect(lowerLeft, upperLeft, lowerRight, upperRight));
-    // Assign the position of the texture
-    sBackground.setPosition(x_center, y_center);
-}
-
-
-
-/**
- * Get the element of the map which the nearest to the actual position
- * @param position_axis_Y is the actual coordinate of the player in the axis Y
- */
-Step LandScape::checkingPossibleCollision(const int position_axis_Y){
-    // Indexes of the binary search
-    int init = 0, last = stepsWithSprite.size() - 1, medium;
-    // Loop for find the sprite
-    while (init != last){
-        // Central sprite obtained
-        medium = (init + last) / 2;
-        // Check if the last sprite is on the left or on the right
-        if (stepsWithSprite.at(medium).spriteY <= position_axis_Y){
-            // Right
-            init = medium + 1;
-        }
-        else {
-            // Left
-            last = medium;
-        }
-    }
-    // Check if the last sprite passed is in the same position of the motorbike
-    if (stepsWithSprite.at(init).spriteY == position_axis_Y){
-        // Get that sprite
-        return stepsWithSprite.at(init - 1);
-    }
-    else {
-        // Get the last found because the collision could have occurred during the movement
-        return stepsWithSprite.at(init - 1);
-    }
-}
-
-
-
-/**
- * Determines if there is a curve to print or not in the position of the map pos
- * @param pos is the position of the map to evaluate if there is a curve or not
- * @param curve is the possible curve in which interval of coordinates is located pos
- * @param exists is a boolean to control if there is curve to print or not in the position of the map pos
- */
-void LandScape::lookForCurveToPrint(int& pos, IntervalCurve& curve, bool& exist){
-    // Defect value of the boolean variable
-    exist = false;
-    // Indexes of the binary search
-    int init = 0, last = curves.size() - 1, medium;
-    // Loop for find the sprite
-    while (init <= last){
-        // Central sprite obtained
-        medium = (init + last) / 2;
-        // Check if the last sprite is on the left or on the right
-        if (pos >= curves.at(medium).startCurvePosition &&
-            pos <= curves.at(medium).finalCurvePosition)
-        {
-            // Right
-            exist = true;
-            break;
-        }
-        else if (pos > curves.at(medium).startCurvePosition &&
-                 pos > curves.at(medium).startCurvePosition)
-        {
-            // Left
-            init = medium + 1;
-        }
-        else if (pos < curves.at(medium).startCurvePosition &&
-                 pos < curves.at(medium).finalCurvePosition)
-        {
-            last = medium - 1;
-        }
-    }
-    // Check if the last sprite passed is in the same position of the motorbike
-    if (exist){
-        // Get that sprite
-        curve = curvesInScene.at(medium);
-    }
-}
-
-
-
-/**
- * Determines if there is a curve or not in the position of the map pos
- * @param pos is the position of the map to evaluate if there is a curve or not
- * @param curve is the possible curve in which interval of coordinates is located pos
- * @param exists is a boolean to control if there is curve or not in the position of the map pos
- */
-void LandScape::lookForCurve(int& pos, IntervalCurve& curve, bool& exist){
-    // Defect value of the boolean variable
-    exist = false;
-    // Indexes of the binary search
-    int init = 0, last = curves.size() - 1, medium;
-    // Loop for find the sprite
-    while (init <= last){
-        // Central sprite obtained
-        medium = (init + last) / 2;
-        // Check if the last sprite is on the left or on the right
-        if (pos >= curvesInScene.at(medium).startCurvePosition &&
-            pos <= curvesInScene.at(medium).finalCurvePosition)
-        {
-            // Right
-            exist = true;
-            break;
-        }
-        else if (pos > curvesInScene.at(medium).startCurvePosition &&
-                 pos > curvesInScene.at(medium).startCurvePosition)
-        {
-            // Left
-            init = medium + 1;
-        }
-        else if (pos < curvesInScene.at(medium).startCurvePosition &&
-                 pos < curvesInScene.at(medium).finalCurvePosition)
-        {
-            last = medium - 1;
-        }
-    }
-    // Check if the last sprite passed is in the same position of the motorbike
-    if (exist){
-        // Get that sprite
-        curve = curvesInScene.at(medium);
-    }
-}
-
-
-
-/**
- * Determines if there is a mountain or not in the position of the map pos
- * @param pos is the position of the map to evaluate if there is a mountain or not
- * @param m is the possible mountain in which interval of coordinates is located pos
- * @param exists is a boolean to control if there is mountain or not in the position of the map pos
- */
-void LandScape::lookForMountain(int& pos, Mountain& m, bool& exist){
-    // Defect value of the boolean variable
-    exist = false;
-    // Indexes of the binary search
-    int init = 0, last = mountains.size() - 1, medium;
-    // Loop for find the sprite
-    while (init <= last){
-        // Central sprite obtained
-        medium = (init + last) / 2;
-        // Check if the last sprite is on the left or on the right
-        if (pos >= mountains.at(medium).startMountainPos &&
-            pos <= mountains.at(medium).finalMountainPos)
-        {
-            // Right
-            exist = true;
-            break;
-        }
-        else if (pos > mountains.at(medium).startMountainPos &&
-                 pos > mountains.at(medium).startMountainPos)
-        {
-            // Left
-            init = medium + 1;
-        }
-        else if (pos < mountains.at(medium).startMountainPos &&
-                 pos < mountains.at(medium).finalMountainPos)
-        {
-            last = medium - 1;
-        }
-    }
-    // Check if the last sprite passed is in the same position of the motorbike
-    if (exist){
-        // Get that sprite
-        m = mountains.at(medium);
-    }
-}
-
-
-
-/**
- * Determines if there is a mountain or not in the position of the map pos
- * @param m is a vector where all the possible sprites to print are going to be kept
- * @param exists is a boolean to control if there are sprites or not in the position of the map pos
- */
-void LandScape::lookForMapElement(int& pos, vector<MapElement>& m, bool& exist){
-    // Defect value of the boolean variable
-    for (MapElement mE : elementsOfMap){
-        // Check if the pos is in the interval of a sprite
-        if (pos >= mE.startPosition && pos <= mE.finalPosition){
-            // Add to the list of intervals of sprites
-            m.push_back(mE);
-            // Update the control of interval found only one time
-            if (!exist){
-                // Updated the control of sprite intervals
-                exist = true;
-            }
-        }
-    }
-
-}
-
-
-
-/**
- * Determines if there is checkpoint or not in the actual step of the map
- * @param step is the actual step of the map where is going to be evaluated if there
- * is or not checkpoint
- * @param c is the possible checkpoint that can be in the actual step of the map
- * @param exists is a boolean that controls if there is or not a checkpoint in the actual step
- */
-void LandScape::lookForCheckpoint(int& step, Checkpoint& c, bool& exists){
-    // Limits of the search
-    int start = 0, last = checkpointsScene.size() - 1, medium;
-    // Binary search
-    while (start != last){
-        // Calculation of the center element of the search
-        medium = (start + last) / 2;
-        if (checkpointsScene[medium].stepPosition < step){
-            // Look for the possible checkpoint in the right
-            start = medium + 1;
-        }
-        else {
-            // Look for the possible checkpoint in the left
-            last = medium;
-        }
-    }
-    // Check if the final checkpoint get is the solution
-    if (checkpointsScene[start].stepPosition == step){
-        // Correct
-        exists = true;
-        // Assign the checkpoint
-        c = checkpointsScene[start];
-    }
-    else {
-        // Control if there is checkpoint in the actual step or not
-        exists = false;
-    }
-}
-
-
-
-/**
- * Order the curves and the mountains of the map using the coordinates of the map X and Y
- */
-void LandScape::orderElementsInLandScape(){
-    // Ordenation of the vector
-    sort(curves.begin(), curves.end());
-    sort(curvesInScene.begin(), curvesInScene.end());
-    sort(mountains.begin(), mountains.end());
-    sort(checkpointsScene.begin(), checkpointsScene.end());
-}
-
-
-
-/**
- * Print the possible curve of the map which can be stored in the position of the map i
- * @param i is the step or position index of the map where is going to be evaluated if
- * there is or not curve
- */
-void LandScape::printCurves(int i){
-    // Variables to make the search of the curve
-    IntervalCurve curve;
-    // Control if the coordinate i is in a curve or not
-    bool exits = false;
-    // Check if the curve is on the vector of curves of the scene
-    lookForCurveToPrint(i, curve, exits);
-    // If it's in a curve
-    if (exits){
-        lines[i].directionCurve = curve.directionCurve;
-    }
-}
-
-
-
-/**
- * Print the possible mountain of the map which can be stored in the position of the map i
- * @param i is the step or position index of the map where is going to be evaluated if
- * there is or not mountain
- */
-void LandScape::printMountains(int i){
-    // Variables to make the search of the curve
-    Mountain m;
-    // Control if the coordinate i is in a curve or not
-    bool exits = false;
-    // Check if the curve is on the vector of curves of the scene
-    lookForMountain(i, m, exits);
-    // If it's in a curve
-    if (exits){
-        lines[i].position_3d_y = sin(i / m.atenuationMountain) * m.heightMountain;
-    }
-}
-
-
-
-/**
- * Print the possible sprite of the map which can be stored in the position of the map i
- * @param i is the step or position index of the map where is going to be evaluated if
- * there is or not sprite
- */
-void LandScape::printSprites(int i){
-    // Variables to make the search of the curve
-    vector<MapElement> m;
-    // Control if the coordinate i is in a curve or not
-    bool exits = false;
-    // Check if the curve is on the vector of curves of the scene
-    lookForMapElement(i, m, exits);
-
-    if (exits){
-        for (MapElement mE : m){
-            // Check if the texture has been loaded already before
-            if (!textures[mE.id - 1]){
-                // Load the texture with the sprite
-                // Load textures and sprites of the game
-                t[mE.id - 1].loadFromFile(spritePaths.at(mE.id - 1));
-                t[mE.id - 1].setSmooth(true);
-                object[mE.id - 1].setTexture(t[mE.id - 1]);
-                textures[mE.id - 1] = true;
-            }
-            // If it's in a curve
-            if (i % mE.each == 0){
-                lines[i].spriteX = mE.xPos;
-                lines[i].spriteY = i * segL;
-                lines[i].character = object[mE.id - 1];
-                if (lines[i].spriteX > 0.f){
-                    lines[i].offset = lines[i].spriteX - 1.2f;
-                }
-                else {
-                    lines[i].offset = lines[i].spriteX + 1.2f;
-                }
-                // Adding the step with the sprite and its coordinates to the list
-                stepsWithSprite.push_back(lines[i]);
-            }
-        }
-    }
-}
-
-
-
-/**
- * Print the possible checkpoint of the map which can be stored in the position of the map i
- * @param i is the step or position index of the map where is going to be evaluated if
- * there is or not a checkpoint
- */
-void LandScape::printCheckpoints(int i){
-    // Variables to make the search of the curve
-    Checkpoint c;
-    // Control if the coordinate i there is a checkpoint or not
-    bool exits = false;
-    // Check if the curve is on the vector of curves of the scene
-    lookForCheckpoint(i, c, exits);
-    // If there is a checkpoint
-    if (exits){
-        // Load the texture and save it into a sprite
-        if (tCheckpoint.loadFromFile(c.path)){
-            // Set the texture of the sprite
-            lines[i].character.setTexture(tCheckpoint);
-            lines[i].spriteX = c.posX;
-        }
-    }
-}
-
-
-
-/**
- * Print the possible checkpoint of the map which can be stored in the position of the map i
- * @param i is the step or position index of the map where is going to be evaluated if
- * there is or not a checkpoint
- */
-void LandScape::printStartingPoints(int i){
-    // Check if it's the same step of the scene where the starting point is
-    if (startPoint.stepPosition == i){
-        // Load the texture and save it into a sprite
-        if (tStartingPoint.loadFromFile(startPoint.path)){
-            // Set the texture of the starting point
-            lines[i].character.setTexture(tStartingPoint);
-            lines[i].spriteX = startPoint.posX;
-        }
-    }
-}
-
-
-
-/**
- * Print the possible checkpoint of the map which can be stored in the position of the map i
- * @param i is the step or position index of the map where is going to be evaluated if
- * there is or not a checkpoint
- */
-void LandScape::printGoalPoints(int i){
-    // Check if it's the same step of the scene where the starting point is
-    if (goalPoint.stepPosition == i){
-        // Load the texture and save it into a sprite
-        if (tGoalPoint.loadFromFile(goalPoint.path)){
-            // Set the texture of the starting point
-            lines[i].character.setTexture(tGoalPoint);
-            lines[i].spriteX = startPoint.posX;
-        }
-    }
-}
-
-
-
-/**
- * Render the landscape appearance and the step of the map
- * @param n is the index of the map position to be processed
- * @param grass is the color which is going to be used to paint the grass of the scene
- * @param rumble is the color which is going to be used to paint the rumble of the scene
- * @param middle is the color which is going to be used to paint the middle road of the scene
- * @param road is the color which is going to be used to paint the road of the scene
- */
-void LandScape::paintScene(const int n, Color& grass, Color& rumble, Color& middle, Color& road){
-    // Determination of the color to paint in the screen
-    if ((n / 5) % 2){
-        grass = colors_grass.at(0);
-        rumble = colors_rumble.at(0);
-        middle = colors_middle.at(0);
-    }
-    else {
-        grass = colors_grass.at(1);
-        rumble = colors_rumble.at(1);
-        middle = colors_middle.at(1);
-    }
-    road = color_road;
-}
-
-
-
 void LandScape::addLine(float x, float y, float &z, float prevY, float curve, bool mainColor,
-                        const Step::SpriteInfo &spriteLeft, const Step::SpriteInfo &spriteRight)
+                        Step::SpriteInfo &spriteNearLeft, Step::SpriteInfo &spriteNearRight,
+                        Step::SpriteInfo &spriteFarLeft, Step::SpriteInfo &spriteFarRight,
+                        int& stepsRead, int& eachNearLeft, int& eachNearRight, int& eachFarLeft,
+                        int&eachFarRight, const int startPos, int& codeNearLeft, int& codeNearRight,
+                        int& codeFarLeft, int& codeFarRight, bool& generateRandomNearLeft,
+                        bool& generateRandomNearRight, bool& generateRandomFarLeft, bool& generateRandomFarRight)
+
 {
+    Step lineAux;
+    lineAux.position_3d_y = prevY;
+
     float yInc = (y - prevY) / 5.0f; // 5 is total lines number will be added
-    Step line, lineAux;
-    line.position_3d_x = x;
-    line.position_3d_y = prevY;
-    line.mainColor = mainColor;
-    line.directionCurve = curve;
+    for (int i = 1; i <= 5; i++){
+        Step line;
+        line.position_3d_x = x;
+        line.position_3d_y = lineAux.position_3d_y + yInc;
+        line.mainColor = mainColor;
+        line.directionCurve = curve;
+        line.position_3d_z = z;
+        z += segL - 50;
 
-    lineAux = line; // without objects
+        if ((startPos + stepsRead) % eachNearLeft != 0){
+            spriteNearLeft.spriteNum = -1;
+        }
+        else {
+            spriteNearLeft.spriteNum = codeNearLeft;
+        }
+        if ((startPos + stepsRead) % eachNearRight != 0){
+            spriteNearRight.spriteNum = -1;
+        }
+        else {
+            spriteNearRight.spriteNum = codeNearRight;
+        }
 
-    line.spriteLeft = spriteLeft;
-    line.spriteRight = spriteRight;
+        if ((startPos + stepsRead) % eachFarLeft != 0){
+            spriteFarLeft.spriteNum = -1;
+        }
+        else {
+            spriteFarLeft.spriteNum = codeFarLeft;
+        }
+        if ((startPos + stepsRead) % eachFarRight != 0){
+            spriteFarRight.spriteNum = -1;
+        }
+        else {
+            spriteFarRight.spriteNum = codeFarRight;
+        }
 
-    // For each normal line, 4 extras without objects for better visualization
-    lineAux.position_3d_z = z;
-    z += segL - 50;
-    lineAux.position_3d_y += yInc;
-    newLines.push_back(lineAux);
+        if (generateRandomNearLeft){
+            mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+            uniform_real_distribution<float> offset(0.0f, 3.0f);
+            spriteNearLeft.offset = offset(rng);
+        }
 
-    lineAux.position_3d_z = z;
-    z += segL - 50;
-    lineAux.position_3d_y += yInc;
-    newLines.push_back(lineAux);
+        if (generateRandomNearRight){
+            mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+            uniform_real_distribution<float> offset(0.0f, 3.0f);
+            spriteNearRight.offset = offset(rng);
+        }
 
-    line.position_3d_z = z;
-    z += segL - 50;
-    lineAux.position_3d_y += yInc;
-    line.position_3d_y = lineAux.position_3d_y;
-    newLines.push_back(line);
+        if (generateRandomFarLeft){
+            mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+            uniform_real_distribution<float> offset(3.0f, 6.0f);
+            spriteFarLeft.offset = offset(rng);
+        }
 
-    lineAux.position_3d_z = z;
-    z += segL - 50;
-    lineAux.position_3d_y += yInc;
-    newLines.push_back(lineAux);
+        if (generateRandomFarRight){
+            mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+            uniform_real_distribution<float> offset(3.0f, 6.0f);
+            spriteFarRight.offset = offset(rng);
+        }
 
-    lineAux.position_3d_z = z;
-    z += segL - 50;
-    lineAux.position_3d_y += yInc;
-    newLines.push_back(lineAux);
+        line.spriteNearLeft = spriteNearLeft;
+        line.spriteNearRight = spriteNearRight;
+        line.spriteFarLeft = spriteFarLeft;
+        line.spriteFarRight = spriteFarRight;
+        newLines.push_back(line);
+        stepsRead++;
+        lineAux.position_3d_y += yInc;
+    }
 }
 
 
@@ -1214,348 +288,286 @@ Step LandScape::getPreviousLine(const int n) const {
         return next->newLines[(n - 1 - newLines.size()) % next->newLines.size()];
 }
 
-void LandScape::fileError(const string &error="") {
-    cerr << "Error: Formato de fichero incorrecto." << endl;
-    if (!error.empty())
-        cerr << "\t" + error << endl;
-    exit(1);
-}
 
-vector<vector<string>> LandScape::randomMap(const int numLines, const vector<int> &objectIndexes) {
 
-    vector<vector<string>> instructions;
-    // Random
-    random_device rd;
-    mt19937 generator(rd());
-    uniform_real_distribution<float> dist(0.0f, 1.0f);
-    uniform_int_distribution<int> distRB(0, 20), distG(0, 255);
+void LandScape::parseBackgroundScene(string pathFile){
+    // Document xml where the document is going to be parsed
+    char* pFile = const_cast<char*>(pathFile.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *nodeLandScape = doc.first_node();
 
-    // Colors
-    instructions.push_back({"107", "107", "107"});
-    instructions.push_back({"105", "105", "105"});
-    instructions.push_back({to_string(distRB(generator)), to_string(distG(generator)), to_string(distRB(generator))});
-    instructions.push_back({to_string(distRB(generator)), to_string(distG(generator)), to_string(distRB(generator))});
-
-    // Instructions
-    float prob;
-    int line = 0, untilLine = 0;
-    while (line < numLines) {
-        vector<string> inst;
-
-        prob = dist(generator);
-        if (line < untilLine || prob < 0.90f) {
-            // Line
-            inst.emplace_back("ROAD");
-
-            if (!objectIndexes.empty() && dist(generator) > 0.75f) {
-                // Left object
-                if (dist(generator) > 0.75f) {
-                    // Repetitive
-                    inst.emplace_back("+");
-                }
-
-                uniform_int_distribution<int> distObj(0, objectIndexes.size() - 1);
-                inst.push_back(to_string(objectIndexes[distObj(generator)]));
-                if (dist(generator) > 0.75f) {
-                    // Offset
-                    inst.push_back(to_string(dist(generator)));
-                }
-            }
-
-            inst.emplace_back("-");
-
-            if (!objectIndexes.empty() && dist(generator) > 0.75f) {
-                // Right object
-                if (dist(generator) > 0.75f) {
-                    // Repetitive
-                    inst.emplace_back("+");
-                }
-
-                uniform_int_distribution<int> distObj(0, objectIndexes.size() - 1);
-                inst.push_back(to_string(objectIndexes[distObj(generator)]));
-                if (dist(generator) > 0.75f) {
-                    // Offset
-                    inst.push_back(to_string(dist(generator)));
-                }
-            }
-
-            line++;
-        }
-        else if (prob < 0.92f) {
-            // Curve
-            inst.emplace_back("CURVE");
-            inst.push_back(to_string(dist(generator) / 2.0f));
-        }
-        else if (prob < 0.94f) {
-            // Curve
-            inst.emplace_back("CURVE");
-            inst.push_back(to_string(-dist(generator) / 2.0f));
-        }
-        else if (prob < 0.96f) {
-            // Straight
-            inst.emplace_back("STRAIGHT");
-        }
-        else if (prob < 0.98f) {
-            // Climb
-            inst.emplace_back("CLIMB");
-
-            uniform_int_distribution<int> distLines(1 + line, numLines);
-            untilLine = distLines(generator);
-
-            inst.push_back(to_string(dist(generator) * float(untilLine - line) * 100.0f));
-            inst.push_back(to_string(untilLine - line));
-        }
-        else {
-            // Drop
-            inst.emplace_back("DROP");
-
-            uniform_int_distribution<int> distLines(1 + line, numLines);
-            untilLine = distLines(generator);
-
-            inst.push_back(to_string(dist(generator) * float(untilLine - line) * 100.0f));
-            inst.push_back(to_string(untilLine - line));
-        }
-
-        instructions.push_back(inst);
-    }
-
-    return instructions;
-}
-
-vector<vector<string>> LandScape::readMapFile(const std::string &file) {
-
-    vector<vector<string>> instructions;
-    ifstream fin(file);
-    if (fin.is_open()) {
-        bool road = false, grass = false, comment = false;
-        int lines = 0, lastInclinationIndex = -1;
-
-        vector<string> buffer;
-        string s;
-        while (!fin.eof()) {
-            fin >> s;
-
-            if (s.size() >= 2 && s[0] == '/' && s[1] == '*')
-                comment = true;
-            if (comment) {
-                if (s.size() >= 2 && s[s.size() - 1] == '/' && s[s.size() - 2] == '*')
-                    comment = false;
-            }
-            else {
-                buffer.push_back(s);
-
-                if (!road) {
-                    if (buffer.size() == 6) {
-                        instructions.push_back({buffer[0], buffer[1], buffer[2]});
-                        instructions.push_back({buffer[3], buffer[4], buffer[5]});
-                        buffer.clear();
-                        road = true;
-                    }
-                }
-                else if (!grass) {
-                    if (buffer.size() == 6) {
-                        instructions.push_back({buffer[0], buffer[1], buffer[2]});
-                        instructions.push_back({buffer[3], buffer[4], buffer[5]});
-                        buffer.clear();
-                        grass = true;
-                    }
-                }
-                else if (buffer.size() > 1 && (s == "ROAD" || s == "CURVE" || s == "STRAIGHT" || s == "CLIMB" ||
-                                               s == "FLAT" || s == "DROP" || s == "RANDOM" || s  == "END")) {
-                    if (buffer[0] == "CLIMB" || buffer[0] == "DROP" || buffer[0] == "FLAT") {
-                        if (lastInclinationIndex > -1 && (instructions[lastInclinationIndex][0] == "CLIMB" ||
-                                instructions[lastInclinationIndex][0] == "DROP")) {
-                            instructions[lastInclinationIndex].push_back(to_string(lines));
-                            lastInclinationIndex = -1;
-                        }
-
-                        if (buffer[0] == "CLIMB" || buffer[0] == "DROP") {
-                            lines = 0;
-                            lastInclinationIndex = instructions.size();
-
-                            buffer.pop_back();
-                            instructions.push_back(buffer);
-                        }
-                    }
-                    else if (buffer[0] == "RANDOM") {
-                        if (buffer.size() < 3)
-                            fileError(buffer[0] + " necesita argumentos.");
-
-                        vector<int> objectIndexes;
-                        for (int i = 2; i < buffer.size() - 1; i++)
-                            objectIndexes.push_back(stoi(buffer[i]));
-
-                        const vector<vector<string>> randomInstructions = randomMap(stoi(buffer[1]), objectIndexes);
-                        for (int i = 4; i < randomInstructions.size(); i++) {
-                            instructions.push_back(randomInstructions[i]);
-                        }
-                    }
-                    else {
-                        if (s == "ROAD")
-                            lines++;
-
-                        buffer.pop_back();
-                        instructions.push_back(buffer);
-                    }
-
-                    buffer.clear();
-                    buffer.push_back(s);
-                }
-            }
-        }
-        fin.close();
-
-        if (buffer[0] != "END")
-            fileError("El fichero debe terminar en END.");
-        if (instructions.size() < 4)
-            fileError();
-    }
-
-    return instructions;
-}
-
-void LandScape::addLines(float x, float y, float &z, const vector<vector<string>> &instructions) {
-    float curveCoeff = 0.0f, elevation = 0.0f;
+    // Variables to control the different types of terrain
+    float curveCoeff = 0.0f, elevation = 0, cordX = 0, cordY = 0, cordZ = 0;
     int elevationIndex = 0, elevationLines = -1;
     bool mainColor = true;
 
-    // Colors
-    roadColor[0] = Color(stoi(instructions[0][0]), stoi(instructions[0][1]), stoi(instructions[0][2]));
-    roadColor[1] = Color(stoi(instructions[1][0]), stoi(instructions[1][1]), stoi(instructions[1][2]));
-    grassColor[0] = Color(stoi(instructions[2][0]), stoi(instructions[2][1]), stoi(instructions[2][2]));
-    grassColor[1] = Color(stoi(instructions[3][0]), stoi(instructions[3][1]), stoi(instructions[3][2]));
-
-    for (int i = 4; i < instructions.size(); i++) {
-        const vector<string> &inst = instructions[i];
-
-        if (inst[0] == "CURVE") {
-            if (inst.size() < 2)
-                fileError(inst[0] + " necesita argumentos.");
-            curveCoeff = stof(inst[1]);
-        }
-        else if (inst[0] == "STRAIGHT") {
-            curveCoeff = 0.0f;
-        }
-        else if (inst[0] == "CLIMB") {
-            if (inst.size() < 3)
-                fileError(inst[0] + " necesita argumentos.");
-            elevation = stof(inst[1]);
-            elevationLines = stoi(inst[2]);
-            elevationIndex = 0;
-        }
-        else if (inst[0] == "DROP") {
-            if (inst.size() < 3)
-                fileError(inst[0] + " necesita argumentos.");
-            elevation = -stof(inst[1]);
-            elevationLines = stoi(inst[2]);
-            elevationIndex = 0;
-        }
-        else if (inst[0] == "ROAD") {
-            Step::SpriteInfo spriteLeft, spriteRight;
-
-            // Elevation
-            float yAux = y;
-            if (elevationIndex < elevationLines) {
-                yAux += float(elevation) / 2.0f +
-                        (float(elevation) / 2.0f) * cosf(M_PI + (M_PI / float(elevationLines)) * float(elevationIndex));
-                elevationIndex++;
-            }
-            if (!newLines.empty() && elevationIndex == elevationLines) {
-                y = newLines[newLines.size() - 1].position_3d_y;
-                yAux = y;
-                elevationLines = -1;
-            }
-
-            // Objects
-            int j = 1; // inst index
-            if (inst[j] != "-") { // Left object
-                if (inst[j] == "+") {
-                    spriteLeft.repetitive = true;
-                    j++;
-                }
-                spriteLeft.spriteNum = stoi(inst[j]) - 1;
-                j++;
-                if (inst[j] != "-") {
-                    spriteLeft.offset = stof(inst[j]);
-                    j++;
+    // Iteration throughout the nodes of the file
+    for (xml_node<> *node = nodeLandScape->first_node(); node; node = node->next_sibling()){
+        // Check if the node contains the kinds of terrain
+        if ((string)node->name() == "Terrain"){
+            // Iteration throughout the nodes of the file
+            for (xml_node<> *part = node->first_node(); part; part = part->next_sibling()){
+                // Iteration throughout the nodes of the file
+                for (xml_node<> *nodeTerrain = part->first_node(); nodeTerrain; nodeTerrain = nodeTerrain->next_sibling()){
+                    // Iteration of the elements of the actual part of the terrain
+                    if ((string)nodeTerrain->name() == "Straight"){
+                        // The road goes in straight direction
+                        curveCoeff = 0.0f;
+                        // Read and parse the road properties in this part of terrain
+                        processRoadPart(nodeTerrain->first_node(), curveCoeff, elevation, mainColor, elevationIndex,
+                                        elevationLines, true, cordX, cordY, cordZ);
+                    }
+                    if ((string)nodeTerrain->name() == "Curve"){
+                        // Get the direction of the curve
+                        curveCoeff = stof(nodeTerrain->first_attribute("direction")->value());
+                        // Read and parse the road properties in this part of terrain
+                        processRoadPart(nodeTerrain->first_node(), curveCoeff, elevation, mainColor,
+                                        elevationIndex, elevationLines, true, cordX, cordY, cordZ);
+                    }
+                    else if ((string)nodeTerrain->name() == "Dropping" || (string)nodeTerrain->name() == "Climbing") {
+                        if ((string)nodeTerrain->name() == "Climbing") {
+                            // Get the elevation of the terrain
+                            elevation = stof(nodeTerrain->first_attribute("elevation")->value());
+                        }
+                        else if ((string)nodeTerrain->name() == "Dropping"){
+                            // Get the elevation of the terrain
+                            elevation = -stof(nodeTerrain->first_attribute("elevation")->value());
+                        }
+                        // Iterate to get the information of the climb of drop terrain part
+                        for (xml_node<> *partTerrain = nodeTerrain->first_node(); partTerrain; partTerrain = partTerrain->next_sibling()){
+                            // Iterate to get the elements of each part of the terrain
+                            for (xml_node<> *terrain = partTerrain->first_node(); terrain; terrain = terrain->next_sibling()){
+                                // Check if it's the node that control the possible curve coefficient
+                                if ((string)terrain->name() == "Direction"){
+                                    curveCoeff = stof(terrain->value());
+                                }
+                                else if ((string)terrain->name() == "Road"){
+                                    processRoadPart(terrain, curveCoeff, elevation, mainColor,
+                                                    elevationIndex, elevationLines, false, cordX, cordY, cordZ);
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            if (j >= inst.size() || inst[j] != "-") { // Checkpoint
-                fileError(inst[0] + " tiene argumentos incorrectos.");
-            }
-            j++;
-            if (j < inst.size()) { // Right object
-                if (inst[j] == "+") {
-                    spriteRight.repetitive = true;
-                    j++;
-                }
-                spriteRight.spriteNum = stoi(inst[j]) - 1;
-                j++;
-                if (j < inst.size()) {
-                    spriteRight.offset = stof(inst[j]);
-                    j++;
-                }
-            }
-            if (j != inst.size()) { // Checkpoint
-                fileError(inst[0] + " tiene argumentos incorrectos.");
-            }
-
-            addLine(x, yAux, z, newLines.empty() ? y : newLines[newLines.size() - 1].position_3d_y, curveCoeff, mainColor,
-                    spriteLeft, spriteRight);
-            mainColor = !mainColor;
+        }
+        // Check if it's the node that contains the different colors of the road
+        else if ((string)node->name() == "Color_grass" || (string)node->name() == "Color_road" ||
+                 (string)node->name() == "Color_rumble")
+        {
+            // Parse the information of the color of the road
+            parseColorGrassRoadScene(node);
         }
     }
 }
 
-LandScape::LandScape(const std::string &path, const std::string &bgName,
-                     const std::vector<std::string> &objectNames, bool random) : posX(0), posY(0), next(nullptr)
+
+void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float& elevation, bool& mainColor,
+                                int elevationIndex, int& elevationLines, bool flatTerrain, float& cordX,
+                                float& cordY, float& cordZ)
 {
-    bg.loadFromFile(path + bgName);
-    bg.setRepeated(true);
+    // Local variables
+    int startPos, finalPos;
+    int eachNearLeft = 0, eachNearRight = 0, eachFarLeft, eachFarRight,
+        codeNearLeft = -1, codeNearRight = -1, codeFarLeft = -1, codeFarRight;
 
-    int k = 0;
-    vector<int> objectIndexes;
-    objectIndexes.reserve(objectNames.size());
-    objects.reserve(objectNames.size());
-    hitCoeff.reserve(objectNames.size());
-    for (const string &s : objectNames) {
-        // Load indexes
-        objectIndexes.push_back(k);
-        k++;
+    // Sprites of the step
+    Step::SpriteInfo spriteNearLeft, spriteNearRight, spriteFarLeft, spriteFarRight;
+    int stepsRead = 0;
+    // Control if the offset of the sprites must be random or not
+    bool generateRandomNearLeft = false, generateRandomNearRight = false,
+         generateRandomFarLeft = false, generateRandomFarRight = false;
 
-        // Load textures
-        Texture t;
-        t.loadFromFile(path + s);
-        t.setSmooth(true);
-        objects.push_back(t);
+    // Get the interval coordinates of the terrain
+    getIntervalCoordinates(roadNode, 0, startPos, finalPos);
 
-        // Load hit percentage from center
-        ifstream fin(path + s + ".info");
-        float coeff = 1.0f;
-        if (fin.is_open()) {
-            fin >> coeff;
-            fin.close();
+    // Get the sprite information of the terrain
+    for (xml_node<> *spriteNode = roadNode->first_node(); spriteNode; spriteNode = spriteNode->next_sibling()){
+        // Check if it's the left or right object
+        if ((string)spriteNode->name() == "SpriteNearLeft"){
+            // Iteration to get the attributes of the sprite object
+            for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
+                // Check the interval to show the sprite
+                if ((string)attributeNode->name() == "Each"){
+                    eachNearLeft = stoi((string)attributeNode->value());
+                }
+                // Check the offset
+                else if ((string)attributeNode->name() == "Offset"){
+                    // Check if the offset has be initialized randomly
+                    if ((string)attributeNode->value() == "Random"){
+                        // Initialize randomly
+                        generateRandomNearLeft = true;
+                    }
+                    else {
+                        // Get the offset value from the file
+                        generateRandomNearLeft = false;
+                        spriteNearLeft.offset = stoi((string)attributeNode->value());
+                    }
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Code"){
+                     codeNearLeft = stoi(attributeNode->value()) - 1;
+                }
+            }
         }
-        hitCoeff.push_back(coeff);
+        // Check if it's the left or right object
+        else if ((string)spriteNode->name() == "SpriteNearRight"){
+            // Iteration to get the attributes of the sprite object
+            for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
+                // Check the interval to show the sprite
+                if ((string)attributeNode->name() == "Each"){
+                    eachNearRight = stoi((string)attributeNode->value());
+                }
+                // Check the offset
+                else if ((string)attributeNode->name() == "Offset"){
+                    // Check if the offset has be initialized randomly
+                    if ((string)attributeNode->value() == "Random"){
+                        // Initialize randomly
+                        generateRandomNearRight = true;
+                    }
+                    else {
+                        // Get the offset value from the file
+                        generateRandomNearRight = false;
+                        spriteNearRight.offset = stoi((string)attributeNode->value());
+                    }
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Code"){
+                     codeNearRight = stoi(attributeNode->value()) - 1;
+                }
+            }
+        }
+        // Check if it's the left or right object
+        if ((string)spriteNode->name() == "SpriteFarLeft"){
+            // Iteration to get the attributes of the sprite object
+            for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
+                // Check the interval to show the sprite
+                if ((string)attributeNode->name() == "Each"){
+                    eachFarLeft = stoi((string)attributeNode->value());
+                }
+                // Check the offset
+                else if ((string)attributeNode->name() == "Offset"){
+                    // Check if the offset has be initialized randomly
+                    if ((string)attributeNode->value() == "Random"){
+                        // Initialize randomly
+                        generateRandomFarLeft = true;
+                    }
+                    else {
+                        // Get the offset value from the file
+                        generateRandomFarLeft = false;
+                        spriteFarLeft.offset = stoi((string)attributeNode->value());
+                    }
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Code"){
+                     codeFarLeft = stoi(attributeNode->value()) - 1;
+                }
+            }
+        }
+        // Check if it's the left or right object
+        else if ((string)spriteNode->name() == "SpriteFarRight"){
+            // Iteration to get the attributes of the sprite object
+            for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
+                // Check the interval to show the sprite
+                if ((string)attributeNode->name() == "Each"){
+                    eachFarRight = stoi((string)attributeNode->value());
+                }
+                // Check the offset
+                else if ((string)attributeNode->name() == "Offset"){
+                    // Check if the offset has be initialized randomly
+                    if ((string)attributeNode->value() == "Random"){
+                        // Initialize randomly
+                        generateRandomFarRight = true;
+                    }
+                    else {
+                        // Get the offset value from the file
+                        generateRandomFarRight = false;
+                        spriteFarRight.offset = stoi((string)attributeNode->value());
+                    }
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Code"){
+                     codeFarRight = stoi(attributeNode->value()) - 1;
+                }
+            }
+        }
+    }
+    // Check if the kind of terrain
+    if (!flatTerrain){
+        // Climbing or dropping terrain
+        elevationLines = finalPos - startPos;
+        elevationIndex = 0;
     }
 
-    // Colors
-    roadColor[0] = Color(107, 107, 107);
-    roadColor[1] = Color(105, 105, 105);
-    grassColor[0] = Color(16, 200, 16);
-    grassColor[1] = Color(0, 154, 0);
+    // All the information is obtained
+    for (int i = startPos; i <= finalPos; i++){
+        // Control the elevation of the terrain
+        float yAux = cordY;
+        if (elevationIndex < elevationLines) {
+            yAux += float(elevation) / 2.0f +
+                    (float(elevation) / 2.0f) * cosf(M_PI + (M_PI / float(elevationLines)) * float(elevationIndex));
+            elevationIndex++;
+        }
+        if (!newLines.empty() && elevationIndex == elevationLines) {
+            cordY = newLines[newLines.size() - 1].position_3d_y;
+            yAux = cordY;
+            elevationLines = -1;
+        }
 
-    // Line generation
-    float z = 0; // Line position
-    if (random) { // Random generation
-        addLines(0, 0, z, randomMap(1000, objectIndexes));
-    }
-    else { // Predefined map
-        addLines(0, 0, z, readMapFile(path + "map.info"));
-    }
+        addLine(cordX, yAux, cordZ, newLines.empty() ? cordY : newLines[newLines.size() - 1].position_3d_y, curveCoeff, mainColor,
+                    spriteNearLeft, spriteNearRight, spriteFarLeft, spriteFarRight, stepsRead, eachNearLeft, eachNearRight,
+                    eachFarLeft, eachFarRight, startPos, codeNearLeft, codeNearRight, codeFarLeft, codeFarRight,
+                    generateRandomNearLeft, generateRandomNearRight, generateRandomFarLeft, generateRandomFarRight);
 
-    if (newLines.empty())
-        fileError();
+        mainColor = !mainColor;
+    }
+}
+
+
+
+LandScape::LandScape(const std::string path, bool random) : posX(0), posY(0), next(nullptr)
+{
+    Texture t;
+    // Document xml where the document is going to be parsed
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *nodeLandScape = doc.first_node()->first_node();
+
+    if ((string)nodeLandScape->name() == "Background"){
+        bg.loadFromFile((string)nodeLandScape->value());
+        bg.setRepeated(true);
+    }
+    nodeLandScape = nodeLandScape->next_sibling();
+    if ((string)nodeLandScape->name() == "Sprites"){
+        // Check the sprite paths of the level
+        for (xml_node<> *sprite = nodeLandScape->first_node(); sprite; sprite = sprite->next_sibling()){
+            t.loadFromFile(sprite->value());
+            t.setSmooth(true);
+            objects.push_back(t);
+
+            // Load hit percentage from center
+            float coeff = 1.0f;
+
+            /*
+            ifstream fin(path + s + ".info");
+            if (fin.is_open()) {
+                fin >> coeff;
+                fin.close();
+            }
+            */
+
+            hitCoeff.push_back(coeff);
+        }
+    }
+    parseBackgroundScene(path);
 }
 
 
@@ -1628,17 +640,21 @@ void LandScape::draw(RenderWindow* app, Configuration* c) {
         if (l->position_2d_y < maxy) {
             maxy = l->position_2d_y;
 
-            Color grass, road;
+            Color grass, road, rumble, dash, dashMedLeft, dashMedRight;
+
             if (n < N || next == nullptr) {
                 grass = grassColor[l->mainColor];
                 road = roadColor[l->mainColor];
+                rumble = rumbleColor[l->mainColor];
             }
             else {
                 grass = next->grassColor[l->mainColor];
                 road = next->roadColor[l->mainColor];
+                rumble = next->rumbleColor[l->mainColor];
             }
-            Color rumble = l->mainColor ? road : Color::White;
-            Color dash = l->mainColor ? Color::White : road;
+            dash = l->mainColor ? rumbleColor[0] : rumbleColor[1];
+            dashMedLeft = l->mainColor ? road : Color::White;
+            dashMedRight = l->mainColor ? road : Color::White;
 
             p = getPreviousLine(n);
 
@@ -1655,36 +671,48 @@ void LandScape::draw(RenderWindow* app, Configuration* c) {
             drawQuad(app, rumble, x1 + w1 - rw1, y1, rw1, x2 + w2 - rw2, y2, rw2); // Right rumble
             drawQuad(app, dash, x1 + rw1, y1, dw1, x2 + rw2, y2, dw2); // First left dash
             drawQuad(app, dash, x1 + w1 - rw1 - dw1, y1, dw1, x2 + w2 - rw2 - dw2, y2, dw2); // First right dash
-            drawQuad(app, dash, x1 + int(float(w1) * 0.333f), y1, dw1, x2 + int(float(w2) * 0.333f), y2, dw2); // Second left dash
-            drawQuad(app, dash, x1 + int(float(w1) * 0.666f), y1, dw1, x2 + int(float(w2) * 0.666f), y2, dw2); // Second right dash
+            drawQuad(app, dashMedLeft, x1 + int(float(w1) * 0.333f), y1, dw1, x2 + int(float(w2) * 0.333f), y2, dw2); // Second left dash
+            drawQuad(app, dashMedRight, x1 + int(float(w1) * 0.666f), y1, dw1, x2 + int(float(w2) * 0.666f), y2, dw2); // Second right dash
         }
     }
 
     ////////draw objects////////
     for (int n = int(posY); n < int(posY) + 300; n++) { // Reset draw info
         l = getLine(n);
-        l->spriteLeft.spriteMinX = 0;
-        l->spriteLeft.spriteMaxX = 0;
-        l->spriteRight.spriteMinX = 0;
-        l->spriteRight.spriteMaxX = 0;
+        l->spriteNearLeft.spriteMinX = 0;
+        l->spriteNearLeft.spriteMaxX = 0;
+        l->spriteNearRight.spriteMinX = 0;
+        l->spriteNearRight.spriteMaxX = 0;
     }
+
     for (int n = startPos + c->getRenderLen(); n > startPos; n--) {
         l = getLine(n);
 
-        if (l->spriteLeft.spriteNum > -1) {
+        if (l->spriteNearLeft.spriteNum > -1) {
             if (n < N || next == nullptr)
-                l->drawSprite(app, objects, hitCoeff, l->spriteLeft, true);
+                l->drawSprite(app, objects, hitCoeff, l->spriteNearLeft, true);
             else
-                l->drawSprite(app, next->objects, next->hitCoeff, l->spriteLeft, true);
+                l->drawSprite(app, next->objects, next->hitCoeff, l->spriteNearLeft, true);
         }
-        if (l->spriteRight.spriteNum > -1) {
+        if (l->spriteNearRight.spriteNum > -1) {
             if (n < N || next == nullptr)
-                l->drawSprite(app, objects, hitCoeff, l->spriteRight, false);
+                l->drawSprite(app, objects, hitCoeff, l->spriteNearRight, false);
             else
-                l->drawSprite(app, next->objects, next->hitCoeff, l->spriteRight, false);
+                l->drawSprite(app, next->objects, next->hitCoeff, l->spriteNearRight, false);
+        }
+        if (l->spriteFarLeft.spriteNum > -1) {
+            if (n < N || next == nullptr)
+                l->drawSprite(app, objects, hitCoeff, l->spriteFarLeft, true);
+            else
+                l->drawSprite(app, next->objects, next->hitCoeff, l->spriteFarLeft, true);
+        }
+        if (l->spriteFarRight.spriteNum > -1) {
+            if (n < N || next == nullptr)
+                l->drawSprite(app, objects, hitCoeff, l->spriteFarRight, false);
+            else
+                l->drawSprite(app, next->objects, next->hitCoeff, l->spriteFarRight, false);
         }
     }
-
 }
 
 

@@ -9,7 +9,7 @@
 #include "SFML/Graphics.hpp"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
-#include "../include/Environment.h"
+#include "Environment.h"
 
 
 using namespace std;
@@ -81,7 +81,7 @@ class GameSelectorMode {
          * @param gameMode is the mode selected by the player to play
          * @param e is the environment of the game which is going to be configured
          */
-         void loadFileConfigurationMode(Environment& e);
+         void loadFileConfigurationMode(Environment& e, vector<string>& landscapePaths);
 
 
 
@@ -108,14 +108,14 @@ class GameSelectorMode {
           * Load the configuration xml file from the world tour game mode
           * @param e is the environment of the game which is going to be configured
           */
-          void loadWorldTourMode(char* pathFile, Environment& e);
+          void loadWorldTourMode(char* pathFile, Environment& e, vector<string>& landscapePaths);
 
 
 
          /**
           * Load the configuration xml file from the out run game mode
           */
-          void loadOutRun(char* pathFile, Environment& e);
+          void loadOutRun(char* pathFile, Environment& e, vector<string>& landscapePaths);
 
 
 

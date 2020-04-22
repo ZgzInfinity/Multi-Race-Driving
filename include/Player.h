@@ -7,11 +7,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
-#include "../include/Configuration.h"
-#include "../include/Step.h"
-#include "../include/IntervalCurve.h"
-#include "../include/rapidxml.hpp"
-#include "../include/rapidxml_utils.hpp"
+#include "Configuration.h"
+#include "Step.h"
+#include "rapidxml.hpp"
+#include "rapidxml_utils.hpp"
 #include "LandScape.h"
 #include <SFML/Graphics.hpp>
 
@@ -30,6 +29,7 @@ const float BORDER_ROAD_LEFT = -1.15;
 const float BORDER_ROAD_RIGHT = 1.15;
 
 const float RATIO = 6.25f;
+const int RECTANGLE = 5;
 
 
 /*
@@ -45,7 +45,7 @@ class Player{
         int actual_code_image;
 
         // Position of the main character
-        float playerX = 0, playerY = 0, previousY = 0, minScreenX = 0, maxScreenX = 0;
+        float playerX = 0, playerY = RECTANGLE, previousY = 0, minScreenX = 0, maxScreenX = 0;
 
         // How to control the motorbike
         int typeControl = 0;
@@ -363,17 +363,6 @@ class Player{
          * @param pos is the current position of the motorbike in the axis Y
          */
         virtual bool controlPossibleCollision(Step& nearestSprite, int lastPos, int pos) = 0;
-
-
-
-        /**
-         * Control if there is there inertia force or not if the motorbike is on a curve of the scene
-         * @param onCurve is a boolean which represents if the motorbike is on curve or not
-         * @param curve is the possible curve of the scene where the motorbike is currently now
-         * @param speed is the actual speed of the motorbike of the player
-         */
-        virtual void controlInertiaForce(bool& onCurve, IntervalCurve& curve, int& speed) = 0;
-
 
 
         /**

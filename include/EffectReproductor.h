@@ -4,7 +4,7 @@
 #define EFFECT_REPRODUCTOR_H
 
 #include <iostream>
-#include "../include/SoundEffect.h"
+#include "SoundEffect.h"
 #include <cstring>
 #include "SFML/Audio.hpp"
 

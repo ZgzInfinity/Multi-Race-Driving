@@ -4,7 +4,7 @@
 #define MUSIC_REPRODUCTOR_H
 
 #include <iostream>
-#include "../include/Soundtrack.h"
+#include "Soundtrack.h"
 #include <cstring>
 #include "SFML/Audio.hpp"
 

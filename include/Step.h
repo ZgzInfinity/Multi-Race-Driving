@@ -41,7 +41,9 @@ struct Step{
      * Si repetitive es true el objeto se repetirá hasta el borde de la pantalla.
      */
     struct SpriteInfo {
+        int intervalShow;
         int spriteNum;
+        string path;
         float offset, spriteMinX, spriteMaxX;
         bool repetitive;
 
@@ -68,10 +70,8 @@ struct Step{
     float scalingValue;
     // Offset to control the possible collisions
     float offset;
-    // Possible sprite to draw
-    Sprite character;
-
-    SpriteInfo spriteLeft, spriteRight;
+    // Possible sprites to draw
+    SpriteInfo spriteNearLeft, spriteNearRight, spriteFarLeft, spriteFarRight;
 
     bool mainColor;
 

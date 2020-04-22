@@ -5,7 +5,6 @@
 #include "../include/Motorbike.h"
 #include "../include/Minivan.h"
 #include "../include/Truck.h"
-#include "../include/IntervalCurve.h"
 #include "../include/LandScape.h"
 #include "../include/Animation.h"
 #include "../include/Menu.h"

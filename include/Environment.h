@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstring>
 #include <SFML/Graphics.hpp>
-#include "../include/Button.h"
+#include "Button.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
