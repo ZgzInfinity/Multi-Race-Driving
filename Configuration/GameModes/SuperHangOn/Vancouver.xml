@@ -1,103 +1,798 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<Circuit> 
-	<Name>Vancouver</Name>
-	<Background>
-		<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/background.png</Path>
-		<LL>-2000</LL>
-		<UL>0</UL>
-		<LR>5000</LR>
-		<UR>411</UR>
-		<Xcenter>-2000</Xcenter> 
-		<Ycenter>0</Ycenter>
-	</Background>
-	<Curves>
-		<C1 startPosGE="203" finalPosLE="456">
-			<Direction>2</Direction>
-		</C1>
-		<C2 startPosGT="456" finalPosLT="800">
-			<Direction>-2</Direction>		
-		</C2>
-		<C3 startPosGE="800" finalPosLE="900">
-			<Direction>3</Direction>
-		</C3>
-		<C4 startPosGE="1000" finalPosLE="1200"> 
-			<Direction>-2.5</Direction>
-		</C4>
-		<C5 startPosGT="1200" finalPosLE="1500"> 
-			<Direction>4</Direction>
-		</C5>
-		<C6 startPosGT="1800" finalPosLE="2100"> 
-			<Direction>0.7</Direction>
-		</C6>
-		<C7 startPosGT="2300" finalPosLE="2400"> 
-			<Direction>-0.7</Direction>
-		</C7>
-		<C8 startPosGT="2400" finalPosLE="2700"> 
-			<Direction>-3.5</Direction>
-		</C8>
-		<C9 startPosGE="3000" finalPosLT="3200"> 
-			<Direction>3.5</Direction>
-		</C9>
-		<C10 startPosGE="3300" finalPosLT="4000"> 
-			<Direction>0.8</Direction>
-		</C10>
-		<C11 startPosGE="4000" finalPosLT="4700"> 
-			<Direction>0.8</Direction>
-		</C11>
-		<C12 startPosGE="5000" finalPosLT="5400"> 
-			<Direction>-1.2</Direction>
-		</C12>
-		<C13 startPosGE="5600" finalPosLE="5800"> 
-			<Direction>1.2</Direction>
-		</C13>
-		<C14 startPosGE="6000" finalPosLE="6500"> 
-			<Direction>-0.5</Direction>
-		</C14>
-		<C15 startPosGE="7000" finalPosLE="8000"> 
-			<Direction>0.3</Direction>
-		</C15>
-		<C16 startPosGE="8200" finalPosLE="8500"> 
-			<Direction>2</Direction>
-		</C16>
-		<C17 startPosGT="9000" finalPosLE="9300"> 
-			<Direction>3.5</Direction>
-		</C17>
-		<C18 startPosGE="9600" finalPosLE="10000"> 
-			<Direction>-2.5</Direction>
-		</C18>
-		<C19 startPosGE="10400" finalPosLT="10800"> 
-			<Direction>1</Direction>
-		</C19>
-		<C20 startPosGE="11000" finalPosLT="11800"> 
-			<Direction>-0.5</Direction>
-		</C20>
-	</Curves>
-	<Mountains>
-		<M1 startPosGE="504" finalPosLT="2640"> 
-			<Atenuation>40.0</Atenuation>
-			<Height>1500</Height>
-		</M1>
-		<M2 startPosGE="4618" finalPosLE="5277">
-			<Atenuation>30.0</Atenuation>
-			<Height>1500</Height>
-		</M2>
-		<M3 startPosGE="7790" finalPosLE="8290">
-			<Atenuation>80.0</Atenuation>
-			<Height>2000</Height>
-		</M3>
-		<M4 startPosGE="8295" finalPosLE="8798">
-			<Atenuation>80.0</Atenuation>
-			<Height>-2000</Height>
-		</M4>
-		<M5 startPosGE="9330" finalPosLE="9896">
-			<Atenuation>90.0</Atenuation>
-			<Height>2500</Height>
-		</M5>
-		<M6 startPosGE="9990" finalPosLE="11876">
-			<Atenuation>60.0</Atenuation>
-			<Height>2500</Height>
-		</M6>
-	</Mountains>
+<LandScape>
+	<Background>images/GameModes/SuperHangOn/Scenes/Vancouver/bg.png</Background>
+	<Sprites>
+		<S1>images/GameModes/SuperHangOn/Scenes/Vancouver/Skimo_boy.png</S1>
+		<S2>images/GameModes/SuperHangOn/Scenes/Vancouver/Left_row.png</S2>
+		<S3>images/GameModes/SuperHangOn/Scenes/Vancouver/Right_row.png</S3>
+		<S4>images/GameModes/SuperHangOn/Scenes/Vancouver/Bridalstone.png</S4>
+		<S5>images/GameModes/SuperHangOn/Scenes/Vancouver/SparkPlugs.png</S5>
+		<S6>images/GameModes/SuperHangOn/Scenes/Vancouver/Morobare.png</S6>
+		<S7>images/GameModes/SuperHangOn/Scenes/Vancouver/DiscoJuice.png</S7>
+		<S8>images/GameModes/SuperHangOn/Scenes/Vancouver/StrawPackect.png</S8>
+		<S9>images/GameModes/SuperHangOn/Scenes/Vancouver/Trash.png</S9>
+		<S10>images/GameModes/SuperHangOn/Scenes/Vancouver/Snow_house1.png</S10>
+		<S11>images/GameModes/SuperHangOn/Scenes/Vancouver/Snow_house2.png</S11>
+		<S12>images/GameModes/SuperHangOn/Scenes/Vancouver/Snow_man.png</S12>
+		<S13>images/GameModes/SuperHangOn/Scenes/Vancouver/Petrol_station.png</S13>
+		<S14>images/GameModes/SuperHangOn/Scenes/Vancouver/Birdbird.png</S14>
+		<S15>images/GameModes/SuperHangOn/Scenes/Vancouver/Street_light.png</S15>
+		<S16>images/GameModes/SuperHangOn/Scenes/Vancouver/Streetlight.png</S16>
+		<S17>images/GameModes/SuperHangOn/Scenes/Vancouver/Signal_50.png</S17>
+		<S18>images/GameModes/SuperHangOn/Scenes/Vancouver/Signal_bus.png</S18>
+		<S19>images/GameModes/SuperHangOn/Scenes/Vancouver/Signal_go.png</S19>
+		<S20>images/GameModes/SuperHangOn/Scenes/Vancouver/Cabin.png</S20>
+		<S21>images/GameModes/SuperHangOn/Scenes/Vancouver/Snow_tree1.png</S21>
+		<S22>images/GameModes/SuperHangOn/Scenes/Vancouver/Snow_tree2.png</S22>
+		<S23>images/GameModes/SuperHangOn/Scenes/Vancouver/Snow_tree3.png</S23>
+		<S24>images/GameModes/SuperHangOn/Scenes/Vancouver/Iglu.png</S24>
+		<S25>images/GameModes/SuperHangOn/Scenes/Vancouver/Mini_streetlight.png</S25>
+		<S26>images/GameModes/SuperHangOn/Scenes/Vancouver/Skimo_girl.png</S26>
+		<S27>images/GameModes/SuperHangOn/Scenes/Vancouver/Start.png</S27>
+		<S28>images/GameModes/SuperHangOn/Scenes/Vancouver/Checkpoint.png</S28>
+		<S29>images/GameModes/SuperHangOn/Scenes/Vancouver/Goal.png</S29>
+	</Sprites>
+	<Terrain>
+		<P1>
+			<Straight>
+				<Road startPosGE="0" finalPosLT="25">
+					<StartingPoint>
+						<Offset>-0.95</Offset>
+						<Position>75</Position>
+						<Code>27</Code>
+					</StartingPoint>
+					<SpriteNearLeft>
+						<Each>50</Each>
+						<Offset>0.3</Offset>
+						<Code>16</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>50</Each>
+						<Offset>0.2</Offset>
+						<Code>16</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>15</Each>
+						<Offset>Random</Offset>
+						<Code>5</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>10</Each>
+						<Offset>Random</Offset>
+						<Code>14</Code>
+					</SpriteFarRight>
+				</Road>
+			</Straight>
+		</P1>
+		<P2>
+			<Climbing elevation="12000">
+				<P1>
+					<Direction>0.0</Direction>
+					<Road startPosGE="25" finalPosLT="100">
+						<SpriteNearLeft>
+							<Each>60</Each>
+							<Offset>0.1</Offset>
+							<Code>15</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>50</Each>
+							<Offset>0.1</Offset>
+							<Code>15</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>55</Each>
+							<Offset>Random</Offset>
+							<Code>9</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>53</Each>
+							<Offset>Random</Offset>
+							<Code>6</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Climbing>
+		</P2>
+		<P3>
+			<Dropping elevation="12000">
+				<P1>
+					<Direction>0.0</Direction>
+					<Road startPosGE="101" finalPosLT="176">
+						<SpriteNearLeft>
+							<Each>44</Each>
+							<Offset>0.3</Offset>
+							<Code>7</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>90</Each>
+							<Offset>0.3</Offset>
+							<Code>17</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>46</Each>
+							<Offset>Random</Offset>
+							<Code>4</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>52</Each>
+							<Offset>Random</Offset>
+							<Code>24</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Dropping>
+		</P3>
+		<P4>
+			<Curve direction="-1.2">
+				<Road startPosGT="175" finalPosLT="230">
+					<SpriteNearLeft>
+						<Each>53</Each>
+						<Offset>0.2</Offset>
+						<Code>14</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>65</Each>
+						<Offset>0.2</Offset>
+						<Code>2</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>84</Each>
+						<Offset>Random</Offset>
+						<Code>13</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>78</Each>
+						<Offset>Random</Offset>
+						<Code>20</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P4>
+		<P5>
+			<Straight>
+				<Road startPosGE="231" finalPosLT="248">
+					<SpriteNearLeft>
+						<Each>30</Each>
+						<Offset>0.3</Offset>
+						<Code>1</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>52</Each>
+						<Offset>0.3</Offset>
+						<Code>26</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>20</Each>
+						<Offset>Random</Offset>
+						<Code>10</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>25</Each>
+						<Offset>Random</Offset>
+						<Code>11</Code>
+					</SpriteFarRight>
+				</Road>
+			</Straight>
+		</P5>
+		<P6>
+			<Curve direction="1.2">
+				<Road startPosGT="247" finalPosLT="320">
+					<SpriteNearLeft>
+						<Each>53</Each>
+						<Offset>0.2</Offset>
+						<Code>6</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>90</Each>
+						<Offset>0.2</Offset>
+						<Code>19</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>65</Each>
+						<Offset>Random</Offset>
+						<Code>12</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>78</Each>
+						<Offset>Random</Offset>
+						<Code>12</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P6>
+		<P7>
+			<Climbing elevation="20000">
+				<P1>
+					<Direction>-2.0</Direction>
+					<Road startPosGE="321" finalPosLT="420">
+						<SpriteNearLeft>
+							<Each>102</Each>
+							<Offset>0.3</Offset>
+							<Code>17</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>93</Each>
+							<Offset>0.3</Offset>
+							<Code>2</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>73</Each>
+							<Offset>Random</Offset>
+							<Code>21</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>62</Each>
+							<Offset>Random</Offset>
+							<Code>22</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+				<P2>
+					<Direction>2.0</Direction>
+					<Road startPosGT="419" finalPosLE="490">
+						<CheckPoint>
+							<Offset>-0.95</Offset>
+							<Position>420</Position>
+							<Code>28</Code>
+						</CheckPoint>
+						<SpriteNearLeft>
+							<Each>93</Each>
+							<Offset>0.3</Offset>
+							<Code>3</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>50</Each>
+							<Offset>0.3</Offset>
+							<Code>5</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>73</Each>
+							<Offset>Random</Offset>
+							<Code>23</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>62</Each>
+							<Offset>Random</Offset>
+							<Code>21</Code>
+						</SpriteFarRight>
+					</Road>
+				</P2>
+			</Climbing>
+		</P7>
+		<P8>
+			<Curve direction="3.0">
+				<Road startPosGT="491" finalPosLT="540">
+					<SpriteNearLeft>
+						<Each>80</Each>
+						<Offset>0.2</Offset>
+						<Code>3</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>90</Each>
+						<Offset>0.2</Offset>
+						<Code>4</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>65</Each>
+						<Offset>Random</Offset>
+						<Code>24</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>78</Each>
+						<Offset>Random</Offset>
+						<Code>24</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P8>
+		<P9>
+			<Curve direction="-4.0">
+				<Road startPosGE="541" finalPosLE="595">
+					<SpriteNearLeft>
+						<Each>53</Each>
+						<Offset>0.2</Offset>
+						<Code>25</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>77</Each>
+						<Offset>0.2</Offset>
+						<Code>2</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>65</Each>
+						<Offset>Random</Offset>
+						<Code>13</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>78</Each>
+						<Offset>Random</Offset>
+						<Code>20</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P9>
+		<P10>
+			<Dropping elevation="17000">
+				<P1>
+					<Direction>3.7</Direction>
+					<Road startPosGE="596" finalPosLT="700">
+						<SpriteNearLeft>
+							<Each>70</Each>
+							<Offset>0.9</Offset>
+							<Code>3</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>50</Each>
+							<Offset>1.2</Offset>
+							<Code>14</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>73</Each>
+							<Offset>Random</Offset>
+							<Code>11</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>62</Each>
+							<Offset>Random</Offset>
+							<Code>10</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+				<P2>
+					<Direction>-3.7</Direction>
+					<Road startPosGE="701" finalPosLE="800">
+						<CheckPoint>
+							<Offset>-0.95</Offset>
+							<Position>701</Position>
+							<Code>28</Code>
+						</CheckPoint>
+						<SpriteNearLeft>
+							<Each>68</Each>
+							<Offset>1.0</Offset>
+							<Code>12</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>62</Each>
+							<Offset>0.3</Offset>
+							<Code>2</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>73</Each>
+							<Offset>Random</Offset>
+							<Code>22</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>62</Each>
+							<Offset>Random</Offset>
+							<Code>21</Code>
+						</SpriteFarRight>
+					</Road>
+				</P2>
+				<P3>
+					<Direction>0.0</Direction>
+					<Road startPosGT="800" finalPosLT="920">
+						<SpriteNearLeft>
+							<Each>72</Each>
+							<Offset>0.3</Offset>
+							<Code>15</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>86</Each>
+							<Offset>0.3</Offset>
+							<Code>15</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>73</Each>
+							<Offset>Random</Offset>
+							<Code>8</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>62</Each>
+							<Offset>Random</Offset>
+							<Code>9</Code>
+						</SpriteFarRight>
+					</Road>
+				</P3>
+			</Dropping>
+		</P10>
+		<P11>
+			<Curve direction="4.0">
+				<Road startPosGT="919" finalPosLE="939">
+					<SpriteNearLeft>
+						<Each>53</Each>
+						<Offset>0.2</Offset>
+						<Code>3</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>40</Each>
+						<Offset>0.2</Offset>
+						<Code>17</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>30</Each>
+						<Offset>Random</Offset>
+						<Code>10</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>42</Each>
+						<Offset>Random</Offset>
+						<Code>11</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P11>
+		<P12>
+			<Curve direction="-4.0">
+				<Road startPosGT="940" finalPosLE="969">
+					<SpriteNearLeft>
+						<Each>53</Each>
+						<Offset>0.2</Offset>
+						<Code>4</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>51</Each>
+						<Offset>0.2</Offset>
+						<Code>2</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>30</Each>
+						<Offset>1.7</Offset>
+						<Code>7</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>42</Each>
+						<Offset>Random</Offset>
+						<Code>25</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P12>
+		<P13>
+			<Curve direction="4.0">
+				<Road startPosGT="970" finalPosLT="1000">
+					<SpriteNearLeft>
+						<Each>51</Each>
+						<Offset>0.2</Offset>
+						<Code>3</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>46</Each>
+						<Offset>0.2</Offset>
+						<Code>23</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>59</Each>
+						<Offset>Random</Offset>
+						<Code>25</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>62</Each>
+						<Offset>Random</Offset>
+						<Code>6</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P13>
+		<P14>
+			<Curve direction="-4.0">
+				<Road startPosGE="1001" finalPosLE="1020">
+					<SpriteNearLeft>
+						<Each>53</Each>
+						<Offset>0.2</Offset>
+						<Code>19</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>49</Each>
+						<Offset>0.2</Offset>
+						<Code>2</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>47</Each>
+						<Offset>Random</Offset>
+						<Code>14</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>52</Each>
+						<Offset>Random</Offset>
+						<Code>5</Code>
+					</SpriteFarRight>
+				</Road>
+			</Curve>
+		</P14>
+		<P15>
+			<Climbing elevation="8000">
+				<P1>
+					<Direction>1.0</Direction>
+					<Road startPosGE="1021" finalPosLT="1060">
+						<SpriteNearLeft>
+							<Each>48</Each>
+							<Offset>1.2</Offset>
+							<Code>1</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>43</Each>
+							<Offset>1.7</Offset>
+							<Code>26</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>53</Each>
+							<Offset>Random</Offset>
+							<Code>11</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>57</Each>
+							<Offset>Random</Offset>
+							<Code>24</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Climbing>
+		</P15>
+		<P16>
+			<Dropping elevation="17000">
+				<P1>
+					<Direction>-1.5</Direction>
+					<Road startPosGT="1061" finalPosLT="1170">
+						<CheckPoint>
+							<Offset>-0.95</Offset>
+							<Position>1063</Position>
+							<Code>28</Code>
+						</CheckPoint>
+						<SpriteNearLeft>
+							<Each>87</Each>
+							<Offset>0.3</Offset>
+							<Code>18</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>90</Each>
+							<Offset>0.7</Offset>
+							<Code>2</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>56</Each>
+							<Offset>Random</Offset>
+							<Code>9</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>64</Each>
+							<Offset>Random</Offset>
+							<Code>23</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Dropping>
+		</P15>
+		<P16>
+			<Climbing elevation="4000">
+				<P1>
+					<Direction>0.0</Direction>
+					<Road startPosGE="1170" finalPosLT="1200">
+						<SpriteNearLeft>
+							<Each>47</Each>
+							<Offset>0.3</Offset>
+							<Code>25</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>47</Each>
+							<Offset>0.3</Offset>
+							<Code>25</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>52</Each>
+							<Offset>Random</Offset>
+							<Code>7</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>48</Each>
+							<Offset>Random</Offset>
+							<Code>14</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Climbing>
+		</P16>
+		<P17>
+			<Dropping elevation="8000">
+				<P1>
+					<Direction>0.0</Direction>
+					<Road startPosGT="1199" finalPosLT="1259">
+						<SpriteNearLeft>
+							<Each>62</Each>
+							<Offset>0.3</Offset>
+							<Code>1</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>71</Each>
+							<Offset>0.3</Offset>
+							<Code>26</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>57</Each>
+							<Offset>Random</Offset>
+							<Code>12</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>54</Each>
+							<Offset>Random</Offset>
+							<Code>12</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Dropping>
+		</P17>
+		<P18>
+			<Climbing elevation="4000">
+				<P1>
+					<Direction>2.5</Direction>
+					<Road startPosGE="1260" finalPosLT="1280">
+						<SpriteNearLeft>
+							<Each>57</Each>
+							<Offset>0.3</Offset>
+							<Code>15</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>53</Each>
+							<Offset>0.3</Offset>
+							<Code>15</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>51</Each>
+							<Offset>Random</Offset>
+							<Code>10</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>50</Each>
+							<Offset>Random</Offset>
+							<Code>11</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Climbing>
+		</P19>
+		<P20>
+			<Dropping elevation="4000">
+				<P1>
+					<Direction>-2.5</Direction>
+					<Road startPosGE="1280" finalPosLT="1310">
+						<SpriteNearLeft>
+							<Each>53</Each>
+							<Offset>0.3</Offset>
+							<Code>16</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>57</Each>
+							<Offset>0.3</Offset>
+							<Code>16</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>50</Each>
+							<Offset>Random</Offset>
+							<Code>11</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>51</Each>
+							<Offset>Random</Offset>
+							<Code>10</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Dropping>
+		</P20>
+		<P21>
+			<Straight>
+				<Road startPosGT="1310" finalPosLT="1355">
+					<SpriteNearLeft>
+						<Each>56</Each>
+						<Offset>0.3</Offset>
+						<Code>4</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>62</Each>
+						<Offset>0.2</Offset>
+						<Code>14</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>73</Each>
+						<Offset>Random</Offset>
+						<Code>5</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>60</Each>
+						<Offset>Random</Offset>
+						<Code>7</Code>
+					</SpriteFarRight>
+				</Road>
+			</Straight>
+		</P21>
+		<P22>
+			<Climbing elevation="4000">
+				<P1>
+					<Direction>-2.5</Direction>
+					<Road startPosGE="1355" finalPosLT="1370">
+						<SpriteNearLeft>
+							<Each>44</Each>
+							<Offset>0.3</Offset>
+							<Code>25</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>50</Each>
+							<Offset>0.3</Offset>
+							<Code>25</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>73</Each>
+							<Offset>Random</Offset>
+							<Code>20</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>62</Each>
+							<Offset>Random</Offset>
+							<Code>24</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Climbing>
+		</P22>
+		<P23>
+			<Dropping elevation="4000">
+				<P1>
+					<Direction>2.5</Direction>
+					<Road startPosGE="1370" finalPosLT="1400">
+						<GoalPoint>
+							<Offset>-0.95</Offset>
+							<Position>1400</Position>
+							<Code>29</Code>
+						</GoalPoint>
+						<SpriteNearLeft>
+							<Each>44</Each>
+							<Offset>0.3</Offset>
+							<Code>15</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>50</Each>
+							<Offset>0.3</Offset>
+							<Code>16</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>73</Each>
+							<Offset>Random</Offset>
+							<Code>21</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>71</Each>
+							<Offset>Random</Offset>
+							<Code>13</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Dropping>
+		</P23>
+		<P24>
+			<Straight>
+				<Road startPosGE="1401" finalPosLT="1450">
+					<SpriteNearLeft>
+						<Each>70</Each>
+						<Offset>0.3</Offset>
+						<Code>15</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>70</Each>
+						<Offset>0.2</Offset>
+						<Code>5</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>68</Each>
+						<Offset>Random</Offset>
+						<Code>14</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>72</Each>
+						<Offset>Random</Offset>
+						<Code>4</Code>
+					</SpriteFarRight>
+				</Road>
+			</Straight>
+		</P24>
+	</Terrain>
 	<Color_grass>
 		<CO1>
 			<R>179</R>
@@ -111,9 +806,16 @@
 		</CO2>
 	</Color_grass>
 	<Color_road>
-		<R>77</R>
-		<G>77</G>
-		<B>77</B>
+		<CO1>
+			<R>4</R>
+			<G>3</G>
+			<B>66</B>
+		</CO1>
+		<CO2>
+			<R>4</R>
+			<G>3</G>
+			<B>66</B>
+		</CO2>
 	</Color_road>
 	<Color_rumble>
 		<CO1>
@@ -122,190 +824,9 @@
 			<B>255</B>
 		</CO1>
 		<CO2>
-			<R>77</R>
-			<G>77</G>
-			<B>77</B>
+			<R>255</R>
+			<G>0</G>
+			<B>0</B>
 		</CO2>
 	</Color_rumble>
-	<Color_middle>
-		<CO1>
-			<R>255</R>
-			<G>255</G>
-			<B>255</B>
-		</CO1>
-		<CO2>
-			<R>77</R>
-			<G>77</G>
-			<B>77</B>
-		</CO2>
-	</Color_middle>
-	<Sprites>
-		<S1 id="1">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/snow_tree1.png</Path>
-			<Interval>
-				<I1 startPosGT="800" finalPosLT="11900">
-					<Each>20</Each>
-					<Xpos>-2.1</Xpos>
-				</I1>	
-			</Interval>
-		</S1>	
-		<S2 id="2">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/snow_tree2.png</Path>
-			<Interval>
-				<I1 startPosGT="800" finalPosLT="11900">
-					<Each>30</Each>
-					<Xpos>1.8</Xpos>
-				</I1>
-			</Interval>
-		</S2>
-		<S3 id="3">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/snow_tree3.png</Path>
-			<Interval>
-				<I1 startPosGT="250" finalPosLT="700">
-					<Each>45</Each>
-					<Xpos>-3.3</Xpos>
-				</I1>
-			</Interval>
-		</S3>
-		<S4 id="4">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/snow_man.png</Path>
-			<Interval>
-				<I1 startPosGE="0" finalPosLT="200">
-					<Each>20</Each>
-					<Xpos>-3</Xpos>
-				</I1>
-				<I2 startPosGT="10500" finalPosLE="12000">
-					<Each>20</Each>
-					<Xpos>-3</Xpos>
-				</I2>
-			</Interval>
-		</S4>
-		<S5 id="5">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/street_light.png</Path>
-			<Interval>
-				<I1 startPosGT="50" finalPosLT="700">
-					<Each>25</Each>
-					<Xpos>0.7</Xpos>
-				</I1>
-				<I2 startPosGT="10500" finalPosLE="12000">
-					<Each>25</Each>
-					<Xpos>0.7</Xpos>
-				</I2>
-			</Interval>
-		</S5>
-		<S6 id="6">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/skimo_boy.png</Path>
-			<Interval>
-				<I1 startPosGE="0" finalPosLE="12000">
-					<Each>505</Each>
-					<Xpos>-8.6</Xpos>
-				</I1>
-			</Interval>
-		</S6>
-		<S7 id="7">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver//snow_house1.png</Path>
-			<Interval>
-				<I1 startPosGE="900" finalPosLE="11500">
-					<Each>57</Each>
-					<Xpos>Random</Xpos>
-					<Margin>Right</Margin>
-				</I1>
-			</Interval>
-		</S7>
-		<S8 id="8">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/snow_house2.png</Path>
-			<Interval>
-				<I1 startPosGE="500" finalPosLE="1000">
-					<Each>63</Each>
-					<Xpos>Random</Xpos>
-					<Margin>Left</Margin>
-				</I1>
-				<I2 startPosGE="750" finalPosLE="10500">
-					<Each>47</Each>
-					<Xpos>Random</Xpos>
-					<Margin>Left</Margin>
-				</I2>
-			</Interval>
-		</S8>
-		<S9 id="9">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/iglu.png</Path>
-			<Interval>
-				<I1 startPosGE="0" finalPosLE="12000">
-					<Each>601</Each>
-					<Xpos>Random</Xpos>
-					<Margin>Right</Margin>
-				</I1>
-				<I2 startPosGE="0" finalPosLE="12000">
-					<Each>303</Each>
-					<Xpos>Random</Xpos>
-					<Margin>Left</Margin>
-				</I2>
-				<I3 startPosGE="0" finalPosLE="12000">
-					<Each>100</Each>
-					<Xpos>Random</Xpos>
-					<Margin>Right</Margin>
-				</I3>
-				<I4 startPosGE="0" finalPosLE="12000">
-					<Each>300</Each>
-					<Xpos>-2</Xpos>
-				</I4>
-				<I5 startPosGE="0" finalPosLE="12000">
-					<Each>200</Each>
-					<Xpos>1</Xpos>
-				</I5>
-			</Interval>
-		</S9>
-		<S10 id="10">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/signal_go.png</Path>
-			<Interval>
-				<I1 startPosGE="0" finalPosLE="12000">
-					<Each>370</Each>
-					<Xpos>3.8</Xpos>
-				</I1>
-			</Interval>
-		</S10>
-		<S11 id="11">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/signal_bus.png</Path>
-			<Interval>
-				<I1 startPosGE="0" finalPosLE="12000">
-					<Each>350</Each>
-					<Xpos>-4.5</Xpos>
-				</I1>
-			</Interval>
-		</S11>
-		<S12 id="12">
-			<Path>images/GameModes/SuperHangOn/Scenes/Vancouver/signal_50.png</Path>
-			<Interval>
-				<I1 startPosGE="0" finalPosLE="12000">
-					<Each>500</Each>
-					<Xpos>3.8</Xpos>
-				</I1>
-			</Interval>
-		</S12>
-	</Sprites>
-	<StartingPoint>
-		<Path>images/GameModes/SuperHangOn/Decoration/start.png</Path>
-		<Position>39</Position>
-		<Xpos>-0.5</Xpos>
-	</StartingPoint>
-	<GoalPoint>
-		<Path>images/GameModes/SuperHangOn/Decoration/goal.png</Path>
-		<Position>11649</Position>
-		<Xpos>-0.5</Xpos>
-	</GoalPoint>
-	<Checkpoint>
-		<Path>images/GameModes/SuperHangOn/Decoration/checkpoint.png</Path>
-		<Ch1>
-			<Position>2971</Position>
-			<Xpos>-0.5</Xpos>
-		</Ch1>
-		<Ch2>
-			<Position>5750</Position>
-			<Xpos>-0.5</Xpos>
-		</Ch2>
-		<Ch3>
-			<Position>9698</Position>
-			<Xpos>-0.5</Xpos>
-		</Ch3>
-	</Checkpoint>
-</Circuit>
+</LandScape>

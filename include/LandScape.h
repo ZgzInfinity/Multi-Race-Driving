@@ -110,22 +110,14 @@ struct LandScape {
          * @param spriteLeft
          * @param spriteRight
          */
-        void addLine(float x, float y, float &z, float prevY, float curve, bool mainColor,
-                     Step::SpriteInfo &spriteNearLeft, Step::SpriteInfo &spriteNearRight,
-                     Step::SpriteInfo &spriteFarLeft, Step::SpriteInfo &spriteFarRight,
-                     int& stepsRead, int& eachNearLeft, int& eachNearRight, int& eachFarLeft,
-                     int&eachFarRight, const int startPos, int& codeNearLeft, int& codeNearRight,
-                     int& codeFarLeft, int& codeFarRight, bool& generateRandomNearLeft,
-                     bool& generateRandomNearRight, bool& generateRandomFarLeft, bool& generateRandomFarRight);
-
-        /**
-         * Añade rectángulos desde las instrucciones al mapa desde (x, y, z). Actualiza z para una nueva línea.
-         * @param x
-         * @param y
-         * @param z
-         * @param instructions
-         */
-        void addLines(float x, float y, float &z, const std::vector<std::vector<std::string>> &instructions);
+        void addLine(float x, float y, float &z, float prevY, float curve, bool mainColor, Step::SpriteInfo &spriteNearLeft,
+                     Step::SpriteInfo &spriteNearRight, Step::SpriteInfo &spriteFarLeft, Step::SpriteInfo &spriteFarRight,
+                     int& stepsRead, int& eachNearLeft, int& eachNearRight, int& eachFarLeft, int&eachFarRight, const int startPos,
+                     int& codeNearLeft, int& codeNearRight, int& codeFarLeft, int& codeFarRight, bool& generateRandomNearLeft,
+                     bool& generateRandomNearRight, bool& generateRandomFarLeft, bool& generateRandomFarRight, float& startPointOffset,
+                     int& startingPointPos, int& codeStartPoint, bool& startPointDrawn, float& leftOffset, float& checkPointOffset,
+                     int& checkPointPos, int& codeCheckPoint, bool& checkPointDrawn, float& goalPointOffset, int& goalPointPos,
+                     int& codeGoalPoint, bool& goalPointDrawn);
 
 
         void parseBackgroundScene(string pathFile);

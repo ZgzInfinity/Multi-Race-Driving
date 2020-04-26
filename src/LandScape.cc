@@ -166,14 +166,14 @@ inline void LandScape::parseColors(xml_node<> * color, int& colorRed, int& color
 
 
 
-void LandScape::addLine(float x, float y, float &z, float prevY, float curve, bool mainColor,
-                        Step::SpriteInfo &spriteNearLeft, Step::SpriteInfo &spriteNearRight,
-                        Step::SpriteInfo &spriteFarLeft, Step::SpriteInfo &spriteFarRight,
-                        int& stepsRead, int& eachNearLeft, int& eachNearRight, int& eachFarLeft,
-                        int&eachFarRight, const int startPos, int& codeNearLeft, int& codeNearRight,
-                        int& codeFarLeft, int& codeFarRight, bool& generateRandomNearLeft,
-                        bool& generateRandomNearRight, bool& generateRandomFarLeft, bool& generateRandomFarRight)
-
+void LandScape::addLine(float x, float y, float &z, float prevY, float curve, bool mainColor, Step::SpriteInfo &spriteNearLeft,
+                        Step::SpriteInfo &spriteNearRight, Step::SpriteInfo &spriteFarLeft, Step::SpriteInfo &spriteFarRight,
+                        int& stepsRead, int& eachNearLeft, int& eachNearRight, int& eachFarLeft, int&eachFarRight, const int startPos,
+                        int& codeNearLeft, int& codeNearRight, int& codeFarLeft, int& codeFarRight, bool& generateRandomNearLeft,
+                        bool& generateRandomNearRight, bool& generateRandomFarLeft, bool& generateRandomFarRight, float& startPointOffset,
+                        int& startingPointPos, int& codeStartPoint, bool& startPointDrawn, float& leftOffset, float& checkPointOffset,
+                        int& checkPointPos, int& codeCheckPoint, bool& checkPointDrawn, float& goalPointOffset, int& goalPointPos,
+                        int& codeGoalPoint, bool& goalPointDrawn)
 {
     Step lineAux;
     lineAux.position_3d_y = prevY;
@@ -188,12 +188,39 @@ void LandScape::addLine(float x, float y, float &z, float prevY, float curve, bo
         line.position_3d_z = z;
         z += segL - 50;
 
-        if ((startPos + stepsRead) % eachNearLeft != 0){
-            spriteNearLeft.spriteNum = -1;
+        // Check the if the start point must be shown
+        if (!startPointDrawn && startPos + stepsRead == startingPointPos){
+            spriteNearLeft.spriteNum = codeStartPoint;
+            spriteNearLeft.offset = startPointOffset;
+            startingPointPos = -1;
+            codeStartPoint = -1;
+            startPointDrawn = true;
+        }
+        else if (!checkPointDrawn && startPos + stepsRead == checkPointPos){
+            spriteNearLeft.spriteNum = codeCheckPoint;
+            spriteNearLeft.offset = checkPointOffset;
+            checkPointPos = -1;
+            codeCheckPoint = -1;
+            checkPointDrawn = true;
+        }
+        else if (!goalPointDrawn && startPos + stepsRead == goalPointPos){
+            spriteNearLeft.spriteNum = codeGoalPoint;
+            spriteNearLeft.offset = goalPointOffset;
+            goalPointPos = -1;
+            codeGoalPoint = -1;
+            goalPointDrawn = true;
         }
         else {
-            spriteNearLeft.spriteNum = codeNearLeft;
+            if ((startPos + stepsRead) % eachNearLeft != 0){
+                spriteNearLeft.spriteNum = -1;
+                spriteNearLeft.offset = leftOffset;
+            }
+            else {
+                spriteNearLeft.spriteNum = codeNearLeft;
+            }
         }
+
+        // Control the near sprite of the right
         if ((startPos + stepsRead) % eachNearRight != 0){
             spriteNearRight.spriteNum = -1;
         }
@@ -201,18 +228,23 @@ void LandScape::addLine(float x, float y, float &z, float prevY, float curve, bo
             spriteNearRight.spriteNum = codeNearRight;
         }
 
+        // Control the far sprite of the left
         if ((startPos + stepsRead) % eachFarLeft != 0){
             spriteFarLeft.spriteNum = -1;
         }
         else {
             spriteFarLeft.spriteNum = codeFarLeft;
         }
+
+        // Control the far sprite of the right
         if ((startPos + stepsRead) % eachFarRight != 0){
             spriteFarRight.spriteNum = -1;
         }
         else {
             spriteFarRight.spriteNum = codeFarRight;
         }
+
+        // Check if any of the sprites must be generated randomly
 
         if (generateRandomNearLeft){
             mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
@@ -373,7 +405,12 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
     // Local variables
     int startPos, finalPos;
     int eachNearLeft = 0, eachNearRight = 0, eachFarLeft, eachFarRight,
-        codeNearLeft = -1, codeNearRight = -1, codeFarLeft = -1, codeFarRight;
+        codeNearLeft = -1, codeNearRight = -1, codeFarLeft = -1, codeFarRight,
+        codeStartPoint = -1, codeCheckPoint = -1, codeGoalPoint = -1;
+
+    int startingPointPos = -1, checkPointPos = -1, goalPointPos = -1;
+
+    bool startPointDrawn = false, checkPointDrawn = false, goalPointDrawn = false;
 
     // Sprites of the step
     Step::SpriteInfo spriteNearLeft, spriteNearRight, spriteFarLeft, spriteFarRight;
@@ -382,13 +419,75 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
     bool generateRandomNearLeft = false, generateRandomNearRight = false,
          generateRandomFarLeft = false, generateRandomFarRight = false;
 
+    float startPointOffset = 0.0, checkPointOffset= 0.0, goalPointOffset = 0.0, leftOffset = 0.0;
+
     // Get the interval coordinates of the terrain
     getIntervalCoordinates(roadNode, 0, startPos, finalPos);
 
     // Get the sprite information of the terrain
     for (xml_node<> *spriteNode = roadNode->first_node(); spriteNode; spriteNode = spriteNode->next_sibling()){
+        // Check if it's the starting point
+        if ((string)spriteNode->name() == "StartingPoint"){
+            // Iteration to get the attributes of the sprite object
+            for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
+                // Check the interval to show the sprite
+                if ((string)attributeNode->name() == "Offset"){
+                    // Check if the offset has be initialized randomly
+                    generateRandomNearLeft = false;
+                    startPointOffset = stof((string)attributeNode->value());
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Position"){
+                    startingPointPos = stoi(attributeNode->value());
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Code"){
+                    codeStartPoint = stoi(attributeNode->value()) - 1;
+                }
+            }
+        }
+        // Check if it's the check point
+        else if ((string)spriteNode->name() == "CheckPoint"){
+            // Iteration to get the attributes of the sprite object
+            for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
+                // Check the interval to show the sprite
+                if ((string)attributeNode->name() == "Offset"){
+                    // Check if the offset has be initialized randomly
+                    generateRandomNearLeft = false;
+                    checkPointOffset = stof((string)attributeNode->value());
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Position"){
+                    checkPointPos = stoi(attributeNode->value());
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Code"){
+                    codeCheckPoint = stoi(attributeNode->value()) - 1;
+                }
+            }
+        }
+        // Check if it's the goal point
+        else if ((string)spriteNode->name() == "GoalPoint"){
+            // Iteration to get the attributes of the sprite object
+            for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
+                // Check the interval to show the sprite
+                if ((string)attributeNode->name() == "Offset"){
+                    // Check if the offset has be initialized randomly
+                    generateRandomNearLeft = false;
+                    goalPointOffset = stof((string)attributeNode->value());
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Position"){
+                    goalPointPos = stoi(attributeNode->value());
+                }
+                // Check the path of the sprite
+                else if ((string)attributeNode->name() == "Code"){
+                    codeGoalPoint = stoi(attributeNode->value()) - 1;
+                }
+            }
+        }
         // Check if it's the left or right object
-        if ((string)spriteNode->name() == "SpriteNearLeft"){
+        else if ((string)spriteNode->name() == "SpriteNearLeft"){
             // Iteration to get the attributes of the sprite object
             for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
                 // Check the interval to show the sprite
@@ -405,7 +504,7 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
                     else {
                         // Get the offset value from the file
                         generateRandomNearLeft = false;
-                        spriteNearLeft.offset = stoi((string)attributeNode->value());
+                        leftOffset = stof((string)attributeNode->value());
                     }
                 }
                 // Check the path of the sprite
@@ -432,7 +531,7 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
                     else {
                         // Get the offset value from the file
                         generateRandomNearRight = false;
-                        spriteNearRight.offset = stoi((string)attributeNode->value());
+                        spriteNearRight.offset = stof((string)attributeNode->value());
                     }
                 }
                 // Check the path of the sprite
@@ -442,7 +541,7 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
             }
         }
         // Check if it's the left or right object
-        if ((string)spriteNode->name() == "SpriteFarLeft"){
+        else if ((string)spriteNode->name() == "SpriteFarLeft"){
             // Iteration to get the attributes of the sprite object
             for (xml_node<> *attributeNode = spriteNode->first_node(); attributeNode; attributeNode = attributeNode->next_sibling()){
                 // Check the interval to show the sprite
@@ -459,7 +558,7 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
                     else {
                         // Get the offset value from the file
                         generateRandomFarLeft = false;
-                        spriteFarLeft.offset = stoi((string)attributeNode->value());
+                        spriteFarLeft.offset = stof((string)attributeNode->value());
                     }
                 }
                 // Check the path of the sprite
@@ -486,7 +585,7 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
                     else {
                         // Get the offset value from the file
                         generateRandomFarRight = false;
-                        spriteFarRight.offset = stoi((string)attributeNode->value());
+                        spriteFarRight.offset = stof((string)attributeNode->value());
                     }
                 }
                 // Check the path of the sprite
@@ -521,7 +620,9 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
         addLine(cordX, yAux, cordZ, newLines.empty() ? cordY : newLines[newLines.size() - 1].position_3d_y, curveCoeff, mainColor,
                     spriteNearLeft, spriteNearRight, spriteFarLeft, spriteFarRight, stepsRead, eachNearLeft, eachNearRight,
                     eachFarLeft, eachFarRight, startPos, codeNearLeft, codeNearRight, codeFarLeft, codeFarRight,
-                    generateRandomNearLeft, generateRandomNearRight, generateRandomFarLeft, generateRandomFarRight);
+                    generateRandomNearLeft, generateRandomNearRight, generateRandomFarLeft, generateRandomFarRight,
+                    startPointOffset, startingPointPos, codeStartPoint, startPointDrawn, leftOffset, checkPointOffset,
+                    checkPointPos, codeCheckPoint, checkPointDrawn, goalPointOffset, goalPointPos, codeGoalPoint, goalPointDrawn);
 
         mainColor = !mainColor;
     }
@@ -671,8 +772,10 @@ void LandScape::draw(RenderWindow* app, Configuration* c) {
             drawQuad(app, rumble, x1 + w1 - rw1, y1, rw1, x2 + w2 - rw2, y2, rw2); // Right rumble
             drawQuad(app, dash, x1 + rw1, y1, dw1, x2 + rw2, y2, dw2); // First left dash
             drawQuad(app, dash, x1 + w1 - rw1 - dw1, y1, dw1, x2 + w2 - rw2 - dw2, y2, dw2); // First right dash
-            drawQuad(app, dashMedLeft, x1 + int(float(w1) * 0.333f), y1, dw1, x2 + int(float(w2) * 0.333f), y2, dw2); // Second left dash
-            drawQuad(app, dashMedRight, x1 + int(float(w1) * 0.666f), y1, dw1, x2 + int(float(w2) * 0.666f), y2, dw2); // Second right dash
+
+            drawQuad(app, dashMedLeft, x1 + int(float(w1) * 0.5f), y1, dw1, x2 + int(float(w2) * 0.5f), y2, dw2); // Second left dash
+            // drawQuad(app, dashMedLeft, x1 + int(float(w1) * 0.333f), y1, dw1, x2 + int(float(w2) * 0.333f), y2, dw2); // Second left dash
+            // drawQuad(app, dashMedRight, x1 + int(float(w1) * 0.666f), y1, dw1, x2 + int(float(w2) * 0.666f), y2, dw2); // Second right dash
         }
     }
 
