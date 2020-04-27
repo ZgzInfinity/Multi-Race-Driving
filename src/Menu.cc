@@ -128,7 +128,8 @@ inline void Menu::loadMainMenu(string& imagePath, string& fontPath, string& text
  */
 inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, string& textContent, string& fontPath,
                                          Font& f, int& positionXPanel, int& positionYPanel, int& width, int& height,
-                                         int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText)
+                                         int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText,
+                                         Color& colorBorderPanel)
 {
     // Path of the xml configuration file
     char* menuF = const_cast<char*>(pathFile.c_str());
@@ -174,6 +175,33 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, str
         else if ((string)node->name() == "Border"){
             // Get y coordinate of the cover
             border = stoi(node->value());
+            continue;
+        }
+        // Get y coordinate of the cover
+        else if ((string)node->name() == "Color"){
+            // Variables to define the color of the text
+            int channelR, channelG, channelB;
+            // Loop in order to iterate all the children nodes of the text's color
+            for (xml_node<> *colorNode = node->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                // Check the value of the red channel
+                if ((string)colorNode->name() == "R"){
+                    // Get y coordinate of the cover
+                    channelR = stoi(colorNode->value());
+                    continue;
+                }
+                // Check the value of the green channel
+                if ((string)colorNode->name() == "G"){
+                    // Get y coordinate of the cover
+                    channelG = stoi(colorNode->value());
+                    continue;
+                }
+                // Check the value of the blue channel
+                if ((string)colorNode->name() == "B"){
+                    // Get y coordinate of the cover
+                    channelB = stoi(colorNode->value());
+                    colorBorderPanel = Color(channelR, channelG, channelB);
+                }
+            }
         }
         // Check if it's the node of the text information
         else if ((string)node->name() == "Text"){
@@ -234,7 +262,6 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, str
                             colorText = Color(channelR, channelG, channelB);
                         }
                     }
-
                 }
             }
         }
@@ -323,8 +350,7 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, str
                         }
                         // Creation of the button and addition to the vector
                         Button b = Button(positionXTextButton, positionYTextButton, widthButton, heightButton, f,
-                                                     textContentButton, color_buttons[0], color_buttons[1],
-                                                     color_buttons[2], initialStateButton);
+                                                     textContentButton, color_buttons[0], color_buttons[1], initialStateButton);
                         menuButtons.push_back(b);
                     }
                 }
@@ -445,13 +471,13 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
     // Variables to store all the information of the menu panel
     string imagePath, textContent, fontPath, textContentButton;
     int positionXPanel, positionYPanel, width, height, border, positionXText, positionYText, sizeText;
-    Color colorText;
+    Color colorText, colorBorderPanel;
     Font fontPanel, fontButton;
 
     // Load from file the player menu
     loadPlayerAndGameMenus(pathFile, imagePath, textContent, fontPath, fontButton,
                            positionXPanel, positionYPanel, width, height, border, positionXText,
-                           positionYText, sizeText, colorText);
+                           positionYText, sizeText, colorText, colorBorderPanel);
 
     // Set position to the cover sprite
     menuSprite.setPosition(positionXCover, positionYCover);
@@ -462,7 +488,7 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
     // Draw the rectangle of the player menu
     rectangle.setPosition(positionXPanel, positionYPanel);
     rectangle.setSize(sf::Vector2f(width, height));
-    rectangle.setOutlineColor(Color::Green);
+    rectangle.setOutlineColor(colorBorderPanel);
     rectangle.setOutlineThickness(border);
     Texture background;
     background.loadFromFile(imagePath);
@@ -627,13 +653,13 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
     // Variables to store all the information of the menu panel
     string imagePath, textContent, fontPath, textContentButton;
     int positionXPanel, positionYPanel, width, height, border, positionXText, positionYText, sizeText;
-    Color colorText;
+    Color colorText, colorBorderPanel;
     Font fontPanel, fontButton;
 
     // Load from file the player menu
     loadPlayerAndGameMenus(pathFile, imagePath, textContent, fontPath, fontButton,
                            positionXPanel, positionYPanel, width, height, border, positionXText,
-                           positionYText, sizeText, colorText);
+                           positionYText, sizeText, colorText, colorBorderPanel);
 
     // Set position to the cover sprite
     menuSprite.setPosition(positionXCover, positionYCover);
@@ -644,7 +670,7 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
     // Draw the rectangle of the player menu
     rectangle.setPosition(positionXPanel, positionYPanel);
     rectangle.setSize(sf::Vector2f(width, height));
-    rectangle.setOutlineColor(Color::Green);
+    rectangle.setOutlineColor(colorBorderPanel);
     rectangle.setOutlineThickness(border);
     Texture background;
     background.loadFromFile(imagePath);

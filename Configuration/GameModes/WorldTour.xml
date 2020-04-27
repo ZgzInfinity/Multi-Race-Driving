@@ -20,18 +20,25 @@
 	</Vehicles>
 	<GamePanel>
 		<SpeedPanel>
-			<Path>images/Environment/speedIndicator.png</Path>
-			<PositionX>0</PositionX>
-			<PositionY>660</PositionY>
+			<Path>images/Environment/KmMesure.png</Path>
+			<Path2>images/Environment/graphicSpeed.png</Path2>
+			<PositionX>160</PositionX>
+			<PositionY>680</PositionY>
 			<Text>
 				<Font>Fonts/digital.ttf</Font>
-				<Size>35</Size>
-				<PositionX>80</PositionX>
+				<Size>60</Size>
+				<PositionX>155</PositionX>
 				<PositionY>662</PositionY>
-				<Color>
-					<R>255</R>
-					<G>255</G>
+				<Border>3</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
 					<B>0</B>
+				</ColorBorder>
+				<Color>
+					<R>206</R>
+					<G>73</G>
+					<B>73</B>
 				</Color>
 			</Text>
 		</SpeedPanel>
@@ -52,11 +59,20 @@
 			</Text>
 		</ElapsedPanel>
 		<TimePanel>
+			<PositionX>455</PositionX>
+			<PositionY>51</PositionY>
+			<Height>60</Height>
+			<Width>100</Width>
+			<Color>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
+			</Color>
 			<TimeText>
 				<Font>Fonts/sgalsbi.ttf</Font>
 				<Size>25</Size>
 				<PositionX>468</PositionX>
-				<PositionY>50</PositionY>
+				<PositionY>51</PositionY>
 				<Color>
 					<R>255</R>
 					<G>255</G>
@@ -70,8 +86,8 @@
 			</PlayingTime>
 			<TimeIndicator>
 				<Font>Fonts/needForSpeed.ttf</Font>
-				<Size>30</Size>
-				<PositionX>468</PositionX>
+				<Size>25</Size>
+				<PositionX>477</PositionX>
 				<PositionY>80</PositionY>
 				<Color>
 					<R>255</R>
@@ -81,6 +97,15 @@
 			</TimeIndicator>
 		</TimePanel>
 		<DestinyPanel>
+			<PositionX>688</PositionX>
+			<PositionY>51</PositionY>
+			<Height>60</Height>
+			<Width>262</Width>
+			<Color>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
+			</Color>
 			<DestinyText>
 				<Font>Fonts/zorque.ttf</Font>
 				<Size>24</Size>
@@ -106,6 +131,6 @@
 		</DestinyPanel>
 	</GamePanel>
 	<LandScapes>
-		<L1>Configuration/GameModes/SuperHangOn/Egypt.xml</L1>
+		<L1>Configuration/GameModes/SuperHangOn/Vancouver.xml</L1>
 	</LandScapes>
 </WorldTour>

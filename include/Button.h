@@ -25,7 +25,6 @@ class Button {
 
         Color idleColorButton;
         Color hoverColorButton;
-        Color activeColorButton;
 
         bool hover, pressed;
         int buttonState;
@@ -39,7 +38,7 @@ class Button {
         Button();
 
         Button (float x, float y, float width, float height, Font& f, string text,
-                Color idleColor, Color hoverColor, Color activeColor, int initialState);
+                Color idleColor, Color hoverColor, int initialState);
 
         void getPressed (Button& otherButton);
 

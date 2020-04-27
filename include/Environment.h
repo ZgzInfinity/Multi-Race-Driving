@@ -21,8 +21,8 @@ using namespace rapidxml;
 struct Environment{
 
     // Variables to control the speed indicator of the player's vehicle
-    Texture textureSpeedPanel;
-    Sprite spriteSpeedPanel;
+    Texture textureSpeedPanel, textureSpeedGraphic;
+    Sprite spriteSpeedPanel, spriteSpeedGraphic;
     Text textSpeedIndicator;
     Font fontSpeedIndicator;
 
@@ -41,8 +41,12 @@ struct Environment{
     Font fontDestinyPanel, fontDestinyIndicator;
 
     // Inform to the user the distance to the next checkpoint or goal
-    string message;
+    string message, pathGraphic;
 
+    // Panel to have more visibility in sprite of the color of the backgrounds
+    RectangleShape timeShape, localizationPlayer;
+
+    int posXFile;
 
     /**
      * Constructor of the data type environment
@@ -51,8 +55,8 @@ struct Environment{
     Environment ();
 
 
-    void configure(string pathSpeedIndicator, string fontPathSpeedPanel, int posXSpeedPanel, int posYSpeedPanel,
-                   int sizeTextSpeedPanel, int posXTextSpeedPanel, int posYTextSpeedPanel,
+    void configure(string pathSpeedIndicator, string pathSpeedGraphic, string fontPathSpeedPanel, int posXSpeedPanel,
+                   int posYSpeedPanel, int sizeTextSpeedPanel, int posXTextSpeedPanel, int posYTextSpeedPanel,
                    string pathElapsedIndicator, string fontPathElapsedPanel, int posXElapsedPanel, int posYElapsedPanel,
                    int sizeTextElapsedPanel, int posXTextElapsedPanel, int posYTextElapsedPanel,
                    string fontPathTimeText, int sizeTimeText, int posXTimeText, int posYTimeText,
@@ -60,7 +64,8 @@ struct Environment{
                    string fontPathDestinyText, int sizeDestinyText, int posXDestinyText, int posYDestinyText,
                    string fontPathDestinyIndicator, int sizeDestinyIndicator, int posXDestinyIndicator, int posYDestinyIndicator,
                    Color colorSpeedPanel, Color colorElapsedPanel, Color colorTimeText, Color colorTimeIndicator,
-                   Color colorDestinyText, Color colorDestinyIndicator);
+                   Color colorDestinyText, Color colorDestinyIndicator, RectangleShape timeShape,
+                   RectangleShape localizationPlayer, int border, Color colorBorderPanel);
 
 };
 

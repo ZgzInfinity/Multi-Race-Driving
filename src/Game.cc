@@ -379,7 +379,7 @@ void Game::playGameSelectedMode(){
     // Reproduce sound of the player, selection game mode and difficult level menus
     mR->reproduceLevelSoundtrack();
 
-    int minutes = 0, secs = 0, decs_in_sec = 0;
+    int minutes = 0, secs = 0, decs_in_sec = 0, maxSpeed;
     int timeToPlay = INITIAL_SECS;
     Clock gameClock;
     Time shot_delay = seconds(0.1);
@@ -461,18 +461,22 @@ void Game::playGameSelectedMode(){
             case 0:
                 // Load vehicle properties of the motorbike
                 collision = mB.getModeCollision();
+                maxSpeed = mB.getMaxSpeed();
                 break;
             case 1:
                 // Load vehicle properties of the devastator
                 collision = d.getModeCollision();
+                maxSpeed = d.getMaxSpeed();
                 break;
             case 2:
                 // Load vehicle properties of the minivan
                 collision = mV.getModeCollision();
+                maxSpeed = mV.getMaxSpeed();
                 break;
             case 3:
                 // Load vehicle properties of the truck
                 collision = t.getModeCollision();
+                maxSpeed = t.getMaxSpeed();
                 break;
         }
 
@@ -499,12 +503,20 @@ void Game::playGameSelectedMode(){
         application->draw(e.spriteSpeedPanel);
         application->draw(e.spriteElapsedPanel);
         e.textSpeedIndicator.setString(to_string(int(speed / RATIO)));
-        application->draw( e.textSpeedIndicator);
+        e.textSpeedIndicator.setPosition(e.posXFile - e.textSpeedIndicator.getLocalBounds().width,
+                                         e.textSpeedIndicator.getPosition().y);
+
+        e.textureSpeedGraphic.loadFromFile(e.pathGraphic, IntRect(0, 0, (speed * 213 / maxSpeed), 20));
+        e.spriteSpeedGraphic.setTexture(e.textureSpeedGraphic, true);
+
+        application->draw(e.textSpeedIndicator);
+        application->draw(e.spriteSpeedGraphic);
 
         e.textElapsedIndicator.setString(time);
         application->draw(e.textElapsedIndicator);
 
         e.textTimePanel.setString("TIME");
+        application->draw(e.timeShape);
         application->draw(e.textTimePanel);
 
         e.textTimeIndicator.setString(to_string(timeToPlay));
@@ -530,6 +542,7 @@ void Game::playGameSelectedMode(){
         }
 
         // e.textDestinyIndicator.setString(to_string(difference) + " Km");
+        application->draw(e.localizationPlayer);
         application->draw(e.textDestinyPanel);
         // application->draw(e.textDestinyIndicator);
 

@@ -88,11 +88,13 @@ class GameSelectorMode {
          inline void controlAvailableVehicles(xml_node<> *worldTourNode);
 
 
-         inline void processTextPanel(xml_node<> *panelNode, string& fontPath, int& sizeText, int& posXTest, int& posYText, Color& colorText);
+         inline void processTextPanel(xml_node<> *panelNode, string& fontPath, int& sizeText, int& posXTest, int& posYText,
+                                      int& border, Color& colorText, Color& colorBorder);
 
 
-         inline void processFirstPanel(xml_node<> *panel, string& pathSpeedIndicator, int& posX, int& posY,
-                                       string& fontPath, int& sizeText, int& posXText, int& posYText, Color& colorText);
+         inline void processFirstPanel(xml_node<> *panel, string& pathSpeedIndicator, string& pathSpeedGraphicIndicator,
+                                       int& posX, int& posY, string& fontPath, int& sizeText, int& posXText, int& posYText,
+                                       int& border, Color& colorText, Color& colorBorder);
 
 
          inline void processSecondPanel(xml_node<> *panel, string& fontPathTimeText, int& sizeTimeText,
@@ -101,7 +103,8 @@ class GameSelectorMode {
                                         string& fontPathDestinyText, int& sizeDestinyText, int& posXDestinyText,
                                         int& posYDestinyText, string& fontPathDistanceText, int& sizeDistanceText,
                                         int& posXDistanceText, int& posYDistanceText, Color& colorTimeText,
-                                        Color& colorTimeIndicator, Color& colorDestinyText, Color& colorDistanceText);
+                                        Color& colorTimeIndicator, Color& colorDestinyText, Color& colorDistanceText,
+                                        RectangleShape& panelIndicator);
 
 
          /**

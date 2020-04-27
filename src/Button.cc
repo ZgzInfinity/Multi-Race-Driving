@@ -4,7 +4,7 @@
 Button::Button(){}
 
 Button::Button (float x, float y, float width, float height, Font& f,
-                string text, Color idleColor, Color hoverColor, Color activeColor, int initialState)
+                string text, Color idleColor, Color hoverColor, int initialState)
 {
     shape.setPosition(Vector2f(x, y));
     shape.setSize(Vector2f(width, height));
@@ -22,7 +22,6 @@ Button::Button (float x, float y, float width, float height, Font& f,
     // Store the possible colors of the button
     idleColorButton = idleColor;
     hoverColorButton = hoverColor;
-    activeColorButton = activeColor;
 
     // Check the initial state of the button
     switch (initialState){
@@ -34,9 +33,6 @@ Button::Button (float x, float y, float width, float height, Font& f,
             buttonState = BUTTON_HOVER;
             shape.setFillColor(hoverColorButton);
         break;
-        case 2:
-            buttonState = BUTTON_PRESSED;
-            shape.setFillColor(activeColorButton);
     }
 }
 
@@ -49,9 +45,6 @@ void Button::setButtonState(button_states stateButton){
         break;
         case BUTTON_HOVER:
             shape.setFillColor(hoverColorButton);
-        break;
-        case BUTTON_PRESSED:
-            shape.setFillColor(activeColorButton);
     }
 }
 

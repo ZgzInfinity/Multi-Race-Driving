@@ -12,7 +12,7 @@ Environment::Environment(){}
 
 
 
-void Environment::configure(string pathSpeedIndicator, string fontPathSpeedPanel, int posXSpeedPanel, int posYSpeedPanel,
+void Environment::configure(string pathSpeedIndicator, string pathSpeedGraphic, string fontPathSpeedPanel, int posXSpeedPanel, int posYSpeedPanel,
                             int sizeTextSpeedPanel, int posXTextSpeedPanel, int posYTextSpeedPanel,
                             string pathElapsedIndicator, string fontPathElapsedPanel, int posXElapsedPanel, int posYElapsedPanel,
                             int sizeTextElapsedPanel, int posXTextElapsedPanel, int posYTextElapsedPanel,
@@ -21,10 +21,19 @@ void Environment::configure(string pathSpeedIndicator, string fontPathSpeedPanel
                             string fontPathDestinyText, int sizeDestinyText, int posXDestinyText, int posYDestinyText,
                             string fontPathDestinyIndicator, int sizeDestinyIndicator, int posXDestinyIndicator, int posYDestinyIndicator,
                             Color colorSpeedPanel, Color colorElapsedPanel, Color colorTimeText, Color colorTimeIndicator,
-                            Color colorDestinyText, Color colorDestinyIndicator)
+                            Color colorDestinyText, Color colorDestinyIndicator, RectangleShape timeShapePanel,
+                            RectangleShape localizationPlayerPanel, int border, Color colorBorderPanel)
 {
     textureSpeedPanel.loadFromFile(pathSpeedIndicator);
     spriteSpeedPanel.setTexture(textureSpeedPanel);
+    pathGraphic = pathSpeedGraphic;
+    posXFile = posXTextSpeedPanel;
+
+    if (pathSpeedGraphic != ""){
+         textureSpeedGraphic.loadFromFile(pathSpeedGraphic);
+         spriteSpeedGraphic.setTexture(textureSpeedGraphic, true);
+         spriteSpeedGraphic.setPosition(posXSpeedPanel - 125, posYSpeedPanel + 52);
+    }
 
     textureElapsedPanel.loadFromFile(pathElapsedIndicator);
     spriteElapsedPanel.setTexture(textureElapsedPanel);
@@ -44,6 +53,8 @@ void Environment::configure(string pathSpeedIndicator, string fontPathSpeedPanel
 
     // Configuring the text speed indicator
     textSpeedIndicator.setFillColor(colorSpeedPanel);
+    textSpeedIndicator.setOutlineThickness(border);
+    textSpeedIndicator.setOutlineColor(colorBorderPanel);
     textSpeedIndicator.setCharacterSize(sizeTextSpeedPanel);
     textSpeedIndicator.setStyle(Text::Bold);
     textSpeedIndicator.setPosition(posXTextSpeedPanel, posYTextSpeedPanel);
@@ -84,4 +95,7 @@ void Environment::configure(string pathSpeedIndicator, string fontPathSpeedPanel
     textDestinyIndicator.setStyle(Text::Bold);
     textDestinyIndicator.setPosition(posXDestinyIndicator, posYDestinyIndicator);
     textDestinyIndicator.setFont(fontDestinyIndicator);
+
+    timeShape = timeShapePanel;
+    localizationPlayer = localizationPlayerPanel;
 }

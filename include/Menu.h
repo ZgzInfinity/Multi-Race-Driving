@@ -100,7 +100,8 @@ class Menu{
      */
     inline void loadPlayerAndGameMenus(string pathFile, string& imagePath, string& textContent, string& fontPath,
                                        Font& f, int& positionXPanel, int& positionYPanel, int& width, int& height,
-                                       int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText);
+                                       int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText,
+                                       Color& colorBorderPanel);
 
 
     /**

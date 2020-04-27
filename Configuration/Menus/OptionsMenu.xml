@@ -7,6 +7,11 @@
 			<Width>633</Width>
 			<Height>660</Height>
 			<Border>5</Border>
+			<Color>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
+			</Color>
 			<Text>
 				<Content>OPTIONS</Content>
 				<Font>Fonts/needForSpeed.ttf</Font>
@@ -30,20 +35,15 @@
 					<InitialState>1</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B1>
 				<B2>
@@ -56,20 +56,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B2>
 				<B3>
@@ -82,20 +77,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B3>
 				<B4>
@@ -108,20 +98,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B4>
 				<B5>
@@ -134,20 +119,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B5>
 				<B6>
@@ -160,20 +140,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B6>
 				<B7>
@@ -186,20 +161,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B7>
 				<B8>
@@ -212,20 +182,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B8>
 				<B9>
@@ -238,20 +203,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B9>
 				<B10>
@@ -264,20 +224,15 @@
 					<InitialState>1</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B10>
 				<B11>
@@ -290,20 +245,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B11>
 				<B12>
@@ -316,20 +266,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B12>
 				<B13>
@@ -342,20 +287,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B13>
 				<B14>
@@ -368,20 +308,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B14>
 				<B15>
@@ -394,20 +329,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B15>
 				<B16>
@@ -420,20 +350,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B16>
 				<B17>
@@ -446,20 +371,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B17>
 				<B18>
@@ -472,20 +392,15 @@
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B18>
 			</Buttons>

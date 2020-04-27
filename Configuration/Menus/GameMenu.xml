@@ -7,6 +7,11 @@
 			<Width>633</Width>
 			<Height>550</Height>
 			<Border>5</Border>
+			<Color>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
+			</Color>
 			<Text>
 				<Content>SELECT GAME MODE!</Content>
 				<Font>Fonts/needForSpeed.ttf</Font>
@@ -23,157 +28,127 @@
 				<B1>
 					<PositionX>320</PositionX>
 					<PositionY>250</PositionY>
-					<Width>400</Width>
+					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
 					<Content>World tour</Content>
 					<InitialState>1</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B1>
 				<B2>
 					<PositionX>320</PositionX>
 					<PositionY>310</PositionY>
-					<Width>400</Width>
+					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
 					<Content>Out Run</Content>
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B2>
 				<B3>
 					<PositionX>320</PositionX>
 					<PositionY>370</PositionY>
-					<Width>400</Width>
+					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
 					<Content>Pole Position</Content>
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B3>
 				<B4>
 					<PositionX>320</PositionX>
 					<PositionY>430</PositionY>
-					<Width>400</Width>
+					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
 					<Content>Driving fury</Content>
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B4>
 				<B5>
 					<PositionX>320</PositionX>
 					<PositionY>490</PositionY>
-					<Width>400</Width>
+					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
 					<Content>Delivery</Content>
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B5>
 				<B6>
 					<PositionX>320</PositionX>
 					<PositionY>550</PositionY>
-					<Width>400</Width>
+					<Width>200</Width>
 					<Height>30</Height>
 					<Font>Fonts/needForSpeed.ttf</Font>
 					<Content>Demarrage</Content>
 					<InitialState>0</InitialState>
 					<Colors>
 						<C1>
-							<R>255</R>
-							<G>0</G>
-							<B>0</B>
-						</C1>
-						<C2>
 							<R>228</R>
 							<G>250</G>
 							<B>0</B>
-						</C2>
-						<C3>
-							<R>23</R>
-							<G>255</G>
+						</C1>
+						<C2>
+							<R>98</R>
+							<G>250</G>
 							<B>0</B>
-						</C3>
+						</C2>
 					</Colors>
 				</B6>
 			</Buttons>
