@@ -21,8 +21,7 @@ void Environment::configure(string pathSpeedIndicator, string pathSpeedGraphic, 
                             string fontPathDestinyText, int sizeDestinyText, int posXDestinyText, int posYDestinyText,
                             string fontPathDestinyIndicator, int sizeDestinyIndicator, int posXDestinyIndicator, int posYDestinyIndicator,
                             Color colorSpeedPanel, Color colorElapsedPanel, Color colorTimeText, Color colorTimeIndicator,
-                            Color colorDestinyText, Color colorDestinyIndicator, RectangleShape timeShapePanel,
-                            RectangleShape localizationPlayerPanel, int border, Color colorBorderPanel)
+                            Color colorDestinyText, Color colorDestinyIndicator, int border, Color colorBorderPanel)
 {
     textureSpeedPanel.loadFromFile(pathSpeedIndicator);
     spriteSpeedPanel.setTexture(textureSpeedPanel);
@@ -60,6 +59,7 @@ void Environment::configure(string pathSpeedIndicator, string pathSpeedGraphic, 
     textSpeedIndicator.setPosition(posXTextSpeedPanel, posYTextSpeedPanel);
     textSpeedIndicator.setFont(fontSpeedIndicator);
 
+
     // Configuring the text elapsed indicator
     textElapsedIndicator.setFillColor(colorElapsedPanel);
     textElapsedIndicator.setCharacterSize(sizeTextElapsedPanel);
@@ -71,6 +71,8 @@ void Environment::configure(string pathSpeedIndicator, string pathSpeedGraphic, 
     textTimePanel.setFillColor(colorTimeText);
     textTimePanel.setCharacterSize(sizeTimeText);
     textTimePanel.setStyle(Text::Bold);
+    textTimePanel.setOutlineThickness(border);
+    textTimePanel.setOutlineColor(colorBorderPanel);
     textTimePanel.setPosition(posXTimeText, posYTimeText);
     textTimePanel.setFont(fontTimePanel);
 
@@ -80,6 +82,8 @@ void Environment::configure(string pathSpeedIndicator, string pathSpeedGraphic, 
     textTimeIndicator.setStyle(Text::Bold);
     textTimeIndicator.setPosition(posXTimeIndicator, posYTimeIndicator);
     textTimeIndicator.setFont(fontTimeIndicator);
+    textTimeIndicator.setOutlineThickness(border);
+    textTimeIndicator.setOutlineColor(colorBorderPanel);
 
     // Configuring the distance text panel
     textDestinyPanel.setFillColor(colorDestinyText);
@@ -88,6 +92,8 @@ void Environment::configure(string pathSpeedIndicator, string pathSpeedGraphic, 
     textDestinyPanel.setPosition(posXDestinyText, posYDestinyText);
     textDestinyPanel.setFont(fontDestinyPanel);
     textDestinyPanel.setString(message);
+    textDestinyPanel.setOutlineThickness(border);
+    textDestinyPanel.setOutlineColor(colorBorderPanel);
 
     // Configuring the distance text indicator
     textDestinyIndicator.setFillColor(colorDestinyIndicator);
@@ -95,7 +101,8 @@ void Environment::configure(string pathSpeedIndicator, string pathSpeedGraphic, 
     textDestinyIndicator.setStyle(Text::Bold);
     textDestinyIndicator.setPosition(posXDestinyIndicator, posYDestinyIndicator);
     textDestinyIndicator.setFont(fontDestinyIndicator);
+    textDestinyIndicator.setOutlineThickness(border);
+    textDestinyIndicator.setOutlineColor(colorBorderPanel);
 
-    timeShape = timeShapePanel;
-    localizationPlayer = localizationPlayerPanel;
+
 }

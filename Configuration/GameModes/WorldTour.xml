@@ -59,25 +59,22 @@
 			</Text>
 		</ElapsedPanel>
 		<TimePanel>
-			<PositionX>455</PositionX>
-			<PositionY>51</PositionY>
-			<Height>60</Height>
-			<Width>100</Width>
-			<Color>
-				<R>0</R>
-				<G>0</G>
-				<B>0</B>
-			</Color>
 			<TimeText>
 				<Font>Fonts/sgalsbi.ttf</Font>
 				<Size>25</Size>
-				<PositionX>468</PositionX>
+				<PositionX>470</PositionX>
 				<PositionY>51</PositionY>
 				<Color>
 					<R>255</R>
 					<G>255</G>
 					<B>255</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</TimeText>
 			<PlayingTime>
 				<EasyLevel>80</EasyLevel>
@@ -94,32 +91,35 @@
 					<G>153</G>
 					<B>51</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</TimeIndicator>
 		</TimePanel>
 		<DestinyPanel>
-			<PositionX>688</PositionX>
-			<PositionY>51</PositionY>
-			<Height>60</Height>
-			<Width>262</Width>
-			<Color>
-				<R>0</R>
-				<G>0</G>
-				<B>0</B>
-			</Color>
 			<DestinyText>
 				<Font>Fonts/zorque.ttf</Font>
-				<Size>24</Size>
-				<PositionX>700</PositionX>
-				<PositionY>50</PositionY>
+				<Size>28</Size>
+				<PositionX>710</PositionX>
+				<PositionY>48</PositionY>
 				<Color>
 					<R>255</R>
 					<G>255</G>
 					<B>255</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</DestinyText>
 			<DistanceText>
 				<Font>Fonts/needForSpeed.ttf</Font>
-				<Size>24</Size>
+				<Size>25</Size>
 				<PositionX>750</PositionX>
 				<PositionY>80</PositionY>
 				<Color>
@@ -127,6 +127,12 @@
 					<G>255</G>
 					<B>255</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</DistanceText>
 		</DestinyPanel>
 	</GamePanel>

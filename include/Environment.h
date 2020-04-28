@@ -43,9 +43,6 @@ struct Environment{
     // Inform to the user the distance to the next checkpoint or goal
     string message, pathGraphic;
 
-    // Panel to have more visibility in sprite of the color of the backgrounds
-    RectangleShape timeShape, localizationPlayer;
-
     int posXFile;
 
     /**
@@ -64,8 +61,7 @@ struct Environment{
                    string fontPathDestinyText, int sizeDestinyText, int posXDestinyText, int posYDestinyText,
                    string fontPathDestinyIndicator, int sizeDestinyIndicator, int posXDestinyIndicator, int posYDestinyIndicator,
                    Color colorSpeedPanel, Color colorElapsedPanel, Color colorTimeText, Color colorTimeIndicator,
-                   Color colorDestinyText, Color colorDestinyIndicator, RectangleShape timeShape,
-                   RectangleShape localizationPlayer, int border, Color colorBorderPanel);
+                   Color colorDestinyText, Color colorDestinyIndicator, int border, Color colorBorderPanel);
 
 };
 

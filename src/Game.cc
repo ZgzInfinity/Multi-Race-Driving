@@ -516,7 +516,6 @@ void Game::playGameSelectedMode(){
         application->draw(e.textElapsedIndicator);
 
         e.textTimePanel.setString("TIME");
-        application->draw(e.timeShape);
         application->draw(e.textTimePanel);
 
         e.textTimeIndicator.setString(to_string(timeToPlay));
@@ -542,7 +541,6 @@ void Game::playGameSelectedMode(){
         }
 
         // e.textDestinyIndicator.setString(to_string(difference) + " Km");
-        application->draw(e.localizationPlayer);
         application->draw(e.textDestinyPanel);
         // application->draw(e.textDestinyIndicator);
 

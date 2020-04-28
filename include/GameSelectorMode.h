@@ -103,8 +103,7 @@ class GameSelectorMode {
                                         string& fontPathDestinyText, int& sizeDestinyText, int& posXDestinyText,
                                         int& posYDestinyText, string& fontPathDistanceText, int& sizeDistanceText,
                                         int& posXDistanceText, int& posYDistanceText, Color& colorTimeText,
-                                        Color& colorTimeIndicator, Color& colorDestinyText, Color& colorDistanceText,
-                                        RectangleShape& panelIndicator);
+                                        Color& colorTimeIndicator, Color& colorDestinyText, Color& colorDistanceText);
 
 
          /**

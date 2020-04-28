@@ -197,8 +197,7 @@ inline void GameSelectorMode::processSecondPanel(xml_node<> *panel, string& font
                                                  string& fontPathDestinyText, int& sizeDestinyText, int& posXDestinyText,
                                                  int& posYDestinyText, string& fontPathDistanceText, int& sizeDistanceText,
                                                  int& posXDistanceText, int& posYDistanceText, Color& colorTimeText,
-                                                 Color& colorTimeIndicator, Color& colorDestinyText, Color& colorDistanceText,
-                                                 RectangleShape& panelIndicator)
+                                                 Color& colorTimeIndicator, Color& colorDestinyText, Color& colorDistanceText)
 {
     // Local variables to store the information
     int posX, posY, height, width;
@@ -207,52 +206,8 @@ inline void GameSelectorMode::processSecondPanel(xml_node<> *panel, string& font
 
     // Store the information of the time panel
     for (xml_node<> *panelNode = panel->first_node(); panelNode; panelNode = panelNode->next_sibling()){
-        if ((string)panelNode->name() == "PositionX"){
-            posX = stoi(panelNode->value());
-        }
-        else if ((string)panelNode->name() == "PositionY"){
-            posY = stoi(panelNode->value());
-        }
-        else if ((string)panelNode->name() == "Height"){
-            height = stoi(panelNode->value());
-        }
-        else if ((string)panelNode->name() == "Width"){
-            width = stoi(panelNode->value());
-        }
-        else if ((string)panelNode->name() == "Color"){
-            // Variables to store the color of the buttons
-            int channelR, channelG, channelB;
-            // Loop in order to iterate all the children nodes of the text's color
-            for (xml_node<> *colorNode = panelNode->first_node(); colorNode; colorNode = colorNode->next_sibling()){
-                // Get the channel of this color
-                for (xml_node<> *colorChannel = colorNode->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
-                    // Check the value of the red channel
-                    if ((string)colorChannel->name() == "R"){
-                        // Get y coordinate of the cover
-                        channelR = stoi(colorChannel->value());
-                        continue;
-                    }
-                    // Check the value of the green channel
-                    else if ((string)colorChannel->name() == "G"){
-                        // Get y coordinate of the cover
-                        channelG = stoi(colorChannel->value());
-                        continue;
-                    }
-                    // Check the value of the blue channel
-                    else if ((string)colorChannel->name() == "B"){
-                        // Get y coordinate of the cover
-                        channelB = stoi(colorChannel->value());
-                        colorPanel = Color(channelR, channelG, channelB);
-                    }
-                }
-            }
-            // Fill the panel with all the attributes
-            panelIndicator.setPosition(posX, posY);
-            panelIndicator.setSize(Vector2f(width, height));
-            panelIndicator.setFillColor(colorPanel);
-        }
         // Iteration of all the attributes of the text
-        else if ((string)panelNode->name() == "TimeText"){
+        if ((string)panelNode->name() == "TimeText"){
             // Store the text information of the time panel
             processTextPanel(panelNode, fontPathTimeText, sizeTimeText, posXTimeText, posYTimeText, border, colorTimeText, colorBorder);
             continue;
@@ -315,9 +270,6 @@ void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e, vector<
     Color colorSpeedPanel, colorElapsedPanel, colorTimeText, colorTimeIndicator,
           colorDestinyText, colorDestinyIndicator;
 
-    // Panels to control the visibility of the indicators
-    RectangleShape timePanel, localizationPlayer;
-
     int border = 0;
     Color colorBorderSpeedPanel = Color::Transparent;
 
@@ -353,7 +305,7 @@ void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e, vector<
                                        sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText,
                                        posXDestinyText, posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator,
                                        posXDestinyIndicator, posYDestinyIndicator, colorTimeText, colorTimeIndicator,
-                                       colorDestinyText, colorDestinyIndicator, timePanel);
+                                       colorDestinyText, colorDestinyIndicator);
                 }
                 // Check the actual node read and process the destiny panel
                 else if ((string)panel->name() == "DestinyPanel"){
@@ -362,7 +314,7 @@ void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e, vector<
                                        sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText,
                                        posXDestinyText, posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator,
                                        posXDestinyIndicator, posYDestinyIndicator, colorTimeText, colorTimeIndicator,
-                                       colorDestinyText, colorDestinyIndicator, localizationPlayer);
+                                       colorDestinyText, colorDestinyIndicator);
                 }
             }
         }
@@ -382,7 +334,7 @@ void GameSelectorMode::loadWorldTourMode(char* pathFile, Environment& e, vector<
                 sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText, posXDestinyText,
                 posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator, posXDestinyIndicator, posYDestinyIndicator,
                 colorSpeedPanel, colorElapsedPanel, colorTimeText, colorTimeIndicator, colorDestinyText, colorDestinyIndicator,
-                timePanel, localizationPlayer, border, colorBorderSpeedPanel);
+                border, colorBorderSpeedPanel);
 }
 
 
@@ -422,8 +374,6 @@ void GameSelectorMode::loadOutRun(char* pathFile, Environment& e, vector<string>
     Color colorSpeedPanel, colorElapsedPanel, colorTimeText, colorTimeIndicator,
           colorDestinyText, colorDestinyIndicator;
 
-    // Panels to control the visibility of the indicators
-    RectangleShape timePanel, localizationPlayer;
     Color colorBorderPanel = Color::Transparent;
 
     int border = 0;
@@ -460,7 +410,7 @@ void GameSelectorMode::loadOutRun(char* pathFile, Environment& e, vector<string>
                                        sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText,
                                        posXDestinyText, posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator,
                                        posXDestinyIndicator, posYDestinyIndicator, colorTimeText, colorTimeIndicator,
-                                       colorDestinyText, colorDestinyIndicator, timePanel);
+                                       colorDestinyText, colorDestinyIndicator);
                 }
                 // Check the actual node read and process the destiny panel
                 else if ((string)panel->name() == "DestinyPanel"){
@@ -469,7 +419,7 @@ void GameSelectorMode::loadOutRun(char* pathFile, Environment& e, vector<string>
                                        sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText,
                                        posXDestinyText, posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator,
                                        posXDestinyIndicator, posYDestinyIndicator, colorTimeText, colorTimeIndicator,
-                                       colorDestinyText, colorDestinyIndicator, localizationPlayer);
+                                       colorDestinyText, colorDestinyIndicator);
                 }
             }
         }
@@ -489,7 +439,7 @@ void GameSelectorMode::loadOutRun(char* pathFile, Environment& e, vector<string>
                 sizeTimeIndicator, posXTimeIndicator, posYTimeIndicator, fontPathDestinyText, sizeDestinyText, posXDestinyText,
                 posYDestinyText, fontPathDestinyIndicator, sizeDestinyIndicator, posXDestinyIndicator, posYDestinyIndicator,
                 colorSpeedPanel, colorElapsedPanel, colorTimeText, colorTimeIndicator, colorDestinyText, colorDestinyIndicator,
-                timePanel, localizationPlayer, border, colorBorderPanel);
+                border, colorBorderPanel);
 }
 
 
