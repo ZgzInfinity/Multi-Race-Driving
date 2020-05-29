@@ -108,7 +108,7 @@ class Player{
             mode = -1;
             // Accumulator to the coordinate of the axis Y to make collision better
             offset = 0;
-            // Load the default configuration to control the vehicle
+            // Offset added if the collision is with the second type
             c = conf;
         }
 

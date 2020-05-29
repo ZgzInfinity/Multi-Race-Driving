@@ -24,9 +24,26 @@
 					<B>255</B>
 				</Color>
 			</Text>
+			<DescriptionPanel>
+				<PositionX>540</PositionX>
+				<PositionY>310</PositionY>
+				<Width>200</Width>
+				<Height>200</Height>
+				<Border>3</Border>
+				<ColorInside>
+					<R>98</R>
+					<G>250</G>
+					<B>0</B>
+				</ColorInside>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
+			</DescriptionPanel>
 			<Buttons>
 				<B1>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>310</PositionY>
 					<Width>200</Width>
 					<Height>40</Height>
@@ -45,9 +62,15 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/Flag.png</Image>
+					<Description>
+						<D1>Time: 70 seconds</D1>
+						<D2>AI: Reduced</D2>
+						<D3>Traffic: weak</D3>
+					</Description>
 				</B1>
 				<B2>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>390</PositionY>
 					<Width>200</Width>
 					<Height>40</Height>
@@ -66,9 +89,15 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/Flag.png</Image>
+					<Description>
+						<D1>Time: 50 seconds</D1>
+						<D2>AI: Balanced</D2>
+						<D3>Traffic: normal</D3>
+					</Description>
 				</B2>
 				<B3>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>470</PositionY>
 					<Width>200</Width>
 					<Height>40</Height>
@@ -87,6 +116,12 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/Flag.png</Image>
+					<Description>
+						<D1>Time: 30 seconds</D1>
+						<D2>AI: Elevated</D2>
+						<D3>Traffic: Dense</D3>
+					</Description>
 				</B3>
 			</Buttons>
 		</MenuPanel>

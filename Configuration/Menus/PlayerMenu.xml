@@ -24,9 +24,26 @@
 					<B>255</B>
 				</Color>
 			</Text>
+			<DescriptionPanel>
+				<PositionX>540</PositionX>
+				<PositionY>280</PositionY>
+				<Width>200</Width>
+				<Height>270</Height>
+				<Border>3</Border>
+				<ColorInside>
+					<R>98</R>
+					<G>250</G>
+					<B>0</B>
+				</ColorInside>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
+			</DescriptionPanel>
 			<Buttons>
-				<B1>
-					<PositionX>320</PositionX>
+				<B0>
+					<PositionX>300</PositionX>
 					<PositionY>280</PositionY>
 					<Width>200</Width>
 					<Height>50</Height>
@@ -45,9 +62,15 @@
 							<B>0</B>
 						</C2>
 					</Colors>
-				</B1>
-				<B2>
-					<PositionX>320</PositionX>
+					<Image>Images/Menus/SinglePlayer.png</Image>
+					<Description>
+						<D1>Enjoy several amazing</D1>
+						<D2>game modes in a solo</D2>
+						<D3>adventure</D3>
+					</Description>
+				</B0>
+				<B1>
+					<PositionX>300</PositionX>
 					<PositionY>390</PositionY>
 					<Width>200</Width>
 					<Height>50</Height>
@@ -66,9 +89,15 @@
 							<B>0</B>
 						</C2>
 					</Colors>
-				</B2>
+					<Image>Images/Menus/MultiPlayer.png</Image>
+					<Description>
+						<D1>Enjoy fantastic driving </D1>
+						<D2>competitions with other</D2>
+						<D3>players</D3>
+					</Description>
+				</B1>
 				<B2>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>500</PositionY>
 					<Width>200</Width>
 					<Height>50</Height>
@@ -87,6 +116,12 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/Options.png</Image>
+					<Description>
+						<D1>Access and configure parameters</D1>
+						<D2>and controllers completely</D2>
+						<D3>to your liking</D3>
+					</Description>
 				</B2>
 			</Buttons>
 		</MenuPanel>

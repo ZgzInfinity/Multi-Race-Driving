@@ -129,7 +129,9 @@ inline void Menu::loadMainMenu(string& imagePath, string& fontPath, string& text
 inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, string& textContent, string& fontPath,
                                          Font& f, int& positionXPanel, int& positionYPanel, int& width, int& height,
                                          int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText,
-                                         Color& colorBorderPanel)
+                                         Color& colorBorderPanel, int& posXDescription, int& posYDescription,
+                                         int& widthDescription, int& heightDescription, int& borderDescription,
+                                         Color& colorInsideDescription, Color& colorBorderDescription)
 {
     // Path of the xml configuration file
     char* menuF = const_cast<char*>(pathFile.c_str());
@@ -266,10 +268,82 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, str
             }
         }
         // Check if it's the node of the text information
+        else if ((string)node->name() == "DescriptionPanel"){
+            // Loop in order to iterate all the children nodes of the text's color
+            for (xml_node<> *nodeDescription = node->first_node(); nodeDescription; nodeDescription = nodeDescription->next_sibling()){
+                // Check the x coordinate of the main cover
+                if ((string)nodeDescription->name() == "PositionX"){
+                    // Get x coordinate of the cover
+                    posXDescription = stoi(nodeDescription->value());
+                    continue;
+                }
+                // Check the y coordinate of the main cover
+                else if ((string)nodeDescription->name() == "PositionY"){
+                    // Get y coordinate of the cover
+                    posYDescription = stoi(nodeDescription->value());
+                    continue;
+                }
+                // Check the x coordinate of the main cover
+                else if ((string)nodeDescription->name() == "Width"){
+                    // Get x coordinate of the cover
+                    widthDescription = stoi(nodeDescription->value());
+                    continue;
+                }
+                // Check the y coordinate of the main cover
+                else if ((string)nodeDescription->name() == "Height"){
+                    // Get y coordinate of the cover
+                    heightDescription = stoi(nodeDescription->value());
+                    continue;
+                }
+                // Check the y coordinate of the main cover
+                else if ((string)nodeDescription->name() == "Border"){
+                    // Get y coordinate of the cover
+                    borderDescription = stoi(nodeDescription->value());
+                    continue;
+                }
+                // Check the y coordinate of the main cover
+                else if ((string)nodeDescription->name() == "ColorInside" || (string)nodeDescription->name() == "ColorBorder"){
+                    // Variables to define the color of the text
+                    int channelR, channelG, channelB;
+                    // Loop in order to iterate all the children nodes of the text's color
+                    for (xml_node<> *colorNode = nodeDescription->first_node(); colorNode; colorNode = colorNode->next_sibling()){
+                        // Check the value of the red channel
+                        if ((string)colorNode->name() == "R"){
+                            // Get y coordinate of the cover
+                            channelR = stoi(colorNode->value());
+                            continue;
+                        }
+                        // Check the value of the green channel
+                        else if ((string)colorNode->name() == "G"){
+                            // Get y coordinate of the cover
+                            channelG = stoi(colorNode->value());
+                            continue;
+                        }
+                        // Check the value of the blue channel
+                        else if ((string)colorNode->name() == "B"){
+                            // Get y coordinate of the cover
+                            channelB = stoi(colorNode->value());
+                            // Store the color in the correct color field
+                            if ((string)nodeDescription->name() == "ColorInside"){
+                                // Store the color of the text when the slot is selected
+                                colorInsideDescription = Color(channelR, channelG, channelB);
+                            }
+                            else if ((string)nodeDescription->name() == "ColorBorder"){
+                                // Store the color of the border when the slot is selected
+                                colorBorderDescription = Color(channelR, channelG, channelB);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Check if it's the node of the text information
         else if ((string)node->name() == "Buttons"){
             // Variables to store the information of the buttons
             int positionXTextButton, positionYTextButton, widthButton, heightButton, initialStateButton;
             string textContentButton;
+            Texture icon;
+            Sprite s;
 
             // Iterate throughout the different buttons of the menu
             for (xml_node<> *button = node->first_node(); button; button = button->next_sibling()){
@@ -348,9 +422,20 @@ inline void Menu::loadPlayerAndGameMenus(string pathFile, string& imagePath, str
                                 }
                             }
                         }
+                    }
+                    else if ((string)buttonNode->name() == "Image"){
+                        icon.loadFromFile((string)buttonNode->value());
+                        texturesIcon.push_back(icon);
+                        Sprite s;
+                        iconButtons.push_back(s);
+                    }
+                    else if ((string)buttonNode->name() == "Description"){
                         // Creation of the button and addition to the vector
                         Button b = Button(positionXTextButton, positionYTextButton, widthButton, heightButton, f,
                                                      textContentButton, color_buttons[0], color_buttons[1], initialStateButton);
+
+                        // Process the description text of the button
+                        b.proccessDescription(buttonNode);
                         menuButtons.push_back(b);
                     }
                 }
@@ -467,17 +552,23 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
 
     // Clear the list of buttons of the last possible menus
     menuButtons.clear();
+    iconButtons.clear();
+    texturesIcon.clear();
 
     // Variables to store all the information of the menu panel
     string imagePath, textContent, fontPath, textContentButton;
-    int positionXPanel, positionYPanel, width, height, border, positionXText, positionYText, sizeText;
-    Color colorText, colorBorderPanel;
+    int positionXPanel, positionYPanel, width, height, border, borderDescription,
+        positionXText, positionYText, sizeText;
+    int posXDescription, posYDescription, widthDescription, heightDescription;
+    Color colorText, colorBorderPanel, colorInsideDescription, colorBorderDescription;
     Font fontPanel, fontButton;
 
     // Load from file the player menu
     loadPlayerAndGameMenus(pathFile, imagePath, textContent, fontPath, fontButton,
                            positionXPanel, positionYPanel, width, height, border, positionXText,
-                           positionYText, sizeText, colorText, colorBorderPanel);
+                           positionYText, sizeText, colorText, colorBorderPanel, posXDescription,
+                           posYDescription, widthDescription, heightDescription, borderDescription,
+                           colorInsideDescription, colorBorderDescription);
 
     // Set position to the cover sprite
     menuSprite.setPosition(positionXCover, positionYCover);
@@ -495,6 +586,13 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
     rectangle.setTexture(&background, true);
     app->draw(rectangle);
 
+    // Draw the rectangle of the player menu
+    description.setPosition(posXDescription, posYDescription);
+    description.setSize(sf::Vector2f(widthDescription, heightDescription));
+    description.setFillColor(colorInsideDescription);
+    description.setOutlineColor(colorBorderPanel);
+    description.setOutlineThickness(borderDescription);
+
     // Draw the text introduction of the menu
     Text playerText;
     playerText.setString(textContent);
@@ -506,12 +604,57 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
     playerText.setFont(fontPanel);
     app->draw(playerText);
 
+    // Draw the text description of the menu
+    Text descriptionText;
+    descriptionText.setStyle(Text::Bold);
+    descriptionText.setFillColor(Color::Blue);
+    descriptionText.setCharacterSize(12);
+    descriptionText.setFont(fontButton);
+
     // Identifier of the actual button selected
     optionParameter = 0;
+
+    app->draw(description);
+
+    int posXDescriptionInit = posXDescription + 10;
+    int posYDescriptionInit = posYDescription + 10;
 
     // Show the buttons of the menu
     for (int i = 0; i < (int)menuButtons.size(); i++){
         menuButtons.at(i).render(app);
+
+        if (i == optionParameter){
+
+            int posXDescriptionOffset = posXDescription + 10;
+            int posYDescriptionOffset = posYDescription + 10;
+
+            // Draw the button description
+            // Display the description of the button
+            vector<string> wordsButton =  menuButtons.at(i).getDescriptionButton();
+
+            for (string s : wordsButton){
+                descriptionText.setString(s);
+                if (posXDescriptionOffset + descriptionText.getLocalBounds().width <= 720){
+                    descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                    app->draw(descriptionText);
+                    posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                }
+                else {
+                    posXDescriptionOffset = posXDescriptionInit;
+                    posYDescriptionOffset += 20;
+                    descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                    app->draw(descriptionText);
+                    posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                }
+            }
+            // Display the icon of the button
+            iconButtons[i].setTexture(texturesIcon[i], true);
+            posXDescriptionOffset = (app->getSize().x / 2.f) + (iconButtons[i].getLocalBounds().width / 1.3f);
+            posYDescriptionOffset += 30;
+            iconButtons[i].setPosition(posXDescriptionOffset, posYDescriptionOffset);
+
+            app->draw(iconButtons[i]);
+        }
     }
 
     // Display the changes of the buttons' appearance
@@ -548,10 +691,45 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
                 // Render the buttons with the changes
                 app->draw(rectangle);
                 app->draw(playerText);
+                app->draw(description);
 
                 // Show the buttons of the menu
                 for (int i = 0; i < (int)menuButtons.size(); i++){
+                    // Draw the button figure
                     menuButtons.at(i).render(app);
+                    if (i == optionParameter){
+
+                        int posXDescriptionOffset = posXDescription + 10;
+                        int posYDescriptionOffset = posYDescription + 10;
+
+                        // Draw the button description
+                        // Display the description of the button
+                        vector<string> wordsButton =  menuButtons.at(i).getDescriptionButton();
+
+                        for (string s : wordsButton){
+                            descriptionText.setString(s);
+                            if (posXDescriptionOffset + descriptionText.getLocalBounds().width <= 720){
+                                descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                                app->draw(descriptionText);
+                                posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                            }
+                            else {
+                                posXDescriptionOffset = posXDescriptionInit;
+                                posYDescriptionOffset += 20;
+                                descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                                app->draw(descriptionText);
+                                posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                            }
+                        }
+
+                        // Display the icon of the button
+                        iconButtons[i].setTexture(texturesIcon[i], true);
+                        posXDescriptionOffset = (app->getSize().x / 2.f) + (iconButtons[i].getLocalBounds().width / 1.3f);
+                        posYDescriptionOffset += 30;
+                        iconButtons[i].setPosition(posXDescriptionOffset, posYDescriptionOffset);
+
+                        app->draw(iconButtons[i]);
+                    }
                 }
                 app->display();
                 sleep(milliseconds(180));
@@ -575,10 +753,44 @@ void Menu::showStandardMenu(RenderWindow* app, string pathFile, int& optionParam
                 app->draw(menuSprite);
                 app->draw(rectangle);
                 app->draw(playerText);
+                app->draw(description);
 
                 // Show the buttons of the menu
                 for (int i = 0; i < (int)menuButtons.size(); i++){
                     menuButtons.at(i).render(app);
+
+                    if (i == optionParameter){
+
+                        int posXDescriptionOffset = posXDescription + 10;
+                        int posYDescriptionOffset = posYDescription + 10;
+
+                        // Draw the button description
+                        // Display the description of the button
+                        vector<string> wordsButton =  menuButtons.at(i).getDescriptionButton();
+
+                        for (string s : wordsButton){
+                            descriptionText.setString(s);
+                            if (posXDescriptionOffset + descriptionText.getLocalBounds().width <= 720){
+                                descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                                app->draw(descriptionText);
+                                posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                            }
+                            else {
+                                posXDescriptionOffset = posXDescriptionInit;
+                                posYDescriptionOffset += 20;
+                                descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                                app->draw(descriptionText);
+                                posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                            }
+                        }
+
+                        // Display the icon of the button
+                        iconButtons[i].setTexture(texturesIcon[i], true);
+                        posXDescriptionOffset = (app->getSize().x / 2.f) + (iconButtons[i].getLocalBounds().width / 1.3f);
+                        posYDescriptionOffset += 30;
+                        iconButtons[i].setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                        app->draw(iconButtons[i]);
+                    }
                 }
                 app->display();
                 sleep(milliseconds(180));
@@ -652,14 +864,18 @@ void Menu::showMenuOptions(RenderWindow* app, string pathFile, Type_control& con
 
     // Variables to store all the information of the menu panel
     string imagePath, textContent, fontPath, textContentButton;
-    int positionXPanel, positionYPanel, width, height, border, positionXText, positionYText, sizeText;
-    Color colorText, colorBorderPanel;
+    int positionXPanel, positionYPanel, width, height, border, borderDescription,
+        positionXText, positionYText, sizeText;
+    int posXDescription, posYDescription, widthDescription, heightDescription;
+    Color colorText, colorBorderPanel, colorInsideDescription, colorBorderDescription;
     Font fontPanel, fontButton;
 
     // Load from file the player menu
     loadPlayerAndGameMenus(pathFile, imagePath, textContent, fontPath, fontButton,
                            positionXPanel, positionYPanel, width, height, border, positionXText,
-                           positionYText, sizeText, colorText, colorBorderPanel);
+                           positionYText, sizeText, colorText, colorBorderPanel, posXDescription,
+                           posYDescription, widthDescription, heightDescription, borderDescription,
+                           colorInsideDescription, colorBorderDescription);
 
     // Set position to the cover sprite
     menuSprite.setPosition(positionXCover, positionYCover);

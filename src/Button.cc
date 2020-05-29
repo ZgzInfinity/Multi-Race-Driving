@@ -67,3 +67,29 @@ void Button::setTextButton(string newString){
 string Button::getTextButton(){
     return textButton.getString();
 }
+
+
+void Button::proccessDescription(xml_node<> *child){
+    string descriptionPhrase, wordRead;
+    int init, last;
+     // Loop in order to iterate throughout the colors of the grass
+    for (xml_node<> *phrase = child->first_node(); phrase; phrase = phrase->next_sibling()){
+        descriptionPhrase = (string)phrase->value();
+        // Iterate character by character the phrase read
+        init = 0, last = 0;
+        while(last = descriptionPhrase.find(" ", init), last >= 0 ){
+            // Get the actual word which has to be processed
+            wordRead = descriptionPhrase.substr(init, last - init);
+            descriptionButton.push_back(wordRead);
+            init = last + 1;
+        }
+        // Last word of the phrase
+        wordRead = descriptionPhrase.substr(init);
+        descriptionButton.push_back(wordRead);
+    }
+}
+
+
+vector<string> Button::getDescriptionButton(){
+    return descriptionButton;
+}

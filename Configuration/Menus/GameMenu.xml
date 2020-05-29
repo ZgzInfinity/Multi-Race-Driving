@@ -24,9 +24,26 @@
 					<B>255</B>
 				</Color>
 			</Text>
+			<DescriptionPanel>
+				<PositionX>540</PositionX>
+				<PositionY>250</PositionY>
+				<Width>200</Width>
+				<Height>330</Height>
+				<Border>3</Border>
+				<ColorInside>
+					<R>98</R>
+					<G>250</G>
+					<B>0</B>
+				</ColorInside>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
+			</DescriptionPanel>
 			<Buttons>
 				<B1>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>250</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
@@ -45,9 +62,16 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/SuperHangOn.png</Image>
+					<Description>
+						<D1>Run in different parts of the world</D1>
+						<D2>facing other rivals and traffic.</D2>
+						<D3>Only the first one is worth it!</D3>
+						<D6>Mode inspired by Super Hang on</D6>
+					</Description>
 				</B1>
 				<B2>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>310</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
@@ -66,9 +90,15 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/OutRun.png</Image>
+					<Description>
+						<D1>Circulate through five different scenarios</D1>
+						<D2>reaching the checkpoint before time runs out.</D2> 
+						<D3>Mode inspired arcade game Out Run.</D3>
+					</Description>
 				</B2>
 				<B3>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>370</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
@@ -87,9 +117,15 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/PolePosition.png</Image>
+					<Description>
+						<D1>Select a scenario to run and win the race investing</D1>
+						<D2>as little time as possible to improve your records.</D2>
+						<D3>Mode inspired in Pole Position game</D3>
+					</Description>
 				</B3>
 				<B4>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>430</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
@@ -108,9 +144,16 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/ChaseHQ.png</Image>
+					<Description>
+						<D1>Chase, hit and eliminate a rival vehicle by</D1>
+						<D2>going through different stages before</D2>
+						<D3>the end of time.</D4>
+						<D4>Mode inspired in Chase HQ game</D4>
+					</Description>
 				</B4>
 				<B5>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>490</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
@@ -129,9 +172,15 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/CrazyTaxi.png</Image>
+					<Description>
+						<D1>Deliver a package to a specific point</D1> 
+						<D2>before any of your rivals do</D2>
+						<D3>Game mode inspired by Crazy taxi</D3>
+					</Description>
 				</B5>
 				<B6>
-					<PositionX>320</PositionX>
+					<PositionX>300</PositionX>
 					<PositionY>550</PositionY>
 					<Width>200</Width>
 					<Height>30</Height>
@@ -150,6 +199,12 @@
 							<B>0</B>
 						</C2>
 					</Colors>
+					<Image>Images/Menus/NeedForSpeedUndercover.png</Image>
+					<Description>
+						<D1>Chase an opponent until you get some distance</D1>
+						<D2>ahead</D2>
+						<D3>Game mode inspired by Need for Speed Undercover</D3>
+					</Description>
 				</B6>
 			</Buttons>
 		</MenuPanel>

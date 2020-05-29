@@ -51,10 +51,17 @@ class Menu{
         vector<Button> menuButtons;
 
         // Vector for store the different color buttons
-        vector<Color>color_buttons;
+        vector<Color> color_buttons;
+
+        vector<Sprite> iconButtons;
+
+        vector<Texture> texturesIcon;
 
         // Panel for the menus of the game
         sf::RectangleShape rectangle;
+
+        // Panel to describe the different game modes
+        sf::RectangleShape description;
 
         // Variable to store the texture of the game's presents main cover
         Texture cover;
@@ -101,7 +108,9 @@ class Menu{
     inline void loadPlayerAndGameMenus(string pathFile, string& imagePath, string& textContent, string& fontPath,
                                        Font& f, int& positionXPanel, int& positionYPanel, int& width, int& height,
                                        int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText,
-                                       Color& colorBorderPanel);
+                                       Color& colorBorderPanel, int& posXDescription, int& posYDescription,
+                                       int& widthDescription, int& heightDescription, int& borderDescription,
+                                       Color& colorInsideDescription, Color& colorBorderDescription);
 
 
     /**

@@ -7,9 +7,14 @@
 #include <iostream>
 #include <cstring>
 #include "SFML/Graphics.hpp"
+#include "rapidxml.hpp"
+#include "rapidxml_utils.hpp"
+#include "Word.h"
 
 using namespace std;
 using namespace sf;
+using namespace rapidxml;
+
 
 enum button_states {
     BUTTON_IDLE = 0,
@@ -28,6 +33,8 @@ class Button {
 
         bool hover, pressed;
         int buttonState;
+
+        vector<string> descriptionButton;
 
     public:
 
@@ -49,6 +56,10 @@ class Button {
         void setTextButton(string newString);
 
         string getTextButton();
+
+        void proccessDescription(xml_node<> *child);
+
+        vector<string> getDescriptionButton();
 
 };
 
