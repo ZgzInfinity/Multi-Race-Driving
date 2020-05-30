@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<OutRun> 
+<WorldTour> 
 	<Vehicles>
 		<Motorbike>
 			<Availability>0</Availability>
@@ -20,18 +20,25 @@
 	</Vehicles>
 	<GamePanel>
 		<SpeedPanel>
-			<Path>images/Environment/speedIndicator.png</Path>
-			<PositionX>0</PositionX>
-			<PositionY>660</PositionY>
+			<Path>images/Environment/KmMesure.png</Path>
+			<Path2>images/Environment/graphicSpeed.png</Path2>
+			<PositionX>160</PositionX>
+			<PositionY>680</PositionY>
 			<Text>
 				<Font>Fonts/digital.ttf</Font>
-				<Size>35</Size>
-				<PositionX>80</PositionX>
+				<Size>60</Size>
+				<PositionX>155</PositionX>
 				<PositionY>662</PositionY>
-				<Color>
-					<R>255</R>
-					<G>255</G>
+				<Border>3</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
 					<B>0</B>
+				</ColorBorder>
+				<Color>
+					<R>206</R>
+					<G>73</G>
+					<B>73</B>
 				</Color>
 			</Text>
 		</SpeedPanel>
@@ -55,13 +62,19 @@
 			<TimeText>
 				<Font>Fonts/sgalsbi.ttf</Font>
 				<Size>25</Size>
-				<PositionX>468</PositionX>
-				<PositionY>50</PositionY>
+				<PositionX>470</PositionX>
+				<PositionY>51</PositionY>
 				<Color>
 					<R>255</R>
 					<G>255</G>
 					<B>255</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</TimeText>
 			<PlayingTime>
 				<EasyLevel>80</EasyLevel>
@@ -70,31 +83,43 @@
 			</PlayingTime>
 			<TimeIndicator>
 				<Font>Fonts/needForSpeed.ttf</Font>
-				<Size>30</Size>
-				<PositionX>468</PositionX>
+				<Size>25</Size>
+				<PositionX>477</PositionX>
 				<PositionY>80</PositionY>
 				<Color>
 					<R>255</R>
 					<G>153</G>
 					<B>51</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</TimeIndicator>
 		</TimePanel>
 		<DestinyPanel>
 			<DestinyText>
 				<Font>Fonts/zorque.ttf</Font>
-				<Size>24</Size>
-				<PositionX>700</PositionX>
-				<PositionY>50</PositionY>
+				<Size>28</Size>
+				<PositionX>710</PositionX>
+				<PositionY>48</PositionY>
 				<Color>
 					<R>255</R>
 					<G>255</G>
 					<B>255</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</DestinyText>
 			<DistanceText>
 				<Font>Fonts/needForSpeed.ttf</Font>
-				<Size>24</Size>
+				<Size>25</Size>
 				<PositionX>750</PositionX>
 				<PositionY>80</PositionY>
 				<Color>
@@ -102,10 +127,17 @@
 					<G>255</G>
 					<B>255</B>
 				</Color>
+				<Border>2</Border>
+				<ColorBorder>
+					<R>0</R>
+					<G>0</G>
+					<B>0</B>
+				</ColorBorder>
 			</DistanceText>
 		</DestinyPanel>
 	</GamePanel>
 	<LandScapes>
-		<L1>Configuration/GameModes/OutRun/GobiDesert.xml</L1>
+		<L1>Configuration/GameModes/OutRun/Caribe.xml</L1>
 	</LandScapes>
-</OutRun>
+</WorldTour>
+
