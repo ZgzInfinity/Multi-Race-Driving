@@ -1,181 +1,188 @@
 
+
 #ifndef MENU_H
 #define MENU_H
 
+#include <vector>
+#include <memory>
 #include <iostream>
-#include <cstring>
-#include <SFML/Graphics.hpp>
 #include "Button.h"
-#include "Slot.h"
-#include "Configuration.h"
 #include "KeywordMapper.h"
-#include "VehicleSpecifications.h"
-#include "EffectReproductor.h"
+#include "Score.h"
+#include "Configuration.h"
+#include "SoundPlayer.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+
 
 using namespace std;
 using namespace sf;
 using namespace rapidxml;
 
-
-enum Game_status {
-    ANIMATION = 0,
-    MAIN_MENU,
-    PLAYER_MENU,
-    OPTIONS,
-    SINGLE_GAME_MODE,
-    MULTI_GAME_MODE,
-    LEVEL_MENU,
-    PREPARING_GAME_MODE,
-    VEHICLE_MENU,
-    PLAYING,
-};
+const int NUM_SEGA_ICONS = 39;
+const int NUM_SOUNDTRACKS = 4;
 
 
-enum Type_control {
-    MOUSE = 0,
-    KEYBOARD,
-    JOYSTICK,
-};
-
-
-/*
- * Step data type
+/**
+ * Animación inicial.
+ * @param c
+ * @return
  */
-class Menu{
+State introAnimation(Configuration &c, SoundPlayer& r);
 
-    private:
+/**
+ * Menú de opciones.
+ * @param c
+ * @param inGame
+ * @return
+ */
+State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame);
 
-        // Vector to keep the buttons of the menus
-        vector<Button> menuButtons;
-
-        // Vector for store the different color buttons
-        vector<Color> color_buttons;
-
-        vector<Sprite> iconButtons;
-
-        vector<Texture> texturesIcon;
-
-        // Panel for the menus of the game
-        sf::RectangleShape rectangle;
-
-        // Panel to describe the different game modes
-        sf::RectangleShape description;
-
-        // Variable to store the texture of the game's presents main cover
-        Texture cover;
-
-        // Sprite where the different textures are loaded
-        Sprite menuSprite;
-
-        // Coordinates of the cover
-        int positionXCover, positionYCover;
-
-    public:
-
-
-    /**
-     * Constructor of the data type Animations
-     * @param pathMenuFile is the path where are indicated the textures used to the menus
-     */
-    Menu();
+/**
+ * Menú para cambiar los controles.
+ * @param c
+ * @return
+ */
+State changeCarControllers(Configuration &c, SoundPlayer& r);
 
 
 
-    /**
-     * Load the main game menu from its xml configuration file
-     * @param imagePath is the path of the background's image of the menu
-     * @param fontPath is the text font of the main text of the menu
-     * @param textContent is the text that appears in the main menu
-     * @param positionXCover is the coordinate in the axis X of the main cover image
-     * @param positionYCover is the coordinate in the axis Y of the main cover image
-     * @param sizeText is the size of the font
-     * @param channelR is the value of the red channel color of the text
-     * @param channelG is the value of the green channel color of the text
-     * @param channelB is the value of the blue channel color of the text
-     */
-    inline void loadMainMenu(string& imagePath, string& fontPath, string& textContent,
-                             int& positionXCover, int& positionYCover, int& positionXText,
-                             int& positionYText, int& sizeText, int&channelR, int&channelG, int& channelB);
+/**
+ * Load the configuration of the main menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void loadMainMenuConfiguration(const string path, Configuration& c);
 
 
 
-    /**
-     * Load the configuration of the player and game menus
-     * @param pathFile is the xml file configuration of the menu to load
-     */
-    inline void loadPlayerAndGameMenus(string pathFile, string& imagePath, string& textContent, string& fontPath,
-                                       Font& f, int& positionXPanel, int& positionYPanel, int& width, int& height,
-                                       int& border,int& positionXText, int& positionYText, int& sizeText, Color& colorText,
-                                       Color& colorBorderPanel, int& posXDescription, int& posYDescription,
-                                       int& widthDescription, int& heightDescription, int& borderDescription,
-                                       Color& colorInsideDescription, Color& colorBorderDescription);
-
-
-    /**
-     * Shows the main cover of the game until the player presses start
-     * @param app is the console where the game is displayed to the players
-     */
-    void showMainMenu(RenderWindow* app, EffectReproductor* eR);
+/**
+ * Displays the main menu of the game
+ * @param c is the configuration of the file
+ * @param startPressed controls if the enter key has been pressed
+ * @return
+ */
+State startMenu(Configuration &c, SoundPlayer &r, bool startPressed = false);
 
 
 
-    /**
-     * Shows the menu of selecting the number of players
-     * @param app is the console where the game is displayed to the players
-     * @param optionParameter is the flag where is stored the option selected by the
-     * the player in the menu
-     */
-    void showStandardMenu(RenderWindow* app, string pathFile, int& optionParameter, Game_status& status, EffectReproductor* eR);
+/**
+ * Load the configuration of the player menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void loadPlayerMenuConfiguration(const string path, Configuration& c);
 
 
 
-    /**
-     * Shows the menu of selecting the number of players
-     * @param app is the console where the game is displayed to the players
-     * @param c stores the current configuration of the game
-     */
-    void showMenuOptions(RenderWindow* app, string pathFile, Type_control& control, Configuration* c, KeywordMapper* kM, EffectReproductor* eR);
+/**
+ * Load the configuration of the player menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+ State playerMenu(Configuration &c, SoundPlayer& r);
 
 
 
-    void loadVehiclesMenu(Sprite& menuVehicle, Font& fontMainText, Font& fontVehicleName, Font& fontVehicleIndicator, Font& fontTitle,
-                          Text& mainText, Text& propertyText, vector<Slot>& slotsMenu, vector<Text>& vehicleIndicators,
-                          RectangleShape& panelIndicator);
+/**
+ * Load the configuration of the game modes menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void loadGameModesMenuConfiguration(const string path, Configuration& c);
 
 
 
-    void readVehicleSpecifications(char* pathVehicleName, int& topSpeed, float& angle,
-                                   string& motor, float& timeBraking, float& timeAcceleration);
-
-    /**
-     * Shows the menu of selecting vehicle
-     * @param app is the console where the game is displayed to the players
-     * @param typeOfVehicle is the kind of vehicle selected by the user in the menu
-     * @param colorVehicle is the vehicle's color selected by the user in the menu
-     */
-    void showSelectionVehicleMenu(RenderWindow* application, int& typeOfVehicle, int& colorVehicle, Game_status& statu, EffectReproductor* eR);
+/**
+ * Load the configuration of the game modes menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ * @param typeOfGame is the game mode selected by the player
+ */
+State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame);
 
 
 
-    /**
-     * Change a configuration parameter of the game that it's not relative to the player
-     * @param optionParameter is the code of the parameter to modify
-     */
-    void modifyOptionConfiguration(const int optionParameter, Type_control& control, Configuration* c, KeywordMapper* kM,
-                                   EffectReproductor* eR);
+/**
+ * Load the configuration of the sound menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void loadSoundMenuConfiguration(const string path, Configuration& c);
 
 
 
-    /**
-     * Change a configuration parameter of the game that it's  relative to the player
-     * @param optionParameter is the code of the parameter to modify
-     * @param c stores the current configuration of the game
-     */
-    void modifyOptionConfigurationPlayer(RenderWindow* app, const int optionParameter, Configuration* c, KeywordMapper* kM,
-                                         EffectReproductor* eR);
+/**
+ * Load the configuration of the sound menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame);
 
-};
+
+
+/**
+ * Load the configuration of the options menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void loadOptionsMenuConfiguration(const string path, Configuration& c);
+
+
+
+/**
+ * Load the configuration of the options menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame);
+
+
+
+/**
+ * Load the configuration of the vehicle controllers menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void loadVehicleControllersMenuConfiguration(const string path, Configuration& c);
+
+
+
+/**
+ * Load the configuration of the vehicle controllers menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+State vehicleControllersMenu(Configuration &c, SoundPlayer& r);
+
+
+
+
+
+/**
+ * Pantalla del ranking.
+ * @param c
+ * @param scorePlayerGame
+ * @param minutes
+ * @param decs
+ * @param cents_Second
+ * @return
+ */
+State rankingMenu(Configuration &c, SoundPlayer& r, unsigned long scorePlayerGame,
+                  int minutes, int decs, int cents_Second, const int typeOfGame);
+
 
 #endif // MENU_H

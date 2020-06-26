@@ -1,82 +1,127 @@
 
+/*
+ * Module Step implementation file
+ */
+
+
 #include "../include/Step.h"
 
-/**
- * Constructor of the data type Step
- * @return an instance of the data type Step
- */
-Step::Step(){
-    // Not sprite by default
-    spriteX = 0.f;
-    // Not curve by default
-    directionCurve = 0;
-    // Initialization of the coordinates in the three axis
-    position_3d_x = 0, position_3d_y = 0, position_3d_z = 0;
 
+/**
+ * Default constructor
+ */
+Step::Step() {
+    directionCurve = 0.0f;
+    position_3d_x = 0.0f;
+    position_3d_y = 0.0f;
+    position_3d_z = 0.0f;
+    offsetX = 0.0f;
+    yOffsetX = 0.0f;
+    bgX = 0.0f;
     mainColor = false;
 }
 
 
-Step::SpriteInfo::SpriteInfo() {
-    spriteNum = -1;
-    offset = spriteMinX = spriteMaxX = 0.0f;
-    repetitive = false;
-}
 
 /**
- * Projects a point in 3d in the equivalent 2d plane
- * @param camX is the coordinate in the axis X
- * @param camY is the coordinate in the axis Y
- * @param camZ is the coordinate in the axis Z
+ * Sets the coordinates on the screen that correspond to the rectangle and its scale. This function must be
+ * call to update the rectangle if the position of the map has been changed and.
+ * @param camX is the coordinate of the rectangle in axis X
+ * @param camY is the coordinate of the rectangle in axis Y
+ * @param camZ is the coordinate of the rectangle in axis Z
+ * @param camD is the deep of the rectangle in the screen
+ * @param width is the width dimension of the rectangle
+ * @param height is the height dimension of the rectangle
+ * @param rW is the with of the road
+ * @param zOffset is the offset in the axis Z
  */
-void Step::project(int camX, int camY, int camZ){
-    // Calculation of the scale between the 3d and 2d
-    scalingValue = camD / (position_3d_z - camZ);
-    // Assignment of the coordinates in 2d
-    position_2d_x = (1 + scalingValue * (position_3d_x - camX)) * WIDTH / 2;
-    position_2d_y = (1 - scalingValue * (position_3d_y - camY)) * HEIGHT / 2;
-    position_2d_w = scalingValue * WIDTH_ROAD  * WIDTH / 2;
-}
-
-
-
 void Step::project(float camX, float camY, float camZ, float camD, float width, float height, float rW, float zOffset) {
     scalingValue = camD / (1.0f + position_3d_z + zOffset - camZ);
     position_2d_x = (1.0f + scalingValue * (position_3d_x - camX)) * width / 2.0f;
     position_2d_y = (1.0f - scalingValue * (position_3d_y - camY)) * height / 2.0f;
-    position_2d_w = scalingValue * rW  * width / 2.0f;
+    position_2d_w = scalingValue * rW * width / 2.0f;
 }
 
 
-void Step::drawSprite(RenderWindow* w, const vector<Texture> &objs, const vector<float> &coeff, Step::SpriteInfo &object,
-                           bool left) {
-    Sprite s(objs[object.spriteNum]);
-    const int width = s.getTextureRect().width;
-    const int h = s.getTextureRect().height;
 
+/**
+ * Draw the map element in the screen of the game
+ * @param w is the console window of the game
+ * @param objs is a vector with all the map elements textures
+ * @param hitCoeff is a vector with all the hits coefficients
+ * @param hitCoeffType is the hit coefficient of the element to draw
+ * @param scaleCoeff is the scaling factor of the element to draw
+ * @param object is the element to draw in the screen
+ * @param left control if the object has to be drawn on the left or on the right of the screen
+ */
+void Step::drawSprite(RenderTexture &w, const vector<Texture> &objs, const vector<float> &hitCoeff,
+                           const vector<HitThresholdObject> &hitCoeffType, const vector<float> &scaleCoeff,
+                           MapElement &object, bool left) const
+{
+    // Sprite where the texture is going to be drawn
+    Sprite s(objs[object.codeMapElement]);
+
+    // Calculation of the dimensions of the object with the scaling factor
+    const float width = scaleCoeff[object.codeMapElement] * s.getTextureRect().width;
+    const float widthOri = s.getTextureRect().width;
+    const float height = scaleCoeff[object.codeMapElement] * s.getTextureRect().height;
+    const float heightOri = s.getTextureRect().height;
+
+    // Coordinates of the map element in the screen with its elevation
     float destY = position_2d_y + 4.0f;
-    float destW = float(width) * position_2d_w / 266.0f;
-    float destH = float(h) * position_2d_w / 266.0f;
+    float destW = width * position_2d_w / SCALE_RESOLUTION;
+    float destH = height * position_2d_w / SCALE_RESOLUTION;
 
-    destY += destH * (-1.0f); //offsetY
+    //offsetY
+    destY += destH * (-1.0f);
 
+    // Calculation the elevation
     float clipH = destY + destH - clip;
-    if (clipH < 0)
+
+    // Elevation
+    if (clipH < 0){
         clipH = 0;
+    }
 
-    if (clipH >= destH) return;
-    s.setTextureRect(IntRect(0, 0, width, float(h) - float(h) * clipH / destH));
-    s.setScale(destW / float(width), destH / float(h));
+    // Check the elevation
+    if (clipH < destH) {
 
-    float destX = position_2d_x + position_2d_w + object.offset * s.getGlobalBounds().width; // Right road side
+        // Scaling the element
+        s.setScale(destW / widthOri, destH / heightOri);
 
-    if (left)
-        destX = position_2d_x - position_2d_w - s.getGlobalBounds().width - object.offset * s.getGlobalBounds().width; // Left road side
-    s.setPosition(destX, destY);
-    w->draw(s);
+        // Right road side
+        float destX = position_2d_x + position_2d_w + object.offset * s.getGlobalBounds().width;
 
-    object.spriteMinX =
-                destX + (s.getGlobalBounds().width - s.getGlobalBounds().width * coeff[object.spriteNum]) / 2.0f;
-        object.spriteMaxX = object.spriteMinX + s.getGlobalBounds().width * coeff[object.spriteNum];
+        if (left){
+            // Left road side
+            destX = position_2d_x - position_2d_w - s.getGlobalBounds().width - object.offset * s.getGlobalBounds().width;
+        }
 
+        // Set the position and draw in the screen
+        s.setPosition(destX, destY);
+        w.draw(s);
+
+        // Control the hit coefficient of the map element
+        if (hitCoeffType[object.codeMapElement] == HIT_CENTER) {
+            // Collision in the center of the map element
+            object.spriteMinX = destX + (s.getGlobalBounds().width - s.getGlobalBounds().width * hitCoeff[object.codeMapElement]) / 2.0f;
+        }
+        else if (hitCoeffType[object.codeMapElement] == HIT_RIGHT) {
+            // Collision with the element in the right part
+            object.spriteMinX = destX + s.getGlobalBounds().width - s.getGlobalBounds().width * hitCoeff[object.codeMapElement];
+        }
+        else {
+            // Collision in the left and in both sides only
+            object.spriteMinX = destX;
+        }
+        object.spriteMaxX = object.spriteMinX + s.getGlobalBounds().width * hitCoeff[object.codeMapElement];
+
+        // Collision on the sides of the element but not in the center
+        if (hitCoeffType[object.codeMapElement] != HIT_SIDES) {
+            object.spriteToSideX = 0.0f;
+        }
+        else {
+            object.spriteToSideX = s.getGlobalBounds().width - (object.spriteMaxX - object.spriteMinX);
+        }
+    }
 }

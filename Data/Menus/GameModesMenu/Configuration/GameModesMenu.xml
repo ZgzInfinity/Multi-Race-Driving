@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GameModesMenu>
+	<Background>Data/Menus/GameModesMenu/Images/cover.png</Background>
+	<MenuPanel>
+		<Background>Data/Menus/GameModesMenu/Images/crono.png</Background>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</MenuPanel>
+	<Title>
+		<Content>SELECT GAME MODE!</Content>
+		<Font>Data/Fonts/needForSpeed.ttf</Font>
+		<ColorText>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorText>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</Title>	
+	<DescriptionPanel>
+		<ColorPanelInside>
+			<R>98</R>
+			<G>250</G>
+			<B>0</B>
+		</ColorPanelInside>
+		<ColorPanelBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorPanelBorder>
+	</DescriptionPanel>
+	<MenuButtons>
+		<Font>Data/Fonts/needForSpeed.ttf</Font>
+		<ColorFont>
+			<R>0</R>
+			<G>0</G>
+			<B>255</B>
+		</ColorFont>
+		<Buttons>
+			<B0>
+				<Content>World Tour</Content>
+				<InitialState>1</InitialState>
+				<Colors>
+					<C1>
+						<R>228</R>
+						<G>250</G>
+						<B>0</B>
+					</C1>
+					<C2>
+						<R>98</R>
+						<G>250</G>
+						<B>0</B>
+					</C2>
+				</Colors>
+				<Description>
+					<D1>Run in different parts of the world</D1>
+					<D2>facing other rivals and traffic.</D2>
+					<D3>Only the first one is worth it!</D3>
+					<D4>Mode inspired in Super Hang on game.</D4>
+				</Description>
+			</B0>
+			<B1>	
+				<Content>Out Run</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>228</R>
+						<G>250</G>
+						<B>0</B>
+					</C1>
+					<C2>
+						<R>98</R>
+						<G>250</G>
+						<B>0</B>
+					</C2>
+				</Colors>
+				<Description>
+					<D1>Circulate through five different scenarios</D1>
+					<D2>reaching the checkpoint before time runs out.</D2> 
+					<D3>Mode inspired in Out Run game.</D3>
+				</Description>
+			</B1>
+			<B2>
+				<Content>Pole Position</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>228</R>
+						<G>250</G>
+						<B>0</B>
+					</C1>
+					<C2>
+						<R>98</R>
+						<G>250</G>
+						<B>0</B>
+					</C2>
+				</Colors>
+				<Description>
+					<D1>Select a scenario to run and win the race investing</D1>
+					<D2>as little time as possible to improve your records.</D2>
+					<D3>Mode inspired in Pole Position game.</D3>
+				</Description>
+			</B2>
+			<B3>
+				<Content>Driving Fury</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>228</R>
+						<G>250</G>
+						<B>0</B>
+					</C1>
+					<C2>
+						<R>98</R>
+						<G>250</G>
+						<B>0</B>
+					</C2>
+				</Colors>
+				<Description>
+					<D1>Chase and stop an escaped vehicle with</D1>
+					<D2>a police car before time runs out.</D2>
+					<D3>Mode inspired in Chase HQ game.</D3>
+				</Description>
+			</B3>
+			<B4>
+				<Content>Derramage</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>228</R>
+						<G>250</G>
+						<B>0</B>
+					</C1>
+					<C2>
+						<R>98</R>
+						<G>250</G>
+						<B>0</B>
+					</C2>
+				</Colors>
+				<Description>
+					<D1>Chase a rival vehicle until you get</D1>
+					<D2>some distance ahead of it.</D2>
+					<D3>Mode inspired in Need for Speed Undercover game.</D3>
+				</Description>
+			</B4>
+			<B5>
+				<Content>Delivery</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>228</R>
+						<G>250</G>
+						<B>0</B>
+					</C1>
+					<C2>
+						<R>98</R>
+						<G>250</G>
+						<B>0</B>
+					</C2>
+				</Colors>
+				<Description>
+					<D1>Deliver a package to a specific point</D1> 
+					<D2>before any of your rivals do.</D2>
+					<D3>Game mode inspired by Crazy taxi.</D3>
+				</Description>
+			</B5>
+		</Buttons>
+	</MenuButtons>
+</GameModesMenu>

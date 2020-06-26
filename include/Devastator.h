@@ -2,255 +2,153 @@
 #ifndef DEVASTATOR_H
 #define DEVASTATOR_H
 
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
-#include <cstring>
-#include "Step.h"
-#include "Player.h"
-#include "rapidxml.hpp"
-#include "rapidxml_utils.hpp"
-#include <SFML/Graphics.hpp>
+#include "Vehicle.h"
+#include "../include/Randomizer.h"
+#include <cmath>
 
-
-const int MAX_SPINNING_TOPS = 2;
-
+using namespace std;
 using namespace sf;
 
-/*
- * Class which represents the player
- */
-class Devastator : public Player {
+namespace Devastator_vehicle {
+    const int FORCE_INERTIA = 7;
+    const int PLAYER_TEXTURES = 56;
+}
+
+
+class Devastator : public Vehicle {
+    float speedMul, maxAcc, accInc, scaleY;
+    float acceleration, minCrashAcc, xDest;
+    int inertia;
+
+    sf::Sprite sprite;
+    bool crashing;      // True if crashing state is on
+    bool smoking;       // True if player generates smoke
+    bool skidding;      // True if player is skidding
+    int mode;           // Type animation collision
+
+    string brand;           // Name of the vehicle
+    string motor;           // Brand of the motor's vehicle
+    float angleTurning;     // Turning angle of the vehicle
+    float topSpeed;         // Top speed of the vehicle
+
+    bool firstCrash, firstTurnLeft, firstTurnRight;
+
+public:
+
+
+    Devastator();
+
+    /**
+     * Inicializa el vehículo del jugador.
+     * @param maxSpeed
+     * @param speedMul multiplicador de la velocidad que multiplicado por speed obtiene la velocidad real
+     * @param accInc incremento de la aceleración
+     * @param scaleX escalado del sprite del vehículo
+     * @param scaleY escalado del sprite del vehículo
+     * @param maxCounterToChange cuando counter_code_image llega a maxCounterToChange se actualiza el sprite
+     * @param vehicle nombre del vehículo
+     * @param pX
+     * @param pY
+     */
+    Devastator(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
+           const std::string &vehicle, float pX, float pY, const string brandName, const float angle,
+           const string motorName);
+
+    /**
+     * Devuelve la posición previa Y.
+     * @return
+     */
+    float getPreviousY() const;
+
+    /**
+     * Actualiza la lógica del choque y restablece la velocidad y aceleración.
+     * @param vehicleCrash true si es un choque entre vehículos
+     */
+    void hitControl(bool vehicleCrash);
+
+    /**
+     * Devuelve true si la lógica de choque está en ejecución.
+     * @return
+     */
+    bool isCrashing() const;
+
+    /**
+     * Devuelve la velocidad real del vehículo.
+     * @return
+     */
+    float getRealSpeed() const;
+
+    /**
+     * Actualiza la lógica de la aceleración y frenado del vehículo.
+     * @param c
+     * @param hasGotOut indica si se ha salido del camino
+     * @return
+     */
+    Action accelerationControl(Configuration &c, bool hasGotOut);
+
+    /**
+     * Actualiza la lógica de giro del vehículo.
+     * @param c
+     * @param curveCoefficient pertenece [-0.9, 0.9]
+     * @return
+     */
+    Direction rotationControl(Configuration &c, float curveCoefficient);
+
+    /**
+     * Actualiza el sprite del vehículo jugador y lo dibuja en la pantalla.
+     * @param c
+     * @param a
+     * @param d
+     * @param e
+     * @param enableSound
+     */
+    void draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d, const Elevation &e, bool enableSound = true);
+
+    /**
+     * Dibuja la animación inicial en la pantalla y devuelve si ha acabado.
+     * @param c
+     * @param x
+     * @param end
+     */
+    void drawInitialAnimation(Configuration &c, float x, bool &end);
 
-    public:
+    /**
+     * Dibuja la animación final en la pantalla y devuelve si ha acabado.
+     * @param c
+     * @param step
+     * @param end
+     * @param smoke
+     */
+    void drawGoalAnimation(Configuration &c, int &step, bool &end, bool smoke = true);
 
-        /**
-         * Constructor of the class
-         */
-        Devastator(char* pathFile, Configuration* c);
+    /**
+     * Fuerza a que el coche esté echando humo o no.
+     * @param smoke
+     */
+    void setSmoking(bool smoke);
 
 
+    void setVehicle();
 
-        /**
-         * Load the set of sprites of the player
-         */
-         void loadVehicleProperties(const string path);
 
+    void setModeCollision();
 
 
-        /**
-         * Draw the player sprite in the console render windowDevastator
-         * @param app is the console window game where the sprite is going to be drawn
-         * @param pos is the actual position of the Devastator in the map
-         */
-        void drawPlayer(RenderWindow* app, int pos);
+    float getHalfMaxSpeed();
 
 
+    string getBrandName();
 
-      /**
-       * Check if the player has to advance in the track
-       * @param eventDetected is a boolean to control if an event has occurred
-       * @param height is the actual elevation of the terrain where is the Devastator
-       * @param lastHeight was the elevation of the terrain where was the Devastator
-       */
-       void advancePlayer(bool& eventDetected);
 
+    float getAngle();
 
 
-       /**
-         * Check if the player has to advance in the track
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param lastHeight was the elevation of the terrain where was the Devastator
-         * @param height is the actual elevation of the terrain where is the Devastator
-         */
-        void advancePlayer(bool& eventDetected, const int lastHeight, const int height, Elevation& e);
+    string getMotorName();
 
 
-
-         /**
-         * Establish the coordinate X and Y of the vehicle
-         * @param pX is the coordinate of the vehicle in the axis X
-         * @param pY is the coordinate of the vehicle in the axis Y
-         */
-        void setPosition(float pX, float pY);
-
-
-
-        /**
-         * Get the coordinate of the payer in the axis X
-         * @return the position of the Devastator in the axis X
-         */
-        float getPlayerX();
-
-
-
-        /**
-         * Get the coordinate of the payer in the axis Y
-         * @return the position of the truck in the axis Y
-         */
-        float getPlayerY();
-
-
-
-        /**
-         * Get the coordinate of the payer in the axis X
-         * @return the position of the motorbike in the axis X
-         */
-        float getPreviousY();
-
-
-
-         /**
-          * Get the coordinate of the payer in the axis X
-          * @return the position of the motorbike in the axis X
-          */
-        float getMinScreenX();
-
-
-
-         /**
-          * Get the coordinate of the payer in the axis X
-          * @return the position of the motorbike in the axis X
-          */
-        float getMaxScreenX();
-
-
-
-         /**
-          * Get the maximum speed of the vehicle
-          */
-         int getMaxSpeed();
-
-
-
-        /**
-          * Uodate the position of the vehicle
-          */
-        void updatePositionY(const float speed);
-
-
-
-
-        /**
-         * Uodate the position of the vehicle
-         */
-        void updatePosition(const float speed);
-
-
-
-         /**
-          * Get the mode of collision of the Devastator
-          * @return the mode to show the collision of the Devastator
-          */
-         int getModeCollision();
-
-
-
-        /**
-         * Control if the user has pressed the q keyword to turn to the left
-         * @param speed is the actual speed of the Devastator of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the Devastator
-         * @param height is the actual elevation of the terrain where is the Devastator
-         */
-        inline void controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                     const int lastHeight, const int height, Elevation& e);
-
-
-
-         /**
-         * Control if the user has pressed the w keyword to turn to the right
-         * @param speed is the actual speed of the Ferrari of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the Devastator
-         * @param height is the actual elevation of the terrain where is the Devastator
-         */
-        inline void controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                      const int lastHeight, const int height, Elevation& e);
-
-
-
-        /**
-         * Control if the user has pressed the q keyword to turn to the left
-         * @param speed is the actual speed of the Ferrari of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         */
-        inline void controlTurningPlayerLeftMouse(int& speed, bool& eventDetected, RenderWindow* app);
-
-
-
-        /**
-         * Control if the user has pressed the w keyword to turn to the right
-         * @param speed is the actual speed of the Ferrari of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         */
-        inline void controlTurningPlayerRightMouse(int& speed, bool& eventDetected, RenderWindow* app);
-
-
-
-        /**
-         * Control if the user has pressed the q keyword to increase the speed
-         * @param speed is the actual speed of the Ferrari of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the Devastator
-         * @param height is the actual elevation of the terrain where is the Devastator
-         */
-        inline void controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
-                                       const int lastHeight, const int height, Elevation& e);
-
-
-
-       /**
-        * Control if the user has pressed the q keyword to increase the speed
-        * @param speed is the actual speed of the Ferrari of the player
-        * @param eventDetected is a boolean to control if an event has occurred
-        * @param app is the console window game where the sprite is going to be drawn
-        * @param lastHeight was the elevation of the terrain where was the Devastator
-        * @param height is the actual elevation of the terrain where is the Devastator
-        */
-        inline void controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
-                                         const int lastHeight, const int height, Elevation& e);
-
-
-
-        /**
-         * Control if the player has done any of his possible actionsconst int lastHeight, const int height
-         * @param speed is the actual speed of the Ferrari of the player
-         * @param eventDetected is a boolean to control if an event has occurred
-         * @param app is the console window game where the sprite is going to be drawn
-         * @param lastHeight was the elevation of the terrain where was the Devastator
-         * @param height is the actual elevation of the terrain where is the Devastator
-         */
-        void controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastHeight, const int height, Elevation& e);
-
-
-
-        /**
-         * Control if the player has have collision with the nearest element of the map to him
-         * @param nearestStep is the step of the scene where is located the nearest element to the player
-         * @param lastPos is the last position of the Ferrari in the axis Y
-         * @param pos is the current position of the Ferrari in the axis Y
-         */
-        bool controlPossibleCollision(Step& nearestSprite, int lastPos, int pos);
-
-
-
-        /**
-         * Shows to the user how the Ferrari crushes
-         * @param pos is the position of the Devastator in the car in the axis Y
-         */
-        void collisionShow();
-
-
-
-        bool hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m);
+    float getTopSpeed();
 
 };
 
-#endif // DEVASTATOR_H
+
+#endif // PLAYER_H

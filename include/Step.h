@@ -1,144 +1,112 @@
 
+/*
+ * Module Step interface file
+ */
+
 #ifndef STEP_H
 #define STEP_H
 
 #include <vector>
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "MapElement.h"
 
-using namespace std;
 using namespace sf;
-
-// Dimension of the road lines black or white
-const int segL = 200;
-const float camD = 0.84;
-
-// Dimensions of the screen of the game
-const int WIDTH = 1024;
-const int HEIGHT = 768;
-const int WIDTH_ROAD = 2000;
-
-// Number of steps to complete the map and repeat
-const int MAX_SPACE_DIMENSION = 12000;
-const int NORMAL_HEIGHT = 1500;
+using namespace std;
 
 
-// Current elevation type of the Step
-enum Elevation {
-    UP,
-    FLAT,
-    DOWN
-};
+const float SCALE_RESOLUTION = 280.0f;
 
 
 /*
- * Step data type
+ * Hit coefficients types
  */
-struct Step{
+enum HitThresholdObject {
+    // Collision in the center
+    HIT_CENTER,
+    // Collision in the left
+    HIT_LEFT,
+    // Collision in the right
+    HIT_RIGHT,
+    // Collision in the sides but not in the center
+    HIT_SIDES
+};
+
 
     /**
-     * Información de un objeto correspondiente a objects[spriteNum] si spriteNum != -1, con un offset en x.
-     * Si repetitive es true el objeto se repetirá hasta el borde de la pantalla.
+     * Rectángulo horizontal cuyo centro está ubicado en las coordenadas (x, y, z), es decir, puede tener elevación (z).
+     * En el centro del rectángulo estará la carretera que puede tener una curvatura dependiendo del coeficiente de
+     * curvatura (curve) que tenga.
+     * Además, puede contener un objeto en cada lateral de la carretera (spriteLeft, spriteRight).
      */
-    struct SpriteInfo {
-        int intervalShow;
-        int spriteNum;
-        string path;
-        float offset, spriteMinX, spriteMaxX;
-        bool repetitive;
+    struct Step {
+
+        // Coordinates in 3d of the rectangle step
+        float position_3d_x, position_3d_y, position_3d_z;
+
+        // Coordinates in 2d of the screen
+        float position_2d_x, position_2d_y, position_2d_w;
+
+        // Direction of the possible curve of the rectangle
+        float directionCurve;
+
+        // Possible elevation of the rectangle
+        float clip;
+
+        // Scaling factor to draw the rectangle
+        float scalingValue;
+
+        // Color of the rectangle
+        bool mainColor;
+
+        // Elements of the map
+        MapElement spriteNearLeft, spriteNearRight, spriteFarLeft, spriteFarRight;
+
+        // Background position
+        float bgX;
+
+        // Offsets
+        float offsetX, yOffsetX;
+
+
 
         /**
-         * Inicializa el sprite.
+         * Default constructor
          */
-        SpriteInfo();
-    };
-
-    // Attributes of the type of data
-    // 3d coordinates of the line in three axis X, Y and Z
-    float position_3d_x, position_3d_y, position_3d_z;
-    // Coordinates of the screen in two dimensions X and Y point and W offset
-    float position_2d_x, position_2d_y, position_2d_w;
-    // Control if there curve to right or to left
-    float directionCurve;
-    // Control the position of the possible sprite in the axis X
-    float spriteX;
-    // Control the position of the possible sprite in the axis Y
-    int spriteY;
-    // Unknown
-    float clip;
-    // Scale to transform 3d coordinates to 2d coordinates
-    float scalingValue;
-    // Offset to control the possible collisions
-    float offset;
-    // Possible sprites to draw
-    SpriteInfo spriteNearLeft, spriteNearRight, spriteFarLeft, spriteFarRight;
-
-    bool mainColor;
-
-    /**
-     * Constructor of the data type Step
-     * @return an instance of the data type Step
-     */
-    Step();
+        explicit Step();
 
 
 
-    /**
-     * Projects a point in 3d in the equivalent 2d plane
-     * @param camX is the coordinate in the axis X
-     * @param camY is the coordinate in the axis Y
-     * @param camZ is the coordinate in the axis Z
-     */
-    void project(int camX,int camY,int camZ);
-
-
-
-    /**
-     * Draw a sprite in the console game
-     * @param app is the console game where the user is playing
-     */
-    void drawSprite(RenderWindow* app);
-
-
-
-    /**
-     * Compares to sprites to determine which is first in the order
-     * @param line is the other step to be compared
-     * @return true is the instance caller to the method is lower than <<line>>.
-     *         Otherwise returns false
-     */
-     bool operator < (Step& line_2);
-
-
-     /**
-         * Establece las coordenadas en la pantalla que corresponen al rectángulo y su escala. Esta función debe ser
-         * llamada para actualizar el rectángulo si se ha variado la posición del mapa y.
-         * @param camX
-         * @param camY
-         * @param camZ
-         * @param camD
-         * @param width
-         * @param height
-         * @param rW
-         * @param zOffset
+        /**
+         * Sets the coordinates on the screen that correspond to the rectangle and its scale. This function must be
+         * call to update the rectangle if the position of the map has been changed and.
+         * @param camX is the coordinate of the rectangle in axis X
+         * @param camY is the coordinate of the rectangle in axis Y
+         * @param camZ is the coordinate of the rectangle in axis Z
+         * @param camD is the deep of the rectangle in the screen
+         * @param width is the width dimension of the rectangle
+         * @param height is the height dimension of the rectangle
+         * @param rW is the with of the road
+         * @param zOffset is the offset in the axis Z
          */
         void project(float camX, float camY, float camZ, float camD, float width, float height, float rW, float zOffset);
 
 
+
         /**
-         * Dibuja el objeto en la pantalla. Esta función debe ser llamada después de project().
-         * @param w
-         * @param objs
-         * @param coeff
-         * @param object
-         * @param left indica si el objeto está a la izquierda de la pantalla
+         * Draw the map element in the screen of the game
+         * @param w is the console window of the game
+         * @param objs is a vector with all the map elements textures
+         * @param hitCoeff is a vector with all the hits coefficients
+         * @param hitCoeffType is the hit coefficient of the element to draw
+         * @param scaleCoeff is the scaling factor of the element to draw
+         * @param object is the element to draw in the screen
+         * @param left control if the object has to be drawn on the left or on the right of the screen
          */
-        void drawSprite(sf::RenderWindow* w, const std::vector<sf::Texture> &objs, const std::vector<float> &coeff,
-                Step::SpriteInfo &object, bool left);
+        void drawSprite(RenderTexture &w, const std::vector<sf::Texture> &objs, const std::vector<float> &hitCoeff,
+                        const std::vector<HitThresholdObject> &hitCoeffType, const std::vector<float> &scaleCoeff,
+                        MapElement &object, bool left) const;
+    };
 
-};
 
-
-
-#endif // STEP_H
-
+      #endif // STEP_H;

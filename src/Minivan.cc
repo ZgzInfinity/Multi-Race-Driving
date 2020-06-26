@@ -1,758 +1,634 @@
 
 #include "../include/Minivan.h"
 
-Minivan::Minivan(char* pathFile, Configuration* conf) : Player(pathFile, conf){};
+
+Minivan::Minivan(){}
 
 
-
-/**
- * Draw the player sprite in the console render window
- * @param app is the console window game where the sprite is going to be drawn
- */
-void Minivan::drawPlayer(RenderWindow* app, int pos){
-    // Check what is the offset to apply while is crushing
-    if (mode == 0){
-        // First mode
-        playerX += 0.05;
-        pos += 400;
-    }
-    if (mode == 1){
-        // First mode
-        playerX -= 0.05;
-        pos -= 200;
-    }
-    // Print the Minivan in its actual position
-    playerSprite.setPosition(Vector2f(418.f, HEIGHT - 200.f));
-    app->draw(playerSprite);
-}
-
-
-
-/**
- * Load the set of sprites of the player
- */
-void Minivan::loadVehicleProperties(const string path){
-    Player::loadVehicleProperties(path);
-}
-
-
-
-/**
- * Check if the player has to advance in the track
- * @param eventDetected is a boolean to control if an event has occurred
- * @param lastHeight was the elevation of the terrain where was the Minivan
- * @param height is the actual elevation of the terrain where is the Minivan
- */
-void Minivan::advancePlayer(bool& eventDetected, const int lastHeight, const int height, Elevation& e){
-    // Eliminate this event detection
-    if (!eventDetected){
-        // Check if the car is ascending on a elevation part of the terrain
-        if (((height > NORMAL_HEIGHT && height <= 2 * NORMAL_HEIGHT) ||
-             (height > 0 && height <= NORMAL_HEIGHT)) && (height > lastHeight || e == Elevation::UP))
-        {
-            // The car is ascending the landing
-            if (actual_code_image < 7 || actual_code_image > 8){
-                // The sprites do not correspond to the ascending
-                actual_code_image = 7;
-            }
-            else {
-                // The sprite corresponds to one of the landing
-                if (actual_code_image != 8){
-                    // Increment to the next ascending sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Return to the first one
-                    actual_code_image--;
-                }
-            }
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        else {
-            if (actual_code_image > 2){
-                // First advance sprite loaded
-                actual_code_image = 1;
-            }
-            else {
-                if (actual_code_image != 2){
-                    actual_code_image++;
-                }
-                else {
-                    actual_code_image = 1;
-                }
-            }
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-    }
-    else {
-        // Elimination of the last event registered
-        eventDetected = false;
-    }
-}
-
-
-
-/**
- * Establish the coordinate X and Y of the vehicle
- * @param pX is the coordinate of the vehicle in the axis X
- * @param pY is the coordinate of the vehicle in the axis Y
- */
-void Minivan::setPosition(float pX, float pY){
-    Player::setPosition(pX, pY);
-}
-
-
-
-/**
- * Get the coordinate of the payer in the axis X
- * @return the position of the Minivan in the axis X
- */
-float Minivan::getPlayerX(){
-    return Player::getPlayerX();
-}
-
-
-
-/**
- * Get the coordinate of the payer in the axis Y
- * @return the position of the truck in the axis Y
- */
-float Minivan::getPlayerY(){
-    return Player::getPlayerY();
-}
-
-
-
-/**
- * Get the coordinate of the payer in the axis X
- * @return the position of the motorbike in the axis X
- */
-float Minivan::getPreviousY(){
-    return Player::getPreviousY();
-}
-
-
-
- /**
-  * Get the coordinate of the payer in the axis X
-  * @return the position of the motorbike in the axis X
-  */
-float Minivan::getMinScreenX(){
-    return Player::getMinScreenX();
-}
-
-
-
- /**
-  * Get the coordinate of the payer in the axis X
-  * @return the position of the motorbike in the axis X
-  */
-float Minivan::getMaxScreenX(){
-    return Player::getMaxScreenX();
-}
-
-
-
-/**
- * Get the maximum speed of the vehicle
- */
-int Minivan::getMaxSpeed(){
-    return Player::getMaxSpeed();
-}
-
-
-
-/**
- * Uodate the position of the vehicle
- */
-void Minivan::updatePositionY(const float speed){
-    Player::updatePositionY(speed);
-}
-
-
-
-/**
- * Uodate the position of the vehicle
- */
-void Minivan::updatePosition(const float speed){
-    Player::updatePosition(speed);
-}
-
-
-
-/**
- * Get the mode of collision of the Minivan
- * @return the mode to show the collision of the Minivan
- */
-int Minivan::getModeCollision(){
-    return mode;
-}
-
-
-
-/**
- * Control if the user has pressed the w keyword to turn to the right
- * @param speed is the actual speed of the Minivan of the player
- * @param eventDetected is a boolean to control if an event has occurred
- * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the Minivan
- * @param height is the actual elevation of the terrain where is the Minivan
- */
-inline void Minivan::controlTurningPlayerLeftKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                      const int lastHeight, const int height, Elevation& e)
+Minivan::Minivan(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
+                       const string &vehicle, float pX, float pY, const string brandName, const float angle,
+                       const string motorName) : Vehicle(maxSpeed / speedMul, scaleX, maxCounterToChange,
+                                                 0.0f, pX, pY, pY, 0, 0, vehicle, Minivan_vehicle::PLAYER_TEXTURES, 1, 0),
+                                                 speedMul(speedMul), maxAcc(pow(maxSpeed / speedMul, 2.0f)),
+                                                 accInc(accInc), scaleY(scaleY), acceleration(0),
+                                                 minCrashAcc(0), xDest(0), inertia(0), crashing(false),
+                                                 smoking(false), skidding(false),
+                                                 firstCrash(true), firstTurnLeft(true),
+                                                 firstTurnRight(true)
 {
-    // Check if key left pressed
-    if (Keyboard::isKeyPressed(c->getLeftKey())){
-        if (!isAccelerating){
-            if (speed > INITIAL_SPEED){
-                speed -= int(deceleration * speed_increment);
-                if (speed < INITIAL_SPEED){
-                    speed = INITIAL_SPEED;
-                }
-            }
+    topSpeed = maxSpeed;
+    mode = -1;
+    brand = brandName;
+    motor = motorName;
+    angleTurning = angle;
+}
+
+float Minivan::getPreviousY() const {
+    return previousY;
+}
+
+void Minivan::hitControl(const bool vehicleCrash) {
+    crashing = true;
+    smoking = false;
+    skidding = false;
+
+    if (!vehicleCrash) {
+        if (posX > angleTurning)
+            posX -= angleTurning;
+        else if (posX < -angleTurning)
+            posX += angleTurning;
+    } else {
+        if (minCrashAcc <= 0.0f) { // Only first time
+            minCrashAcc = (speed * 0.333f) * (speed * 0.333f); // In case of car crash, speed will be drop to 1/3. Otherwise it will be drop to 0.
+            acceleration = (speed * 0.5f) * (speed * 0.5f); // At the moment of the crash, speed drops to 1/2.
+
+            if (posX < 0.0f)
+                xDest = 0.8f;
+            else
+                xDest = -0.8f;
         }
-        // Check if the motorbike can be moved or not spite of pressing the key
-        if (playerX - 0.1 >= BORDER_LIMIT_ROAD_LEFT){
-            // Check if the motorbike is outside the road
-            if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
-                // Advance more
-                playerX -= 0.1;
-            }
-            else {
-                 playerX -= 0.035;
-            }
-        }
-        // Check if the car is ascending in a elevation terrain or not
-        if (((height > NORMAL_HEIGHT && height <= 2 * NORMAL_HEIGHT) ||
-             (height > 0 && height <= NORMAL_HEIGHT)) && (e == Elevation::UP))
-        {
-            // The car is in a elevation
-            if (actual_code_image < 9 || (actual_code_image >= 11 && actual_code_image <= 20) ||
-               (actual_code_image >= 23))
-            {
-                actual_code_image = 9;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            else if (actual_code_image >= 9 && actual_code_image <= 10){
-                // Increment the actual code of the sprite
-                if (actual_code_image != 10){
-                    // Increment the texture of the sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Change sprite while the motorbike is turning to left
-                    actual_code_image--;
-                }
-                // Set the texture from the file
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            // Register event
-            eventDetected = true;
-        }
-        else {
-            // The car is not in a elevation Change the texture
-            if (actual_code_image < 3 || (actual_code_image >= 5 && actual_code_image <= 14) ||
-               (actual_code_image >= 17))
-            {
-                actual_code_image = 3;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            else if (actual_code_image >= 3 && actual_code_image <= 4){
-                // Increment the actual code of the sprite
-                if (actual_code_image != 4){
-                    // Increment the texture of the sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Change sprite while the motorbike is turning to left
-                    actual_code_image--;
-                }
-                // Set the texture from the file
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            // Register event
-            eventDetected = true;
-        }
+
+        if (posX > xDest)
+            posX -= angleTurning;
+        else if (posX < xDest)
+            posX += angleTurning;
+
+        if (posX > 0.8f)
+            posX = 0.8f;
+        else if (posX < -0.8f)
+            posX = -0.8f;
+    }
+
+    acceleration -= accInc * 2.5f;
+    if (speed > 1.333f * halfMaxSpeed) // Reduces hit time
+        acceleration -= accInc * 7.5f;
+    else if (speed > halfMaxSpeed)
+        acceleration -= accInc * 5.0f;
+    else if (speed > 0.5f * halfMaxSpeed)
+        acceleration -= accInc * 2.5f;
+
+    if (acceleration < 0.0f)
+        acceleration = 0.0f;
+
+    speed = sqrt(acceleration);
+
+    previousY = posY;
+    if (vehicleCrash && abs(posX) != 0.8f)
+        posY -= speed / 2.0f;
+    if (!vehicleCrash && (posX <= -angleTurning || posX >= angleTurning))
+        posY -= speed / 6.0f;
+
+    if (acceleration <= minCrashAcc ||
+        current_code_image == 36 || current_code_image == 44)
+    {
+        acceleration = minCrashAcc;
+        speed = sqrt(acceleration);
+        crashing = false;
+        minCrashAcc = 0.0f;
+        xDest = 0.0f;
+        inertia = 0;
+        previousY = posY;
+        mode = -1;
     }
 }
 
-
-
-/**
- * Control if the user has pressed the q keyword to turn to the left
- * @param speed is the actual speed of the motorbike of the player
- * @param eventDetected is a boolean to control if an event has occurred
- * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the Minivan
- * @param height is the actual elevation of the terrain where is the Minivan
- */
-inline void Minivan::controlTurningPlayerRightKeyboard(int& speed, bool& eventDetected, RenderWindow* app,
-                                                       const int lastHeight, const int height, Elevation& e){
-    // Check if key right pressed
-    if (Keyboard::isKeyPressed(c->getRightKey())){
-        if (!isAccelerating){
-            if (speed > INITIAL_SPEED){
-                speed -= int(deceleration * speed_increment);
-                if (speed < INITIAL_SPEED){
-                    speed = INITIAL_SPEED;
-                }
-            }
-        }
-        // Check if the motorbike can be moved or not spite of pressing the key
-        if (playerX + 0.1 <= BORDER_LIMIT_ROAD_RIGHT){
-            // Check if the motorbike is outside the road
-            if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
-                // Advance more
-                playerX += 0.1;
-            }
-            else {
-                 playerX += 0.035;
-            }
-        }
-        // Check if the car is ascending in a elevation terrain or not
-        if (((height > NORMAL_HEIGHT && height <= 2 * NORMAL_HEIGHT) ||
-             (height > 0 && height <= NORMAL_HEIGHT)) && (e == Elevation::UP))
-        {
-            // The car is in a elevation
-            if (actual_code_image < 11 || (actual_code_image >= 13 && actual_code_image <= 22))
-            {
-                actual_code_image = 11;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            else if (actual_code_image >= 11 && actual_code_image <= 12){
-                // Increment the actual code of the sprite
-                if (actual_code_image != 12){
-                    // Increment the texture of the sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Change sprite while the motorbike is turning to left
-                    actual_code_image--;
-                }
-                // Set the texture from the file
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            // Register event
-            eventDetected = true;
-        }
-        else {
-            // Change the texture
-            if (actual_code_image < 5 || (actual_code_image >= 7 && actual_code_image <= 16) ||
-               (actual_code_image >= 19))
-            {
-                actual_code_image = 5;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            else if (actual_code_image <= 6){
-                // Increment the actual code of the sprite
-                if (actual_code_image != 6){
-                    // Increment the texture of the sprite
-                    actual_code_image++;
-                }
-                else {
-                    // Change sprite while the motorbike is turning to left
-                    actual_code_image--;
-                }
-                // Set the texture from the file
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            // Register event
-            eventDetected = true;
-        }
-    }
+bool Minivan::isCrashing() const {
+    return crashing;
 }
 
+float Minivan::getRealSpeed() const {
+    return speed * speedMul;
+}
 
+Vehicle::Action Minivan::accelerationControl(Configuration &c, bool hasGotOut) {
+    Action a = NONE;
+    smoking = false;
+    float previousAcc = acceleration;
 
-/**
- * Control if the user has pressed the q keyword to increase the speed
- * @param speed is the actual speed of the Minivan of the player
- * @param eventDetected is a boolean to control if an event has occurred
- * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the Minivan
- * @param height is the actual elevation of the terrain where is the Minivan
- */
-inline void Minivan::controlPlayerSpeed(int& speed, bool& eventDetected, RenderWindow* app,
-                                        const int lastHeight, const int height, Elevation& e){
-    // Check if the user is accelerating
-    if ((Keyboard::isKeyPressed(c->getAccelerateKey()))){
-        isAccelerating = true;
-        // Control about not acceleration if the Minivan goes in the grass
-        if (playerX >= BORDER_ROAD_LEFT && playerX <= BORDER_ROAD_RIGHT){
-            // Increment the speed because it is inside the road
-            if (speed <= maxSpeed){
-                // Increment of the speed
-                speed += int(acceleration * (speed_increment + speed_increment));
-                if (speed > maxSpeed){
-                    speed = maxSpeed;
-                }
+    if (Keyboard::isKeyPressed(c.brakeKey))
+        a = BRAKE;
+
+    if (a != BRAKE && Keyboard::isKeyPressed(c.accelerateKey)) {
+        if (hasGotOut) {
+            if (acceleration < maxAcc / 4.5f)
+                acceleration += accInc / 3.0f;
+            else
+                acceleration -= accInc * 1.5f;
+        } else {
+            if (acceleration < maxAcc)
+                acceleration += accInc;
+        }
+
+        if (acceleration > maxAcc)
+            acceleration = maxAcc;
+
+        smoking = acceleration < maxAcc * 0.1f;
+    } else {
+        float mul = 2.0f;
+        if (a == BRAKE)
+            mul *= 2.0f;
+        if (hasGotOut)
+            mul *= 1.5f;
+
+        if (acceleration > 0.0f)
+            acceleration -= accInc * mul;
+
+        if (acceleration < 0.0f)
+            acceleration = 0.0f;
+    }
+
+    if (previousAcc == 0.0f && acceleration > 0.0f)
+        a = BOOT;
+    else if (a == NONE && acceleration > 0.0f)
+        a = ACCELERATE;
+
+    speed = sqrt(acceleration);
+    if (speed > 0.0f) {
+        previousY = posY;
+        posY += speed;
+    }
+    return a;
+}
+
+Vehicle::Direction Minivan::rotationControl(Configuration &c, float curveCoefficient) {
+    skidding = false;
+
+    if (speed > 0.0f) {
+        if (speed < 0.66f * maxSpeed)
+            posX -= angleTurning * curveCoefficient * sqrt(speed / 2.0f) * speed / maxSpeed;
+        else
+            posX -= angleTurning * curveCoefficient * sqrt(speed) * speed / maxSpeed;
+
+        if (abs(curveCoefficient) >= 0.33f && speed >= 0.66f * maxSpeed)
+            skidding = true;
+
+        if (Keyboard::isKeyPressed(c.leftKey)) {
+            if (inertia > -Minivan_vehicle::FORCE_INERTIA)
+                inertia--;
+
+            if (inertia < 0) {
+                if (curveCoefficient > 0.0f)
+                    skidding = false;
+
+                if (speed < halfMaxSpeed)
+                    posX -= 1.5f * angleTurning * speed / maxSpeed;
+                else if (curveCoefficient == 0.0f)
+                    posX -= 1.25f * angleTurning * speed / maxSpeed;
+                else
+                    posX -= angleTurning * speed / maxSpeed;
+
+                return TURNLEFT;
+            }
+        } else if (Keyboard::isKeyPressed(c.rightKey)) {
+            if (inertia < Minivan_vehicle::FORCE_INERTIA)
+                inertia++;
+
+            if (inertia > 0) {
+                if (curveCoefficient < 0.0f)
+                    skidding = false;
+
+                if (speed < halfMaxSpeed)
+                    posX += 1.5f * angleTurning * speed / maxSpeed;
+                else if (curveCoefficient == 0.0f)
+                    posX += 1.25f * angleTurning * speed / maxSpeed;
+                else
+                    posX += angleTurning * speed / maxSpeed;
+
+                return TURNRIGHT;
+            }
+        } else if (inertia > 0) {
+            inertia--;
+        } else if (inertia < 0) {
+            inertia++;
+        }
+
+        skidding = false;
+    }
+
+    return RIGHT;
+}
+
+void Minivan::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d,
+                  const Elevation &e, bool enableSound)
+{
+    // Sound effects
+    if (a != CRASH)
+        firstCrash = true;
+
+    if (enableSound) {
+        if (speed > 0.0f) {
+            if (a == BOOT) {
+                // Acceleration sound
+                r.soundEffects[41]->stop();
+                r.soundEffects[41]->play();
+            }
+            if (r.soundEffects[42]->getStatus() != SoundSource::Playing) {
+                // Engine sound
+                r.soundEffects[42]->stop();
+                r.soundEffects[42]->play();
+            }
+            r.soundEffects[42]->setVolume((33.0f + 67.0f * speed / maxSpeed) * float(r.volumeEffects) / 100.f);
+            if (skidding && r.soundEffects[8]->getStatus() != SoundSource::Playing) {
+                // Skidding sound
+                r.soundEffects[8]->stop();
+                r.soundEffects[8]->play();
             }
         }
         else {
-            // Increment the speed because it is outside the road
-            if (speed >= INITIAL_SPEED){
-                // Decrement of the speed
-                speed -= int(deceleration * (speed_increment + speed_increment));
-                if (speed < INITIAL_SPEED){
-                    speed = INITIAL_SPEED;
-                }
-            }
+            r.soundEffects[41]->stop();
+            r.soundEffects[42]->stop();
+            r.soundEffects[8]->stop();
         }
-        // Check if the key to turn left is pressed
-        if (!eventDetected){
-            isAccelerating = false;
-            controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastHeight, height, e);
-            return;
-        }
-        // Check if the key to turn left is pressed
-        if (!eventDetected){
-            isAccelerating = false;
-            controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastHeight, height, e);
-            return;
-        }
-        // Change the sprite;
-        if (actual_code_image >= 1 && actual_code_image <= 2 && eventDetected){
-            if (actual_code_image != 2){
-                actual_code_image++;
+
+        if (a == CRASH && firstCrash) {
+            firstCrash = false;
+            r.soundEffects[17]->stop();
+            r.soundEffects[18]->stop();
+            r.soundEffects[19]->stop();
+            r.soundEffects[17]->play();
+            r.soundEffects[rand_generator_int(18, 19)]->play();
+            if (r.soundEffects[52]->getStatus() != SoundSource::Playing) {
+                // Engine sound
+                r.soundEffects[52]->stop();
+                r.soundEffects[52]->play();
             }
-            else {
-                actual_code_image --;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
         }
     }
     else {
-        isAccelerating = false;
-    }
-}
-
-
-
-
-/**
- * Control if the user has pressed the q keyword to increase the speed
- * @param speed is the actual speed of the Minivan of the player
- * @param eventDetected is a boolean to control if an event has occurred
- * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the Minivan
- * @param height is the actual elevation of the terrain where is the Minivan
- */
-inline void Minivan::controlPlayerBraking(int& speed, bool& eventDetected, RenderWindow* app,
-                                          const int lastHeight, const int height, Elevation& e){
-    // Check if the user is braking
-    if (Keyboard::isKeyPressed(c->getBrakeKey())){
-        isAccelerating = false;
-        // Check more events
-        if (!eventDetected){
-            // Control if first the user has accelerated
-            controlPlayerSpeed(speed, eventDetected, app, lastHeight, height, e);
-        }
-        // The Minivan goes straight
-        if (actual_code_image >= 1 && actual_code_image <= 2){
-            actual_code_image += 12;
-        }
-        // The Minivan was straight and brake
-        else if (actual_code_image >= 13 && actual_code_image <= 14){
-            if (actual_code_image != 14){
-                actual_code_image++;
-            }
-            else {
-                actual_code_image--;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan goes left
-        else if (actual_code_image >= 3 && actual_code_image <= 4){
-            actual_code_image += 12;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan goes right
-        else if (actual_code_image >= 5 && actual_code_image <= 6){
-            actual_code_image += 12;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        //The Minivan was left and brake
-        else if (actual_code_image >= 15 && actual_code_image <= 16){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 16){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the Minivan is turning left and braking
-                actual_code_image--;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan was right and brake
-        else if (actual_code_image >= 17 && actual_code_image <= 18){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 18){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the Minivan is turning right and braking
-                actual_code_image--;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan goes ascending
-        else if (actual_code_image >= 7 && actual_code_image <= 8){
-            actual_code_image += 12;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan was ascending and brake
-        else if (actual_code_image >= 19 && actual_code_image <= 20){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 20){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the Minivan is ascending and braking
-                actual_code_image--;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan goes ascending and turning left
-        else if (actual_code_image >= 9 && actual_code_image <= 10){
-            actual_code_image += 12;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan was descending while it was turning left and brake
-        else if (actual_code_image >= 21 && actual_code_image <= 22){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 22){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the Minivan is ascending while is turning left and braking
-                actual_code_image--;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan goes ascending and turning left
-        else if (actual_code_image >= 11 && actual_code_image <= 12){
-            actual_code_image += 12;
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // The Minivan was descending while it was turning left and brake
-        else if (actual_code_image >= 23 && actual_code_image <= 24){
-            // Increment the actual code of the sprite
-            if (actual_code_image != 24){
-                // Increment the texture of the sprite
-                actual_code_image++;
-            }
-            else {
-                // Change sprite while the Minivan is ascending while is turning left and braking
-                actual_code_image--;
-            }
-            // Set the texture from the file
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-        }
-        // Reduce the speed
-        if (speed > INITIAL_SPEED){
-            // Increment of the speed
-            speed -= int(deceleration * (speed_increment + speed_increment));
-            if (speed < INITIAL_SPEED){
-                speed = INITIAL_SPEED;
-            }
-        }
-        // Detect event
-        eventDetected = true;
-    }
-}
-
-
-
-/**
- * Control if the player has done any of his possible actions
- * @param speed is the actual speed of the Minivan of the player
- * @param eventDetected is a boolean to control if an event has occurred
- * @param app is the console window game where the sprite is going to be drawn
- * @param lastHeight was the elevation of the terrain where was the Minivan
- * @param height is the actual elevation of the terrain where is the Minivan
- */
-void Minivan::controlActionPlayer(int& speed, bool& eventDetected, RenderWindow* app, const int lastCamH, const int camH, Elevation& e){
-
-    // Check if W keyword has been pressed to turn to the right
-    controlTurningPlayerRightKeyboard(speed, eventDetected, app, lastCamH, camH, e);
-
-    // Check if Q keyword has been pressed to turn to the left
-    controlTurningPlayerLeftKeyboard(speed, eventDetected, app, lastCamH, camH, e);
-
-    //Check if the E keyword has been pressed to brake the Minivan
-    controlPlayerBraking(speed, eventDetected, app, lastCamH, camH, e);
-
-    // Check if any event has been registered
-    if (!eventDetected){
-        // Reduce the speed
-        if (speed > INITIAL_SPEED){
-            // Increment of the speed
-            speed -= int(deceleration);
-            if (speed < INITIAL_SPEED){
-                speed = INITIAL_SPEED;
-            }
-        }
+        r.soundEffects[41]->stop();
+        r.soundEffects[42]->stop();
+        r.soundEffects[8]->stop();
+        r.soundEffects[17]->stop();
+        r.soundEffects[18]->stop();
+        r.soundEffects[19]->stop();
     }
 
-    // Check if the Up keyword has been pressed to increase the speed
-    controlPlayerSpeed(speed, eventDetected, app, lastCamH, camH, e);
-}
+    // Draw
+    if (d != TURNLEFT){
+        firstTurnLeft = true;
+    }
+    if (d != TURNRIGHT){
+        firstTurnRight = true;
+    }
 
+    if (a != NONE) {
+        if (counter_code_image >= maxCounterToChange) {
+            counter_code_image = 0;
 
+            if (speed > 0.0f)
+                current_code_image++;
 
-/**
- * Control if the player has have collision with the nearest element of the map to him
- * @param nearestStep is the step of the scene where is located the nearest element to the player
- * @param lastPos is the last position of the Minivan in the axis Y
- * @param pos is the current position of the Minivan in the axis Y
- */
-bool Minivan::controlPossibleCollision(Step& nearestStep, int lastPos, int pos){
-    // Calculation of the distance
-    float distance = nearestStep.spriteX - playerX;
-    // Check the sign of the offset
-    if (distance > 0){
-        // Right
-        // Check if the coordinates in the axis X are more less equal to have a collision
-        if (distance >= nearestStep.offset - 1.2 && distance <= nearestStep.offset + 0.075){
-            // Check if there is a direct collision or indirect collision in axis Y
-            if ((pos == nearestStep.spriteY) || (lastPos <= nearestStep.spriteY && nearestStep.spriteY <= pos)){
-                // Collision
-                return true;
-            }
-            else {
-                // There is not collision in spite the coordinates in axis X are equal
-                return false;
+            if (textures.size() == Minivan_vehicle::PLAYER_TEXTURES) {
+                if (a == ACCELERATE || a == BOOT) {
+                    if (e == FLAT) {
+                        if (d == RIGHT) {
+                            if (current_code_image < 1 || current_code_image > 2)
+                                current_code_image = 1;
+                        }
+                        else if (d == TURNLEFT) {
+                            if (firstTurnLeft) {
+                                if (current_code_image < 3 || current_code_image > 5)
+                                    current_code_image = 3;
+                                if (current_code_image == 3)
+                                    firstTurnLeft = false;
+                            } else {
+                                if (current_code_image < 3 || current_code_image > 5)
+                                    current_code_image = 3;
+                            }
+                        }
+                        else { // Turn right
+                            if (firstTurnRight) {
+                                if (current_code_image < 6 || current_code_image > 8)
+                                    current_code_image = 6;
+                                if (current_code_image == 6)
+                                    firstTurnRight = false;
+                            } else {
+                                if (current_code_image < 6 || current_code_image > 8)
+                                    current_code_image = 6;
+                            }
+                        }
+                    }
+                     else if (e == UP) {
+                        if (d == RIGHT) {
+                            if (current_code_image < 9 || current_code_image > 10)
+                                current_code_image = 9;
+                        }
+                        else if (d == TURNLEFT) {
+                            if (firstTurnLeft) {
+                                if (current_code_image < 11 || current_code_image > 12)
+                                    current_code_image = 11;
+                                if (current_code_image == 11)
+                                    firstTurnLeft = false;
+                            } else {
+                                if (current_code_image < 11 || current_code_image > 12)
+                                    current_code_image = 11;
+                            }
+                        }
+                        else { // Turn right
+                            if (firstTurnRight) {
+                                if (current_code_image < 13 || current_code_image > 14)
+                                    current_code_image = 13;
+                                if (current_code_image == 13)
+                                    firstTurnRight = false;
+                            } else {
+                                if (current_code_image < 13 || current_code_image > 14)
+                                    current_code_image = 13;
+                            }
+                        }
+                    }
+                    else { // Down
+                         if (d == RIGHT) {
+                            if (current_code_image < 1 || current_code_image > 2)
+                                current_code_image = 1;
+                        }
+                        else if (d == TURNLEFT) {
+                            if (firstTurnLeft) {
+                                if (current_code_image < 3 || current_code_image > 5)
+                                    current_code_image = 3;
+                                if (current_code_image == 3)
+                                    firstTurnLeft = false;
+                            } else {
+                                if (current_code_image < 3 || current_code_image > 5)
+                                    current_code_image = 3;
+                            }
+                        }
+                        else { // Turn right
+                            if (firstTurnRight) {
+                                if (current_code_image < 6 || current_code_image > 8)
+                                    current_code_image = 6;
+                                if (current_code_image == 6)
+                                    firstTurnRight = false;
+                            } else {
+                                if (current_code_image < 6 || current_code_image > 8)
+                                    current_code_image = 6;
+                            }
+                        }
+                    }
+                } else if (a == BRAKE) {
+                    if (e == FLAT) {
+                        if (d == RIGHT) {
+                            if (current_code_image < 15 || current_code_image > 16)
+                                current_code_image = 15;
+                        }
+                        else if (d == TURNLEFT) {
+                            if (firstTurnLeft) {
+                                if (current_code_image < 17 || current_code_image > 19)
+                                    current_code_image = 17;
+                                if (current_code_image == 17)
+                                    firstTurnLeft = false;
+                            } else {
+                                if (current_code_image < 17 || current_code_image > 19)
+                                    current_code_image = 17;
+                            }
+                        }
+                        else { // Turn right
+                            if (firstTurnRight) {
+                                if (current_code_image < 20 || current_code_image > 22)
+                                    current_code_image = 20;
+                                if (current_code_image == 20)
+                                    firstTurnRight = false;
+                            } else {
+                                if (current_code_image < 20 || current_code_image > 22)
+                                    current_code_image = 20;
+                            }
+                        }
+                    } else if (e == UP) {
+                        if (d == RIGHT) {
+                            if (current_code_image < 23 || current_code_image > 24)
+                                current_code_image = 23;
+                        } else if (d == TURNLEFT) {
+                            if (firstTurnLeft) {
+                                if (current_code_image < 25 || current_code_image > 26)
+                                    current_code_image = 25;
+                                if (current_code_image == 25)
+                                    firstTurnLeft = false;
+                            } else {
+                                if (current_code_image < 25 || current_code_image > 26)
+                                    current_code_image = 25;
+                            }
+                        } else { // Turn right
+                            if (firstTurnRight) {
+                                if (current_code_image < 27 || current_code_image > 28)
+                                    current_code_image = 27;
+                                if (current_code_image == 27)
+                                    firstTurnRight = false;
+                            } else {
+                                if (current_code_image < 27 || current_code_image > 28)
+                                    current_code_image = 27;
+                            }
+                        }
+                    } else { // Down
+                        if (d == RIGHT) {
+                            if (current_code_image < 15 || current_code_image > 16)
+                                current_code_image = 15;
+                        }
+                        else if (d == TURNLEFT) {
+                            if (firstTurnLeft) {
+                                if (current_code_image < 17 || current_code_image > 19)
+                                    current_code_image = 17;
+                                if (current_code_image == 17)
+                                    firstTurnLeft = false;
+                            } else {
+                                if (current_code_image < 17 || current_code_image > 19)
+                                    current_code_image = 17;
+                            }
+                        }
+                        else { // Turn right
+                            if (firstTurnRight) {
+                                if (current_code_image < 20 || current_code_image > 22)
+                                    current_code_image = 20;
+                                if (current_code_image == 20)
+                                    firstTurnRight = false;
+                            } else {
+                                if (current_code_image < 20 || current_code_image > 22)
+                                    current_code_image = 20;
+                            }
+                        }
+                    }
+                }
+                else {
+                    // Crash
+                    if (mode == 0) {
+                        if (current_code_image < 29 || current_code_image > 36)
+                            current_code_image = 29;
+                    }
+                    else if (mode == 1) {
+                        if (current_code_image < 37 || current_code_image > 44)
+                            current_code_image = 37;
+                    }
+                }
             }
         }
-        // There is not collision because the coordinates in axis X are different
-        return false;
+        else {
+            counter_code_image++;
+        }
     }
     else {
-        // Left
-        // Check if the coordinates in the axis X are more less equal to have a collision
-        if (distance >= nearestStep.offset - 0.075 && distance <= nearestStep.offset + 0.2){
-            // Check if there is a direct collision or indirect collision in axis Y
-            if ((pos == nearestStep.spriteY) || (lastPos <= nearestStep.spriteY && nearestStep.spriteY <= pos)){
-                // Collision
-                return true;
-            }
-            else {
-                // There is not collision in spite the coordinates in axis X are equal
-                return false;
-            }
+        current_code_image = 1;
+    }
+
+    sprite.setTexture(textures[current_code_image - 1], true);
+    sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
+    minScreenX = ((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width / 2.0f;
+    maxScreenX = minScreenX + sprite.getGlobalBounds().width;
+    sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
+    c.w.draw(sprite);
+
+
+    if (smoking || skidding || crashing) {
+        if (!crashing){
+            maxCounterToChange = COUNTER + 4;
         }
-        // There is not collision because the coordinates in axis X are different
-        return false;
+        const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
+        sprite.setTexture(textures[44 + current_code_image % 4], true);
+        sprite.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
+        sprite.setPosition(((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width,
+                           j - sprite.getGlobalBounds().height);
+        c.w.draw(sprite);
+        sprite.setPosition(((float) c.w.getSize().x) / 2.0f, j - sprite.getGlobalBounds().height);
+        c.w.draw(sprite);
     }
 }
 
+void Minivan::drawInitialAnimation(Configuration &c, float x, bool &end) {
+    if (textures.size() == Minivan_vehicle::PLAYER_TEXTURES) {
+        if (counter_code_image >= maxCounterToChange) {
+            current_code_image++;
+            counter_code_image = 0;
+        }
+        if (current_code_image < 132 || current_code_image > 135)
+            current_code_image = 132;
+
+        int index = 125;
+        if (x < ((float) c.w.getSize().x) * 0.45f)
+            index = 124;
+        end = x < ((float) c.w.getSize().x) * 0.4f || x >= c.w.getSize().x;
+
+        // Vehicle
+        sprite.setTexture(textures[index], true);
+        sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
+        sprite.setPosition(x, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
+        c.w.draw(sprite);
+
+        // Smoke
+        float i = x - sprite.getGlobalBounds().width / 3, j = sprite.getPosition().y + sprite.getGlobalBounds().height;
+        while (i < (float) c.w.getSize().x) {
+            index = current_code_image;
+            sprite.setTexture(textures[index], true);
+            sprite.setScale(4.0f * c.screenScale, 4.0f * c.screenScale);
+            sprite.setPosition(i, j - sprite.getGlobalBounds().height);
+            c.w.draw(sprite);
+
+            i += sprite.getGlobalBounds().width;
+        }
+
+        if (end) {
+            current_code_image = 0;
+            counter_code_image = 0;
+        } else {
+            counter_code_image++;
+        }
+    }
+}
+
+void Minivan::drawGoalAnimation(Configuration &c, int &step, bool &end, bool smoke) {
+    if (textures.size() == Minivan_vehicle::PLAYER_TEXTURES) {
+        if (counter_code_image >= maxCounterToChange) {
+            current_code_image++;
+            counter_code_image = 0;
+            step++;
+        }
+        if (current_code_image < 132 || current_code_image > 135)
+            current_code_image = 132;
+
+        int index = 126;
+        if (step < 2)
+            index = 124;
+        else if (step < 4)
+            index = 125;
+
+        // Vehicle
+        sprite.setTexture(textures[index], true);
+        sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
+        minScreenX = ((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width / 2.0f;
+        maxScreenX = minScreenX + sprite.getGlobalBounds().width;
+        sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
+        c.w.draw(sprite);
+
+        // Smoke
+        if (smoke) {
+            float i = minScreenX - sprite.getGlobalBounds().width / 3, j =
+                    sprite.getPosition().y + sprite.getGlobalBounds().height;
+            while (i < (float) c.w.getSize().x) {
+                index = current_code_image;
+                sprite.setTexture(textures[index], true);
+                sprite.setScale(4.0f * c.screenScale, 4.0f * c.screenScale);
+                sprite.setPosition(i, j - sprite.getGlobalBounds().height);
+                c.w.draw(sprite);
+
+                i += sprite.getGlobalBounds().width;
+            }
+        }
+
+        if (step >= 6)
+            end = true;
+
+        if (end) {
+            current_code_image = 0;
+            counter_code_image = 0;
+        } else {
+            counter_code_image++;
+        }
+    }
+}
+
+void Minivan::setSmoking(bool smoke) {
+    smoking = smoke;
+}
 
 
-/**
- * Shows to the user how the Minivan crushes
- * @param pos is the position of the Minivan in the car in the axis Y
- */
-void Minivan::collisionShow(){
-    // Not collision detected before
+void Minivan::setVehicle(){
+    Vehicle::setVehicle();
+    acceleration = 0.0f;
+    minCrashAcc = 0.0f;
+    inertia = 0.0f;
+    xDest = 0.0f;
+    accInc = topSpeed * ACCELERATION_INCREMENT / MAX_SPEED;
+    smoking = false;
+    skidding = false;
+    firstCrash = true;
+    firstTurnLeft = true;
+    firstTurnRight = true;
+}
+
+
+void Minivan::setModeCollision(){
     if (mode == -1){
-        // Code generated to the way of collision
-        // Pseudo generator of aleatory number in order to generate randomly the way of collision
-        srand(time(NULL));
-        mode = rand() % 2;
-        // Establish the first collision sprite
-        if (mode == 0){
-            // First way to collision
-            actual_code_image = 25;
-        }
-        else if (mode == 1) {
-            // Second way to collision
-            actual_code_image = 27;
-        }
-    }
-    else {
-        // Collision detected in process
-        // Avoid overflow of code number identifier of collision sprite
-        if (mode == 1){
-            // Show the sprite
-            playerSprite.setTexture(textures[actual_code_image - 1], true);
-            actual_code_image++;
-            // Check if it's the final sprite
-            if (actual_code_image == 33){
-                spinningTopsDone++;
-                actual_code_image -= 8;
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-            }
-            if (spinningTopsDone == 2){
-                actual_code_image = 1;
-                mode = -1;
-                playerX = 0.f;
-                spinningTopsDone = 0;
-            }
-        }
-        else if (mode == 0){
-            if (actual_code_image == 25){
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-                actual_code_image += 7;
-            }
-            else {
-                playerSprite.setTexture(textures[actual_code_image - 1], true);
-                actual_code_image--;
-                if (actual_code_image == 25){
-                    spinningTopsDone++;
-                }
-                if (spinningTopsDone == 2){
-                    actual_code_image = 1;
-                    mode = -1;
-                    playerX = 0.f;
-                    spinningTopsDone = 0;
-                }
-            }
-        }
+        mode = rand_generator_int(0, 1);
     }
 }
 
 
-
-bool Minivan::hasCrashed(float prevY, float currentY, float minX, float maxX, LandScape* m)  {
-    Step* l;
-    for (int n = int(playerY); n < int(playerY) + 300; n++) {
-        l = m->getLine(n);
-        if (l->spriteNearLeft.spriteNum != -1 && l->spriteNearLeft.spriteMinX != l->spriteNearLeft.spriteMaxX && // l has an object that can crash
-                prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l->spriteNearLeft.spriteMinX && minX <= l->spriteNearLeft.spriteMaxX) ||
-                 (maxX >= l->spriteNearLeft.spriteMinX && maxX <= l->spriteNearLeft.spriteMaxX) ||
-                 (l->spriteNearLeft.spriteMinX >= minX && l->spriteNearLeft.spriteMinX <= maxX) ||
-                 (l->spriteNearLeft.spriteMaxX >= minX && l->spriteNearLeft.spriteMaxX <= maxX))) // x matches
-            return true;
-        if (l->spriteNearRight.spriteNum != -1 && l->spriteNearRight.spriteMinX != l->spriteNearRight.spriteMaxX && // l has an object that can crash
-                prevY <= float(n) && currentY >= float(n) && // y matches
-                ((minX >= l->spriteNearRight.spriteMinX && minX <= l->spriteNearRight.spriteMaxX) ||
-                 (maxX >= l->spriteNearRight.spriteMinX && maxX <= l->spriteNearRight.spriteMaxX) ||
-                 (l->spriteNearRight.spriteMinX >= minX && l->spriteNearRight.spriteMinX <= maxX) ||
-                 (l->spriteNearRight.spriteMaxX >= minX && l->spriteNearRight.spriteMaxX <= maxX))) // x matches
-            return true;
-    }
-    return false;
+float Minivan::getHalfMaxSpeed(){
+    return halfMaxSpeed;
 }
 
 
+string Minivan::getBrandName(){
+    return brand;
+}
 
 
+string Minivan::getMotorName(){
+    return motor;
+}
 
 
+float Minivan::getAngle(){
+    return angleTurning;
+}
 
+
+float Minivan::getTopSpeed(){
+    return topSpeed;
+}

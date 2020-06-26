@@ -1,22 +1,64 @@
 
+/*
+ * Module Button implementation file
+ */
+
 #include "../include/Button.h"
+
+
+/**
+ * Default constructor
+ */
 
 Button::Button(){}
 
-Button::Button (float x, float y, float width, float height, Font& f,
-                string text, Color idleColor, Color hoverColor, int initialState)
+
+
+/**
+ * Constructor of the button
+ * @param x is the coordinate in axis x of the button in the screen
+ * @param y is the coordinate in axis y of the button in the screen
+ * @param width is the width dimension of the button
+ * @param height is the height dimension of the button
+ * @param f is the font of the text
+ * @param text is the content of the button
+ * @param idleColor is the normal color of the button
+ * @param hoverColor is the color of the button hovered
+ * @param activeColor is the color of the button pressed
+ * @param initialState is the state code of the button
+ * @param screenScale is the factor of resolution of the screen
+ */
+Button::Button(float x, float y, float width, float height, Font &f,
+               const string &text, Color idleColor, Color hoverColor, Color fontColor, int initialState,
+               float screenScale)
 {
+    // Establish the position of the button in the screen
     shape.setPosition(Vector2f(x, y));
+
+    // Establish the dimensions of the button in the screen
     shape.setSize(Vector2f(width, height));
+
+    // Assign the border color of the button
     shape.setOutlineColor(Color::Black);
-    shape.setOutlineThickness(3);
+
+    // Fix the size border depending of the resolution
+    shape.setOutlineThickness(3.0f * screenScale);
+
+    // Assign the font and text of the button
     textButton.setString(text);
     textButton.setFont(f);
-    textButton.setFillColor(Color::Blue);
-    textButton.setCharacterSize(12);
+
+    // Assign the color of the font and the size of the text
+    textButton.setFillColor(fontColor);
+    textButton.setCharacterSize(static_cast<unsigned int>(int(15.0f * screenScale)));
+
+    // Color of the font
+    fontColorButton = fontColor;
+
+    // Establish the text in the center of the button
     textButton.setPosition(
-        shape.getPosition().x + (shape.getGlobalBounds().width / 2.f)  - textButton.getGlobalBounds().width / 2.f,
-        shape.getPosition().y + (shape.getGlobalBounds().height / 2.f)  - textButton.getGlobalBounds().height / 2.f - 5
+        shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - textButton.getGlobalBounds().width / 2.f,
+        shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - textButton.getGlobalBounds().height / 2.f - 5
     );
 
     // Store the possible colors of the button
@@ -24,49 +66,61 @@ Button::Button (float x, float y, float width, float height, Font& f,
     hoverColorButton = hoverColor;
 
     // Check the initial state of the button
-    switch (initialState){
+    switch (initialState) {
         case 0:
-            buttonState = BUTTON_IDLE;
             shape.setFillColor(idleColorButton);
-        break;
+            break;
         case 1:
-            buttonState = BUTTON_HOVER;
             shape.setFillColor(hoverColorButton);
-        break;
+            break;
+        default:
+            break;
     }
 }
 
 
 
-void Button::setButtonState(button_states stateButton){
-    switch(stateButton){
+/**
+ * Updates the state of the button
+ * @param buttonState is the new state of the button to change
+ */
+void Button::setButtonState(button_states stateButton) {
+    // Modification of the button's state
+    switch (stateButton) {
         case BUTTON_IDLE:
             shape.setFillColor(idleColorButton);
-        break;
+            break;
         case BUTTON_HOVER:
             shape.setFillColor(hoverColorButton);
     }
 }
 
 
-void Button::render (RenderWindow* app){
+
+/**
+ * Draws the button
+ * @param app is the console window of the game
+ */
+void Button::render(RenderTexture *app) {
     app->draw(shape);
     app->draw(textButton);
 }
 
 
-void Button::setTextButton(string newString){
+
+/**
+ * Initialize the text content of the button
+ * @param newString is the content text of the button
+ */
+void Button::setTextButton(const string &newString) {
+    // Update the text content of the button in the center of it
     textButton.setString(newString);
     textButton.setPosition(
-        shape.getPosition().x + (shape.getGlobalBounds().width / 2.f)  - textButton.getGlobalBounds().width / 2.f,
-        shape.getPosition().y + (shape.getGlobalBounds().height / 2.f)  - textButton.getGlobalBounds().height / 2.f - 5
+        shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - textButton.getGlobalBounds().width / 2.f,
+        shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - textButton.getGlobalBounds().height / 2.f - 5
     );
 }
 
-
-string Button::getTextButton(){
-    return textButton.getString();
-}
 
 
 void Button::proccessDescription(xml_node<> *child){
@@ -90,6 +144,38 @@ void Button::proccessDescription(xml_node<> *child){
 }
 
 
+
 vector<string> Button::getDescriptionButton(){
     return descriptionButton;
 }
+
+
+void Button::setDescriptionButton(vector<string> description){
+    descriptionButton = description;
+}
+
+
+
+string Button::getTextButton(){
+    return textButton.getString();
+}
+
+
+
+Color Button::getIdleColorButton(){
+    return idleColorButton;
+}
+
+
+
+Color Button::getHoverColorButton(){
+    return hoverColorButton;
+}
+
+
+
+Color Button::getFontColorButton(){
+    return fontColorButton;
+}
+
+

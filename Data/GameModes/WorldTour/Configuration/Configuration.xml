@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Width_road>2000</Width_road>
+	<Number_tracks>2</Number_tracks>
+	<Rumble_limit>0.1</Rumble_limit>
+</Configuration>
