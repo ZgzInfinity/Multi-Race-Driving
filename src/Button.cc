@@ -50,7 +50,7 @@ Button::Button(float x, float y, float width, float height, Font &f,
 
     // Assign the color of the font and the size of the text
     textButton.setFillColor(fontColor);
-    textButton.setCharacterSize(static_cast<unsigned int>(int(15.0f * screenScale)));
+    textButton.setCharacterSize(static_cast<unsigned int>(int(18.0f * screenScale)));
 
     // Color of the font
     fontColorButton = fontColor;

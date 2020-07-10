@@ -44,7 +44,7 @@ struct SoundPlayer {
         /**
          * Default constructor
          */
-        SoundPlayer();
+        SoundPlayer(const int volMusic, const int volEffects);
 
 
 

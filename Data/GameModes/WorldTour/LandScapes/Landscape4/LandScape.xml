@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LandScape>
 	<Name>Tokio</Name>
+	<Type>Grass</Type>
 	<Sprites>
 		<S1>Data/GameModes/WorldTour/LandScapes/LandScape4/1.png</S1>
 		<S2>Data/GameModes/WorldTour/LandScapes/LandScape4/2.png</S2>
@@ -80,7 +81,7 @@
 						<SpriteFarLeft>
 							<Each>40</Each>
 							<Offset>Random</Offset>
-							<Code>20</Code>
+							<Code>5</Code>
 						</SpriteFarLeft>
 						<SpriteFarRight>
 							<Each>36</Each>
@@ -94,7 +95,7 @@
 		<P3>
 			<Climbing elevation="5000">
 				<P1>
-					<Direction>0.8</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGT="250" finalPosLE="360">
 						<SpriteNearLeft>
 							<Each>70</Each>
@@ -320,12 +321,12 @@
 				<Road startPosGE="1001" finalPosLT="1100">
 					<SpriteNearLeft>
 						<Each>67</Each>
-						<Offset>0.3</Offset>
+						<Offset>-0.8</Offset>
 						<Code>30</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
 						<Each>79</Each>
-						<Offset>0.2</Offset>
+						<Offset>-0.8</Offset>
 						<Code>31</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
@@ -344,7 +345,7 @@
 		<P10>
 			<Dropping elevation="19000">
 				<P1>
-					<Direction>-2.0</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGT="1099" finalPosLT="1550">
 						<SpriteNearLeft>
 							<Each>70</Each>
@@ -354,7 +355,7 @@
 						<SpriteNearRight>
 							<Each>90</Each>
 							<Offset>0.7</Offset>
-							<Code>2</Code>
+							<Code>15</Code>
 						</SpriteNearRight>
 						<SpriteFarLeft>
 							<Each>68</Each>
@@ -394,7 +395,7 @@
 					</Road>
 				</P2>
 				<P3>
-					<Direction>0.0</Direction>
+					<Direction>2.0</Direction>
 					<Road startPosGE="1901" finalPosLT="2100">
 						<CheckPoint>
 							<Offset>-0.95</Offset>
@@ -403,7 +404,7 @@
 						</CheckPoint>
 						<SpriteNearLeft>
 							<Each>70</Each>
-							<Offset>0.3</Offset>
+							<Offset>-0.8</Offset>
 							<Code>30</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
@@ -428,12 +429,12 @@
 		<P11>
 			<Climbing elevation="12000">
 				<P1>
-					<Direction>0.0</Direction>
+					<Direction>2.0</Direction>
 					<Road startPosGE="2100" finalPosLE="2200">
 						<SpriteNearLeft>
 							<Each>70</Each>
 							<Offset>0.3</Offset>
-							<Code>18</Code>
+							<Code>3</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
 							<Each>90</Each>

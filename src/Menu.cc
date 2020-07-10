@@ -21,7 +21,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
             }
         }
         // Loading the icon texture
-        t.loadFromFile("Data/SegaAnimation/segaLogo" + to_string(i) + ".png");
+        t.loadFromFile("Data/Animations/SegaAnimation/segaLogo" + to_string(i) + ".png");
         segaIcons.push_back(t);
         // Load the texture in the sprite reseting the last texture
         segaIcon.setTexture(segaIcons.at(static_cast<unsigned long>(i - 1)), true);
@@ -40,7 +40,17 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
         sleep(milliseconds(40));
     }
 
+    // Wait until sound stops
     r.soundEffects[27]->play();
+    while (r.soundEffects[27]->getStatus() == SoundSource::Playing){
+        // Detect the possible events
+        Event e{};
+        while (c.window.pollEvent(e)) {
+            if (e.type == Event::Closed) {
+                return EXIT;
+            }
+        }
+    }
     return START;
 }
 
@@ -170,17 +180,43 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
 
     // Global rectangle of the background
     IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
-    c.textureBackground.setRepeated(true);
     Sprite sprite(c.textureBackground, background);
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
     c.sBackground = sprite;
 
     // Options of the main menu
     Text textElements[NUM_TEXTS];
 
+    Text titleGame1;
+    titleGame1.setString("MULTI RACE");
+    titleGame1.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+    titleGame1.setFont(c.fontsMainMenu[0]);
+    titleGame1.setFillColor(Color::White);
+    titleGame1.setOutlineColor(Color::Black);
+    titleGame1.setOutlineThickness(5.0f * c.screenScale);
+    titleGame1.setStyle(Text::Bold);
+    titleGame1.setPosition((c.w.getSize().x - titleGame1.getGlobalBounds().width) / 2.f,
+                            c.w.getSize().y / 2.f - 200.0f * c.screenScale);
+
+    Text titleGame2;
+    titleGame2.setString("DRIVING");
+    titleGame2.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+    titleGame2.setFont(c.fontsMainMenu[0]);
+    titleGame2.setFillColor(Color::White);
+    titleGame2.setOutlineColor(Color::Black);
+    titleGame2.setOutlineThickness(5.0f * c.screenScale);
+    titleGame2.setStyle(Text::Bold);
+    titleGame2.setPosition((c.w.getSize().x - titleGame2.getGlobalBounds().width) / 2.f,
+                            c.w.getSize().y / 2.f - 150.0f * c.screenScale);
+
+
+
     // Fill the vector with the information read in the
     // configuration file of the menu
     textElements[0].setString(c.contents[0]);
-    textElements[0].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    textElements[0].setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
     textElements[0].setFont(c.fontsMainMenu[0]);
     textElements[0].setFillColor(c.colorTexts[0]);
     textElements[0].setOutlineColor(c.colorBorders[0]);
@@ -189,7 +225,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
                                 c.w.getSize().y / 2.f + 100.0f * c.screenScale);
 
     textElements[1].setString(c.contents[1]);
-    textElements[1].setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    textElements[1].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     textElements[1].setFont(c.fontsMainMenu[1]);
     textElements[1].setFillColor(c.colorTexts[1]);
     textElements[1].setOutlineColor(c.colorBorders[1]);
@@ -199,7 +235,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[1].setPosition(initialX, initialY);
 
     textElements[2].setString(c.contents[2]);
-    textElements[2].setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    textElements[2].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     textElements[2].setFont(c.fontsMainMenu[2]);
     textElements[2].setFillColor(c.colorTexts[2]);
     textElements[2].setOutlineColor(c.colorBorders[2]);
@@ -208,7 +244,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
 
     initialX = textElements[1].getGlobalBounds().width;
     textElements[3].setString(c.contents[3]);
-    textElements[3].setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    textElements[3].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     textElements[3].setFont(c.fontsMainMenu[3]);
     textElements[3].setFillColor(c.colorTexts[3]);
     textElements[3].setOutlineColor(c.colorBorders[4]);
@@ -217,7 +253,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
 
     initialY -= 2.0f * textElements[3].getGlobalBounds().height;
     textElements[4].setString(c.contents[4]);
-    textElements[4].setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    textElements[4].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     textElements[4].setFont(c.fontsMainMenu[4]);
     textElements[4].setFillColor(c.colorTexts[4]);
     textElements[4].setOutlineColor(c.colorBorders[4]);
@@ -226,7 +262,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
 
     initialY -= 2.0f * textElements[4].getGlobalBounds().height;
     textElements[5].setString(c.contents[5]);
-    textElements[5].setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    textElements[5].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     textElements[5].setFont(c.fontsMainMenu[5]);
     textElements[5].setFillColor(c.colorTexts[5]);
     textElements[5].setOutlineColor(c.colorBorders[5]);
@@ -286,6 +322,9 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
             // Show the press start title in the menu
             c.w.draw(c.sBackground);
 
+            c.w.draw(titleGame1);
+            c.w.draw(titleGame2);
+
             c.w.draw(textElements[0]);
             c.w.draw(textElements[1]);
             c.w.draw(textElements[2]);
@@ -303,6 +342,8 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
             if (Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Pass to the second menu
                 startPressed = true;
+                // Stop the soundtrack of the main menu
+                r.soundTracks[0]->stop();
                 r.soundEffects[1]->stop();
                 r.soundEffects[1]->play();
             }
@@ -312,16 +353,9 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
             j = (j < (int) nameGames.size() - 1) ? j + 1 : 0;
         }
 
-        // Stop the soundtrack of the main menu
-        r.soundTracks[0]->stop();
-
         // Control the second menu
         startPressed = false;
         state = PLAYER_MENU;
-        sleep(milliseconds(200));
-
-        // Return the state of the game
-        r.soundEffects[0]->stop();
 
         if (c.enablePixelArt) {
             if (c.isDefaultScreen)
@@ -334,6 +368,17 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
                        static_cast<unsigned int>(c.window.getView().getSize().y));
             c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
         }
+
+        while (r.soundEffects[1]->getStatus() == SoundSource::Playing){
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)) {
+                if (e.type == Event::Closed) {
+                    return EXIT;
+                }
+            }
+        }
+
         r.soundTracks[1]->play();
         return state;
     }
@@ -639,6 +684,39 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         string pathFile = "Data/Menus/PlayerMenu/Configuration/PlayerMenu.xml";
         loadPlayerMenuConfiguration(pathFile, c);
     }
+    else if (!c.comeFromOptions) {
+        int numButtons = int(c.menuPlayerButtons.size());
+
+        // Description of the button
+        vector<string> descriptionButton;
+
+        // Change the state of the first color
+        Button b = Button(c.w.getSize().x / 2.f - 280.0f * c.screenScale, c.w.getSize().y / 2.f - 149.0f * c.screenScale,
+                          200.0f * c.screenScale, 50.0f * c.screenScale, c.fontMenuPlayerButtons, c.menuPlayerButtons[0].getTextButton(),
+                          c.menuPlayerButtons[0].getIdleColorButton(), c.menuPlayerButtons[0].getHoverColorButton(),
+                          c.menuPlayerButtons[0].getFontColorButton(), 1, c.screenScale);
+
+        // Get the description of the button
+        descriptionButton = c.menuPlayerButtons[0].getDescriptionButton();
+        b.setDescriptionButton(descriptionButton);
+
+        c.menuPlayerButtons[0] = b;
+
+        // Eliminate the buttons of the right column
+        for (int i = 1; i < numButtons; i++){
+            // Change the state of the first color
+            Button b = Button(c.w.getSize().x / 2.f - 280.0f * c.screenScale, c.w.getSize().y / 2.f - (149.0f - i * 133.f) * c.screenScale,
+                              200.0f * c.screenScale, 50.0f * c.screenScale, c.fontMenuPlayerButtons, c.menuPlayerButtons[i].getTextButton(),
+                              c.menuPlayerButtons[i].getIdleColorButton(), c.menuPlayerButtons[i].getHoverColorButton(),
+                              c.menuPlayerButtons[i].getFontColorButton(), 0, c.screenScale);
+
+            // Get the description of the button
+            descriptionButton = c.menuPlayerButtons[i].getDescriptionButton();
+            b.setDescriptionButton(descriptionButton);
+
+            c.menuPlayerButtons[i] = b;
+        }
+    }
 
     // Control if the start key is pressed or not
     bool startPressed = false;
@@ -655,8 +733,6 @@ State playerMenu(Configuration &c, SoundPlayer& r){
     // Control the option selected by the user
     int optionSelected;
 
-    // Reproduce the soundtrack of the level
-
     // While start and backspace have not been pressed
     while (!startPressed && !backSpacePressed) {
 
@@ -667,6 +743,10 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         // Global rectangle of the background
         IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
         Sprite sprite(c.playerMenuBackground, background);
+
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
         c.sPlayerMenuBackground = sprite;
 
         // Creation of the panel rectangle of the menu
@@ -688,19 +768,20 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         // Main Text of the menu
         Text mainText;
         mainText.setString(c.contentTitlePlayerMenu);
-        mainText.setPosition((c.w.getSize().x / 2.f) - 190.0f * c.screenScale, c.w.getSize().y / 2.f - 230.0f * c.screenScale);
-        mainText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        mainText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
         mainText.setFont(c.fontPlayerMenu);
         mainText.setStyle(Text::Bold | Text::Underlined);
         mainText.setFillColor(c.colorTitleTextPlayerMenu);
         mainText.setOutlineColor(c.colorTitleBorderPlayerMenu);
-        mainText.setOutlineThickness(3.0f * c.screenScale);
+        mainText.setOutlineThickness(5.0f * c.screenScale);
+        mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 230.0f * c.screenScale);
 
         // Text description of the buttons
         Text descriptionText;
         descriptionText.setStyle(Text::Bold);
-        descriptionText.setFillColor(Color::Blue);
-        descriptionText.setCharacterSize(18 * c.screenScale);
+        descriptionText.setFillColor(c.colorFontMenuPlayerButtons);
+        descriptionText.setCharacterSize(25 * c.screenScale);
         descriptionText.setFont(c.fontMenuPlayerButtons);
 
         if (c.comeFromOptions){
@@ -810,7 +891,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::BackSpace)) {
+            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -1206,6 +1287,9 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
         // Global rectangle of the background
         IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
         Sprite sprite(c.gameModesMenuBackground, background);
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
         c.sGameModesBackground = sprite;
 
         // Creation of the panel rectangle of the menu
@@ -1227,19 +1311,20 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
         // Main Text of the menu
         Text mainText;
         mainText.setString(c.contentTitleGameModeMenu);
-        mainText.setPosition((c.w.getSize().x / 2.f) - 190.0f * c.screenScale, c.w.getSize().y / 2.f - 230.0f * c.screenScale);
-        mainText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        mainText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
         mainText.setFont(c.fontGameModeMenu);
         mainText.setStyle(Text::Bold | Text::Underlined);
         mainText.setFillColor(c.colorTitleTextGameModeMenu);
         mainText.setOutlineColor(c.colorTitleBorderGameModeMenu);
-        mainText.setOutlineThickness(3.0f * c.screenScale);
+        mainText.setOutlineThickness(5.0f * c.screenScale);
+        mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 230.0f * c.screenScale);
 
         // Text description of the buttons
         Text descriptionText;
         descriptionText.setStyle(Text::Bold);
-        descriptionText.setFillColor(Color::Blue);
-        descriptionText.setCharacterSize(18 * c.screenScale);
+        descriptionText.setFillColor(c.colorFontMenuGameModesButtons);
+        descriptionText.setCharacterSize(25 * c.screenScale);
         descriptionText.setFont(c.fontMenuGameModeButtons);
 
         // All buttons of the menu have been created correctly
@@ -1334,7 +1419,7 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
                 r.soundEffects[2]->play();
             }
             // Check if backspace key has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::BackSpace)) {
+            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -1350,9 +1435,6 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
     // Store the game selected by the player
     typeOfGame = optionSelected;
 
-    // Stop the soundtrack of the menu
-    r.soundTracks[1]->stop();
-
     if (c.enablePixelArt) {
         if (c.isDefaultScreen)
             c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -1365,10 +1447,17 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
         c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
     }
 
-    if (typeOfGame != 3){
+    if (typeOfGame == 2){
+        // Stop the soundtrack of the menu
+        return LOAD_GAME;
+    }
+    else if (typeOfGame != 3){
+        r.soundTracks[1]->stop();
         return VEHICLE_SELECTION;
     }
     else {
+        // Stop the soundtrack of the menu
+        r.soundTracks[1]->stop();
         return LOAD_GAME;
     }
 }
@@ -1898,6 +1987,9 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
 
     IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
     Sprite sprite(c.soundMenuBackground, background);
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
     c.sdMenuBackground = sprite;
 
     RectangleShape shape;
@@ -1910,13 +2002,14 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
     // Main Text of the menu
     Text soundText;
     soundText.setString(c.contentTitleSoundMenu);
-    soundText.setPosition(c.w.getSize().x / 2.f - 160.0f * c.screenScale, c.w.getSize().y / 2.f - 220.0f * c.screenScale);
-    soundText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    soundText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
     soundText.setFont(c.fontSoundMenu);
     soundText.setStyle(Text::Bold | Text::Underlined);
     soundText.setFillColor(c.colorTitleTextSoundMenu);
     soundText.setOutlineColor(c.colorTitleBorderSoundMenu);
     soundText.setOutlineThickness(5.0f * c.screenScale);
+    soundText.setPosition((c.w.getSize().x / 2.f) - soundText.getLocalBounds().width / 2.f,
+                           c.w.getSize().y / 2.f - 220.0f * c.screenScale);
 
     // Option configurations
     c.soundMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
@@ -1986,6 +2079,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                         }
                     }
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeMusic)));
+                    c.changeAnyParameter = true;
                 }
             }
             else if (Keyboard::isKeyPressed(Keyboard::Right)) {
@@ -1999,6 +2093,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                         }
                     }
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeMusic)));
+                    c.changeAnyParameter = true;
                 }
             }
         }
@@ -2014,6 +2109,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeEffects)));
+                    c.changeAnyParameter = true;
                 }
             }
             else if (Keyboard::isKeyPressed(Keyboard::Right)) {
@@ -2025,6 +2121,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeEffects)));
+                    c.changeAnyParameter = true;
                 }
             }
         }
@@ -2046,7 +2143,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         r.soundEffects[0]->stop();
 
         // Check if left or right cursor keys have been pressed or not
-        if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+        if (Keyboard::isKeyPressed(Keyboard::Escape)) {
             // Change the controllers of the car
             startPressed = true;
             c.modifiedConfig = true;
@@ -2115,14 +2212,11 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
     // Control if the start key is pressed or not
     bool startPressed = false;
 
-    // Control if the backspace key is pressed or not
-    bool backSpacePressed = false;
-
     // Control the option selected by the user
     int optionSelected = 0;
 
     // While the start key and the backspace key have not been pressed
-    while (!startPressed && !backSpacePressed) {
+    while (!startPressed) {
 
         // Clean the console window
         c.w.clear(Color(0, 0, 0));
@@ -2139,6 +2233,9 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
         IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
         Sprite sprite(c.optionsMenuBackground, background);
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
         c.optMenuBackground = sprite;
 
         RectangleShape shape;
@@ -2151,13 +2248,14 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         // Main Text of the menu
         Text optionsText;
         optionsText.setString(c.contentTitleOptionsMenu);
-        optionsText.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / 2.f - 230.0f * c.screenScale);
-        optionsText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+        optionsText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
         optionsText.setFont(c.fontOptionsMenu);
         optionsText.setStyle(Text::Bold | Text::Underlined);
         optionsText.setFillColor(c.colorTitleTextOptionsMenu);
         optionsText.setOutlineColor(c.colorTitleBorderOptionsMenu);
         optionsText.setOutlineThickness(5.0f * c.screenScale);
+        optionsText.setPosition((c.w.getSize().x / 2.f) - optionsText.getLocalBounds().width / 2.f,
+                                 c.w.getSize().y / 2.f - 230.0f * c.screenScale);
 
         // Option configurations
 
@@ -2177,7 +2275,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                 break;
         }
 
-        const string submenu = "Menu", access = "Press C", saved = "Saved!";
+        const string submenu = "Menu", access = "Press Enter", saved = "Saved!";
 
         c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
                                           c.w.getSize().y / 2.f - 130.0f * c.screenScale, 200.0f * c.screenScale,
@@ -2189,7 +2287,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
                                           c.w.getSize().y / 2.f - 60.0f * c.screenScale, 200.0f * c.screenScale,
                                           30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                          c.enableAI ? "ENABLED" : "DISABLED", c.optionsMenuButtons[1].getIdleColorButton(),
+                                          c.enableAI ? "Enabled" : "Disabled", c.optionsMenuButtons[1].getIdleColorButton(),
                                           c.optionsMenuButtons[1].getHoverColorButton(),
                                           c.optionsMenuButtons[1].getFontColorButton(), 0, c.screenScale);
 
@@ -2216,7 +2314,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
 
         // Until the start keyword and the backspace keyword have not pressed
-        while (!startPressed && !backSpacePressed) {
+        while (!startPressed) {
             // Detect the possible events
             Event e{};
             while (c.window.pollEvent(e)){
@@ -2271,6 +2369,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                                 c.level = NORMAL;
                                 c.optionsMenuButtons[optionSelected + 5].setTextButton("Normal");
                             }
+                            c.changeAnyParameter = true;
                         }
                     }
                     else if (Keyboard::isKeyPressed(Keyboard::Right)) {
@@ -2288,6 +2387,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                                 c.level = HARD;
                                 c.optionsMenuButtons[optionSelected + 5].setTextButton("Hard");
                             }
+                            c.changeAnyParameter = true;
                         }
                     }
                     break;
@@ -2297,13 +2397,15 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     if (Keyboard::isKeyPressed(Keyboard::Left)) {
                         if (c.enableAI) {
                             c.enableAI = false;
-                            c.optionsMenuButtons[optionSelected + 5].setTextButton("DISABLED");
+                            c.optionsMenuButtons[optionSelected + 5].setTextButton("Disabled");
+                            c.changeAnyParameter = true;
                         }
                     }
                     else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                         if (!c.enableAI) {
                             c.enableAI = true;
-                            c.optionsMenuButtons[optionSelected + 5].setTextButton("ENABLED");
+                            c.optionsMenuButtons[optionSelected + 5].setTextButton("Enabled");
+                            c.changeAnyParameter = true;
                         }
                     }
 
@@ -2314,7 +2416,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 5].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::C)) {
+                    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
                         r.soundEffects[1]->stop();
                         r.soundEffects[1]->play();
                         State status = soundMenu(c, r, inGame);
@@ -2333,7 +2435,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 5].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::C)) {
+                    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
                         r.soundEffects[1]->stop();
                         r.soundEffects[1]->play();
                         State status = c.graphicsMenu(r);
@@ -2341,6 +2443,28 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             return status;
                         }
                         if (c.modifiedConfig) {
+
+                            float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+                            float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+                            sprite.setScale(axis_x, axis_y);
+                            c.optMenuBackground = sprite;
+
+                            shape.setPosition((c.w.getSize().x / 2.f) - 350.0f * c.screenScale, c.w.getSize().y / 2.f - 250.0f * c.screenScale);
+                            shape.setSize(sf::Vector2f(710.0f * c.screenScale, 500.0f * c.screenScale));
+                            shape.setOutlineColor(c.colorBorderPanelOptionsMenu);
+                            shape.setOutlineThickness(5.0f * c.screenScale);
+                            shape.setTexture(&c.optionsMenuPanelBack, true);
+
+                            // Main Text of the menu
+                            optionsText.setString(c.contentTitleOptionsMenu);
+                            optionsText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+                            optionsText.setFont(c.fontOptionsMenu);
+                            optionsText.setStyle(Text::Bold | Text::Underlined);
+                            optionsText.setFillColor(c.colorTitleTextOptionsMenu);
+                            optionsText.setOutlineColor(c.colorTitleBorderOptionsMenu);
+                            optionsText.setOutlineThickness(5.0f * c.screenScale);
+                            optionsText.setPosition((c.w.getSize().x / 2.f) - optionsText.getLocalBounds().width / 2.f,
+                                                     c.w.getSize().y / 2.f - 230.0f * c.screenScale);
 
                             c.optionsMenuButtons[optionSelected + 5].setTextButton(saved);
                             shape.setPosition((c.w.getSize().x / 2.f) - 350.0f * c.screenScale,
@@ -2418,7 +2542,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                                        c.w.getSize().y / 2.f - 60.0f * c.screenScale,
                                        200.0f * c.screenScale,
                                        30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                       c.enableAI ? "ENABLED" : "DISABLED", c.optionsMenuButtons[i - 5].getIdleColorButton(),
+                                       c.enableAI ? "Enabled" : "Disabled", c.optionsMenuButtons[i - 5].getIdleColorButton(),
                                        c.optionsMenuButtons[i - 5].getHoverColorButton(),
                                        c.optionsMenuButtons[i - 5].getFontColorButton(), 0, c.screenScale);
                             c.optionsMenuButtons[i] = b;
@@ -2548,7 +2672,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 5].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::C)) {
+                    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
                         // Change the controllers of the car
                         r.soundEffects[1]->stop();
                         r.soundEffects[1]->play();
@@ -2584,18 +2708,11 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
             r.soundEffects[0]->stop();
 
             // Check if the start key has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
-            }
-            // Check if the backspace key has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::BackSpace)) {
-                // Change the controllers of the car
-                startPressed = true;
-                r.soundEffects[11]->stop();
-                r.soundEffects[11]->play();
             }
         }
         r.soundTracks[14]->stop();
@@ -2614,6 +2731,39 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
     }
     // The options have been stored
     c.comeFromOptions = true;
+
+    // Update the xml configuration file
+    if (c.changeAnyParameter = true){
+        const string path = "Data/Settings/Configuration.xml";
+
+        KeywordMapper kM = KeywordMapper();
+
+        int index = kM.lookForKeyBoardId(c.leftKey);
+        string controlLeft = kM.mapperIdKeyWord[index];
+
+        // Get the keyword to control the turn to the left
+        index = kM.lookForKeyBoardId(c.rightKey);
+        string controlRight = kM.mapperIdKeyWord[index];
+
+        // Get the keyword to control the acceleration
+        index = kM.lookForKeyBoardId(c.accelerateKey);
+        string controlAccelerate = kM.mapperIdKeyWord[index];
+
+        // Get the keyword to control the brake
+        index = kM.lookForKeyBoardId(c.brakeKey);
+        string controlBrake = kM.mapperIdKeyWord[index];
+
+        // Get the keyword to control the change of soundtrack
+        index = kM.lookForKeyBoardId(c.soundtrackKey);
+        string controlSoundtrack = kM.mapperIdKeyWord[index];
+
+        // Update the file
+        updateGameConfiguration(path, c.level, c.enableAI, r.volumeMusic, r.volumeEffects, c.enablePixelArt, c.resIndex,
+                                c.resolutions[c.resIndex].first, c.resolutions[c.resIndex].second, controlLeft, controlRight,
+                                controlAccelerate, controlBrake, controlSoundtrack);
+
+        c.changeAnyParameter = false;
+    }
 
     if (inGame) {
         return PLAY_GAME;
@@ -2829,8 +2979,8 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                                 }
                                 // Creation of the button and addition to the vector
                                 posX = c.w.getSize().x / 2.f - 270.0f * c.screenScale;
-                                posY = c.w.getSize().y / 2.f - (70.0f - idButton * 70.0f) * c.screenScale;
-                                widthButton = 240.0f * c.screenScale;
+                                posY = c.w.getSize().y / 2.f - (85.0f - idButton * 70.0f) * c.screenScale;
+                                widthButton = 260.0f * c.screenScale;
                                 heightButton = 30.0f * c.screenScale;
 
                                 // Creation of the button
@@ -2884,8 +3034,8 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
             c.vehicleControllersMenuButtons.pop_back();
         }
         // Change the state of the first color
-        Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - 70.0f * c.screenScale,
-                          240.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, c.vehicleControllersMenuButtons[0].getTextButton(),
+        Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - 85.0f * c.screenScale,
+                          260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, c.vehicleControllersMenuButtons[0].getTextButton(),
                           c.vehicleControllersMenuButtons[0].getIdleColorButton(), c.vehicleControllersMenuButtons[0].getHoverColorButton(),
                           c.vehicleControllersMenuButtons[0].getFontColorButton(), 1, c.screenScale);
 
@@ -2894,8 +3044,8 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
         // Eliminate the buttons of the right column
         for (int i = 1; i < int(c.vehicleControllersMenuButtons.size()); i++){
             // Change the state of the first color
-            Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - (70.0f - i * 70.f) * c.screenScale,
-                              240.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons,
+            Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - (85.0f - i * 70.f) * c.screenScale,
+                              260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons,
                               c.vehicleControllersMenuButtons[i].getTextButton(), c.vehicleControllersMenuButtons[i].getIdleColorButton(),
                               c.vehicleControllersMenuButtons[i].getHoverColorButton(),
                               c.vehicleControllersMenuButtons[i].getFontColorButton(), 0, c.screenScale);
@@ -2916,11 +3066,14 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
 
     IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
     Sprite sprite(c.vehicleControllersMenuBackground, background);
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
     c.vehControllersMenuBackground = sprite;
 
     RectangleShape shape;
     shape.setPosition((c.w.getSize().x / 2.f) - 300.0f * c.screenScale, c.w.getSize().y / 2.f - 240.0f * c.screenScale);
-    shape.setSize(sf::Vector2f(610.0f * c.screenScale, 510.0f * c.screenScale));
+    shape.setSize(sf::Vector2f(610.0f * c.screenScale, 480.0f * c.screenScale));
     shape.setOutlineColor(c.colorBorderPanelVehicleControllersMenu);
     shape.setOutlineThickness(5.0f * c.screenScale);
     shape.setTexture(&c.vehicleControllersMenuPanelBack, true);
@@ -2928,13 +3081,15 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
     // Main Text of the menu
     Text controllersText;
     controllersText.setString(c.contentTitleVehicleControllersMenu);
-    controllersText.setPosition(c.w.getSize().x / 2.f - 160.0f * c.screenScale, c.w.getSize().y / 2.f - 210.0f * c.screenScale);
-    controllersText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    controllersText.setPosition(c.w.getSize().x / 2.f - 160.0f * c.screenScale, c.w.getSize().y / 2.f - 240.0f * c.screenScale);
+    controllersText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
     controllersText.setFont(c.fontVehicleControllersMenu);
     controllersText.setStyle(Text::Bold | Text::Underlined);
     controllersText.setFillColor(c.colorTitleTextVehicleControllersMenu);
     controllersText.setOutlineColor(c.colorTitleBorderVehicleControllersMenu);
     controllersText.setOutlineThickness(5.0f * c.screenScale);
+    controllersText.setPosition((c.w.getSize().x / 2.f) - controllersText.getLocalBounds().width / 2.f,
+                                 c.w.getSize().y / 2.f - 210.0f * c.screenScale);
 
     // Informative indjcators about how to change a controller
     Text info1;
@@ -2942,58 +3097,58 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
     info1.setFillColor(Color(10, 201, 235));
     info1.setOutlineColor(Color(3, 39, 8));
     info1.setOutlineThickness(3.0f * c.screenScale);
-    info1.setCharacterSize(static_cast<unsigned int>(int(15.0f * c.screenScale)));
+    info1.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
     info1.setStyle(Text::Bold);
-    info1.setPosition(c.w.getSize().x / 2.f - 235.0f * c.screenScale, c.w.getSize().y / 2.f - 150.0f * c.screenScale);
-    info1.setFont(c.options);
+    info1.setFont(c.fontMenuOptionsButtons);
+    info1.setPosition(c.w.getSize().x / 2.f - info1.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 160.0f * c.screenScale);
     c.w.draw(info1);
 
     Text info2;
     info2.setString("Then press a key to change its configuration");
     info2.setFillColor(Color(10, 201, 235));
     info2.setOutlineColor(Color(3, 39, 8));
-    info2.setCharacterSize(static_cast<unsigned int>(int(15.0f * c.screenScale)));
+    info2.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
     info2.setOutlineThickness(3.0f * c.screenScale);
     info2.setStyle(Text::Bold);
-    info2.setPosition(c.w.getSize().x / 2.f - 265.0f * c.screenScale, c.w.getSize().y / 2.f - 130.0f * c.screenScale);
-    info2.setFont(c.options);
+    info2.setFont(c.fontMenuOptionsButtons);
+    info2.setPosition(c.w.getSize().x / 2.f - info2.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 130.0f * c.screenScale);
     c.w.draw(info2);
 
     // Option configurations
 
     int code;
     code = kM.mapperCodeKeyWord[c.leftKey];
-    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 40.0f * c.screenScale,
-                                                 c.w.getSize().y / 2.f - 70.0f * c.screenScale, 240.0f * c.screenScale,
-                                                 30.0f * c.screenScale, c.options,
+    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
+                                                 c.w.getSize().y / 2.f - 85.0f * c.screenScale, 260.0f * c.screenScale,
+                                                 30.0f * c.screenScale, c.fontMenuOptionsButtons,
                                                  kM.mapperIdKeyWord[code], c.vehicleControllersMenuButtons[0].getIdleColorButton(),
                                                  c.vehicleControllersMenuButtons[0].getHoverColorButton(),
                                                  c.vehicleControllersMenuButtons[0].getFontColorButton(), 1, c.screenScale);
 
     code = kM.mapperCodeKeyWord[c.rightKey];
-    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 40.0f * c.screenScale,
-                                                 c.w.getSize().y / 2.f, 240.0f * c.screenScale, 30.0f * c.screenScale,
-                                                 c.options, kM.mapperIdKeyWord[code], c.vehicleControllersMenuButtons[1].getIdleColorButton(),
+    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
+                                                 c.w.getSize().y / 2.f - 15.f * c.screenScale, 260.0f * c.screenScale, 30.0f * c.screenScale,
+                                                 c.fontMenuOptionsButtons, kM.mapperIdKeyWord[code], c.vehicleControllersMenuButtons[1].getIdleColorButton(),
                                                  c.vehicleControllersMenuButtons[1].getHoverColorButton(),
                                                  c.vehicleControllersMenuButtons[1].getFontColorButton(), 0, c.screenScale);
 
     code = kM.mapperCodeKeyWord[c.accelerateKey];
-    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 40.0f * c.screenScale, c.w.getSize().y / 2.f + 70.0f * c.screenScale,
-                                                 240.0f * c.screenScale, 30.0f * c.screenScale, c.options, kM.mapperIdKeyWord[code],
+    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale, c.w.getSize().y / 2.f + 55.0f * c.screenScale,
+                                                 260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, kM.mapperIdKeyWord[code],
                                                  c.vehicleControllersMenuButtons[2].getIdleColorButton(),
                                                  c.vehicleControllersMenuButtons[2].getHoverColorButton(),
                                                  c.vehicleControllersMenuButtons[2].getFontColorButton(), 0, c.screenScale);
 
     code = kM.mapperCodeKeyWord[c.brakeKey];
-    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 40.0f * c.screenScale, c.w.getSize().y / 2.f + 140.0f * c.screenScale,
-                                                 240.0f * c.screenScale, 30.0f * c.screenScale, c.options, kM.mapperIdKeyWord[code],
+    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale, c.w.getSize().y / 2.f + 125.0f * c.screenScale,
+                                                 260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, kM.mapperIdKeyWord[code],
                                                  c.vehicleControllersMenuButtons[3].getIdleColorButton(),
                                                  c.vehicleControllersMenuButtons[3].getHoverColorButton(),
                                                  c.vehicleControllersMenuButtons[3].getFontColorButton(), 0, c.screenScale);
 
     code = kM.mapperCodeKeyWord[c.soundtrackKey];
-    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 40.0f * c.screenScale, c.w.getSize().y / 2.f + 210.0f * c.screenScale,
-                                                 240.0f * c.screenScale, 30.0f * c.screenScale, c.options, kM.mapperIdKeyWord[code],
+    c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale, c.w.getSize().y / 2.f + 195.0f * c.screenScale,
+                                                 260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, kM.mapperIdKeyWord[code],
                                                  c.vehicleControllersMenuButtons[4].getIdleColorButton(),
                                                  c.vehicleControllersMenuButtons[4].getHoverColorButton(),
                                                  c.vehicleControllersMenuButtons[4].getFontColorButton(), 0, c.screenScale);
@@ -3043,7 +3198,8 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                 c.vehicleControllersMenuButtons[optionSelected + 5].setButtonState(BUTTON_HOVER);
                 c.vehicleControllersMenuButtons[optionSelected + 4].setButtonState(BUTTON_IDLE);
             }
-        } else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+        }
+        else if (Keyboard::isKeyPressed(Keyboard::Up)) {
             // Down cursor pressed and change the soundtrack selected in the list
             if (optionSelected != 0) {
                 // Change the color appearance of both buttons
@@ -3069,11 +3225,13 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             kM.mapperCodeKeyWord[e.key.code] == c.soundtrackKey) {
                             r.soundEffects[3]->stop();
                             r.soundEffects[3]->play();
-                        } else {
-                            c.vehicleControllersMenuButtons[optionSelected + 4].setTextButton(kM.mapperIdKeyWord[e.key.code]);
+                        }
+                        else {
+                            c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.leftKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
                             r.soundEffects[1]->play();
+                            c.changeAnyParameter = true;
                         }
                         break;
                     case 1:
@@ -3086,10 +3244,11 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
-                            c.vehicleControllersMenuButtons[optionSelected + 4].setTextButton(kM.mapperIdKeyWord[e.key.code]);
+                            c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.rightKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
                             r.soundEffects[1]->play();
+                            c.changeAnyParameter = true;
                         }
                         break;
                     case 2:
@@ -3102,10 +3261,11 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
-                            c.vehicleControllersMenuButtons[optionSelected + 4].setTextButton(kM.mapperIdKeyWord[e.key.code]);
+                            c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.accelerateKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
                             r.soundEffects[1]->play();
+                            c.changeAnyParameter = true;
                         }
                         break;
                     case 3:
@@ -3118,10 +3278,11 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
-                            c.vehicleControllersMenuButtons[optionSelected + 4].setTextButton(kM.mapperIdKeyWord[e.key.code]);
+                            c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.brakeKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
                             r.soundEffects[1]->play();
+                            c.changeAnyParameter = true;
                         }
                         break;
                     case 4:
@@ -3134,10 +3295,11 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
-                            c.vehicleControllersMenuButtons[optionSelected + 4].setTextButton(kM.mapperIdKeyWord[e.key.code]);
+                            c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.soundtrackKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
                             r.soundEffects[1]->play();
+                            c.changeAnyParameter = true;
                         }
                         break;
                     default:
@@ -3147,7 +3309,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
         }
 
         // Check if left or right cursor keys have been pressed or not
-        if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+        if (Keyboard::isKeyPressed(Keyboard::Escape)) {
             // Change the controllers of the car
             startPressed = true;
             c.modifiedConfig = true;
@@ -3192,7 +3354,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     r.soundTracks[12]->play();
 
     Text rankingTitle;
-    rankingTitle.setFont(c.fontTimeToPlay);
+    rankingTitle.setFont(c.fontMenus);
     rankingTitle.setPosition(c.w.getSize().x / 4.f, c.w.getSize().y / 17.f);
     rankingTitle.setString("BEST OUTRUNNERS");
     rankingTitle.setCharacterSize(static_cast<unsigned int>(int(49.0f * c.screenScale)));
@@ -3201,8 +3363,8 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     rankingTitle.setOutlineThickness(3.0f * c.screenScale);
 
     Text scoreIndicator;
-    scoreIndicator.setFont(c.fontTimeToPlay);
-    scoreIndicator.setPosition(c.w.getSize().x / 9.2f, c.w.getSize().y / 6.0f);
+    scoreIndicator.setFont(c.fontMenus);
+    scoreIndicator.setPosition(c.w.getSize().x / 6.7f, c.w.getSize().y / 6.0f);
     scoreIndicator.setString("SCORE");
     scoreIndicator.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
     scoreIndicator.setFillColor(Color(146, 194, 186));
@@ -3210,8 +3372,8 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     scoreIndicator.setOutlineThickness(3.0f * c.screenScale);
 
     Text playerIndicator;
-    playerIndicator.setFont(c.fontTimeToPlay);
-    playerIndicator.setPosition(c.w.getSize().x / 2.33f, c.w.getSize().y / 6.0f);
+    playerIndicator.setFont(c.fontMenus);
+    playerIndicator.setPosition(c.w.getSize().x / 2.12f, c.w.getSize().y / 6.0f);
     playerIndicator.setString("NAME");
     playerIndicator.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
     playerIndicator.setFillColor(Color(146, 194, 186));
@@ -3219,8 +3381,8 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     playerIndicator.setOutlineThickness(3.0f * c.screenScale);
 
     Text recordIndicator;
-    recordIndicator.setFont(c.fontTimeToPlay);
-    recordIndicator.setPosition((c.w.getSize().x / 2.f) * 1.44f, c.w.getSize().y / 6.0f);
+    recordIndicator.setFont(c.fontMenus);
+    recordIndicator.setPosition((c.w.getSize().x / 2.f) * 1.55f, c.w.getSize().y / 6.0f);
     recordIndicator.setString("RECORD");
     recordIndicator.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
     recordIndicator.setFillColor(Color(146, 194, 186));
@@ -3228,52 +3390,51 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     recordIndicator.setOutlineThickness(3.0f * c.screenScale);
 
     Text timeCounter;
-    timeCounter.setFont(c.fontTimeToPlay);
+    timeCounter.setFont(c.fontMenus);
     timeCounter.setCharacterSize(static_cast<unsigned int>(int(48.0f * c.screenScale)));
     timeCounter.setString(to_string(time));
-    timeCounter.setPosition((c.w.getSize().x / 2.f) * 1.7f - timeCounter.getLocalBounds().width,
-                            c.w.getSize().y / 15.7f);
+    timeCounter.setPosition(c.w.getSize().x / 4.f + rankingTitle.getLocalBounds().width + 30.f, c.w.getSize().y / 15.7f);
     timeCounter.setFillColor(Color::Red);
     timeCounter.setOutlineColor(Color(12, 12, 12));
     timeCounter.setOutlineThickness(3.0f * c.screenScale);
 
     Text scorePlayer;
-    scorePlayer.setFont(c.fontTimeToPlay);
+    scorePlayer.setFont(c.fontMenus);
     scorePlayer.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     scorePlayer.setFillColor(Color(146, 194, 186));
     scorePlayer.setOutlineColor(Color::Black);
     scorePlayer.setOutlineThickness(3.0f * c.screenScale);
 
     Text namePlayer;
-    namePlayer.setFont(c.fontTimeToPlay);
+    namePlayer.setFont(c.fontMenus);
     namePlayer.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     namePlayer.setFillColor(Color(146, 194, 186));
     namePlayer.setOutlineColor(Color(12, 12, 12));
     namePlayer.setOutlineThickness(3.0f * c.screenScale);
 
     Text minutesPlayer;
-    minutesPlayer.setFont(c.fontTimeToPlay);
+    minutesPlayer.setFont(c.fontMenus);
     minutesPlayer.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     minutesPlayer.setFillColor(Color(146, 194, 186));
     minutesPlayer.setOutlineColor(Color::Black);
     minutesPlayer.setOutlineThickness(3.0f * c.screenScale);
 
     Text secondsPlayer;
-    secondsPlayer.setFont(c.fontTimeToPlay);
+    secondsPlayer.setFont(c.fontMenus);
     secondsPlayer.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     secondsPlayer.setFillColor(Color(146, 194, 186));
     secondsPlayer.setOutlineColor(Color::Black);
     secondsPlayer.setOutlineThickness(3.0f * c.screenScale);
 
     Text centsPlayer;
-    centsPlayer.setFont(c.fontTimeToPlay);
+    centsPlayer.setFont(c.fontMenus);
     centsPlayer.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     centsPlayer.setFillColor(Color(146, 194, 186));
     centsPlayer.setOutlineColor(Color::Black);
     centsPlayer.setOutlineThickness(3.0f * c.screenScale);
 
     Text index;
-    index.setFont(c.fontTimeToPlay);
+    index.setFont(c.fontMenus);
     index.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
     index.setFillColor(Color(180, 130, 211));
     index.setOutlineColor(Color::Black);
@@ -3281,7 +3442,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
 
     Text start;
     start.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-    start.setFont(c.fontTimeToPlay);
+    start.setFont(c.fontMenus);
     start.setFillColor(Color::Green);
     start.setOutlineColor(Color::Black);
     start.setOutlineThickness(3.0f * c.screenScale);
@@ -3294,7 +3455,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
                         (float) c.w.getSize().y / rankingBackground.getSize().y);
 
     // Get the best seventh out runners
-    vector<Score> scoreRankingPlayer = getGlobalScores();
+    vector<Score> scoreRankingPlayer = getGlobalScores(c, typeOfGame);
 
     // Check if there is a new record
     int record = isNewRecord(scoreRankingPlayer, scorePlayerGame);
@@ -3321,7 +3482,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
             time--;
             rankingTime.restart();
             timeCounter.setString(to_string(time));
-            timeCounter.setPosition((c.w.getSize().x / 2.f) * 1.7f - timeCounter.getLocalBounds().width,
+            timeCounter.setPosition(c.w.getSize().x / 4.f + rankingTitle.getLocalBounds().width + 30.f,
                                     c.w.getSize().y / 15.7f);
         }
 
@@ -3335,7 +3496,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
         // There is no new record
         if (record == -1) {
 
-            start.setString("PRESS START!");
+            start.setString("PRESS START");
             start.setPosition(c.w.getSize().x / 2.77f, (c.w.getSize().y / 4.5f) + 400.0f);
 
             // There is not a new record
@@ -3389,11 +3550,11 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
         } else {
 
             if (lettersIntroduced != 3) {
-                start.setString("ENTER YOUR NAME!");
+                start.setString("ENTER YOUR NAME");
                 start.setPosition(c.w.getSize().x / 3.4f, (c.w.getSize().y / 4.5f) + 400.0f);
             }
             else {
-                start.setString("PRESS START!");
+                start.setString("PRESS START");
                 start.setPosition(c.w.getSize().x / 2.77f, (c.w.getSize().y / 4.5f) + 400.0f);
             }
 
@@ -3575,16 +3736,28 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
             }
         }
         if (Keyboard::isKeyPressed(c.menuEnterKey)) {
-            startPressed = true;
+            if (lettersIntroduced == 3){
+                startPressed = true;
+            }
+            else {
+                r.soundEffects[3]->stop();
+                r.soundEffects[3]->play();
+            }
+        }
+    }
+
+    // Control if the exit of the loop was by the time
+    if (time == 0){
+        // Check if the name was completed or not
+        if (lettersIntroduced != 3){
+            // Default name
+            name = "SER";
         }
     }
 
     // Store the record
     if (record != -1) {
         // If the was record and the name is uncompleted
-        if (lettersIntroduced != 3) {
-            name = "   ";
-        }
         Score s = Score(scorePlayerGame, name, minutes, secs, cents_Second);
         saveNewRecord(scoreRankingPlayer, s, typeOfGame, c);
     }
@@ -3605,5 +3778,359 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
                    static_cast<unsigned int>(c.window.getView().getSize().y));
         c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
     }
+    r.soundTracks[1]->play();
     return GAME_MODES_MENU;
 }
+
+
+
+// Update the file
+void updateGameConfiguration(const string path, const Difficult difficulty, const bool activeAI, const int volumeSoundtracks,
+                             const int volumeEffects, const bool pixelArt, const int fullScreen, const int axis_x, const int axis_y,
+                             const string controlLeft, const string controlRight, const string controlAccelerate, const string controlBrake,
+                             const string controlSoundtrack)
+{
+    // xml file which stores the player with the highest score in the level
+    ofstream theFile (path);
+    xml_document<> doc;
+
+    // Add the headers to the file
+    xml_node<>* decl = doc.allocate_node(node_declaration);
+    decl->append_attribute(doc.allocate_attribute("version", "1.0"));
+    decl->append_attribute(doc.allocate_attribute("encoding", "UTF-8"));
+    doc.append_node(decl);
+
+    // Create the node record
+    xml_node<>* root = doc.allocate_node(node_element, "Settings");
+    doc.append_node(root);
+
+    // Create a node with the level difficulty
+    xml_node<>* levelDifficulty = doc.allocate_node(node_element, "Difficulty");
+    root->append_node(levelDifficulty);
+    string level;
+    switch(difficulty){
+        case 0:
+            level = "Peaceful";
+            break;
+        case 1:
+            level = "Easy";
+            break;
+        case 2:
+            level = "Normal";
+            break;
+        case 3:
+            level = "Hard";
+    }
+    levelDifficulty->value(level.c_str());
+
+    // Create the node of the AI level
+    xml_node<>* levelAI = doc.allocate_node(node_element, "AI");
+    root->append_node(levelAI);
+    string active;
+    if (activeAI){
+        active = "Enabled";
+    }
+    else {
+        active = "Disabled";
+    }
+    levelAI->value(active.c_str());
+
+    // Create the node with the volume of the soundtracks
+    xml_node<>* musicSoundtrack = doc.allocate_node(node_element, "Volume_Soundtracks");
+    root->append_node(musicSoundtrack);
+    musicSoundtrack->value(to_string(volumeSoundtracks).c_str());
+
+    // Create the node with the volume of the sound effects
+    xml_node<>* musicSoundEffects = doc.allocate_node(node_element, "Volume_Effects");
+    root->append_node(musicSoundEffects);
+    musicSoundEffects->value(to_string(volumeEffects).c_str());
+
+    // Create the node of the pixelart control
+    xml_node<>* nodePixelArt = doc.allocate_node(node_element, "PixelArt");
+    root->append_node(nodePixelArt);
+    string activePixelArt;
+    if (pixelArt){
+        activePixelArt = "Enabled";
+    }
+    else {
+        activePixelArt = "Disabled";
+    }
+    nodePixelArt->value(activePixelArt.c_str());
+
+    // Create the node of the full screen controller
+    xml_node<>* fullScreenNode = doc.allocate_node(node_element, "Full_screen");
+    root->append_node(fullScreenNode);
+    string activeFullScreen;
+    if (fullScreen == -1){
+        activeFullScreen = "Enabled";
+    }
+    else {
+        activeFullScreen = "Disabled";
+    }
+    fullScreenNode->value(activeFullScreen.c_str());
+
+    // Create a new node with the screen resolution in axis x
+    xml_node<>* resolution_x = doc.allocate_node(node_element, "Resolution_x");
+    root->append_node(resolution_x);
+    resolution_x->value(to_string(axis_x).c_str());
+
+    // Create a new node with the screen resolution in axis y
+    xml_node<>* resolution_y = doc.allocate_node(node_element, "Resolution_y");
+    root->append_node(resolution_y);
+    resolution_y->value(to_string(axis_y).c_str());
+
+    // Create a new node with the turning left controller
+    xml_node<>* left = doc.allocate_node(node_element, "Controller_left");
+    root->append_node(left);
+    left->value(controlLeft.c_str());
+
+    // Create a new node with the turning right controller
+    xml_node<>* right = doc.allocate_node(node_element, "Controller_right");
+    root->append_node(right);
+    right->value(controlRight.c_str());
+
+    // Create a new node with the acceleration controller
+    xml_node<>* accelerate = doc.allocate_node(node_element, "Controller_accelerate");
+    root->append_node(accelerate);
+    accelerate->value(controlAccelerate.c_str());
+
+    // Create a new node with the brake controller
+    xml_node<>* brake = doc.allocate_node(node_element, "Controller_brake");
+    root->append_node(brake);
+    brake->value(controlBrake.c_str());
+
+    // Create a new node with the changing soundtrack controller
+    xml_node<>* soundtrack = doc.allocate_node(node_element, "Controller_soundtrack");
+    root->append_node(soundtrack);
+    soundtrack->value(controlSoundtrack.c_str());
+
+    // Store the new xml file configuration
+    theFile << doc;
+    theFile.close();
+    doc.clear();
+}
+
+
+
+State showLoadingAnimation(Configuration& c, SoundPlayer& r){
+
+    // The xml configuration file of the player menu has been read
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+
+    // Load the background of the animation
+    Texture t;
+    t.loadFromFile("Data/Animations/LoadingAnimation/cover.png");
+    IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+    Sprite sprite(t, background);
+
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
+
+    Texture t2;
+    t2.loadFromFile("Data/Animations/LoadingAnimation/crono.png");
+
+    RectangleShape shape;
+    shape.setPosition((c.w.getSize().x / 2.f) - 300.0f * c.screenScale, c.w.getSize().y / 2.f - 240.0f * c.screenScale);
+    shape.setSize(sf::Vector2f(610.0f * c.screenScale, 425.0f * c.screenScale));
+    shape.setOutlineColor(Color::Black);
+    shape.setOutlineThickness(5.0f * c.screenScale);
+    shape.setTexture(&t2, true);
+
+    // Main Text of the menu
+    Text controllersText;
+    controllersText.setString("CONTROLLERS");
+    controllersText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+    controllersText.setFont(c.fontMenus);
+    controllersText.setStyle(Text::Bold | Text::Underlined);
+    controllersText.setFillColor(Color::White);
+    controllersText.setOutlineColor(Color::Black);
+    controllersText.setOutlineThickness(5.0f * c.screenScale);
+    controllersText.setPosition((c.w.getSize().x / 2.f) - controllersText.getLocalBounds().width / 2.f,
+                                 c.w.getSize().y / 2.f - 210.0f * c.screenScale);
+
+    int totalPoints, offsetText;
+    if (c.isDefaultScreen){
+        totalPoints = 25;
+        offsetText = 235;
+    }
+    else {
+        totalPoints = 35;
+        offsetText = 205;
+    }
+
+
+    Text loadingText;
+    loadingText.setString("NOW LOADING");
+    loadingText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    loadingText.setFont(c.fontMenus);
+    loadingText.setStyle(Text::Bold);
+    loadingText.setFillColor(Color::White);
+    loadingText.setOutlineColor(Color::Black);
+    loadingText.setOutlineThickness(5.0f * c.screenScale);
+    loadingText.setPosition((c.w.getSize().x / 7.f) - loadingText.getLocalBounds().width / 2.f,
+                                 c.w.getSize().y / 2.f + offsetText * c.screenScale);
+
+    // Buttons of the menu
+    vector<Button> controllerButtons;
+
+    // Left buttons
+    Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - 145.0f * c.screenScale,
+                      260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenus, "Turn left", Color(249, 54, 46),
+                      Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+    // Add the button in the vector of buttons of the menu
+    controllerButtons.push_back(b);
+
+    b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - 75.0f * c.screenScale,
+                      260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenus, "Turn right", Color(249, 54, 46),
+                      Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+    // Add the button in the vector of buttons of the menu
+    controllerButtons.push_back(b);
+
+    b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f -5.0f * c.screenScale,
+                      260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenus, "Accelerating", Color(249, 54, 46),
+                      Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+    // Add the button in the vector of buttons of the menu
+    controllerButtons.push_back(b);
+
+        // Change the state of the first color
+    b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f + 65.0f * c.screenScale,
+                      260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenus, "Braking", Color(249, 54, 46),
+                      Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+    // Add the button in the vector of buttons of the menu
+    controllerButtons.push_back(b);
+
+        // Change the state of the first color
+    b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f + 135.0f * c.screenScale,
+                      260.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenus, "Change soundtrack", Color(249, 54, 46),
+                      Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+    // Add the button in the vector of buttons of the menu
+    controllerButtons.push_back(b);
+
+    // Right buttons
+    KeywordMapper kM = KeywordMapper();
+
+    // Right buttons
+    int code;
+    code = kM.mapperCodeKeyWord[c.leftKey];
+    controllerButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
+                                   c.w.getSize().y / 2.f - 145.0f * c.screenScale, 260.0f * c.screenScale,
+                                   30.0f * c.screenScale, c.fontMenus, kM.mapperIdKeyWord[code], Color(249, 54, 46),
+                                   Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+
+    code = kM.mapperCodeKeyWord[c.rightKey];
+    controllerButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
+                                   c.w.getSize().y / 2.f - 75.0f * c.screenScale, 260.0f * c.screenScale,
+                                   30.0f * c.screenScale, c.fontMenus, kM.mapperIdKeyWord[code], Color(249, 54, 46),
+                                   Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+
+    code = kM.mapperCodeKeyWord[c.accelerateKey];
+    controllerButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
+                                   c.w.getSize().y / 2.f - 5.0f * c.screenScale, 260.0f * c.screenScale,
+                                   30.0f * c.screenScale, c.fontMenus, kM.mapperIdKeyWord[code], Color(249, 54, 46),
+                                   Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+
+    code = kM.mapperCodeKeyWord[c.brakeKey];
+    controllerButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
+                                   c.w.getSize().y / 2.f + 65.0f * c.screenScale, 260.0f * c.screenScale,
+                                   30.0f * c.screenScale, c.fontMenus, kM.mapperIdKeyWord[code], Color(249, 54, 46),
+                                   Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+
+    code = kM.mapperCodeKeyWord[c.soundtrackKey];
+    controllerButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
+                                   c.w.getSize().y / 2.f + 135.0f * c.screenScale, 260.0f * c.screenScale,
+                                   30.0f * c.screenScale, c.fontMenus, kM.mapperIdKeyWord[code], Color(249, 54, 46),
+                                   Color(255, 255, 255), Color(0, 0, 0), 0, c.screenScale);
+
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+    // Vector of loafing points
+    string points[totalPoints];
+    // Fill the vector with the points
+    for (int i = 0; i < totalPoints; i++){
+        points[i] = ".";
+    }
+
+    // Reproduce the soundtrack of the game
+    r.soundTracks[17]->play();
+
+    for (int i = 0; i < totalPoints; i++){
+
+        // Detect the possible events
+        Event e{};
+        while (c.window.pollEvent(e)){
+            if (e.type == Event::Closed){
+                return EXIT;
+            }
+        }
+
+        c.w.draw(sprite);
+        c.w.draw(shape);
+        c.w.draw(controllersText);
+
+        // Show the buttons of the menu
+        for (auto &menuButton : controllerButtons) {
+            menuButton.render(&c.w);
+        }
+
+        c.w.draw(loadingText);
+
+        // Draw the loading points
+        for (int j = 0; j <= i; j++){
+
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)){
+                if (e.type == Event::Closed){
+                    return EXIT;
+                }
+            }
+
+            Text pointText;
+            pointText.setString(points[j]);
+            pointText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+            pointText.setFont(c.fontMenus);
+            pointText.setStyle(Text::Bold);
+            pointText.setFillColor(Color::White);
+            pointText.setOutlineColor(Color::Black);
+            pointText.setOutlineThickness(5.0f * c.screenScale);
+            pointText.setPosition((c.w.getSize().x / 7.f) + loadingText.getLocalBounds().width / 2.f + 25.f * (j + 1),
+                                   c.w.getSize().y / 2.f + offsetText * c.screenScale);
+            c.w.draw(pointText);
+        }
+
+        bufferSprite.setTexture(c.w.getTexture(), true);
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+
+        sleep(milliseconds(350));
+    }
+
+    // Reproduce the soundtrack of the game
+    r.soundTracks[17]->stop();
+
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen)
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        else
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+    }
+
+    return PLAY_GAME;
+}
+

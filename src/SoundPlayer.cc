@@ -6,16 +6,16 @@
 /**
  * Default constructor
  */
-SoundPlayer::SoundPlayer(){
+SoundPlayer::SoundPlayer(const int volMusic, const int volEffects){
 
     // Initialize the default soundtrack of the game
     currentSoundtrack = 2;
 
     // Default volume for the sound effects
-    volumeEffects = 100;
+    volumeEffects = volEffects;
 
     // Default volume for the soundtracks
-    volumeMusic = 80;
+    volumeMusic = volMusic;
 
     // Soundtrack not changed by default
     soundtrackChanged = false;

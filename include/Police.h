@@ -10,8 +10,8 @@ using namespace std;
 using namespace sf;
 
 namespace Police_vehicle {
-    const int FORCE_INERTIA = 10;
-    const int PLAYER_TEXTURES = 54;
+    const int FORCE_INERTIA = 15;
+    const int PLAYER_TEXTURES = 74;
 }
 
 
@@ -29,7 +29,8 @@ class Police : public Vehicle {
     string brand;           // Name of the vehicle
     string motor;           // Brand of the motor's vehicle
     float angleTurning;     // Turning angle of the vehicle
-
+    float speedCollision;   // Initial speed when starts the collision
+    bool outSideRoad;       // Control if the motorbike is outside the road
 
 
     bool firstCrash, firstTurnLeft, firstTurnRight;
@@ -93,7 +94,7 @@ public:
      * @param curveCoefficient pertenece [-0.9, 0.9]
      * @return
      */
-    Direction rotationControl(Configuration &c, float curveCoefficient);
+    Direction rotationControl(Configuration &c, float curveCoefficient, const bool& isFinalMap, const int& limitMap);
 
     /**
      * Actualiza el sprite del vehículo jugador y lo dibuja en la pantalla.
@@ -103,7 +104,7 @@ public:
      * @param e
      * @param enableSound
      */
-    void draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d, const Elevation &e, bool enableSound = true);
+    void draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d, const Elevation &e, int terrain, bool enableSound = true);
 
     /**
      * Dibuja la animación inicial en la pantalla y devuelve si ha acabado.

@@ -506,6 +506,20 @@ void LandScape::loadMapElements(const string &path, vector<int> &objectIndexes) 
         if ((string)node->name() == "Name"){
             name = (string)node->value();
         }
+        // Check if the node contains the name of the landscape
+        else if ((string)node->name() == "Type"){
+            // Check the kind of landScape
+            if ((string)node->value() == "Grass"){
+                terrain = 0;
+            }
+            else if ((string)node->value() == "Land"){
+                terrain = 1;
+            }
+            // Check the kind of landScape
+            if ((string)node->value() == "Snow"){
+                terrain = 2;
+            }
+        }
         // Check if the node contains the sprites of the scenario
         else if ((string)node->name() == "Sprites"){
             // Iteration throughout the nodes of the file
@@ -970,7 +984,7 @@ void LandScape::drawRoadTracks(RenderTexture& w, Color& dash, const int x1, cons
  */
 LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
                      const int time, const int typeOfGame) : posCameraX(0), posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
-                     startingLandScape(false), finalLandScape(false), timeToPlay(time)
+                     startingLandScape(false), finalLandScape(false), middleLandScape(false), timeToPlay(time)
 {
     // Load the background texture of the map
     background.loadFromFile(path + bgName);
@@ -1024,6 +1038,8 @@ LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
 
 
 
+LandScape::LandScape(){}
+
 /**
  * Creates a straight flat map which represents the starting point of a landscape
  * @param landscape is the landscape to be displayed
@@ -1032,9 +1048,22 @@ LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
  */
 LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame) : background(landScape.background),
                      posCameraX(0), posCameraY(0), nextLeft(nullptr), nextRight(nullptr), startingLandScape(true), finalLandScape(false),
-                     timeToPlay(0)
+                     middleLandScape(false), timeToPlay(0)
 {
-    const int rectangles = 50; // Map size
+    int rectangles, peopleDisplayed, treesDisplayed;
+
+    if (typeOfGame == 2){
+        rectangles = 180;
+        peopleDisplayed = 12;
+        treesDisplayed = 6;
+    }
+    else {
+        rectangles = 50;
+        treesDisplayed = 4;
+        peopleDisplayed = 2;
+    }
+
+    // Map size
     const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // File with all the textures
     const int nobjects = 19;
 
@@ -1093,14 +1122,14 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
 
     // Fill
     for (int i = 7; i < rectangles; i++) {
-        if (i % 4 == 3) {
+        if (i % treesDisplayed == 3) {
             // Trees
             leftSprites[i].codeMapElement = 18;
             leftSprites[i].offset = -0.15f;
             rightSprites[i].codeMapElement = 17;
             rightSprites[i].offset = -0.15f;
         }
-        else if (i % 2 == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
+        else if (i % peopleDisplayed == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
             // People
             leftSprites[i].codeMapElement = 15;
             rightSprites[i].codeMapElement = 14;
@@ -1126,6 +1155,87 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
 
 
 /**
+ * Creates a straight flat map which represents the starting point of a landscape
+ * @param landscape is the landscape to be displayed
+ * @param flagger is the flagger position while is announcing the start
+ * @param semaphore is the color of the semaphore in the starting
+ */
+LandScape::LandScape(const LandScape &landScape, const int typeOfGame) :
+                     background(landScape.background), posCameraX(0), posCameraY(0),
+                     nextLeft(nullptr), nextRight(nullptr), startingLandScape(false), finalLandScape(false),
+                     middleLandScape(true), timeToPlay(0)
+{
+    int rectangles = 180;
+
+    // Map size
+    const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // File with all the textures
+    const int nobjects = 19;
+
+    vector<int> objectIndexes;
+
+    loadMapElements(mapPath, objectIndexes);
+
+    // Hardcoded sprites
+    vector<MapElement> leftSprites, rightSprites;
+    leftSprites.reserve(rectangles);
+    rightSprites.reserve(rectangles);
+    for (int i = 0; i < rectangles; i++) {
+        leftSprites.emplace_back();
+        rightSprites.emplace_back();
+    }
+
+    // Signals
+    leftSprites[6].codeMapElement = 6;
+    leftSprites[6].offset = -1;
+    rightSprites[6].codeMapElement = 11;
+    rightSprites[6].offset = -1;
+
+    // Flagger
+    leftSprites[5].codeMapElement = 1;
+    leftSprites[5].offset = -2;
+
+
+    rightSprites[4].codeMapElement = 10;
+    rightSprites[4].offset = -0.95f;
+
+    // Trees
+    leftSprites[3].codeMapElement = 18;
+    leftSprites[3].offset = -1.15f;
+    rightSprites[3].codeMapElement = 17;
+    rightSprites[3].offset = -1.15f;
+
+    // Fill
+    for (int i = 7; i < rectangles; i++) {
+        if (i % 6 == 3) {
+            // Trees
+            leftSprites[i].codeMapElement = 18;
+            leftSprites[i].offset = -0.15f;
+            rightSprites[i].codeMapElement = 17;
+            rightSprites[i].offset = -0.15f;
+        }
+        else if (i % 12 == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
+            // People
+            leftSprites[i].codeMapElement = 15;
+            rightSprites[i].codeMapElement = 14;
+        }
+    }
+
+    // Line generation
+    bool mainColor = true;
+    vector<vector<string>> instructions;
+    instructions.reserve(rectangles);
+    float z = 0; // Line position
+    float bgX = 0; // Background position
+    for (int i = 0; i < rectangles; i++) {
+        float offset = 0.0f;
+        addStep(0, 0, z, 0, 0, mainColor, leftSprites[i], rightSprites[i], bgX, offset);
+        mainColor = !mainColor;
+    }
+}
+
+
+
+/**
  * Creates a straight flat map which represents the goal point of a landscape
  * @param landscape is the landscape to be displayed
  * @param flagger is the flagger position while is announcing the goal
@@ -1133,9 +1243,9 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
  */
 LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame) : posCameraX(0), posCameraY(0),
                      nextLeft(nullptr), nextRight(nullptr), startingLandScape(false), finalLandScape(true),
-                     timeToPlay(0)
+                     middleLandScape(false), timeToPlay(0)
 {
-    const int rectangles = 800; // Map size
+    const int rectangles = 180; // Map size
     const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // Folder with common objects
     const int nobjects = 19;
 
@@ -1199,6 +1309,8 @@ LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame) : posCame
 
 
 
+
+
 /**
  * Initialize the colors of the landscape
  * @param landscape is the map whose colors are going to be initialized
@@ -1215,6 +1327,7 @@ void LandScape::setColorsLandScape(const LandScape &landScape) {
     width_road = landScape.width_road;
     number_tracks = landScape.number_tracks;
     limit_rumble = landScape.limit_rumble;
+    terrain = landScape.terrain;
 }
 
 
@@ -1387,11 +1500,21 @@ float LandScape::getCameraPosY() const {
 
 
 /**
+ * Returns the kind of terrain of the landscape
+ * @return
+ */
+ int LandScape::getTerrain() const {
+    return this->terrain;
+ }
+
+
+
+/**
  * Draws the percent of landscape visible with all the traffic cars in it
  * @param c is the configuration of the player
  * @param vehicles is the vector with all the traffic cars
  */
-void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles) {
+void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, const int typeOfGame) {
     const int N = static_cast<const int>(newLines.size());
     const int startPos = int(posCameraY) % N;
     const int lastPos = startPos + c.renderLen - 1;
@@ -1426,7 +1549,13 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles) {
     sbg.setScale( Vector2f(2.0f * (float) c.w.getSize().x / background.getSize().x, (float) c.w.getSize().y * BGS / background.getSize().y));
     sbg.setTextureRect(IntRect(0, 0, static_cast<int>(80.0f * sbg.getGlobalBounds().width), background.getSize().y));
     sbg.setPosition(0, 0);
-    sbg.move(-8.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
+
+    if (typeOfGame == 2){
+        sbg.move(-16.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
+    }
+    else {
+        sbg.move(-8.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
+    }
     c.w.draw(sbg);
 
     // Initialize lines
@@ -1470,6 +1599,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles) {
 
         // Draw road
         if (visibleLines.back() == n) {
+
             visibleLines.pop_back();
 
             Color grassRight, grass, roadRight, road, rumbleRight, rumble, dashRight, dash;
@@ -1653,26 +1783,28 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles) {
             }
         }
 
-        // Draw vehicles
-        while (!sortedVehicles.empty() && int(sortedVehicles.back()->getPosY()) == n - startPos + int(posCameraY)) {
-            TrafficCar *v = sortedVehicles.back();
+        if (typeOfGame != 2){
+            // Draw vehicles
+            while (!sortedVehicles.empty() && int(sortedVehicles.back()->getPosY()) == n - startPos + int(posCameraY)) {
+                TrafficCar *v = sortedVehicles.back();
 
-            Sprite sv;
-            sv.setTexture(*v->getCurrentTexture(), true);
-            const float width = v->getScale() * sv.getTextureRect().width;
-            const float widthOri = sv.getTextureRect().width;
-            const float height = v->getScale() * sv.getTextureRect().height;
-            const float heightOri = sv.getTextureRect().height;
-            float destW = width * l->position_2d_w / SCALE_RESOLUTION;
-            float destH = height * l->position_2d_w / SCALE_RESOLUTION;
+                Sprite sv;
+                sv.setTexture(*v->getCurrentTexture(), true);
+                const float width = v->getScale() * sv.getTextureRect().width;
+                const float widthOri = sv.getTextureRect().width;
+                const float height = v->getScale() * sv.getTextureRect().height;
+                const float heightOri = sv.getTextureRect().height;
+                float destW = width * l->position_2d_w / SCALE_RESOLUTION;
+                float destH = height * l->position_2d_w / SCALE_RESOLUTION;
 
-            sv.setScale(destW / widthOri, destH / heightOri);
-            v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
-            v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
-            sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
-            c.w.draw(sv);
+                sv.setScale(destW / widthOri, destH / heightOri);
+                v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
+                v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
+                sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
+                c.w.draw(sv);
 
-            sortedVehicles.pop_back();
+                sortedVehicles.pop_back();
+            }
         }
     }
 }
@@ -1690,11 +1822,28 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles) {
  * @param crashPos is the possible position of crash detected
  * @return
  */
-bool LandScape::hasCrashed(const Configuration &c, float prevY, float currentY, float currentX, float minX, float maxX,
-                     float &crashPos) const {
-    if (!inFork(currentY) && abs(currentX) > 3.0f) { // has left the map
-        crashPos = posCameraY;
-        return true;
+bool LandScape::hasCrashed(Configuration &c, float prevY, float currentY, float currentX, float minX, float maxX,
+                     float &crashPos, const int typeOfGame) const {
+    /*
+    if (inFork(currentY) || (this->getMaxY() - currentY <= 100.f && typeOfGame != 0 && typeOfGame != 2)){
+        c.renderLen = 300;
+    }
+    else {
+        c.renderLen = 450;
+    }
+    */
+    if (inFork(currentY)){
+        // has left the map
+        if (abs(currentX) > 30.0f){
+            crashPos = posCameraY;
+            return true;
+        }
+    }
+    else {
+        if (abs(currentX) > 2.8f){
+            crashPos = posCameraY;
+            return true;
+        }
     }
 
     Step l;
@@ -1800,7 +1949,8 @@ Vehicle::Elevation LandScape::getElevation(float currentY) const {
  * @return
  */
 bool LandScape::isOutSideLandScape() const {
-    if (startingLandScape || finalLandScape || (nextLeft != nullptr && nextLeft->finalLandScape)){
+    if (startingLandScape || finalLandScape || middleLandScape || (nextLeft != nullptr && nextLeft->finalLandScape) ||
+        (nextLeft != nullptr && nextLeft->isMiddleMap())){
         return posCameraY >= newLines.size();
     }
     else {
@@ -1815,7 +1965,8 @@ bool LandScape::isOutSideLandScape() const {
  * @return
  */
 float LandScape::getMaxY() const {
-    if (startingLandScape || finalLandScape || (nextLeft != nullptr && nextLeft->finalLandScape)){
+    if (startingLandScape || finalLandScape || middleLandScape || (nextLeft != nullptr && nextLeft->finalLandScape) ||
+        (nextLeft != nullptr && nextLeft->isMiddleMap())){
         return newLines.size();
     }
     else {
@@ -1847,7 +1998,7 @@ float LandScape::getOffsetX() const {
  * @return
  */
 bool LandScape::inFork(const float currentY) const {
-    if (startingLandScape || finalLandScape || (nextLeft != nullptr && nextLeft->finalLandScape)){
+    if (startingLandScape || finalLandScape || middleLandScape || (nextLeft != nullptr && nextLeft->finalLandScape)){
         return false;
     }
     else {
@@ -1885,6 +2036,11 @@ bool LandScape::isFinalLandScape() const {
     return finalLandScape;
 }
 
+
+
+bool LandScape::isMiddleMap() const {
+    return middleLandScape;
+}
 
 
 /**

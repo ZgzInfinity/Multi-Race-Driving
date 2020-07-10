@@ -1,11 +1,48 @@
 
 #include "../include/Configuration.h"
 
-Configuration::Configuration() : resolutions({SCREEN_DEFAULT, SCREEN_1, SCREEN_2, SCREEN_3, SCREEN_4, SCREEN_5}), resIndex(0),
-                   isDefaultScreen(true), camD(0.87), renderLen(300) {
-    window.create(VideoMode(static_cast<unsigned int>(resolutions[resIndex].first),
-                            static_cast<unsigned int>(resolutions[resIndex].second)), "Multi Race Driving",
-                  Style::Titlebar | Style::Close);
+Configuration::Configuration(const Difficult difficulty, const bool activeAI, const bool pixelArt, const bool fullScreen, const int axis_x,
+                             const int axis_y, const string controlLeft,const string controlRight, const string controlAccelerate,
+                             const string controlBrake, const string controlSoundtrack)
+                             : resolutions({SCREEN_DEFAULT, SCREEN_1, SCREEN_2, SCREEN_3, SCREEN_4, SCREEN_5}), resIndex(0),
+                             isDefaultScreen(true), camD(0.87), renderLen(450)
+
+{
+
+    if (axis_x == DEFAULT_WIDTH && axis_y == DEFAULT_HEIGHT){
+        isDefaultScreen = true;
+        resIndex = 0;
+    }
+    else {
+        isDefaultScreen = false;
+    }
+
+    if (axis_x == SCREEN_1.first && axis_y == SCREEN_1.second){
+        resIndex = 1;
+    }
+    else if (axis_x == SCREEN_2.first && axis_y == SCREEN_2.second){
+        resIndex = 2;
+    }
+    else if (axis_x == SCREEN_3.first && axis_y == SCREEN_3.second){
+        resIndex = 3;
+    }
+    else if (axis_x == SCREEN_4.first && axis_y == SCREEN_5.second){
+        resIndex = 4;
+    }
+    else if (axis_x == SCREEN_4.first && axis_y == SCREEN_5.second){
+        resIndex = 5;
+    }
+
+    if (!fullScreen){
+        window.create(VideoMode(static_cast<unsigned int>(resolutions[resIndex].first),
+                                static_cast<unsigned int>(resolutions[resIndex].second)), "Multi Race Driving",
+                      Style::Titlebar | Style::Close);
+    }
+    else {
+        window.create(VideoMode::getFullscreenModes()[0], "Out Run", Style::Fullscreen);
+        resIndex = -1;
+    }
+
     window.setFramerateLimit(FPS);
     window.setKeyRepeatEnabled(false);
 
@@ -21,21 +58,28 @@ Configuration::Configuration() : resolutions({SCREEN_DEFAULT, SCREEN_1, SCREEN_2
     vehicleControllersMenuRead = false;
     pauseMenuRead = false;
     vehicleSelectionMenuRead = false;
-
-    imageOffset = IMAGE_DEFAULT_OFFSET;
-
-    thresholdDescriptionX = SCREEN_HD_HEIGHT;
-    thresholdDescriptionY = VERTICAL_OFFSET;
-
-    if (isDefaultScreen)
-        window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
-                            Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
-    else
-        window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
-                            Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+    circuitMenuRead = false;
 
     w.create(static_cast<unsigned int>(window.getView().getSize().x),
              static_cast<unsigned int>(window.getView().getSize().y));
+
+    window.setView(View(Vector2f(window.getSize().x / 2.0f, window.getSize().y / 2.0f),
+                          Vector2f(window.getSize().x, window.getSize().y)));
+    w.create(static_cast<unsigned int>(window.getView().getSize().x),
+               static_cast<unsigned int>(window.getView().getSize().y));
+
+    screenScale = float(w.getSize().x) / float(DEFAULT_WIDTH);
+
+    if (isDefaultScreen){
+        imageOffset = IMAGE_DEFAULT_OFFSET;
+        thresholdDescriptionX = SCREEN_HD_HEIGHT;
+        thresholdDescriptionY = VERTICAL_OFFSET;
+    }
+    else {
+        thresholdDescriptionX = w.getSize().x * SCREEN_HD_HEIGHT / DEFAULT_WIDTH;
+        thresholdDescriptionY = int((w.getSize().y * VERTICAL_OFFSET / DEFAULT_HEIGHT) * 1.2f);
+        imageOffset = float(w.getSize().y) * IMAGE_DEFAULT_OFFSET / DEFAULT_HEIGHT;
+    }
 
     Image i;
     i.loadFromFile("Data/Icon/Multi_Race_Driving.png");
@@ -47,15 +91,35 @@ Configuration::Configuration() : resolutions({SCREEN_DEFAULT, SCREEN_1, SCREEN_2
     menuUpKey = Keyboard::Up;
     menuDownKey = Keyboard::Down;
     menuEnterKey = Keyboard::Enter;
-    accelerateKey = Keyboard::LControl;
-    brakeKey = Keyboard::LAlt;
-    leftKey = Keyboard::Left;
-    rightKey = Keyboard::Right;
-    soundtrackKey = Keyboard::Z;
+
+    int index;
+    KeywordMapper kM = KeywordMapper();
+
+    // Look for the keyboard to control the turning left
+    index = kM.lookForKeyBoard(controlLeft);
+    leftKey = kM.mapperCodeKeyWord[index];
+
+    // Look for the keyboard to control the turning right
+    index = kM.lookForKeyBoard(controlRight);
+    rightKey = kM.mapperCodeKeyWord[index];
+
+    // Look for the keyboard to control the acceleration
+    index = kM.lookForKeyBoard(controlAccelerate);
+    accelerateKey = kM.mapperCodeKeyWord[index];
+
+    // Look for the keyboard to control the braking
+    index = kM.lookForKeyBoard(controlBrake);
+    brakeKey = kM.mapperCodeKeyWord[index];
+
+    // Look for the keyboard to control the changing soundtrack
+    index = kM.lookForKeyBoard(controlSoundtrack);
+    soundtrackKey = kM.mapperCodeKeyWord[index];
 
     fontElapsedTime = initializeFontElapsedTime();
 
     fontTimeToPlay = initializeFontTimeToPlay();
+
+    fontMenus = initializeFontMenus();
 
     fontScore = initializeFontScore();
 
@@ -63,14 +127,14 @@ Configuration::Configuration() : resolutions({SCREEN_DEFAULT, SCREEN_1, SCREEN_2
 
     options = initializeFontOptions();
 
-    level = NORMAL;
+    level = difficulty;
 
     modifiedConfig = false;
+    changeAnyParameter = false;
 
     maxAggressiveness = 0.0f;
-    enableAI = false;
-
-    enablePixelArt = true;
+    enableAI = activeAI;
+    enablePixelArt = pixelArt;
 }
 
 
@@ -323,6 +387,9 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
 
         IntRect background(0, 0, w.getSize().x, w.getSize().y);
         Sprite sprite(graphicsMenuBackground, background);
+        float axis_x = float(w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
         ghMenuBackground = sprite;
 
         RectangleShape shape;
@@ -337,13 +404,15 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
         // Main Text of the menu
         Text optionsText;
         optionsText.setString(contentTitleGraphicsMenu);
-        optionsText.setPosition(w.getSize().x / 2.f - 160.0f * screenScale, w.getSize().y / 2.f - 220.0f * screenScale);
-        optionsText.setCharacterSize(static_cast<unsigned int>(int(35.0f * screenScale)));
+        optionsText.setCharacterSize(static_cast<unsigned int>(int(40.0f * screenScale)));
         optionsText.setFont(fontGraphicsMenu);
         optionsText.setStyle(Text::Bold | Text::Underlined);
         optionsText.setFillColor(colorTitleTextGraphicsMenu);
         optionsText.setOutlineColor(colorTitleBorderGraphicsMenu);
         optionsText.setOutlineThickness(5.0f * screenScale);
+        optionsText.setPosition(w.getSize().x / 2.f - optionsText.getLocalBounds().width / 2.f,
+                                w.getSize().y / 2.f - 220.0f * screenScale);
+
 
         // Option indicators
 
@@ -364,7 +433,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
 
         menuButtons.emplace_back(w.getSize().x / 2.f + 80.0f * screenScale, w.getSize().y / 2.f, 200.0f * screenScale,
                                  30.0f * screenScale, fontMenuGraphicsButtons,
-                                 enablePixelArt ? "ENABLED" : "DISABLED", colorButtons[2], colorButtons[3], colorFontMenuGraphicsButtons,
+                                 enablePixelArt ? "Enabled" : "Disabled", colorButtons[2], colorButtons[3], colorFontMenuGraphicsButtons,
                                  0, screenScale);
 
         // Control the option selected by the user
@@ -411,7 +480,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
             if (optionSelected == 0) {
                 // Volume music
                 // Check if left or right cursor keys have been pressed or not
-                if (Keyboard::isKeyPressed(leftKey)) {
+                if (Keyboard::isKeyPressed(Keyboard::Left)) {
                     if (resized) {
                         resized = false;
                     } else if (resIndex > -1) {
@@ -423,11 +492,13 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                         if (resIndex > -1) {
                             window.create(VideoMode(static_cast<unsigned int>(resolutions[resIndex].first),
                                                     static_cast<unsigned int>(resolutions[resIndex].second)),
-                                          "Out Run",
+                                          "Multi Race Driving",
                                           Style::Titlebar | Style::Close);
+                            fullScreen = true;
                         }
                         else {
-                            window.create(VideoMode::getFullscreenModes()[0], "Out Run", Style::Fullscreen);
+                            window.create(VideoMode::getFullscreenModes()[0], "Multi Race Driving", Style::Fullscreen);
+                            fullScreen = false;
                         }
                         window.setFramerateLimit(FPS);
                         window.setKeyRepeatEnabled(false);
@@ -449,7 +520,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                     thresholdDescriptionY = int((w.getSize().y * VERTICAL_OFFSET / DEFAULT_HEIGHT) * 1.2f);
                     imageOffset = float(w.getSize().y) * IMAGE_DEFAULT_OFFSET / DEFAULT_HEIGHT;
                 }
-                else if (Keyboard::isKeyPressed(rightKey)) {
+                else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                     if (resized) {
                         resized = false;
                     }
@@ -459,10 +530,12 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                                                                       to_string(resolutions[resIndex].second));
 
                         window.create(VideoMode(static_cast<unsigned int>(resolutions[resIndex].first),
-                                                static_cast<unsigned int>(resolutions[resIndex].second)), "Out Run",
+                                                static_cast<unsigned int>(resolutions[resIndex].second)), "Multi Race Driving",
                                       Style::Titlebar | Style::Close);
                         window.setFramerateLimit(FPS);
                         window.setKeyRepeatEnabled(false);
+
+
 
                         isDefaultScreen = resIndex == 0;
 
@@ -484,15 +557,16 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
             else {
                 // Volume effects
                 // Check if left or right cursor keys have been pressed or not
-                if (Keyboard::isKeyPressed(leftKey)) {
+                if (Keyboard::isKeyPressed(Keyboard::Left)) {
                     if (enablePixelArt) {
                         enablePixelArt = false;
-                        menuButtons[optionSelected + 2].setTextButton("DISABLED");
+                        menuButtons[optionSelected + 2].setTextButton("Disabled");
                     }
-                } else if (Keyboard::isKeyPressed(rightKey)) {
+                }
+                else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                     if (!enablePixelArt) {
                         enablePixelArt = true;
-                        menuButtons[optionSelected + 2].setTextButton("ENABLED");
+                        menuButtons[optionSelected + 2].setTextButton("Enabled");
                     }
                 }
             }
@@ -513,7 +587,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
             r.soundEffects[0]->stop();
 
             // Check if left or right cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(menuEnterKey)) {
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 startPressed = true;
                 modifiedConfig = true;
@@ -536,6 +610,13 @@ Font initializeFontElapsedTime() {
 Font initializeFontTimeToPlay() {
     Font f;
     if (!f.loadFromFile("Data/Fonts/zorque.ttf")) exit(1);
+    return f;
+}
+
+
+Font initializeFontMenus() {
+    Font f;
+    if (!f.loadFromFile("Data/Fonts/Hetikademo.otf")) exit(1);
     return f;
 }
 

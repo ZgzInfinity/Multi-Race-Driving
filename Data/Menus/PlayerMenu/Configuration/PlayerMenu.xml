@@ -10,8 +10,8 @@
 		</ColorBorder>
 	</MenuPanel>
 	<Title>
-		<Content>SELECT PLAYER MODE!</Content>
-		<Font>Data/Fonts/needForSpeed.ttf</Font>
+		<Content>SELECT PLAYER MODE</Content>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
 		<ColorText>
 			<R>255</R>
 			<G>255</G>
@@ -25,9 +25,9 @@
 	</Title>	
 	<DescriptionPanel>
 		<ColorPanelInside>
-			<R>98</R>
-			<G>250</G>
-			<B>0</B>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
 		</ColorPanelInside>
 		<ColorPanelBorder>
 			<R>0</R>
@@ -36,11 +36,11 @@
 		</ColorPanelBorder>
 	</DescriptionPanel>
 	<MenuButtons>
-		<Font>Data/Fonts/needForSpeed.ttf</Font>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
 		<ColorFont>
 			<R>0</R>
 			<G>0</G>
-			<B>255</B>
+			<B>0</B>
 		</ColorFont>
 		<Buttons>
 			<B0>
@@ -48,14 +48,14 @@
 				<InitialState>1</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Image>Data/Menus/PlayerMenu/Images/SinglePlayer.png</Image>
@@ -70,20 +70,20 @@
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Image>Data/Menus/PlayerMenu/Images/MultiPlayer.png</Image>
 				<Description>
-					<D1>Enjoy fantastic races </D1>
-					<D2>competing with friends or </D2>
+					<D1>Enjoy fantastic races</D1>
+					<D2>competing with friends or</D2>
 					<D3>other players.</D3>
 				</Description>
 			</B1>
@@ -92,21 +92,21 @@
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Image>Data/Menus/PlayerMenu/Images/Options.png</Image>
 				<Description>
-					<D1>Access and configure parameters</D1>
-					<D2>and controllers completely</D2>
-					<D3>like you want.</D3>
+					<D1>Configure the game</D1>
+					<D2>completely like</D2>
+					<D3>you want.</D3>
 				</Description>
 			</B2>
 		</Buttons>

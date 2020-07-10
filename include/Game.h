@@ -50,6 +50,8 @@ class Game {
     pair<int, int> mapId;
     LandScape *currentMap;
     LandScape goalMap;
+    LandScape *startMap;
+    LandScape middleMap;
     int goalFlagger, goalEnd;
 
     Motorbike player;
@@ -158,7 +160,7 @@ class Game {
     float elapsed13, elapsed14;
 
     // Vector of textures for represent the game panel
-    vector<sf::Texture> textures;
+    vector<Texture> textures;
 
     // Tree map with levels
     Texture treeMap[5][5];
@@ -184,6 +186,34 @@ class Game {
     // Position reached by the player in a race
     int posArrival;
 
+    // Kind of of terrain of the current landscape
+    int terrain;
+
+    // Number of laps in Pole Position
+    int numberLaps;
+
+    // Laps done in Pole Position
+    int lapsDone;
+
+    // LandScape selected in Pole Position
+    int landScapeSelected;
+
+    // Control when the players increments the number of laps done
+    bool newLap;
+
+    // Lap indicator of lap
+    float offsetLapIndicator;
+
+
+    int timeElapsed;
+
+
+    int displayLapFactor;
+
+
+    int numberRacers;
+
+
     /**
      * Load the Hud interface of the game
      */
@@ -195,6 +225,25 @@ class Game {
      * Draw the initial animation of the HUD
      */
     void drawHudAnimation(Configuration& c, SoundPlayer& r);
+
+
+
+    /**
+     * Draw the bonus final animation
+     * @param c is the configuration of the game
+     * @param seconds are the seconds the player has left when he reaches the goal
+     * @param decs_second are the hundreds of seconds the player has left when he reaches the goal
+     */
+    void drawBonus(Configuration &c, int seconds, int decs_second);
+
+
+
+    /**
+     * Draw the new lap animation
+     * @param c is the configuration of the game
+     * @param r is the sound reproducer of the game
+     */
+    void drawNewLap(Configuration &c);
 
 
 
@@ -263,7 +312,7 @@ class Game {
      * with the vehicles on the screen.
      * @param c is the configuration of the game
      */
-    void updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action, Vehicle::Direction &direction);
+    void updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action, Vehicle::Direction &direction, int& terrain);
 
 
 
@@ -426,8 +475,19 @@ public:
     void readRecordFromLandScape(const string path, string& namePlayer, int& minutesLap, int& secondsLap, int& centsSecondLap);
 
 
-
     State classificationRace(Configuration& c, SoundPlayer& r);
+
+
+    /**
+     * Load the configuration of the circuit selection menu in its xml file
+     * @param path contains the path of the xml configuration file
+     * @param c is the configuration of the game
+     */
+    void loadCircuitMenuConfiguration(const string path, Configuration& c);
+
+
+
+    State selectionCircuitMenu(Configuration& c, SoundPlayer& r);
 
 
 };

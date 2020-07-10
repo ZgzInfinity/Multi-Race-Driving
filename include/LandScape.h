@@ -80,6 +80,9 @@ class LandScape {
     // Control if a landScape is the goal or not
     bool finalLandScape;
 
+    // Control if a landscape is the middle or not
+    bool middleLandScape;
+
     // Time to play in the landscape
     int timeToPlay;
 
@@ -98,6 +101,8 @@ class LandScape {
     // Vector with the positions of the checkpoints
     vector<int>checkPointPositions;
 
+    // Kind of terrain
+    int terrain;
 
 
     /**
@@ -311,6 +316,7 @@ class LandScape {
 public:
 
 
+    LandScape();
 
     /**
      * Creates a landscape reading its xml configuration file
@@ -331,6 +337,11 @@ public:
      * @param semaphore is the color of the semaphore in the starting
      */
     LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame);
+
+
+
+
+    LandScape(const LandScape &landScape, const int typeOfGame);
 
 
 
@@ -420,12 +431,20 @@ public:
 
 
 
+     /**
+     * Returns the kind of terrain of the landscape
+     * @return
+     */
+     int getTerrain() const;
+
+
+
     /**
      * Draws the percent of landscape visible with all the traffic cars in it
      * @param c is the configuration of the player
      * @param vehicles is the vector with all the traffic cars
      */
-    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles);
+    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, const int typeOfGame);
 
 
 
@@ -440,8 +459,8 @@ public:
      * @param crashPos is the possible position of crash detected
      * @return
      */
-    bool hasCrashed(const Configuration &c, float prevY, float currentY, float currentX, float minX, float maxX,
-                    float &crashPos) const;
+    bool hasCrashed(Configuration &c, float prevY, float currentY, float currentX, float minX, float maxX,
+                    float &crashPos, const int typeOfGame) const;
 
 
 
@@ -531,6 +550,10 @@ public:
      * @return
      */
     bool isFinalLandScape() const;
+
+
+
+    bool isMiddleMap() const;
 
 
 

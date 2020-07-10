@@ -1,53 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <RecordsOutRun>
 	<Players>
 		<P1>
-			<Score>13369879</Score>
-			<Name>ZGZ</Name>
-			<Minutes>5</Minutes>
-			<Seconds>10</Seconds>
-			<HundredthsOfSecond>29</HundredthsOfSecond>
+			<Score>61922530</Score>
+			<Name>LGK</Name>
+			<Minutes>6</Minutes>
+			<Seconds>30</Seconds>
+			<HundredthsOfSecond>5</HundredthsOfSecond>
 		</P1>
 		<P2>
-			<Score>25417947</Score>
-			<Name>UUU</Name>
-			<Minutes>5</Minutes>
-			<Seconds>15</Seconds>
-			<HundredthsOfSecond>36</HundredthsOfSecond>
+			<Score>61922530</Score>
+			<Name>ZGZ</Name>
+			<Minutes>6</Minutes>
+			<Seconds>30</Seconds>
+			<HundredthsOfSecond>51</HundredthsOfSecond>
 		</P2>
 		<P3>
-			<Score>22022526</Score>
-			<Name>RGB</Name>
+			<Score>61922530</Score>
+			<Name>UUU</Name>
 			<Minutes>6</Minutes>
-			<Seconds>20</Seconds>
-			<HundredthsOfSecond>42</HundredthsOfSecond>
+			<Seconds>30</Seconds>
+			<HundredthsOfSecond>51</HundredthsOfSecond>
 		</P3>
 		<P4>
-			<Score>21922530</Score>
-			<Name>HSV</Name>
-			<Minutes>6</Minutes>
-			<Seconds>25</Seconds>
-			<HundredthsOfSecond>47</HundredthsOfSecond>
+			<Score>49915184</Score>
+			<Name>JPG</Name>
+			<Minutes>0</Minutes>
+			<Seconds>53</Seconds>
+			<HundredthsOfSecond>0</HundredthsOfSecond>
 		</P4>
 		<P5>
 			<Score>21922530</Score>
-			<Name>OMS</Name>
+			<Name>RGB</Name>
 			<Minutes>6</Minutes>
 			<Seconds>30</Seconds>
 			<HundredthsOfSecond>51</HundredthsOfSecond>
 		</P5>
 		<P6>
 			<Score>21922530</Score>
-			<Name>UNI</Name>
-			<Minutes>7</Minutes>
-			<Seconds>35</Seconds>
-			<HundredthsOfSecond>57</HundredthsOfSecond>
+			<Name>HSV</Name>
+			<Minutes>6</Minutes>
+			<Seconds>30</Seconds>
+			<HundredthsOfSecond>51</HundredthsOfSecond>
 		</P6>
 		<P7>
 			<Score>21922530</Score>
-			<Name>COV</Name>
-			<Minutes>7</Minutes>
-			<Seconds>40</Seconds>
-			<HundredthsOfSecond>63</HundredthsOfSecond>
+			<Name>OMS</Name>
+			<Minutes>6</Minutes>
+			<Seconds>30</Seconds>
+			<HundredthsOfSecond>51</HundredthsOfSecond>
 		</P7>
 	</Players>
 </RecordsOutRun>
+

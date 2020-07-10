@@ -42,7 +42,7 @@ struct Score {
  * posiciones 0 a 6).
  * @return
  */
-std::vector<Score> getGlobalScores();
+std::vector<Score> getGlobalScores(Configuration& c, const int typeOfGame);
 
 /**
  * Dados todos los récords de puntuación ordenados de mayor a menor puntuación y una puntuación score, devuelve la

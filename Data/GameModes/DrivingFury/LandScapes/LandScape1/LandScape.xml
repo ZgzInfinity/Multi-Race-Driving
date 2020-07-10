@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LandScape>
+	<Type>Land</Type>
 	<Sprites>
 		<S1>Data/GameModes/DrivingFury/LandScapes/LandScape1/1.png</S1>
 		<S2>Data/GameModes/DrivingFury/LandScapes/LandScape1/2.png</S2>
@@ -33,12 +34,12 @@
 			<Straight>
 				<Road startPosGE="0" finalPosLE="19">
 					<SpriteNearLeft>
-						<Each>30</Each>
+						<Each>70</Each>
 						<Offset>0.3</Offset>
 						<Code>1</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
-						<Each>52</Each>
+						<Each>82</Each>
 						<Offset>0.2</Offset>
 						<Code>1</Code>
 					</SpriteNearRight>
@@ -61,12 +62,12 @@
 					<Direction>0.0</Direction>
 					<Road startPosGT="19" finalPosLT="50">
 						<SpriteNearLeft>
-							<Each>15</Each>
+							<Each>83</Each>
 							<Offset>Random</Offset>
 							<Code>11</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>20</Each>
+							<Each>75</Each>
 							<Offset>Random</Offset>
 							<Code>12</Code>
 						</SpriteNearRight>
@@ -85,7 +86,7 @@
 			</Climbing>
 		</P2>
 		<P3>
-			<Curve direction="-0.7">
+			<Curve direction="-1.3">
 				<Road startPosGE="50" finalPosLT="100">
 					<SpriteNearLeft>
 						<Each>100</Each>
@@ -93,7 +94,7 @@
 						<Code>22</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
-						<Each>45</Each>
+						<Each>85</Each>
 						<Offset>0.0</Offset>
 						<Code>2</Code>
 					</SpriteNearRight>
@@ -114,12 +115,12 @@
 			<Straight>
 				<Road startPosGT="99" finalPosLE="110">
 					<SpriteNearLeft>
-						<Each>60</Each>
+						<Each>70</Each>
 						<Offset>0.3</Offset>
 						<Code>23</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
-						<Each>37</Each>
+						<Each>77</Each>
 						<Offset>Random</Offset>
 						<Code>13</Code>
 					</SpriteNearRight>
@@ -137,10 +138,10 @@
 			</Straight>
 		</P4>
 		<P5>
-			<Curve direction="0.5">
+			<Curve direction="1.6">
 				<Road startPosGT="110" finalPosLT="160">
 					<SpriteNearLeft>
-						<Each>37</Each>
+						<Each>97</Each>
 						<Offset>Random</Offset>
 						<Code>14</Code>
 					</SpriteNearLeft>
@@ -163,7 +164,7 @@
 			</Curve>
 		</P5>
 		<P6>
-			<Curve direction="-0.5">
+			<Straight>
 				<Road startPosGE="160" finalPosLT="210">
 					<SpriteNearLeft>
 						<Each>90</Each>
@@ -186,15 +187,15 @@
 						<Code>21</Code>
 					</SpriteFarRight>
 				</Road>
-			</Curve>
+			</Straight>
 		</P6>
 		<P7>
 			<Climbing elevation="3000">
 				<P1>
-					<Direction>0.5</Direction>
+					<Direction>1.5</Direction>
 					<Road startPosGT="209" finalPosLT="260">
 						<SpriteNearLeft>
-							<Each>34</Each>
+							<Each>84</Each>
 							<Offset>Random</Offset>
 							<Code>9</Code>
 						</SpriteNearLeft>
@@ -216,10 +217,10 @@
 					</Road>
 				</P1>
 				<P2>
-					<Direction>-0.9</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGE="260" finalPosLE="290">
 						<SpriteNearLeft>
-							<Each>41</Each>
+							<Each>71</Each>
 							<Offset>0.2</Offset>
 							<Code>25</Code>
 						</SpriteNearLeft>
@@ -246,12 +247,12 @@
 			<Straight>
 				<Road startPosGE="291" finalPosLE="315">
 					<SpriteNearLeft>
-						<Each>20</Each>
+						<Each>78</Each>
 						<Offset>0.0</Offset>
 						<Code>10</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
-						<Each>40</Each>
+						<Each>73</Each>
 						<Offset>0.0</Offset>
 						<Code>14</Code>
 					</SpriteNearRight>
@@ -271,15 +272,15 @@
 		<P9>
 			<Dropping elevation="5000">
 				<P1>
-					<Direction>0.8</Direction>
+					<Direction>1.1</Direction>
 					<Road startPosGE="316" finalPosLE="365">
 						<SpriteNearLeft>
-							<Each>40</Each>
+							<Each>85</Each>
 							<Offset>0.2</Offset>
 							<Code>3</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>50</Each>
+							<Each>81</Each>
 							<Offset>1.0</Offset>
 							<Code>15</Code>
 						</SpriteNearRight>
@@ -298,15 +299,15 @@
 			</Dropping>
 		</P9>
 		<P10>
-			<Curve direction="-0.45">
+			<Curve direction="-1.45">
 				<Road startPosGT="365" finalPosLT="400">
 					<SpriteNearLeft>
-						<Each>58</Each>
+						<Each>72</Each>
 						<Offset>0.2</Offset>
 						<Code>6</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
-						<Each>40</Each>
+						<Each>79</Each>
 						<Offset>0.0</Offset>
 						<Code>2</Code>
 					</SpriteNearRight>
@@ -326,7 +327,7 @@
 		<P11>
 			<Climbing elevation="9000">
 				<P1>
-					<Direction>0.5</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGT="399" finalPosLT="500">
 						<SpriteNearLeft>
 							<Each>85</Each>
@@ -363,7 +364,7 @@
 							<Code>11</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>67</Each>
+							<Each>77</Each>
 							<Offset>Random</Offset>
 							<Code>12</Code>
 						</SpriteNearRight>
@@ -380,7 +381,7 @@
 					</Road>
 				</P1>
 				<P1>
-					<Direction>0.5</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGE="560" finalPosLT="620">
 						<SpriteNearLeft>
 							<Each>72</Each>
@@ -388,7 +389,7 @@
 							<Code>11</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>54</Each>
+							<Each>84</Each>
 							<Offset>Random</Offset>
 							<Code>7</Code>
 						</SpriteNearRight>
@@ -410,12 +411,12 @@
 			<Straight>
 				<Road startPosGT="618" finalPosLE="650">
 					<SpriteNearLeft>
-						<Each>54</Each>
+						<Each>84</Each>
 						<Offset>Random</Offset>
 						<Code>13</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
-						<Each>23</Each>
+						<Each>88</Each>
 						<Offset>Random</Offset>
 						<Code>13</Code>
 					</SpriteNearRight>
@@ -433,15 +434,15 @@
 			</Straight>
 		</P13>
 		<P14>
-			<Curve direction="-2.0">
+			<Curve direction="-1.7">
 				<Road startPosGT="650" finalPosLE="730">
 					<SpriteNearLeft>
-						<Each>47</Each>
+						<Each>86</Each>
 						<Offset>Random</Offset>
 						<Code>15</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
-						<Each>33</Each>
+						<Each>81</Each>
 						<Offset>0.15</Offset>
 						<Code>2</Code>
 					</SpriteNearRight>
@@ -459,7 +460,7 @@
 			</Curve>
 		</P14>
 		<P15>
-			<Curve direction="2.0">
+			<Curve direction="1.7">
 				<Road startPosGT="730" finalPosLE="810">
 					<SpriteNearLeft>
 						<Each>110</Each>
@@ -487,12 +488,12 @@
 		<P16>
 			<Climbing elevation="5000">
 				<P1>
-					<Direction>2.0</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGE="811" finalPosLT="890">
 						<SpriteNearLeft>
-							<Each>70</Each>
+							<Each>90</Each>
 							<Offset>0.0</Offset>
-							<Code>3</Code>
+							<Code>14</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
 							<Each>100</Each>
@@ -520,7 +521,7 @@
 							<Code>13</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>74</Each>
+							<Each>94</Each>
 							<Offset>Random</Offset>
 							<Code>13</Code>
 						</SpriteNearRight>
@@ -542,7 +543,7 @@
 			<Straight>
 				<Road startPosGT="939" finalPosLE="952">
 					<SpriteNearLeft>
-						<Each>55</Each>
+						<Each>75</Each>
 						<Offset>0.0</Offset>
 						<Code>19</Code>
 					</SpriteNearLeft>
@@ -565,7 +566,7 @@
 			</Straight>
 		</P17>
 		<P18>
-			<Curve direction="0.9">
+			<Curve direction="1.2">
 				<Road startPosGE="953" finalPosLE="996">
 					<SpriteNearLeft>
 						<Each>87</Each>
@@ -627,7 +628,7 @@
 							<Code>22</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>56</Each>
+							<Each>69</Each>
 							<Offset>0.0</Offset>
 							<Code>24</Code>
 						</SpriteNearRight>
@@ -648,7 +649,7 @@
 		<P21>
 			<Climbing elevation="1000">
 				<P1>
-					<Direction>0.0</Direction>
+					<Direction>0.3</Direction>
 					<Road startPosGT="1069" finalPosLT="1099">
 						<SpriteNearLeft>
 							<Each>78</Each>
@@ -680,7 +681,7 @@
 					<Direction>1.8</Direction>
 					<Road startPosGT="1040" finalPosLT="1100">
 						<SpriteNearLeft>
-							<Each>60</Each>
+							<Each>80</Each>
 							<Offset>0.0</Offset>
 							<Code>3</Code>
 						</SpriteNearLeft>
@@ -705,7 +706,7 @@
 					<Direction>-1.2</Direction>
 					<Road startPosGT="1099" finalPosLT="1180">
 						<SpriteNearLeft>
-							<Each>69</Each>
+							<Each>99</Each>
 							<Offset>0.0</Offset>
 							<Code>10</Code>
 						</SpriteNearLeft>
@@ -734,12 +735,12 @@
 					<Direction>0.0</Direction>
 					<Road startPosGE="1180" finalPosLT="1330">
 						<SpriteNearLeft>
-							<Each>47</Each>
+							<Each>98</Each>
 							<Offset>Random</Offset>
 							<Code>9</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>70</Each>
+							<Each>95¡3</Each>
 							<Offset>Random</Offset>
 							<Code>6</Code>
 						</SpriteNearRight>
@@ -764,7 +765,7 @@
 							<Code>3</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>89</Each>
+							<Each>108</Each>
 							<Offset>Random</Offset>
 							<Code>7</Code>
 						</SpriteNearRight>

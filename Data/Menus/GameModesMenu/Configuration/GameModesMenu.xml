@@ -10,8 +10,8 @@
 		</ColorBorder>
 	</MenuPanel>
 	<Title>
-		<Content>SELECT GAME MODE!</Content>
-		<Font>Data/Fonts/needForSpeed.ttf</Font>
+		<Content>SELECT GAME MODE</Content>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
 		<ColorText>
 			<R>255</R>
 			<G>255</G>
@@ -25,8 +25,8 @@
 	</Title>	
 	<DescriptionPanel>
 		<ColorPanelInside>
-			<R>98</R>
-			<G>250</G>
+			<R>255</R>
+			<G>255</G>
 			<B>0</B>
 		</ColorPanelInside>
 		<ColorPanelBorder>
@@ -36,11 +36,11 @@
 		</ColorPanelBorder>
 	</DescriptionPanel>
 	<MenuButtons>
-		<Font>Data/Fonts/needForSpeed.ttf</Font>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
 		<ColorFont>
 			<R>0</R>
 			<G>0</G>
-			<B>255</B>
+			<B>0</B>
 		</ColorFont>
 		<Buttons>
 			<B0>
@@ -48,20 +48,20 @@
 				<InitialState>1</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Description>
 					<D1>Run in different parts of the world</D1>
 					<D2>facing other rivals and traffic.</D2>
-					<D3>Only the first one is worth it!</D3>
+					<D3>Only the first one is worth it.</D3>
 					<D4>Mode inspired in Super Hang on game.</D4>
 				</Description>
 			</B0>
@@ -70,14 +70,14 @@
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Description>
@@ -91,14 +91,14 @@
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Description>
@@ -112,14 +112,14 @@
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Description>
@@ -133,14 +133,14 @@
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Description>
@@ -154,20 +154,20 @@
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
-						<R>228</R>
-						<G>250</G>
-						<B>0</B>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
 					</C1>
 					<C2>
-						<R>98</R>
-						<G>250</G>
-						<B>0</B>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
 					</C2>
 				</Colors>
 				<Description>
 					<D1>Deliver a package to a specific point</D1> 
 					<D2>before any of your rivals do.</D2>
-					<D3>Game mode inspired by Crazy taxi.</D3>
+					<D3>Game mode inspired in Crazy taxi.</D3>
 				</Description>
 			</B5>
 		</Buttons>

@@ -9,11 +9,49 @@ Score::Score(unsigned long score, const string &name, int minutes, int secs, int
                                                                                                 cents_second(
                                                                                                         centsSecond) {}
 
-vector<Score> getGlobalScores() {
+vector<Score> getGlobalScores(Configuration& c, const int typeOfGame) {
 
     vector<Score> globalScores;
 
-    const string path = "Data/Records/OutRun/scores.xml";
+        // xml file which stores the player with the highest score in the level
+    string path = "Data/Records/";
+
+    // Control the game mode selected by the player
+    switch(typeOfGame){
+        case 1:
+            path += "OutRun/Scores_";
+            break;
+        case 3:
+            path += "DrivingFury/Scores_";
+            break;
+        case 4:
+            path += "Derramage/Scores_";
+    }
+
+    // Control if the player has played with the AI enabled or not
+    if (c.enableAI){
+        // Active AI
+        path += "Enabled_";
+    }
+    else {
+        // Disabled AI
+        path += "Disabled_";
+    }
+
+    // Control the difficulty of the game
+    switch (c.level){
+        case PEACEFUL:
+            path += "Peaceful.xml";
+            break;
+        case EASY:
+            path += "Easy.xml";
+            break;
+        case NORMAL:
+            path += "Normal.xml";
+            break;
+        case HARD:
+            path += "Hard.xml";
+    }
 
     // Open the xml file of the scenario
     char* pFile = const_cast<char*>(path.c_str());
@@ -88,7 +126,7 @@ bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, co
     // Control the game mode selected by the player
     switch(typeOfGame){
         case 1:
-            path = "OutRun/Scores_";
+            path += "OutRun/Scores_";
             break;
         case 3:
             path += "DrivingFury/Scores_";
@@ -158,16 +196,15 @@ bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, co
     // Number of players checked
     int numPlayers = 0;
 
+    string tags[7] = {"P1", "P2", "P3", "P4", "P5", "P6", "P7"};
+
     // While the position has not been found
     while (!foundPosition){
         // Check the actual player
         if (globalScores[numPlayers].score >= newRecord.score){
 
-            // Identifier of the node
-            string idNode = "P" + to_string(numPlayers + 1);
-
             // The actual player goes first
-            xml_node<>* player = doc.allocate_node(node_element, idNode.c_str());
+            xml_node<>* player = doc.allocate_node(node_element, tags[numPlayers].c_str());
             players->append_node(player);
 
             // Create the score node
@@ -238,41 +275,36 @@ bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, co
     numPlayers++;
 
     // While the position has not been found
-    for (int j = numPlayers; j < 6; j++){
-        // Identifier of the node
-        string idNode = "P" + to_string(numPlayers);
+    for (int j = numPlayers; j < 7; j++){
 
         // The actual player goes first
-        xml_node<>* lastPlayer = doc.allocate_node(node_element, idNode.c_str());
+        xml_node<>* lastPlayer = doc.allocate_node(node_element, tags[j].c_str());
         players->append_node(lastPlayer);
 
         // Create the score node
         xml_node<>* lastScore = doc.allocate_node(node_element, "Score");
         lastPlayer->append_node(lastScore);
-        lastScore->value(to_string(globalScores[numPlayers - 1].score).c_str());
+        lastScore->value(to_string(globalScores[j - 1].score).c_str());
 
         // Create the name node
         xml_node<>* lastName = doc.allocate_node(node_element, "Name");
         lastPlayer->append_node(lastName);
-        lastName->value(globalScores[numPlayers - 1].name.c_str());
+        lastName->value(globalScores[j - 1].name.c_str());
 
         // Create the minutes node
         xml_node<>* lastMinutes = doc.allocate_node(node_element, "Minutes");
         lastPlayer->append_node(lastMinutes);
-        lastMinutes->value(to_string(globalScores[numPlayers - 1].minutes).c_str());
+        lastMinutes->value(to_string(globalScores[j - 1].minutes).c_str());
 
         // Create the seconds node
         xml_node<>* lastSeconds = doc.allocate_node(node_element, "Seconds");
         lastPlayer->append_node(lastSeconds);
-        lastSeconds->value(to_string(globalScores[numPlayers - 1].secs).c_str());
+        lastSeconds->value(to_string(globalScores[j - 1].secs).c_str());
 
         // Create the Hundredths of second node
         xml_node<>* lastHundredthsOfSecond = doc.allocate_node(node_element, "HundredthsOfSecond");
         lastPlayer->append_node(lastHundredthsOfSecond);
-        lastHundredthsOfSecond->value(to_string(globalScores[numPlayers - 1].cents_second).c_str());
-
-        // Increment the number of players processed
-        numPlayers++;
+        lastHundredthsOfSecond->value(to_string(globalScores[j - 1].cents_second).c_str());
     }
 
     // Store the new xml file configuration

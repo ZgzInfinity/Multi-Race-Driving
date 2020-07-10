@@ -4,7 +4,7 @@
 	<Texts>
 		<T1>
 			<Content>Press Start</Content>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>
@@ -18,7 +18,7 @@
 		</T1>
 		<T2>
 			<Content>SEGA</Content>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>
@@ -32,7 +32,7 @@
 		</T2>
 		<T3>
 			<Content>2020</Content>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>
@@ -46,7 +46,7 @@
 		</T3>
 		<T4>
 			<Content>EXIT / PAUSE: ESC KEY</Content>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>
@@ -60,7 +60,7 @@
 		</T4>
 		<T5>
 			<Content>MOVE: ARROW KEYS</Content>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>
@@ -74,7 +74,7 @@
 		</T5>
 		<T6>
 			<Content>SELECT: ENTER KEY</Content>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>

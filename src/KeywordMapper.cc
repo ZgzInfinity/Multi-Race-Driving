@@ -172,3 +172,43 @@ KeywordMapper::KeywordMapper() {
 }
 
 
+
+int KeywordMapper::lookForKeyBoard(const string key){
+    bool found = false;
+    int i = 0;
+    while (!found){
+        if (mapperIdKeyWord[i] == key){
+            found = true;
+        }
+        else {
+            i++;
+        }
+    }
+    if (found){
+        return i;
+    }
+    else {
+        return -1;
+    }
+}
+
+
+
+int KeywordMapper::lookForKeyBoardId(const Keyboard::Key key){
+    bool found = false;
+    int i = 0;
+    while (!found){
+        if (mapperCodeKeyWord[i] == key){
+            found = true;
+        }
+        else {
+            i++;
+        }
+    }
+    if (found){
+        return i;
+    }
+    else {
+        return -1;
+    }
+}

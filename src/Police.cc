@@ -11,7 +11,7 @@ Police::Police(float maxSpeed, float speedMul, float accInc, float scaleX, float
                                                  0.0f, pX, pY, pY, 0, 0, vehicle, Police_vehicle::PLAYER_TEXTURES, 1, 0),
                                                  speedMul(speedMul), maxAcc(pow(maxSpeed / speedMul, 2.0f)),
                                                  accInc(accInc), scaleY(scaleY), acceleration(0),
-                                                 minCrashAcc(0), xDest(0), inertia(0), crashing(false),
+                                                 minCrashAcc(0), xDest(1000), inertia(0), crashing(false),
                                                  smoking(false), skidding(false),
                                                  firstCrash(true), firstTurnLeft(true),
                                                  firstTurnRight(true)
@@ -20,6 +20,8 @@ Police::Police(float maxSpeed, float speedMul, float accInc, float scaleX, float
     brand = brandName;
     motor = motorName;
     angleTurning = angle;
+    speedCollision = 0.f;
+    outSideRoad = false;
 }
 
 float Police::getPreviousY() const {
@@ -31,63 +33,108 @@ void Police::hitControl(const bool vehicleCrash) {
     smoking = false;
     skidding = false;
 
-    if (!vehicleCrash) {
-        if (posX > angleTurning)
-            posX -= angleTurning;
-        else if (posX < -angleTurning)
-            posX += angleTurning;
-    } else {
-        if (minCrashAcc <= 0.0f) { // Only first time
-            minCrashAcc = (speed * 0.333f) * (speed * 0.333f); // In case of car crash, speed will be drop to 1/3. Otherwise it will be drop to 0.
-            acceleration = (speed * 0.5f) * (speed * 0.5f); // At the moment of the crash, speed drops to 1/2.
+    if (speedCollision == 0.f){
+        speedCollision = getRealSpeed();
+    }
 
-            if (posX < 0.0f)
-                xDest = 0.8f;
-            else
-                xDest = -0.8f;
+    if (xDest == 1000){
+        if (posX > 0.0f){
+            xDest = -(acceleration * 1.7f / maxAcc);
+        }
+        else {
+            xDest = acceleration * 1.7f / maxAcc;
+        }
+    }
+
+    if (xDest > 0.0f){
+        if (speedCollision <= 40.f){
+            posX = posX + (acceleration * angleTurning / maxAcc) * 40.f;
+        }
+        else if (speedCollision > 40.f && speedCollision < 85.f){
+            posX = posX + (acceleration * angleTurning / maxAcc) * 20.f;
+        }
+        else if (speedCollision >= 85.f && speedCollision < 100.f){
+            posX = posX + (acceleration * angleTurning / maxAcc) * 10.f;
+        }
+        else if (speedCollision >= 100.f && speedCollision < 120.f){
+            posX = posX + (acceleration * angleTurning / maxAcc) * 5.f;
+        }
+        else {
+            posX = posX + (acceleration * angleTurning / maxAcc) * 1.5f;
+        }
+    }
+    else {
+        if (speedCollision <= 40.f){
+            posX = posX - (acceleration * angleTurning / maxAcc) * 40.f;
+        }
+        else if (speedCollision > 40.f && speedCollision <= 85.f){
+            posX = posX - (acceleration * angleTurning / maxAcc) * 20.f;
+        }
+        else if (speedCollision > 85.f && speedCollision < 100.f){
+            posX = posX - (acceleration * angleTurning / maxAcc) * 10.f;
+        }
+        else if (speedCollision >= 100.f && speedCollision < 120.f){
+            posX = posX - (acceleration * angleTurning / maxAcc) * 5.f;
+        }
+        else {
+            posX = posX - (acceleration * angleTurning / maxAcc) * 1.5f;
         }
 
-        if (posX > xDest)
-            posX -= angleTurning;
-        else if (posX < xDest)
-            posX += angleTurning;
+    }
 
-        if (posX > 0.8f)
-            posX = 0.8f;
-        else if (posX < -0.8f)
-            posX = -0.8f;
+    if (vehicleCrash){
+        if (minCrashAcc <= 0.0f) { // Only first time
+            minCrashAcc = (speed * 0.1555f) * (speed * 0.1555f);
+            acceleration = (speed * 0.75f) * (speed * 0.75f);
+        }
     }
 
     acceleration -= accInc * 2.5f;
-    if (speed > 1.333f * halfMaxSpeed) // Reduces hit time
-        acceleration -= accInc * 7.5f;
-    else if (speed > halfMaxSpeed)
-        acceleration -= accInc * 5.0f;
-    else if (speed > 0.5f * halfMaxSpeed)
-        acceleration -= accInc * 2.5f;
 
-    if (acceleration < 0.0f)
+    if (speed > 1.333f * halfMaxSpeed){
+        acceleration -= accInc * 7.5f;
+    }
+    else if (speed > halfMaxSpeed){
+        acceleration -= accInc * 5.0f;
+    }
+    else if (speed > 0.5f * halfMaxSpeed){
+        acceleration -= accInc * 2.5f;
+    }
+
+    if (acceleration < 0.0f){
         acceleration = 0.0f;
+    }
 
     speed = sqrt(acceleration);
 
-    previousY = posY;
-    if (vehicleCrash && abs(posX) != 0.8f)
-        posY -= speed / 2.0f;
-    if (!vehicleCrash && (posX <= -angleTurning || posX >= angleTurning))
-        posY -= speed / 6.0f;
+    if (xDest > 0.f && posX < xDest){
+        if (!vehicleCrash){
+            posY = posY + acceleration * 7.f / maxAcc;
+        }
+        else {
+            posY = posY - acceleration * 7.f / maxAcc;
+        }
+    }
+    else if (xDest < 0.f && posX > xDest) {
+        if (!vehicleCrash){
+            posY = posY + acceleration * 7.f / maxAcc;
+        }
+        else {
+            posY = posY - acceleration * 7.f / maxAcc;
+        }
+    }
 
-    if (acceleration <= minCrashAcc ||
-        current_code_image == 37 || current_code_image == 50)
-    {
+    if (acceleration <= minCrashAcc){
         acceleration = minCrashAcc;
         speed = sqrt(acceleration);
         crashing = false;
         minCrashAcc = 0.0f;
-        xDest = 0.0f;
+        xDest = 1000;
         inertia = 0;
         previousY = posY;
         mode = -1;
+        speedCollision = 0.0f;
+        outSideRoad = false;
     }
 }
 
@@ -109,11 +156,13 @@ Vehicle::Action Police::accelerationControl(Configuration &c, bool hasGotOut) {
 
     if (a != BRAKE && Keyboard::isKeyPressed(c.accelerateKey)) {
         if (hasGotOut) {
+            outSideRoad = true;
             if (acceleration < maxAcc / 4.5f)
                 acceleration += accInc / 3.0f;
             else
                 acceleration -= accInc * 1.5f;
         } else {
+            outSideRoad = false;
             if (acceleration < maxAcc)
                 acceleration += accInc;
         }
@@ -149,65 +198,81 @@ Vehicle::Action Police::accelerationControl(Configuration &c, bool hasGotOut) {
     return a;
 }
 
-Vehicle::Direction Police::rotationControl(Configuration &c, float curveCoefficient) {
+Vehicle::Direction Police::rotationControl(Configuration &c, float curveCoefficient, const bool& isFinalMap, const int& limitMap) {
     skidding = false;
     if (speed > 0.0f) {
-        if (speed < 0.66f * maxSpeed)
-            posX -= angleTurning * curveCoefficient * sqrt(speed / 2.0f) * speed / maxSpeed;
-        else
-            posX -= angleTurning * curveCoefficient * sqrt(speed) * speed / maxSpeed;
-
-        if (abs(curveCoefficient) >= 0.33f && speed >= 0.66f * maxSpeed)
-            skidding = true;
-
-        if (Keyboard::isKeyPressed(c.leftKey)) {
-            if (inertia > -Police_vehicle::FORCE_INERTIA)
-                inertia--;
-
-            if (inertia < 0) {
-                if (curveCoefficient > 0.0f)
-                    skidding = false;
-
-                if (speed < halfMaxSpeed)
-                    posX -= 1.5f * angleTurning * speed / maxSpeed;
-                else if (curveCoefficient == 0.0f)
-                    posX -= 1.25f * angleTurning * speed / maxSpeed;
-                else
-                    posX -= angleTurning * speed / maxSpeed;
-
-                return TURNLEFT;
+        if (isFinalMap && limitMap - posY <= 150.f){
+            if (posX > 0.f){
+                posX -= 0.02f;
+                if (posX < 0.0f){
+                    posX = 0.0f;
+                }
             }
-        } else if (Keyboard::isKeyPressed(c.rightKey)) {
-            if (inertia < Police_vehicle::FORCE_INERTIA)
-                inertia++;
-
-            if (inertia > 0) {
-                if (curveCoefficient < 0.0f)
-                    skidding = false;
-
-                if (speed < halfMaxSpeed)
-                    posX += 1.5f * angleTurning * speed / maxSpeed;
-                else if (curveCoefficient == 0.0f)
-                    posX += 1.25f * angleTurning * speed / maxSpeed;
-                else
-                    posX += angleTurning * speed / maxSpeed;
-
-                return TURNRIGHT;
+            else if (posX < 0.0f) {
+                posX += 0.02f;
+                if (posX > 0.0f){
+                    posX = 0.0f;
+                }
             }
-        } else if (inertia > 0) {
-            inertia--;
-        } else if (inertia < 0) {
-            inertia++;
         }
+        else {
+            if (speed < 0.66f * maxSpeed)
+                posX -= angleTurning * curveCoefficient * sqrt(speed / 2.0f) * speed / maxSpeed;
+            else
+                posX -= angleTurning * curveCoefficient * sqrt(speed) * speed / maxSpeed;
 
-        skidding = false;
+            if (abs(curveCoefficient) >= 0.33f && speed >= 0.66f * maxSpeed)
+                skidding = true;
+
+            if (Keyboard::isKeyPressed(c.leftKey)) {
+                if (inertia > -Police_vehicle::FORCE_INERTIA)
+                    inertia--;
+
+                if (inertia < 0) {
+                    if (curveCoefficient > 0.0f)
+                        skidding = false;
+
+                    if (speed < halfMaxSpeed)
+                        posX -= 1.5f * angleTurning * speed / maxSpeed;
+                    else if (curveCoefficient == 0.0f)
+                        posX -= 1.25f * angleTurning * speed / maxSpeed;
+                    else
+                        posX -= angleTurning * speed / maxSpeed;
+
+                    return TURNLEFT;
+                }
+            } else if (Keyboard::isKeyPressed(c.rightKey)) {
+                if (inertia < Police_vehicle::FORCE_INERTIA)
+                    inertia++;
+
+                if (inertia > 0) {
+                    if (curveCoefficient < 0.0f)
+                        skidding = false;
+
+                    if (speed < halfMaxSpeed)
+                        posX += 1.5f * angleTurning * speed / maxSpeed;
+                    else if (curveCoefficient == 0.0f)
+                        posX += 1.25f * angleTurning * speed / maxSpeed;
+                    else
+                        posX += angleTurning * speed / maxSpeed;
+
+                    return TURNRIGHT;
+                }
+            } else if (inertia > 0) {
+                inertia--;
+            } else if (inertia < 0) {
+                inertia++;
+            }
+
+            skidding = false;
+        }
     }
 
     return RIGHT;
 }
 
 void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d,
-                  const Elevation &e, bool enableSound)
+                  const Elevation &e, int terrain, bool enableSound)
 {
     // Sound effects
     if (a != CRASH)
@@ -236,12 +301,22 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
                 r.soundEffects[8]->stop();
                 r.soundEffects[8]->play();
             }
+            if (outSideRoad && r.soundEffects[53]->getStatus() != SoundSource::Playing) {
+                // Outside sound
+                r.soundEffects[53]->stop();
+                r.soundEffects[53]->play();
+            }
+            else if (!outSideRoad && r.soundEffects[53]->getStatus() == SoundSource::Playing){
+                // Outside sound
+                r.soundEffects[53]->stop();
+            }
         }
         else {
             r.soundEffects[12]->stop();
             r.soundEffects[6]->stop();
             r.soundEffects[35]->stop();
             r.soundEffects[8]->stop();
+            r.soundEffects[53]->stop();
         }
 
         if (a == CRASH && firstCrash) {
@@ -263,6 +338,7 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
         r.soundEffects[6]->stop();
         r.soundEffects[35]->stop();
         r.soundEffects[8]->stop();
+        r.soundEffects[53]->stop();
         r.soundEffects[17]->stop();
         r.soundEffects[18]->stop();
         r.soundEffects[19]->stop();
@@ -478,13 +554,35 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
     sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
     minScreenX = ((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width / 2.0f;
     maxScreenX = minScreenX + sprite.getGlobalBounds().width;
-    sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
+    if (c.isDefaultScreen){
+        sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
+    }
+    else {
+        sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f - 15.f);
+    }
     c.w.draw(sprite);
 
 
     if (smoking || skidding || crashing) {
         if (!crashing){
-            maxCounterToChange = COUNTER + 4;
+            maxCounterToChange = COUNTER + 2;
+        }
+        else {
+            if (getRealSpeed() < 20.f){
+                maxCounterToChange = COUNTER + 4;
+            }
+            else if (getRealSpeed() >= 20.f && getRealSpeed() < 60.f){
+                maxCounterToChange = COUNTER + 3;
+            }
+            else if (getRealSpeed() >= 60.f && getRealSpeed() < 100.f){
+                maxCounterToChange = COUNTER + 2;
+            }
+            else if (getRealSpeed() >= 100.f && getRealSpeed() < 120.f){
+                maxCounterToChange = COUNTER + 1;
+            }
+            else if (getRealSpeed() >= 120.f){
+                maxCounterToChange = COUNTER;
+            }
         }
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         sprite.setTexture(textures[50 + current_code_image % 4], true);
@@ -495,99 +593,32 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
         sprite.setPosition(((float) c.w.getSize().x) / 2.0f, j - sprite.getGlobalBounds().height);
         c.w.draw(sprite);
     }
-}
-
-void Police::drawInitialAnimation(Configuration &c, float x, bool &end) {
-    if (textures.size() == Police_vehicle::PLAYER_TEXTURES) {
-        if (counter_code_image >= maxCounterToChange) {
-            current_code_image++;
-            counter_code_image = 0;
+    else if (outSideRoad){
+        maxCounterToChange = COUNTER;
+        const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
+        switch(terrain){
+        case 0:
+            sprite.setTexture(textures[54 + current_code_image % 8], true);
+            break;
+        case 1:
+            sprite.setTexture(textures[60 + current_code_image % 6], true);
+            break;
+        case 2:
+            sprite.setTexture(textures[68 + current_code_image % 6], true);
         }
-        if (current_code_image < 132 || current_code_image > 135)
-            current_code_image = 132;
-
-        int index = 125;
-        if (x < ((float) c.w.getSize().x) * 0.45f)
-            index = 124;
-        end = x < ((float) c.w.getSize().x) * 0.4f || x >= c.w.getSize().x;
-
-        // Vehicle
-        sprite.setTexture(textures[index], true);
-        sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
-        sprite.setPosition(x, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
+        sprite.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
+        sprite.setPosition(((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width,
+                           j - sprite.getGlobalBounds().height);
         c.w.draw(sprite);
-
-        // Smoke
-        float i = x - sprite.getGlobalBounds().width / 3, j = sprite.getPosition().y + sprite.getGlobalBounds().height;
-        while (i < (float) c.w.getSize().x) {
-            index = current_code_image;
-            sprite.setTexture(textures[index], true);
-            sprite.setScale(4.0f * c.screenScale, 4.0f * c.screenScale);
-            sprite.setPosition(i, j - sprite.getGlobalBounds().height);
-            c.w.draw(sprite);
-
-            i += sprite.getGlobalBounds().width;
-        }
-
-        if (end) {
-            current_code_image = 0;
-            counter_code_image = 0;
-        } else {
-            counter_code_image++;
-        }
+        sprite.setPosition(((float) c.w.getSize().x) / 2.0f, j - sprite.getGlobalBounds().height);
+        c.w.draw(sprite);
+    }
+    else if (!crashing) {
+        maxCounterToChange = COUNTER;
     }
 }
 
-void Police::drawGoalAnimation(Configuration &c, int &step, bool &end, bool smoke) {
-    if (textures.size() == Police_vehicle::PLAYER_TEXTURES) {
-        if (counter_code_image >= maxCounterToChange) {
-            current_code_image++;
-            counter_code_image = 0;
-            step++;
-        }
-        if (current_code_image < 132 || current_code_image > 135)
-            current_code_image = 132;
 
-        int index = 126;
-        if (step < 2)
-            index = 124;
-        else if (step < 4)
-            index = 125;
-
-        // Vehicle
-        sprite.setTexture(textures[index], true);
-        sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
-        minScreenX = ((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width / 2.0f;
-        maxScreenX = minScreenX + sprite.getGlobalBounds().width;
-        sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
-        c.w.draw(sprite);
-
-        // Smoke
-        if (smoke) {
-            float i = minScreenX - sprite.getGlobalBounds().width / 3, j =
-                    sprite.getPosition().y + sprite.getGlobalBounds().height;
-            while (i < (float) c.w.getSize().x) {
-                index = current_code_image;
-                sprite.setTexture(textures[index], true);
-                sprite.setScale(4.0f * c.screenScale, 4.0f * c.screenScale);
-                sprite.setPosition(i, j - sprite.getGlobalBounds().height);
-                c.w.draw(sprite);
-
-                i += sprite.getGlobalBounds().width;
-            }
-        }
-
-        if (step >= 6)
-            end = true;
-
-        if (end) {
-            current_code_image = 0;
-            counter_code_image = 0;
-        } else {
-            counter_code_image++;
-        }
-    }
-}
 
 void Police::setSmoking(bool smoke) {
     smoking = smoke;

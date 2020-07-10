@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VehicleSelectionMenu>
-	<Background>Data/Menus/MainMenu/Images/cover.png</Background>
-	<BackgroundColor>
-		<R>115</R>
-		<G>115</G>
-		<B>115</B>
-	</BackgroundColor>
+	<Background>Data/Menus/VehicleSelectionMenu/Images/cover.png</Background>
 	<Title>
 		<Content>VEHICLE SELECTION</Content>
-		<Font>Data/Fonts/needForSpeed.ttf</Font>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
 		<ColorText>
 			<R>255</R>
 			<G>255</G>
@@ -22,7 +17,7 @@
 	</Title>
 	<VehiclePanel>
 		<Title>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>
@@ -42,7 +37,7 @@
 	</VehiclePanel>
 	<DescriptionPanel>
 		<Title>
-			<Font>Data/Fonts/zorque.ttf</Font>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
 			<ColorText>
 				<R>255</R>
 				<G>255</G>
@@ -56,7 +51,7 @@
 		</Title>
 		<Properties>
 			<Content>
-				<Font>Data/Fonts/zorque.ttf</Font>
+				<Font>Data/Fonts/Hetikademo.otf</Font>
 				<ColorText>
 					<R>255</R>
 					<G>255</G>

@@ -40,6 +40,97 @@ void Game::loadHudGame(){
 
 
 /**
+ * Draw the bonus final animation
+ * @param c is the configuration of the game
+ * @param seconds are the seconds the player has left when he reaches the goal
+ * @param decs_second are the hundreds of seconds the player has left when he reaches the goal
+ */
+void Game::drawBonus(Configuration &c, int seconds, int decs_second) {
+    // Only for separation
+    Sprite s;
+    s.setTexture(textures[0], true);
+    s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
+    const float separation = s.getGlobalBounds().width / 3.0f;
+
+    // Final score after completing all the levels
+    Text bonification;
+    bonification.setFont(c.fontTimeToPlay);
+    bonification.setString("BONUS POINTS!");
+    bonification.setCharacterSize(static_cast<unsigned int>(int(65.0f * c.screenScale)));
+    bonification.setFillColor(Color::Yellow);
+    bonification.setOutlineColor(Color(12, 12, 12));
+    bonification.setOutlineThickness(3.0f * c.screenScale);
+    float initialY = float(c.w.getSize().y) / 3.0f + float(bonification.getCharacterSize());
+    float initial = (float(c.w.getSize().x) - bonification.getGlobalBounds().width) / 2.0f;
+    bonification.setPosition(initial, float(c.w.getSize().y) / 3.0f - float(bonification.getCharacterSize()));
+    c.w.draw(bonification);
+
+    // Time bonus to the player
+    Text timeBonus;
+    timeBonus.setFont(c.fontTimeToPlay);
+    timeBonus.setString("000.0");
+    timeBonus.setCharacterSize(static_cast<unsigned int>(int(55.0f * c.screenScale)));
+    timeBonus.setFillColor(Color::Yellow);
+    timeBonus.setOutlineColor(Color(12, 12, 12));
+    timeBonus.setOutlineThickness(3.0f * c.screenScale);
+    initial -= timeBonus.getLocalBounds().width;
+    timeBonus.setPosition(initial, initialY);
+    initialY += float(timeBonus.getCharacterSize());
+    initial += 1.25f * timeBonus.getLocalBounds().width;
+    timeBonus.setString(to_string(seconds) + "." + to_string(decs_second));
+    c.w.draw(timeBonus);
+
+    // Seconds arrival indicator
+    Text secondsIndicator;
+    secondsIndicator.setFont(c.fontTimeToPlay);
+    secondsIndicator.setString("SEC");
+    secondsIndicator.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+    secondsIndicator.setFillColor(Color(183, 164, 190));
+    secondsIndicator.setOutlineColor(Color::Black);
+    secondsIndicator.setOutlineThickness(3.0f * c.screenScale);
+    secondsIndicator.setPosition(initial, initialY - float(secondsIndicator.getCharacterSize()));
+    initial += separation + secondsIndicator.getLocalBounds().width;
+    c.w.draw(secondsIndicator);
+
+    // Seconds arrival indicator
+    Text crossSign;
+    crossSign.setFont(c.fontTimeToPlay);
+    crossSign.setString("x");
+    crossSign.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+    crossSign.setFillColor(Color(232, 191, 157));
+    crossSign.setOutlineColor(Color::Black);
+    crossSign.setOutlineThickness(3.0f * c.screenScale);
+    crossSign.setPosition(initial, initialY - float(crossSign.getCharacterSize()));
+    initial += separation + crossSign.getLocalBounds().width;
+    c.w.draw(crossSign);
+
+    // Score factor to multiply
+    Text scoreMultiply;
+    scoreMultiply.setFont(c.fontTimeToPlay);
+    scoreMultiply.setString(to_string((long long) BONIFICATION));
+    scoreMultiply.setCharacterSize(static_cast<unsigned int>(int(55.0f * c.screenScale)));
+    scoreMultiply.setFillColor(Color::Yellow);
+    scoreMultiply.setOutlineColor(Color(12, 12, 12));
+    scoreMultiply.setOutlineThickness(3.0f * c.screenScale);
+    scoreMultiply.setPosition(initial * 0.92f, initialY - float(scoreMultiply.getCharacterSize()));
+    initial += separation + scoreMultiply.getLocalBounds().width;
+    c.w.draw(scoreMultiply);
+
+    // Seconds arrival indicator
+    Text pointsIndicator;
+    pointsIndicator.setFont(c.fontTimeToPlay);
+    pointsIndicator.setString("PTS");
+    pointsIndicator.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+    pointsIndicator.setFillColor(Color(183, 164, 190));
+    pointsIndicator.setOutlineColor(Color::Black);
+    pointsIndicator.setOutlineThickness(3.0f * c.screenScale);
+    pointsIndicator.setPosition(initial * 0.90f, initialY - float(pointsIndicator.getCharacterSize()));
+    c.w.draw(pointsIndicator);
+}
+
+
+
+/**
  * Draw the initial animation of the HUD
  */
 void Game::drawHudAnimation(Configuration& c, SoundPlayer& r){
@@ -71,7 +162,6 @@ void Game::drawHudAnimation(Configuration& c, SoundPlayer& r){
     // Check the initial sound to reproduce
     switch(typeOfGame){
         case 0:
-        case 2:
             r.soundEffects[39]->stop();
             r.soundEffects[39]->play();
             break;
@@ -79,10 +169,17 @@ void Game::drawHudAnimation(Configuration& c, SoundPlayer& r){
             r.soundEffects[38]->stop();
             r.soundEffects[38]->play();
             break;
+        case 2:
+            r.soundEffects[57]->stop();
+            r.soundEffects[57]->play();
+            break;
         case 3:
-        case 4:
             r.soundEffects[37]->stop();
             r.soundEffects[37]->play();
+            break;
+        case 4:
+            r.soundEffects[58]->stop();
+            r.soundEffects[58]->play();
     }
 
     for (int i = 0; i <= 200; i++){
@@ -92,24 +189,24 @@ void Game::drawHudAnimation(Configuration& c, SoundPlayer& r){
         c.window.pollEvent(e);
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars);
+        currentMap->drawLandScape(c, cars, typeOfGame);
 
         // Draw the vehicle
         switch(typeOfVehicle){
             case 0:
-                player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()));
+                player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
                 break;
             case 1:
-                player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()));
+                player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
                 break;
             case 2:
-                player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()));
+                player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
                 break;
             case 3:
-                player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()));
+                player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
                 break;
             case 4:
-                player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()));
+                player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
         }
 
         Sprite s;
@@ -477,6 +574,65 @@ void Game::drawHudAnimation(Configuration& c, SoundPlayer& r){
         c.window.display();
     }
 }
+
+
+
+/**
+ * Draw the new lap animation
+ * @param c is the configuration of the game
+ * @param r is the sound reproducer of the game
+ */
+void Game::drawNewLap(Configuration &c){
+
+    string lap;
+    if (lapsDone == numberLaps){
+        lap = " FINAL LAP!";
+    }
+    else {
+        switch(lapsDone){
+            case 2:
+                lap = "SECOND LAP!";
+                break;
+            case 3:
+                lap = " THIRD LAP!";
+                break;
+            case 4:
+                lap = "FOURTH LAP!";
+        }
+    }
+
+    // CheckPoint title
+    Text lapText;
+    lapText.setFont(c.fontTimeToPlay);
+    lapText.setString(lap);
+    lapText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    lapText.setOutlineThickness(3.0f * c.screenScale);
+
+    if (!onPause){
+        // Control the position of the lap indicator in axis x
+        if (timeElapsed != displayLapFactor){
+            if (offsetLapIndicator < 1.48f){
+                // Check if the indicator is coming or returning
+                offsetLapIndicator += 0.01075;
+            }
+            else {
+                // Time slept increased
+                timeElapsed++;
+            }
+        }
+        else {
+            if (offsetLapIndicator > 1.f){
+                offsetLapIndicator -= 0.01075;
+            }
+            else {
+                timeElapsed = 0;
+            }
+        }
+    }
+    lapText.setPosition(c.w.getSize().x / offsetLapIndicator, c.w.getSize().y / 6.1f);
+    c.w.draw(lapText);
+}
+
 
 
 /**
@@ -1080,8 +1236,7 @@ void Game::showBonusIndications(Configuration &c, int seconds, int decs_second) 
  * Constructor of the game
  * @param c is the configuration of the game
  */
-Game::Game(Configuration &c) : goalMap(goalFlagger, goalEnd, typeOfGame)
-{
+Game::Game(Configuration &c){
 
     // Variables to store the vehicle properties
     string brandName, motorName, pathFile;
@@ -1156,13 +1311,14 @@ Game::Game(Configuration &c) : goalMap(goalFlagger, goalEnd, typeOfGame)
     cents_secondTrip = 0;
     timeCheck = 0;
     posArrival = 1;
+    numberLaps = 3;
+    lapsDone = 1;
+    timeElapsed = 0;
+    offsetLapIndicator = 1.f;
+    numberRacers = 8;
 
-    goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
     lap = "00:00:00";
     typeOfGame = 1;
-
-    // Loads enemies and time
-    checkDifficulty(c);
 }
 
 
@@ -1172,38 +1328,88 @@ Game::Game(Configuration &c) : goalMap(goalFlagger, goalEnd, typeOfGame)
  * @param c is the configuration of the game
  */
 State Game::loadWorldTourPolePositionConf(Configuration& c){
+    finalGame = false;
+    lastY = 0;
+    vehicleCrash = false;
+
+    onPause = false;
+    comeFromOptions = false;
+    blink = false;
+    arrival = false;
+    updatedTimeCheck = false;
+
+    minutes = 0;
+    secs = 0;
+    cents_second = 0;
+    minutesTrip = 0;
+    secsTrip = 0;
+    cents_secondTrip = 0;
+    timeCheck = 0;
+    lap = "00:00:00";
+    indexCheckPoint = 1;
+    posArrival = 1;
+
+    switch(typeOfVehicle){
+        case 0:
+            player.setVehicle();
+            break;
+        case 1:
+            player2.setVehicle();
+            break;
+        case 2:
+            player3.setVehicle();
+            break;
+        case 3:
+            player4.setVehicle();
+    }
+
     // Times of each scenario
-    const int times[] = {40, 43, 44, 45};
+    vector<int> times;
+
+    string path;
+    if (typeOfGame == 0){
+        times = {62, 53, 54, 55};
+        path = "Data/Gamemodes/WorldTour/LandScapes/LandScape";
+    }
+    else {
+        times = {58, 58, 59, 57};
+        path = "Data/Gamemodes/PolePosition/LandScapes/LandScape";
+    }
 
     // Loop for load the maps
     for (int i = 0; i < 4; i++) {
         // Load the landscape using the correspond path
-        LandScape m(c, "Data/Gamemodes/WorldTour/LandScapes/LandScape" + to_string(i + 1) + "/", "bg.png", times[i], typeOfGame);
+        LandScape m(c, path + to_string(i + 1) + "/", "bg.png", times[i], typeOfGame);
         tourLandScapes.push_back(m);
     }
 
     // Index of the first landscape
     indexLandScape = 0;
     // Definition of the first landScape
-    currentMap = &tourLandScapes[indexLandScape];
 
-    // Back door
-    int bdTime = 0;
-    time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
-    score = 0;
-    level = -1;
+    if (typeOfGame == 0){
+        currentMap = &tourLandScapes[indexLandScape];
+
+        // Back door
+        int bdTime = 0;
+        time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
+        score = 0;
+        level = -1;
+
+        // Initialize the checkpoint index
+        indexCheckPoint = 1;
+        checkPointPositions = tourLandScapes[indexLandScape].getCheckPointPositions();
+    }
 
     // Load the game mode hud
     loadHudGame();
 
-    // Loads enemies and time
-    checkDifficulty(c);
-
-    // Initialize the checkpoint index
-    indexCheckPoint = 1;
-    checkPointPositions = tourLandScapes[indexLandScape].getCheckPointPositions();
-
-    return PLAY_GAME;
+    if (typeOfGame == 2){
+        return CIRCUIT_SELECTION_MENU;
+    }
+    else {
+        return LOADING;
+    }
 }
 
 
@@ -1213,6 +1419,41 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
  * @param c is the configuration of the game
  */
 State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
+    finalGame = false;
+    lastY = 0;
+    vehicleCrash = false;
+
+    onPause = false;
+    comeFromOptions = false;
+    blink = false;
+    arrival = false;
+    updatedTimeCheck = false;
+
+    minutes = 0;
+    secs = 0;
+    cents_second = 0;
+    minutesTrip = 0;
+    secsTrip = 0;
+    cents_secondTrip = 0;
+    timeCheck = 0;
+    lap = "00:00:00";
+    indexCheckPoint = 1;
+    posArrival = 1;
+
+    switch(typeOfVehicle){
+        case 0:
+            player.setVehicle();
+            break;
+        case 1:
+            player2.setVehicle();
+            break;
+        case 2:
+            player3.setVehicle();
+            break;
+        case 3:
+            player4.setVehicle();
+    }
+
     // Control the loading of the landscapes
     int nm = 0;
     // Times of each scenario
@@ -1222,17 +1463,9 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     string pathMode;
 
     switch(typeOfGame){
-        case 0:
-            // World tour mode
-            pathMode = "Data/Gamemodes/WorldTour/LandScapes/LandScape";
-            break;
         case 1:
             // Out Run mode
             pathMode = "Data/Gamemodes/OutRun/LandScapes/LandScape";
-            break;
-        case 2:
-            // Pole Position mode
-            pathMode = "Data/Gamemodes/PolePosition/LandScapes/LandScape";
             break;
         case 3:
             // Driving fury mode
@@ -1294,6 +1527,7 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     if (mapId.first < 4)
         currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
     else {
+        goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
         goalMap.setColorsLandScape(*currentMap);
         currentMap->addNewLandScape(&goalMap);
     }
@@ -1301,16 +1535,12 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     // Load the game mode hud
     loadHudGame();
 
-    // Start the time of the first level
-    time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
     score = 0;
     level = mapId.first + 1;
-
-    // Loads enemies and time
-    checkDifficulty(c);
+    time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
 
     // Start the game
-    return PLAY_GAME;
+    return LOADING;
 }
 
 
@@ -1381,6 +1611,7 @@ void Game::checkDifficulty(Configuration &c) {
     for (TrafficCar &v : cars){
         v.setAI(c.maxAggressiveness);
     }
+
 
     time = int(float(time) * timeMul);
     timeAI = !cars.empty() ? float(time) * c.maxAggressiveness / 3.0f : 0.0f;
@@ -1478,6 +1709,9 @@ State Game::play(Configuration &c, SoundPlayer& r) {
         showsInitialAnimation(c, r);
     }
 
+    // Get the kind of terrain of the landscape
+    terrain = currentMap->getTerrain();
+
     c.window.setKeyRepeatEnabled(false);
 
     // Time to update the clock counter
@@ -1523,10 +1757,10 @@ State Game::play(Configuration &c, SoundPlayer& r) {
         }
 
         // Update the status of the game
-        updateGameStatus(c, r, action, direction);
+        updateGameStatus(c, r, action, direction, terrain);
 
         // Control the final of the game
-        if (!finalGame) {
+        if (!finalGame && !arrival) {
             // Check is the game is on pause
             if (Keyboard::isKeyPressed(c.menuKey) || onPause) {
                 // Pause the game
@@ -1729,59 +1963,114 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
     if (indexLandScape == 0){
         r.soundTracks[r.currentSoundtrack]->stop();
-        LandScape *initMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame);
-        initMap->addNewLandScape(currentMap);
-        initMap->setColorsLandScape(*currentMap);
+        startMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame);
+        startMap->addNewLandScape(currentMap);
+        startMap->setColorsLandScape(*currentMap);
 
-        if (typeOfGame == 0 || typeOfGame == 2){
+        if (typeOfGame == 0){
+            int bdTime = 0;
+            time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
+            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
-        currentMap = initMap;
+        else if (typeOfGame == 2){
+            if (numberLaps == 1){
+                goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
+                goalMap.setColorsLandScape(*currentMap);
+                currentMap->addNewLandScape(&goalMap);
+            }
+            else {
+                middleMap = LandScape(*currentMap, typeOfGame);
+                middleMap.setColorsLandScape(*currentMap);
+                currentMap->addNewLandScape(&middleMap);
+            }
+        }
+        currentMap = startMap;
     }
     else {
         LandScape *initMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame);
         initMap->addNewLandScape(currentMap);
         initMap->setColorsLandScape(*currentMap);
 
-        if (typeOfGame == 0 || typeOfGame == 2){
+        if (typeOfGame == 0){
+            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
         currentMap = initMap;
     }
 
+    checkDifficulty(c);
+
     // Semaphore and flagger
     currentMap->addMapElelementIndex(flagger, false, -1);
     int ms = 1000;
 
-    currentMap->drawLandScape(c, cars);
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+     // Creation of the panel rectangle of the menu
+    RectangleShape blackShape;
+    blackShape.setPosition(0, 0);
+    blackShape.setSize(sf::Vector2f(c.w.getSize().x, c.w.getSize().y));
+
+    // Draw the landscape animation
+    for (int i = 255; i >= 0; i -= 45){
+
+        // Draw the landscape
+        currentMap->drawLandScape(c, cars, typeOfGame);
+
+        // Draw the vehicle
+        switch(typeOfVehicle){
+            case 0:
+                player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
+                break;
+            case 1:
+                player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
+                break;
+            case 2:
+                player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
+                break;
+            case 3:
+                player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
+                break;
+            case 4:
+                player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
+        }
+
+        blackShape.setFillColor(Color(0, 0, 0, i));
+        c.w.draw(blackShape);
+
+        bufferSprite.setTexture(c.w.getTexture(), true);
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+        sleep(milliseconds(30));
+    }
 
      // Draw the hud animation
     drawHudAnimation(c, r);
 
     switch(typeOfVehicle){
         case 0:
-            player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()));
+            player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
             break;
         case 1:
-            player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()));
+            player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
             break;
         case 2:
-            player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()));
+            player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
             break;
         case 3:
-            player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()));
+            player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
             break;
         case 4:
-            player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()));
+            player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
     }
-
-
-    Sprite bufferSprite(c.w.getTexture());
-    c.w.display();
-    c.window.draw(bufferSprite);
-    c.window.display();
 
     // Detect the possible events
     Event e;
@@ -1797,23 +2086,23 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
         // Draw map
         c.w.clear();
-        currentMap->drawLandScape(c, cars);
+        currentMap->drawLandScape(c, cars, typeOfGame);
 
         switch(typeOfVehicle){
             case 0:
-                player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()));
+                player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
                 break;
             case 1:
-                player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()));
+                player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
                 break;
             case 2:
-                player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()));
+                player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
                 break;
             case 3:
-                player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()));
+                player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
                 break;
             case 4:
-                player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()));
+                player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
         }
 
         // Draw the HUD of the game
@@ -1834,23 +2123,23 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
                 // Draw map
                 c.w.clear();
-                currentMap->drawLandScape(c, cars);
+                currentMap->drawLandScape(c, cars, typeOfGame);
 
                 switch(typeOfVehicle){
                     case 0:
-                        player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()));
+                        player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
                         break;
                     case 1:
-                        player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()));
+                        player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
                         break;
                     case 2:
-                        player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()));
+                        player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
                         break;
                     case 3:
-                        player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()));
+                        player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
                         break;
                     case 4:
-                        player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()));
+                        player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
                 }
 
                 showHudInterface(c);
@@ -1889,7 +2178,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
     // Position of the player in the race
     string place;
-    Text positionText;
+    Text positionText, congratulationsText, totalTimeText;
 
     float elapsed1, elapsed2;
     Clock blinkClcok;
@@ -1959,6 +2248,11 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 r.soundEffects[45]->play();
         }
     }
+    else if (typeOfGame == 1){
+        r.soundEffects[54]->stop();
+        r.soundEffects[54]->play();
+
+    }
 
     // Hide enemies
     for (TrafficCar &v : cars)
@@ -1966,6 +2260,14 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
     int increment = 0;
     float currentTime = gameClockTime.getElapsedTime().asMilliseconds();
+
+    // Bonus seconds
+    int decsTime = time * 10;
+    int seconds = decsTime / 10;
+    int decs_second = decsTime % 10;
+
+    bonus.restart();
+    elapsed11 = bonus.getElapsedTime().asSeconds(); // TODO: Esta marca solo se actualiza aquí ?????
 
     int position;
 
@@ -2036,33 +2338,33 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
         // Draw map
         c.w.clear();
-        currentMap->drawLandScape(c, cars);
+        currentMap->drawLandScape(c, cars, typeOfGame);
 
         switch(typeOfVehicle){
             case 0:
                 player.setPosition(player.getPosX(), player.getPosY() + 1);
                 player.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
-                        currentMap->getElevation(player.getPosY()), false);
+                        currentMap->getElevation(player.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 1:
                 player2.setPosition(player2.getPosX(), player2.getPosY() + 1);
                 player2.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
-                        currentMap->getElevation(player2.getPosY()), false);
+                        currentMap->getElevation(player2.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 2:
                 player3.setPosition(player3.getPosX(), player3.getPosY() + 1);
                 player3.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
-                        currentMap->getElevation(player3.getPosY()), false);
+                        currentMap->getElevation(player3.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 3:
                 player4.setPosition(player4.getPosX(), player4.getPosY() + 1);
                 player4.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
-                        currentMap->getElevation(player4.getPosY()), false);
+                        currentMap->getElevation(player4.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 4:
                 player5.setPosition(player5.getPosX(), player5.getPosY() + 1);
                 player5.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
-                        currentMap->getElevation(player5.getPosY()), false);
+                        currentMap->getElevation(player5.getPosY()), currentMap->getTerrain(), false);
         }
 
         if (typeOfGame == 0 || typeOfGame == 2){
@@ -2099,6 +2401,31 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
             currentTime = gameClockTime.getElapsedTime().asMilliseconds();
         }
 
+        if (typeOfGame == 1){
+
+            elapsed12 = bonus.getElapsedTime().asSeconds();
+
+            // Check if a second has passed between both timestamps
+            if (elapsed12 - elapsed11 >= bonus_delay.asSeconds()) {
+                // Decrement one Tenth of a second
+
+                if (decsTime > 0) {
+                    decsTime--;
+
+                    seconds = decsTime / 10;
+                    // Decs per second
+                    decs_second = decsTime % 10;
+                }
+
+                score += int(scoreMul * BONIFICATION / 10.0f); // Bonif. per dec.
+
+                bonus.restart();
+            }
+
+            // Draw the bonus points
+            drawBonus(c, seconds, decs_second);
+        }
+
         switch(typeOfVehicle){
             case 0:
                 position = int(player.getPosY());
@@ -2123,7 +2450,9 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
     }
 
     // Reproduce the music soundtrack
-    r.soundTracks[15]->play();
+    if (typeOfGame == 0 || typeOfGame == 2){
+        r.soundTracks[15]->play();
+    }
 
     for (int i = 0; i <= 255; i += 5){
 
@@ -2159,7 +2488,8 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
  * with the vehicles on the screen.
  * @param c is the configuration of the game
  */
-void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action, Vehicle::Direction &direction) {
+void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action, Vehicle::Direction &direction, int& terrain) {
+
     // Update camera
     switch(typeOfVehicle){
         case 0:
@@ -2177,6 +2507,7 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
         case 4:
             currentMap->updateCamera(player5.getPosX(), player5.getPosY() - RECTANGLE);
     }
+
 
     switch (typeOfGame){
         case 0:
@@ -2202,20 +2533,70 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         player5.setPosition(player5.getPosX() + currentMap->getOffsetX(), player5.getPosY() - currentMap->getMaxY());
                 }
 
-                for (TrafficCar &v : cars)
-                    v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
+                if (typeOfGame != 2){
+                    for (TrafficCar &v : cars)
+                        v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
+                }
 
                 // Update to the map
                 if (level < 0){
                     level++;
-                    currentMap = &tourLandScapes[indexLandScape];
+                    currentMap = currentMap->getNextLeft();
                     checkPointPositions = currentMap->getCheckPointPositions();
                 }
                 else {
-                    finalGame = true;
+                    if (typeOfGame == 0){
+                        currentMap = &goalMap;
+                    }
+                    else if (typeOfGame == 2){
+                        currentMap = currentMap->getNextLeft();
+                        if (!currentMap->isFinalLandScape()){
+                            if (currentMap->isMiddleMap()){
+                                lapsDone++;
+                            }
+                            if (typeOfGame == 2){
+                                if (lapsDone <= numberLaps){
+                                    if (currentMap->isMiddleMap()){
+                                        currentMap->addNewLandScape(&tourLandScapes[landScapeSelected]);
+                                        checkPointPositions = tourLandScapes[landScapeSelected].getCheckPointPositions();
+                                        newLap = true;
+                                        time += 25;
+                                        if (lapsDone < numberLaps){
+                                            // New lap sound
+                                            r.soundEffects[55]->stop();
+                                            r.soundEffects[55]->play();
+                                            displayLapFactor = 70;
+                                        }
+                                        else {
+                                            // Final lap sound
+                                            r.soundTracks[r.currentSoundtrack]->pause();
+                                            r.soundEffects[56]->stop();
+                                            r.soundEffects[56]->play();
+                                            displayLapFactor = 130;
+                                        }
+                                    }
+                                    else {
+                                        if (lapsDone == numberLaps){
+                                             goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
+                                             goalMap.setColorsLandScape(*currentMap);
+                                             currentMap->addNewLandScape(&goalMap);
+                                        }
+                                        else {
+                                            middleMap = LandScape(*currentMap, typeOfGame);
+                                            middleMap.setColorsLandScape(*currentMap);
+                                            currentMap->addNewLandScape(&middleMap);
+                                            checkPointPositions = currentMap->getCheckPointPositions();
+                                        }
+                                    }
+                                    indexCheckPoint = 1;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             else {
+
                 // The player is still inside the landscape
                 float pos, halfspeed;
 
@@ -2250,9 +2631,6 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         // Initialize the clock again
                         updatedTimeCheck = true;
 
-                        // Get the position of the vehicle in the landscape
-                        int posY;
-
                         // Add the time to complete the landscape
                         if (indexCheckPoint != 4){
                             time += ((checkPointPositions[indexCheckPoint - 1] - pos) / (halfspeed * 65.f)) ;
@@ -2264,6 +2642,7 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         timeCheck = time;
                     }
                 }
+
                 if (!checkPoint){
                     // Update the time
                     lapCheckPoint = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
@@ -2272,10 +2651,6 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     lapCheckPoint += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
                 }
                 else if (updatedTimeCheck){
-                    // Updated the counters of time to zero
-                    minutes = 0;
-                    secs = 0;
-                    cents_second = 0;
                     // Initialize the clock again to zero one time
                     updatedTimeCheck = false;
 
@@ -2283,8 +2658,15 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     r.soundEffects[24]->stop();
                     r.soundEffects[24]->play();
                 }
-
             }
+            if (currentMap->isFinalLandScape()) {
+                State status = showsGoalAnimation(c, r);
+                if (status == EXIT) {
+                    exit(1);
+                }
+                arrival = true;
+            }
+            break;
         case 1:
         case 3:
         case 4:
@@ -2292,7 +2674,6 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
             // Out Run and Driving Fury and Demarrage modes
             if (currentMap->isOutSideLandScape()) {
                 if (currentMap->getNextLeft() != nullptr) {
-
                     // Update player and vehicle positions
                     switch(typeOfVehicle){
                         case 0:
@@ -2316,6 +2697,7 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
 
                     const bool isInitMap = currentMap->isStartingLandScape();
                     currentMap = currentMap->getNextLeft();
+                    terrain = currentMap->getTerrain();
                     if (!isInitMap && !currentMap->isFinalLandScape()) {
                         level++;
                         // Update fork maps
@@ -2326,6 +2708,7 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         if (mapId.first < 4)
                             currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
                         else {
+                            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
                             goalMap.setColorsLandScape(*currentMap);
                             currentMap->addNewLandScape(&goalMap);
                         }
@@ -2384,27 +2767,30 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
             }
             break;
     }
-    if (!finalGame) {
+
+    if (!finalGame && !arrival) {
         // Update and prepare cars to draw
         if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
             lastY = currentMap->getCameraPosY() + float(c.renderLen);
         }
-        for (TrafficCar &v : cars) {
-            if (currentMap->inFork(v.getPosY())) {
-                v.setPosition(v.getPosX(), -RECTANGLE * DEL_DISTANCE * 3.0f);
-            }
-            else if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
-                v.update(lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness);
-                lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
-            }
+        if (typeOfGame != 2){
+            for (TrafficCar &v : cars) {
+                if (currentMap->inFork(v.getPosY())) {
+                    v.setPosition(v.getPosX(), -RECTANGLE * DEL_DISTANCE * 3.0f);
+                }
+                else if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
+                    v.update(lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness);
+                    lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
+                }
 
-            float posY = v.getPosY();
-            v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
+                float posY = v.getPosY();
+                v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
+            }
         }
 
         // Draw map with cars
         c.w.clear();
-        currentMap->drawLandScape(c, cars);
+        currentMap->drawLandScape(c, cars, typeOfGame);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -2414,20 +2800,21 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
             case 0:
                 if (!player.isCrashing()) { // If not has crashed
                     action = player.accelerationControl(c, currentMap->isOutSideRoad(player.getPosX(), player.getPosY()));
-                    direction = player.rotationControl(c, currentMap->getCurveCoefficient(player.getPosY()));
+                    direction = player.rotationControl(c, currentMap->getCurveCoefficient(player.getPosY()),
+                                                          currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
                 }
                 else {
                     player.hitControl(vehicleCrash);
                 }
 
-                player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()));
+                player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()), terrain);
 
                 if (!player.isCrashing()) {
                     vehicleCrash = false;
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player.getPreviousY(), player.getPosY(), player.getPosX(),
-                                                        player.getMinScreenX(), player.getMaxScreenX(), crashPos);
-                    if (!crash)
+                                                        player.getMinScreenX(), player.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash && typeOfGame != 2)
                         for (int i = 0; !vehicleCrash && i < cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player.getPreviousY(), player.getPosY(),
                                                               player.getMinScreenX(), player.getMaxScreenX(),
@@ -2441,30 +2828,33 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         action = Vehicle::CRASH;
                         direction = Vehicle::RIGHT;
 
-                        player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()));
+                        player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()), terrain);
                     }
                 }
 
+                if (typeOfGame != 2){
                 for (TrafficCar &v : cars)
                     v.autoControl(c, player.getPosX(), player.getPosY());
+                }
                 break;
             case 1:
                 if (!player2.isCrashing()) { // If not has crashed
                     action = player2.accelerationControl(c, currentMap->isOutSideRoad(player2.getPosX(), player2.getPosY()));
-                    direction = player2.rotationControl(c, currentMap->getCurveCoefficient(player2.getPosY()));
+                    direction = player2.rotationControl(c, currentMap->getCurveCoefficient(player2.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
                 }
                 else {
                     player2.hitControl(vehicleCrash);
                 }
 
-                player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()));
+                player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()), terrain);
 
                 if (!player2.isCrashing()) {
                     vehicleCrash = false;
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player2.getPreviousY(), player2.getPosY(), player2.getPosX(),
-                                                        player2.getMinScreenX(), player2.getMaxScreenX(), crashPos);
-                    if (!crash)
+                                                        player2.getMinScreenX(), player2.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash && typeOfGame != 2)
                         for (int i = 0; !vehicleCrash && i < cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player2.getPreviousY(), player2.getPosY(),
                                                               player2.getMinScreenX(), player2.getMaxScreenX(),
@@ -2478,30 +2868,33 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         action = Vehicle::CRASH;
                         direction = Vehicle::RIGHT;
 
-                        player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()));
+                        player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()), terrain);
                     }
                 }
 
-                for (TrafficCar &v : cars)
-                    v.autoControl(c, player2.getPosX(), player2.getPosY());
+                if (typeOfGame != 2){
+                    for (TrafficCar &v : cars)
+                        v.autoControl(c, player2.getPosX(), player2.getPosY());
+                }
                 break;
             case 2:
                 if (!player3.isCrashing()) { // If not has crashed
                     action = player3.accelerationControl(c, currentMap->isOutSideRoad(player3.getPosX(), player3.getPosY()));
-                    direction = player3.rotationControl(c, currentMap->getCurveCoefficient(player3.getPosY()));
+                    direction = player3.rotationControl(c, currentMap->getCurveCoefficient(player3.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
                 }
                 else {
                     player3.hitControl(vehicleCrash);
                 }
 
-                player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()));
+                player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()), terrain);
 
                 if (!player3.isCrashing()) {
                     vehicleCrash = false;
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player3.getPreviousY(), player3.getPosY(), player3.getPosX(),
-                                                        player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
-                    if (!crash)
+                                                        player3.getMinScreenX(), player3.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash && typeOfGame != 2)
                         for (int i = 0; !vehicleCrash && i < cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player3.getPreviousY(), player3.getPosY(),
                                                               player3.getMinScreenX(), player3.getMaxScreenX(),
@@ -2515,30 +2908,33 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         action = Vehicle::CRASH;
                         direction = Vehicle::RIGHT;
 
-                        player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()));
+                        player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()), terrain);
                     }
                 }
 
-                for (TrafficCar &v : cars)
-                    v.autoControl(c, player3.getPosX(), player3.getPosY());
+                if (typeOfGame != 2){
+                    for (TrafficCar &v : cars)
+                        v.autoControl(c, player3.getPosX(), player3.getPosY());
+                }
                 break;
             case 3:
                 if (!player4.isCrashing()) { // If not has crashed
                     action = player4.accelerationControl(c, currentMap->isOutSideRoad(player4.getPosX(), player4.getPosY()));
-                    direction = player4.rotationControl(c, currentMap->getCurveCoefficient(player4.getPosY()));
+                    direction = player4.rotationControl(c, currentMap->getCurveCoefficient(player4.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
                 }
                 else {
                     player4.hitControl(vehicleCrash);
                 }
 
-                player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()));
+                player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
 
                 if (!player4.isCrashing()) {
                     vehicleCrash = false;
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player4.getPreviousY(), player4.getPosY(), player4.getPosX(),
-                                                        player4.getMinScreenX(), player4.getMaxScreenX(), crashPos);
-                    if (!crash)
+                                                        player4.getMinScreenX(), player4.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash && typeOfGame != 2)
                         for (int i = 0; !vehicleCrash && i < cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player4.getPreviousY(), player4.getPosY(),
                                                               player4.getMinScreenX(), player4.getMaxScreenX(),
@@ -2552,30 +2948,33 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         action = Vehicle::CRASH;
                         direction = Vehicle::RIGHT;
 
-                        player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()));
+                        player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
                     }
                 }
 
-                for (TrafficCar &v : cars)
-                    v.autoControl(c, player4.getPosX(), player4.getPosY());
+                if (typeOfGame != 2){
+                    for (TrafficCar &v : cars)
+                        v.autoControl(c, player4.getPosX(), player4.getPosY());
+                }
                 break;
             case 4:
                 if (!player5.isCrashing()) { // If not has crashed
                     action = player5.accelerationControl(c, currentMap->isOutSideRoad(player5.getPosX(), player5.getPosY()));
-                    direction = player5.rotationControl(c, currentMap->getCurveCoefficient(player5.getPosY()));
+                    direction = player5.rotationControl(c, currentMap->getCurveCoefficient(player5.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
                 }
                 else {
                     player5.hitControl(vehicleCrash);
                 }
 
-                player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()));
+                player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()), terrain);
 
                 if (!player5.isCrashing()) {
                     vehicleCrash = false;
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player5.getPreviousY(), player5.getPosY(), player5.getPosX(),
-                                                        player5.getMinScreenX(), player5.getMaxScreenX(), crashPos);
-                    if (!crash)
+                                                        player5.getMinScreenX(), player5.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash && typeOfGame != 2)
                         for (int i = 0; !vehicleCrash && i < cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player5.getPreviousY(), player5.getPosY(),
                                                               player5.getMinScreenX(), player5.getMaxScreenX(),
@@ -2589,81 +2988,100 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                         action = Vehicle::CRASH;
                         direction = Vehicle::RIGHT;
 
-                        player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()));
+                        player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()), terrain);
                     }
                 }
 
-                for (TrafficCar &v : cars)
-                    v.autoControl(c, player5.getPosX(), player5.getPosY());
+                if (typeOfGame != 2){
+                    for (TrafficCar &v : cars)
+                        v.autoControl(c, player5.getPosX(), player5.getPosY());
+                }
         }
+        if (!finalGame && !arrival){
+            // Check if enemies are displayed on the screen
+            if (typeOfGame != 2){
+                for (TrafficCar &v : cars) {
+                    float distX, distY;
 
-        // Check if enemies are displayed on the screen
-        for (TrafficCar &v : cars) {
-            float distX, distY;
+                    bool visible;
 
-            bool visible;
+                    switch(typeOfVehicle){
+                        case 0:
+                            visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                            break;
+                        case 1:
+                            visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                            break;
+                        case 2:
+                            visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                            break;
+                        case 3:
+                            visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
+                            break;
+                        case 4:
+                            visible = v.isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
+                    }
 
-            switch(typeOfVehicle){
-                case 0:
-                    visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
-                    break;
-                case 1:
-                    visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
-                    break;
-                case 2:
-                    visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
-                    break;
-                case 3:
-                    visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
-                    break;
-                case 4:
-                    visible = v.isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
-            }
-
-            if (visible) {
-                if (distY <= 20.f && distX <= 0.3f) {
-                    // Thread with sound of the woman
-                    elapsed6 = womanShot.getElapsedTime().asSeconds();
-                    if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
-                        // WomanSound
-                        r.soundEffects[13]->stop();
-                        r.soundEffects[14]->stop();
-                        r.soundEffects[15]->stop();
-                        r.soundEffects[rand_generator_int(13, 15)]->play();
-                        womanShot.restart();
+                    if (visible) {
+                        if (distY <= 20.f && distX <= 0.3f) {
+                            // Thread with sound of the woman
+                            elapsed6 = womanShot.getElapsedTime().asSeconds();
+                            if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
+                                // WomanSound
+                                r.soundEffects[13]->stop();
+                                r.soundEffects[14]->stop();
+                                r.soundEffects[15]->stop();
+                                r.soundEffects[rand_generator_int(13, 15)]->play();
+                                womanShot.restart();
+                            }
+                        }
+                        if (distY <= 30.f && distX <= 1.2f) {
+                            // Thread with sound of the woman
+                            elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                            if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                                // makeCarTrafficSound
+                                r.soundEffects[20]->stop();
+                                r.soundEffects[21]->stop();
+                                r.soundEffects[22]->stop();
+                                r.soundEffects[rand_generator_int(20, 22)]->play();
+                                trafficCarSound.restart();
+                            }
+                        }
                     }
                 }
-                if (distY <= 30.f && distX <= 1.2f) {
-                    // Thread with sound of the woman
-                    elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
-                    if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
-                        // makeCarTrafficSound
-                        r.soundEffects[20]->stop();
-                        r.soundEffects[21]->stop();
-                        r.soundEffects[22]->stop();
-                        r.soundEffects[rand_generator_int(20, 22)]->play();
-                        trafficCarSound.restart();
-                    }
+            }
+            if (checkPoint) {
+                elapsed10 = blinkTime.getElapsedTime().asSeconds();
+                if (elapsed10 - elapsed9 >= blink_delay.asSeconds()) {
+                    blink = !blink;
+                    blinkTime.restart();
+                }
+                if (blink) {
+                    showCheckpointIndications(c, true);
+                    // BeepSound
+                    r.soundEffects[48]->stop();
+                    r.soundEffects[48]->play();
+                }
+                else {
+                    showCheckpointIndications(c, false);
+                }
+                if (timeCheck - time > 5) {
+                    checkPoint = false;
                 }
             }
-        }
-        if (checkPoint) {
-            elapsed10 = blinkTime.getElapsedTime().asSeconds();
-            if (elapsed10 - elapsed9 >= blink_delay.asSeconds()) {
-                blink = !blink;
-                blinkTime.restart();
-            }
-            if (blink) {
-                showCheckpointIndications(c, true);
-                // BeepSound
-                r.soundEffects[48]->stop();
-                r.soundEffects[48]->play();
-            }
-            else {
-                showCheckpointIndications(c, false);
-            }
-            if (timeCheck - time > 5) {
-                checkPoint = false;
+            if (newLap) {
+                drawNewLap(c);
+                if (lapsDone < numberLaps){
+                    if (r.soundEffects[55]->getStatus() != SoundSource::Playing){
+                        newLap = false;
+                    }
+                }
+                else {
+                    if (r.soundEffects[56]->getStatus() != SoundSource::Playing){
+                        r.soundTracks[r.currentSoundtrack]->play();
+                        newLap = false;
+                    }
+                }
             }
         }
     }
@@ -2899,7 +3317,7 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     c.w.clear();
 
     // Draw the map
-    currentMap->drawLandScape(c, cars);
+    currentMap->drawLandScape(c, cars, typeOfGame);
 
     switch(typeOfVehicle){
         case 0:
@@ -2920,6 +3338,16 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     // Draw the vehicle of the player
 
     showHudInterface(c);
+
+    if (newLap){
+        if (lapsDone < numberLaps){
+            r.soundEffects[55]->pause();
+        }
+        else {
+            r.soundEffects[56]->pause();
+        }
+        drawNewLap(c);
+    }
 
     c.w.display();
     const Texture bgTexture(c.w.getTexture());
@@ -3072,6 +3500,14 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
         case 0:
             // Resume button selected and reanudate the music
             onPause = false;
+            if (newLap){
+                if (lapsDone < numberLaps){
+                    r.soundEffects[55]->play();
+                }
+                else {
+                    r.soundEffects[56]->play();
+                }
+            }
             return PLAY_GAME;
         case 1:
             // Options button selected
@@ -3113,31 +3549,6 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
             // Get the background image of the menu
             backgroundTexture = (string)property->value();
             c.backgroundSelectionMenu.loadFromFile(backgroundTexture);
-        }
-        // Check if its the node of the background color
-        else if ((string)property->name() == "BackgroundColor"){
-            // Get the background image of the menu
-            int colorRed, colorGreen, colorBlue;
-            // Iterate to get the information of the background menu color
-            for (xml_node<> *colorChannel = property->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
-                // Get the red color channel
-                if ((string)colorChannel->name() == "R"){
-                    // Get the red channel
-                    colorRed = stoi((string)colorChannel->value());
-                }
-                // Get the green color channel
-                else if ((string)colorChannel->name() == "G"){
-                    // Get the red channel
-                    colorGreen = stoi((string)colorChannel->value());
-                }
-                // Get the blue color channel
-                else if ((string)colorChannel->name() == "B"){
-                    // Get the red channel
-                    colorBlue = stoi((string)colorChannel->value());
-                }
-            }
-            // Store the color border of the panel
-            c.colorBackground = Color(colorRed, colorGreen, colorBlue);
         }
         // Check if its the node of the title
         else if ((string)property->name() == "Title"){
@@ -3480,7 +3891,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     Texture t;
     vector<Texture> vehicleTextures;
 
-    t.loadFromFile("Data/Vehicles/Motorbike/Images/c44.png");
+    t.loadFromFile("Data/Vehicles/Motorbike/Images/c46.png");
     vehicleTextures.push_back(t);
 
     t.loadFromFile("Data/Vehicles/Devastator/Images/c57.png");
@@ -3506,7 +3917,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
         IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
         Sprite sprite(c.backgroundSelectionMenu, background);
-        sprite.setColor(c.colorBackground);
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
 
         Sprite garage;
         garage.setTexture(carTexture, true);
@@ -3532,18 +3945,19 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         // Main Text of the menu
         Text selectionVehicleText;
         selectionVehicleText.setString(c.contentTitleVehicleSelectionMenu);
-        selectionVehicleText.setPosition(c.w.getSize().x / 2.f - 200.0f * c.screenScale, c.w.getSize().y / 2.f - 240.0f * c.screenScale);
-        selectionVehicleText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+        selectionVehicleText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
         selectionVehicleText.setFont(c.fontVehicleSelectionMenu);
         selectionVehicleText.setStyle(Text::Bold | Text::Underlined);
         selectionVehicleText.setFillColor(c.colorTitleTextVehicleSelectionMenu);
         selectionVehicleText.setOutlineColor(c.colorTitleBorderVehicleSelectionMenu);
         selectionVehicleText.setOutlineThickness(5.0f * c.screenScale);
+        selectionVehicleText.setPosition(c.w.getSize().x / 2.f - selectionVehicleText.getLocalBounds().width / 2.f,
+                                         c.w.getSize().y / 2.f - 240.0f * c.screenScale);
 
         // Main Text of the menu
         Text vehiclePropertiesText;
         vehiclePropertiesText.setString("PROPERTIES");
-        vehiclePropertiesText.setPosition(c.w.getSize().x / 2.f - 320.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+        vehiclePropertiesText.setPosition(c.w.getSize().x / 2.f - 295.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
         vehiclePropertiesText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
         vehiclePropertiesText.setFont(c.fontVehicleSelectionMenuPanelTitleProp);
         vehiclePropertiesText.setStyle(Text::Bold | Text::Underlined);
@@ -3595,7 +4009,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         // Main Text of the menu
         Text vehicleName;
         vehicleName.setString(player.getBrandName());
-        vehicleName.setPosition(c.w.getSize().x / 2.f + 130.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+        vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
         vehicleName.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
         vehicleName.setFont(c.fontVehicleSelectionMenuPanelTitle);
         vehicleName.setStyle(Text::Bold | Text::Underlined);
@@ -3604,7 +4018,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         vehicleName.setOutlineThickness(3.0f * c.screenScale);
 
         Text speed;
-        speed.setString(to_string(int(player.getTopSpeed())) + "KM/H");
+        speed.setString(to_string(int(player.getTopSpeed())) + " KM/H");
         speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                      c.w.getSize().y / 2.f - 75.0f * c.screenScale);
         speed.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
@@ -3699,9 +4113,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                                     c.w.getSize().y / 2.f - 5.f * c.screenScale);
 
                             vehicleName.setString(player2.getBrandName());
-                            vehicleName.setPosition(c.w.getSize().x / 2.f + 130.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player2.getTopSpeed())) + "KM/H");
+                            speed.setString(to_string(int(player2.getTopSpeed())) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
@@ -3733,9 +4147,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                                     c.w.getSize().y / 2.f - 30.f * c.screenScale);
 
                             vehicleName.setString(player3.getBrandName());
-                            vehicleName.setPosition(c.w.getSize().x / 2.f + 130.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 153.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player3.getTopSpeed())) + "KM/H");
+                            speed.setString(to_string(int(player3.getTopSpeed())) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
@@ -3767,9 +4181,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                                     c.w.getSize().y / 2.f - 55.f * c.screenScale);
 
                             vehicleName.setString(player4.getBrandName());
-                            vehicleName.setPosition(c.w.getSize().x / 2.f + 110.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 158.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player4.getTopSpeed())) + "KM/H");
+                            speed.setString(to_string(int(player4.getTopSpeed())) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
@@ -3811,9 +4225,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                                     c.w.getSize().y / 2.f - 25.f * c.screenScale);
 
                             vehicleName.setString(player.getBrandName());
-                            vehicleName.setPosition(c.w.getSize().x / 2.f + 130.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player.getTopSpeed())) + "KM/H");
+                            speed.setString(to_string(int(player.getTopSpeed())) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
@@ -3845,9 +4259,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                                     c.w.getSize().y / 2.f - 5.f * c.screenScale);
 
                             vehicleName.setString(player2.getBrandName());
-                            vehicleName.setPosition(c.w.getSize().x / 2.f + 130.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 137.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player2.getTopSpeed())) + "KM/H");
+                            speed.setString(to_string(int(player2.getTopSpeed())) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
@@ -3879,9 +4293,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                                     c.w.getSize().y / 2.f - 30.f * c.screenScale);
 
                             vehicleName.setString(player3.getBrandName());
-                            vehicleName.setPosition(c.w.getSize().x / 2.f + 130.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 153.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player3.getTopSpeed())) + "KM/H");
+                            speed.setString(to_string(int(player3.getTopSpeed())) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
@@ -3937,7 +4351,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::BackSpace)) {
+            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -3978,14 +4392,24 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
     if (backSpacePressed){
         r.soundTracks[1]->play();
-        return GAME_MODES_MENU;
+        if (typeOfGame == 2){
+            return CIRCUIT_SELECTION_MENU;
+        }
+        else {
+            return GAME_MODES_MENU;
+        }
     }
     else if (startPressed){
 
         // Store the car selected by the player
         typeOfVehicle = optionSelected;
 
-        return LOAD_GAME;
+        if (typeOfGame == 2){
+            return LOADING;
+        }
+        else {
+            return LOAD_GAME;
+        }
     }
 }
 
@@ -4091,13 +4515,16 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     c.window.display();
 
     Texture t;
-    t.loadFromFile("Data/Menus/MainMenu/Images/cover.png");
+    t.loadFromFile("Data/Animations/ClassificationRaceAnimation/cover.png");
     t.setRepeated(true);
     t.setSmooth(true);
 
     // Global rectangle of the background
     IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
     Sprite sprite(t, background);
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
 
     // Control if the start key is pressed
     bool startPressed = false;
@@ -4112,9 +4539,9 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     float carOffset = 1.f;
 
     Text recordText;
-    recordText.setString("NEW RECORD!");
+    recordText.setString("NEW RECORD");
     recordText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-    recordText.setFont(c.fontTimeToPlay);
+    recordText.setFont(c.fontMenus);
     recordText.setStyle(Text::Bold);
     recordText.setFillColor(Color(64, 147, 225));
     recordText.setOutlineColor(Color::Black);
@@ -4135,6 +4562,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     bool carSpriteArrived = false;
 
 
+
     // Until start key is pressed
     while(!mainTextArrived && !lapTextsArrived && !carSpriteArrived){
 
@@ -4148,9 +4576,16 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         // Main Text of the menu
         Text titleText;
-        titleText.setString(tourLandScapes[indexLandScape].getName());
+
+        if (typeOfGame == 0){
+            titleText.setString(tourLandScapes[indexLandScape].getName());
+        }
+        else {
+            titleText.setString(tourLandScapes[landScapeSelected].getName());
+        }
+
         titleText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
-        titleText.setFont(c.fontTimeToPlay);
+        titleText.setFont(c.fontMenus);
         titleText.setStyle(Text::Bold);
         titleText.setFillColor(Color::White);
         titleText.setOutlineColor(Color::Black);
@@ -4162,7 +4597,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         Text totalTime;
         totalTime.setString("TOTAL TIME");
         totalTime.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        totalTime.setFont(c.fontTimeToPlay);
+        totalTime.setFont(c.fontMenus);
         totalTime.setStyle(Text::Bold);
         totalTime.setFillColor(Color(64, 147, 225));
         totalTime.setOutlineColor(Color::Black);
@@ -4180,7 +4615,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         Text timeLap;
         timeLap.setString(lapTime);
         timeLap.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        timeLap.setFont(c.fontTimeToPlay);
+        timeLap.setFont(c.fontMenus);
         timeLap.setStyle(Text::Bold);
         timeLap.setFillColor(Color(64, 147, 225));
         timeLap.setOutlineColor(Color::Black);
@@ -4190,7 +4625,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         switch(typeOfVehicle){
             case 0:
-                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c45.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c47.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
@@ -4289,9 +4724,16 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     // Main Text of the menu
     Text titleText;
-    titleText.setString(tourLandScapes[indexLandScape].getName());
+
+    if (typeOfGame == 0){
+        titleText.setString(tourLandScapes[indexLandScape].getName());
+    }
+    else {
+        titleText.setString(tourLandScapes[landScapeSelected].getName());
+    }
+
     titleText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
-    titleText.setFont(c.fontTimeToPlay);
+    titleText.setFont(c.fontMenus);
     titleText.setStyle(Text::Bold);
     titleText.setFillColor(Color::White);
     titleText.setOutlineColor(Color::Black);
@@ -4303,7 +4745,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     Text totalTime;
     totalTime.setString("TOTAL TIME");
     totalTime.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-    totalTime.setFont(c.fontTimeToPlay);
+    totalTime.setFont(c.fontMenus);
     totalTime.setStyle(Text::Bold);
     totalTime.setFillColor(Color(64, 147, 225));
     totalTime.setOutlineColor(Color::Black);
@@ -4321,7 +4763,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     Text timeLap;
     timeLap.setString(lapTime);
     timeLap.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-    timeLap.setFont(c.fontTimeToPlay);
+    timeLap.setFont(c.fontMenus);
     timeLap.setStyle(Text::Bold);
     timeLap.setFillColor(Color(64, 147, 225));
     timeLap.setOutlineColor(Color::Black);
@@ -4331,7 +4773,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     switch(typeOfVehicle){
         case 0:
-            vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c45.png");
+            vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c47.png");
             vehicle.setTexture(vehicleTexture, true);
             vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
             vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
@@ -4365,7 +4807,14 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     bool blink = true;
 
     // Read the file with the best time
-    string path = "Data/Records/WorldTour_PolePosition/LandScape" + to_string(indexLandScape + 1) + "_";
+    string path;
+
+    if (typeOfGame == 0){
+        path = "Data/Records/WorldTour/LandScape" + to_string(indexLandScape + 1) + "_";
+    }
+    else {
+        path = "Data/Records/PolePosition/LandScape" + to_string(indexLandScape + 1) + "_";
+    }
 
     // Control if the game has been played with the AI enabled or not
     if (c.enableAI){
@@ -4481,24 +4930,25 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         recordText.setString("ENTER YOUR NAME: ");
         recordText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        recordText.setFont(c.fontTimeToPlay);
+        recordText.setFont(c.fontMenus);
         recordText.setStyle(Text::Bold);
         recordText.setFillColor(Color(64, 147, 225));
         recordText.setOutlineColor(Color::Black);
         recordText.setOutlineThickness(3.0f * c.screenScale);
-        recordText.setPosition((c.w.getSize().x / 2.f) - 280.f * c.screenScale, c.w.getSize().y / 2.f + 175.0f * c.screenScale);
+        recordText.setPosition((c.w.getSize().x / 2.f) - 190.f * c.screenScale, c.w.getSize().y / 2.f + 175.0f * c.screenScale);
 
         string name = "_";
 
         Text playerName;
         playerName.setString(name);
         playerName.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        playerName.setFont(c.fontTimeToPlay);
+        playerName.setFont(c.fontMenus);
         playerName.setStyle(Text::Bold);
         playerName.setFillColor(Color(64, 147, 225));
         playerName.setOutlineColor(Color::Black);
         playerName.setOutlineThickness(3.0f * c.screenScale);
-        playerName.setPosition((c.w.getSize().x / 2.f) + 170.f * c.screenScale, c.w.getSize().y / 2.f + 175.0f * c.screenScale);
+        playerName.setPosition((c.w.getSize().x / 2.f) - 190.f * c.screenScale + recordText.getLocalBounds().width + 10.f,
+                                c.w.getSize().y / 2.f + 175.0f * c.screenScale);
 
         KeywordMapper kM = KeywordMapper();
 
@@ -4547,12 +4997,34 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
             playerName.setString(name);
             playerName.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-            playerName.setFont(c.fontTimeToPlay);
+            playerName.setFont(c.fontMenus);
             playerName.setStyle(Text::Bold);
             playerName.setFillColor(Color(64, 147, 225));
             playerName.setOutlineColor(Color::Black);
             playerName.setOutlineThickness(3.0f * c.screenScale);
-            playerName.setPosition((c.w.getSize().x / 2.f) + 160.f * c.screenScale, c.w.getSize().y / 2.f + 175.0f * c.screenScale);
+            playerName.setPosition((c.w.getSize().x / 2.f) - 190.f * c.screenScale + recordText.getLocalBounds().width + 10.f,
+                                    c.w.getSize().y / 2.f + 175.0f * c.screenScale);
+
+            elapsed2 = blinkClcok.getElapsedTime().asSeconds();
+
+            // Change the color of the main text
+            if (elapsed2 - elapsed1 >= blink_delay.asSeconds()) {
+                blink = !blink;
+                blinkClcok.restart();
+            }
+
+            if (blink) {
+                totalTime.setFillColor(Color(64, 147, 225));
+                totalTime.setOutlineColor(Color::Black);
+                timeLap.setFillColor(Color(64, 147, 225));
+                timeLap.setOutlineColor(Color::Black);
+            }
+            else {
+                totalTime.setFillColor(Color::Transparent);
+                totalTime.setOutlineColor(Color::Transparent);
+                timeLap.setFillColor(Color::Transparent);
+                timeLap.setOutlineColor(Color::Transparent);
+            }
 
             // Draw the elements of the menu
             c.w.draw(sprite);
@@ -4568,6 +5040,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             c.w.display();
             c.window.draw(bufferSprite);
             c.window.display();
+
             sleep(milliseconds(50));
         }
 
@@ -4580,12 +5053,11 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         record = (minutesLap < 10) ? "0" + to_string(int(minutesLap)) + ":" : to_string(int(minutesLap)) + ":";
         record += (secondsLap < 10) ? "0" + to_string(int(secondsLap)) + ":" : to_string(int(secondsLap)) + ":";
-        int cent_sec = centsSecondLap * 100.f;
-        record += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
+        record += (cent_sec < 10) ? "0" + to_string(centsSecondLap) : to_string(centsSecondLap);
 
         recordText.setString("CURRENT RECORD: " + record);
         recordText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        recordText.setFont(c.fontTimeToPlay);
+        recordText.setFont(c.fontMenus);
         recordText.setStyle(Text::Bold);
         recordText.setFillColor(Color(64, 147, 225));
         recordText.setOutlineColor(Color::Black);
@@ -4646,9 +5118,9 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     // Main Text of the menu
     Text startText;
-    startText.setString("PRESS START!");
+    startText.setString("PRESS START");
     startText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-    startText.setFont(c.fontTimeToPlay);
+    startText.setFont(c.fontMenus);
     startText.setStyle(Text::Bold);
     startText.setFillColor(Color::Green);
     startText.setOutlineColor(Color::Black);
@@ -4735,9 +5207,16 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         // Main Text of the menu
         Text titleText;
-        titleText.setString(tourLandScapes[indexLandScape].getName());
+
+        if (typeOfGame == 0){
+            titleText.setString(tourLandScapes[indexLandScape].getName());
+        }
+        else {
+            titleText.setString(tourLandScapes[landScapeSelected].getName());
+        }
+
         titleText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
-        titleText.setFont(c.fontTimeToPlay);
+        titleText.setFont(c.fontMenus);
         titleText.setStyle(Text::Bold);
         titleText.setFillColor(Color::White);
         titleText.setOutlineColor(Color::Black);
@@ -4749,7 +5228,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         Text totalTime;
         totalTime.setString("TOTAL TIME");
         totalTime.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        totalTime.setFont(c.fontTimeToPlay);
+        totalTime.setFont(c.fontMenus);
         totalTime.setStyle(Text::Bold);
         totalTime.setFillColor(Color(64, 147, 225));
         totalTime.setOutlineColor(Color::Black);
@@ -4767,7 +5246,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         Text timeLap;
         timeLap.setString(lapTime);
         timeLap.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        timeLap.setFont(c.fontTimeToPlay);
+        timeLap.setFont(c.fontMenus);
         timeLap.setStyle(Text::Bold);
         timeLap.setFillColor(Color(64, 147, 225));
         timeLap.setOutlineColor(Color::Black);
@@ -4777,7 +5256,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         switch(typeOfVehicle){
             case 0:
-                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c45.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c47.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
@@ -4881,12 +5360,14 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     // Start with the initial map again
     level = -1;
-    indexLandScape++;
 
-    currentMap = &tourLandScapes[indexLandScape];
+    if (typeOfGame == 0){
+        indexLandScape++;
+        currentMap = &tourLandScapes[indexLandScape];
+        int bdTime = 0;
+        time = int(float(tourLandScapes[indexLandScape].getTimeToPlay()) * timeMul) + bdTime;
+    }
 
-    int bdTime = 0;
-    time = int(float(tourLandScapes[indexLandScape].getTimeToPlay()) * timeMul) + bdTime;
     finalGame = false;
 
     lastY = 0;
@@ -4924,5 +5405,610 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     }
 
     r.soundTracks[15]->stop();
-    return PLAY_GAME;
+
+    if (typeOfGame == 2){
+        r.soundTracks[1]->play();
+        return CIRCUIT_SELECTION_MENU;
+    }
+    else {
+        return PLAY_GAME;
+    }
+}
+
+
+
+/**
+ * Load the configuration of the circuit selection menu in its xml file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void Game::loadCircuitMenuConfiguration(const string path, Configuration& c){
+
+    // Open the xml file of the scenario
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Local variable to store temporary the text content and the fonts of the texts
+    string content, fontPath, backgroundTexture, colorKind;
+
+    // Iterate to get the information of the player menu
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check it is the node that contains the information of the background
+        if ((string)property->name() == "Background"){
+            // Get the background image of the menu
+            backgroundTexture = (string)property->value();
+            c.backgroundCircuitMenu.loadFromFile(backgroundTexture);
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Title"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                // Get the red color channel
+                if ((string)titleProp->name() == "Content"){
+                    // Get the content of the title
+                    content = (string)titleProp->value();
+                    c.contentTitleCircuitMenu = content;
+                }
+                // Get the green color channel
+                else if ((string)titleProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)titleProp->value();
+                    c.fontTitleCircuitMenu.loadFromFile(fontPath);
+                }
+                // Get color text of the title
+                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                    // Get the kind of color to process
+                    colorKind = (string)titleProp->name();
+                    // Get the border color of the panel
+                    int colorRed, colorGreen, colorBlue;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Check if it is the color of the text
+                    if (colorKind == "ColorText"){
+                        c.colorTitleTextCircuitMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                    // Check if it is the color of the border
+                    else if (colorKind == "ColorBorder"){
+                        c.colorTitleBorderCircuitMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "CircuitPanel"){
+            // Iterate to get the information of the title
+            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
+                // Get the red color channel
+                if ((string)panelProp->name() == "Background"){
+                    // Get the background image of the menu
+                    backgroundTexture = (string)panelProp->value();
+                    c.backgroundCircuitPanel.loadFromFile(backgroundTexture);
+                }
+                // Check if it is the node that stores the information of the main text of the menu
+                else if ((string)panelProp->name() == "Text"){
+                    // Iterate to get the information of the title
+                    for (xml_node<> *textProp = panelProp->first_node(); textProp; textProp = textProp->next_sibling()){
+                        // Get the green color channel
+                        if ((string)textProp->name() == "Font"){
+                            // Read the font from the file
+                            fontPath = (string)textProp->value();
+                            c.fontTitleCircuitPanel.loadFromFile(fontPath);
+                        }
+                        // Get color text of the title
+                        else if ((string)textProp->name() == "ColorText" || (string)textProp->name() == "ColorBorder"){
+                            // Get the kind of color to process
+                            colorKind = (string)textProp->name();
+                            // Get the border color of the panel
+                            int colorRed, colorGreen, colorBlue;
+                            // Iterate to get the information of the player menu
+                            for (xml_node<> *colorChannel = textProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                                // Get the red color channel
+                                if ((string)colorChannel->name() == "R"){
+                                    // Get the red channel
+                                    colorRed = stoi(colorChannel->value());
+                                }
+                                // Get the green color channel
+                                else if ((string)colorChannel->name() == "G"){
+                                    // Get the red channel
+                                    colorGreen = stoi(colorChannel->value());
+                                }
+                                // Get the blue color channel
+                                else if ((string)colorChannel->name() == "B"){
+                                    // Get the red channel
+                                    colorBlue = stoi(colorChannel->value());
+                                }
+                            }
+                            // Check if it is the color of the text
+                            if (colorKind == "ColorText"){
+                                c.colorTitleTextCircuitPanel = Color(colorRed, colorGreen, colorBlue);
+                            }
+                            // Check if it is the color of the border
+                            else if (colorKind == "ColorBorder"){
+                                c.colorTitleBorderCircuitPanel = Color(colorRed, colorGreen, colorBlue);
+                            }
+                        }
+                    }
+                }
+                // Check if it is the node that stores the information of the main text of the menu
+                else if ((string)panelProp->name() == "ColorBorder"){
+                    // Get the border color of the panel
+                    int colorRed, colorGreen, colorBlue;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Store the border color
+                    c.colorBorderCircuitPanel = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Indicators"){
+            // Get the border color of the panel
+            int colorRed, colorGreen, colorBlue;
+            // Iterate to get the information of the player menu
+            for (xml_node<> *color = property->first_node(); color; color = color->next_sibling()){
+                // Get the kind of color to process
+                colorKind = (string)color->name();
+                // Iterate to get the information of the player menu
+                for (xml_node<> *colorChannel = color->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                    // Get the red color channel
+                    if ((string)colorChannel->name() == "R"){
+                        // Get the red channel
+                        colorRed = stoi(colorChannel->value());
+                    }
+                    // Get the green color channel
+                    else if ((string)colorChannel->name() == "G"){
+                        // Get the red channel
+                        colorGreen = stoi(colorChannel->value());
+                    }
+                    // Get the blue color channel
+                    else if ((string)colorChannel->name() == "B"){
+                        // Get the red channel
+                        colorBlue = stoi(colorChannel->value());
+                    }
+                }
+                // Check if it is the color of the text
+                if (colorKind == "ColorInside"){
+                    c.colorInsideIndicator = Color(colorRed, colorGreen, colorBlue);
+                }
+                // Check if it is the color of the border
+                else if (colorKind == "ColorBorder"){
+                    c.colorBorderIndicator = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+    }
+    c.circuitMenuRead = true;
+}
+
+
+State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
+
+    // Initialize the number of laps to do
+    lapsDone = 1;
+
+    // The xml configuration file of the player menu has been read
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+
+    // Check if the xml configuration file of the menu has been read or not
+    if (!c.circuitMenuRead){
+        string path = "Data/Menus/CircuitSelectionMenu/Configuration/CircuitSelectionMenu.xml";
+        loadCircuitMenuConfiguration(path, c);
+    }
+
+
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+    // Load the background of the animation
+    c.backgroundCircuitMenu.setRepeated(true);
+    IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+    Sprite sprite(c.backgroundCircuitMenu, background);
+
+    // Adapting the resolution of the screen
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
+
+    // Main rectangle of the menu
+    RectangleShape shape;
+    shape.setSize(sf::Vector2f(610.0f * c.screenScale, 485.0f * c.screenScale));
+    shape.setOutlineColor(Color::Black);
+    shape.setOutlineThickness(5.0f * c.screenScale);
+    shape.setPosition(c.w.getSize().x / 2.f - shape.getLocalBounds().width / 2.f,
+                      c.w.getSize().y / 2.f - shape.getLocalBounds().height / 2.f);
+    // Current circuit selected to run
+    landScapeSelected = 0;
+
+    // Main text of the menu
+    Text mainText;
+    mainText.setString(c.contentTitleCircuitMenu);
+    mainText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+    mainText.setFont(c.fontTitleCircuitMenu);
+    mainText.setStyle(Text::Bold | Text::Underlined);
+    mainText.setFillColor(c.colorTitleTextCircuitMenu);
+    mainText.setOutlineColor(c.colorTitleBorderCircuitMenu);
+    mainText.setOutlineThickness(5.0f * c.screenScale);
+    mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                          c.w.getSize().y / 2.f - 200.0f * c.screenScale);
+
+    // Main text of the menu
+    Text circuitName;
+    circuitName.setString(tourLandScapes[landScapeSelected].getName());
+    circuitName.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    circuitName.setFont(c.fontTitleCircuitPanel);
+    circuitName.setStyle(Text::Bold);
+    circuitName.setFillColor(c.colorTitleTextCircuitPanel);
+    circuitName.setOutlineColor(c.colorTitleBorderCircuitPanel);
+    circuitName.setOutlineThickness(5.0f * c.screenScale);
+    circuitName.setPosition((c.w.getSize().x / 2.f) - circuitName.getLocalBounds().width / 2.f,
+                             c.w.getSize().y / 2.f - 120.0f * c.screenScale);
+
+    // Vector of textures with the circuit textures
+    vector<Texture> circuits;
+
+    // Add the textures to the vector
+    Texture circuit;
+    for (int i = 1; i <= 4; i++){
+        circuit.loadFromFile("Data/Menus/CircuitSelectionMenu/Images/c" + to_string(i) + ".png");
+        circuits.push_back(circuit);
+    }
+
+    c.backgroundCircuitPanel.setRepeated(true);
+    shape.setTexture(&c.backgroundCircuitPanel, true);
+    shape.setFillColor(Color(45, 81, 112));
+
+    // Control if the player presses the start key or not
+    bool startPressed = false;
+
+    // Control if the player presses the backspace key or not
+    bool backSpacePressed = false;
+
+    // Control the option currently selected
+    int optionSelected = 0;
+
+    // Show the vehicle selected
+    Sprite circuitRoute;
+    circuitRoute.setTexture(circuits[0], true);
+    circuitRoute.setScale(3.0f * c.screenScale, 3.0f * c.screenScale);
+    circuitRoute.setPosition(shape.getPosition().x + (float(shape.getSize().x) / 2.f) -
+                            (float(circuitRoute.getLocalBounds().width ) / 2.f) * 3.0f * c.screenScale,
+                             c.w.getSize().y / 2.f - 70.f * c.screenScale);
+
+    // While start and backspace have not been pressed
+    while (!startPressed && !backSpacePressed) {
+
+        // Laps indicators text
+        Text circuitIndicatorText;
+        circuitIndicatorText.setString("CIRCUIT: ");
+        circuitIndicatorText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+        circuitIndicatorText.setFont(c.fontTitleCircuitPanel);
+        circuitIndicatorText.setStyle(Text::Bold);
+        circuitIndicatorText.setFillColor(c.colorTitleTextCircuitPanel);
+        circuitIndicatorText.setOutlineColor(c.colorTitleBorderCircuitPanel);
+        circuitIndicatorText.setOutlineThickness(5.0f * c.screenScale);
+        circuitIndicatorText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale,
+                                         c.w.getSize().y / 2.f + 100.0f * c.screenScale);
+
+        // Laps indicators text
+        Text lapsIndicatorText;
+        lapsIndicatorText.setString("LAPS: ");
+        lapsIndicatorText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+        lapsIndicatorText.setFont(c.fontTitleCircuitPanel);
+        lapsIndicatorText.setStyle(Text::Bold);
+        lapsIndicatorText.setFillColor(c.colorTitleTextCircuitPanel);
+        lapsIndicatorText.setOutlineColor(c.colorTitleBorderCircuitPanel);
+        lapsIndicatorText.setOutlineThickness(5.0f * c.screenScale);
+        lapsIndicatorText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale,
+                                      c.w.getSize().y / 2.f + 140.0f * c.screenScale);
+
+        // Racers indicators text
+        Text racersIndicatorText;
+        racersIndicatorText.setString("RACERS: ");
+        racersIndicatorText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+        racersIndicatorText.setFont(c.fontTitleCircuitPanel);
+        racersIndicatorText.setStyle(Text::Bold);
+        racersIndicatorText.setFillColor(c.colorTitleTextCircuitPanel);
+        racersIndicatorText.setOutlineColor(c.colorTitleBorderCircuitPanel);
+        racersIndicatorText.setOutlineThickness(5.0f * c.screenScale);
+        racersIndicatorText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale,
+                                        c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+
+        CircleShape triangle2(14 * c.screenScale, 3);
+        triangle2.setFillColor(c.colorInsideIndicator);
+        triangle2.setOutlineColor(c.colorBorderIndicator);
+        triangle2.setOutlineThickness(2.0f * c.screenScale);
+        triangle2.setRotation(90);
+        triangle2.setPosition(c.w.getSize().x / 2.f - 80.f * c.screenScale - 11.f, c.w.getSize().y / 2.f + 106.0f * c.screenScale);
+
+        Text circuitText;
+        circuitText.setString(to_string(landScapeSelected + 1));
+        circuitText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+        circuitText.setFont(c.fontTitleCircuitPanel);
+        circuitText.setStyle(Text::Bold);
+        circuitText.setFillColor(c.colorTitleTextCircuitPanel);
+        circuitText.setOutlineColor(c.colorTitleBorderCircuitPanel);
+        circuitText.setOutlineThickness(5.0f * c.screenScale);
+        circuitText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale + circuitIndicatorText.getLocalBounds().width + 5.f ,
+                                c.w.getSize().y / 2.f + 100.0f * c.screenScale);
+
+        Text lapsText;
+        lapsText.setString(to_string(numberLaps));
+        lapsText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+        lapsText.setFont(c.fontTitleCircuitPanel);
+        lapsText.setStyle(Text::Bold);
+        lapsText.setFillColor(c.colorTitleTextCircuitPanel);
+        lapsText.setOutlineColor(c.colorTitleBorderCircuitPanel);
+        lapsText.setOutlineThickness(5.0f * c.screenScale);
+        lapsText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale + lapsIndicatorText.getLocalBounds().width + 5.f ,
+                             c.w.getSize().y / 2.f + 140.0f * c.screenScale);
+
+        // Racers indicators text
+        Text racersText;
+        racersText.setString(to_string(numberRacers));
+        racersText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+        racersText.setFont(c.fontTitleCircuitPanel);
+        racersText.setStyle(Text::Bold);
+        racersText.setFillColor(c.colorTitleTextCircuitPanel);
+        racersText.setOutlineColor(c.colorTitleBorderCircuitPanel);
+        racersText.setOutlineThickness(5.0f * c.screenScale);
+        racersText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale + racersIndicatorText.getLocalBounds().width + 5.f,
+                               c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+
+        // While start and backspace have not been pressed
+        while (!startPressed && !backSpacePressed) {
+
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)){
+                if (e.type == Event::Closed){
+                    return EXIT;
+                }
+            }
+
+            // Check if the up or down cursor keys have been pressed or not
+            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+                // Up cursor pressed and change the soundtrack selected in the list
+                if (optionSelected != 2) {
+                    // Change the color appearance of both buttons
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                    optionSelected++;
+
+                    switch(optionSelected){
+                        case 0:
+                            triangle2.setPosition(c.w.getSize().x / 2.f - 80.f * c.screenScale - 11.f,
+                                                  c.w.getSize().y / 2.f + 106.0f * c.screenScale);
+                            break;
+                        case 1:
+                            triangle2.setPosition(c.w.getSize().x / 2.f - 80.f * c.screenScale - 11.f,
+                                                  c.w.getSize().y / 2.f + 146.0f * c.screenScale);
+                            break;
+                        case 2:
+                            triangle2.setPosition(c.w.getSize().x / 2.f - 80.f * c.screenScale - 11.f,
+                                                  c.w.getSize().y / 2.f + 186.0f * c.screenScale);
+                    }
+                }
+            }
+            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+                // Down cursor pressed and change the soundtrack selected in the list
+                if (optionSelected != 0) {
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                    optionSelected--;
+
+                    switch(optionSelected){
+                        case 0:
+                            triangle2.setPosition(c.w.getSize().x / 2.f - 80.f * c.screenScale - 11.f,
+                                                  c.w.getSize().y / 2.f + 106.0f * c.screenScale);
+                            break;
+                        case 1:
+                            triangle2.setPosition(c.w.getSize().x / 2.f - 80.f * c.screenScale - 11.f,
+                                                  c.w.getSize().y / 2.f + 146.0f * c.screenScale);
+                            break;
+                        case 2:
+                            triangle2.setPosition(c.w.getSize().x / 2.f - 80.f * c.screenScale - 11.f,
+                                                  c.w.getSize().y / 2.f + 186.0f * c.screenScale);
+                    }
+                }
+            }
+            else if (Keyboard::isKeyPressed(Keyboard::Left)) {
+                // Up cursor pressed and change the soundtrack selected in the list
+                switch(optionSelected){
+                    case 0:
+                        if (landScapeSelected != 0){
+                            // Change to the left circuit
+                            landScapeSelected--;
+
+                            // Get the name of the circuit
+                            circuitName.setString(tourLandScapes[landScapeSelected].getName());
+                            circuitName.setPosition((c.w.getSize().x / 2.f) - circuitName.getLocalBounds().width / 2.f,
+                                                     c.w.getSize().y / 2.f - 120.0f * c.screenScale);
+
+                            // Change the circuit texture to display
+                            circuitRoute.setTexture(circuits[landScapeSelected], true);
+                            circuitRoute.setScale(3.0f * c.screenScale, 3.0f * c.screenScale);
+                            circuitRoute.setPosition(shape.getPosition().x + (float(shape.getSize().x) / 2.f) -
+                                                    (float(circuitRoute.getLocalBounds().width ) / 2.f) * 3.0f * c.screenScale,
+                                                     c.w.getSize().y / 2.f - 70.f * c.screenScale);
+
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+                        }
+                        break;
+                    case 1:
+                        if (numberLaps != 1){
+                            // Decrement one lap
+                            numberLaps--;
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+                        }
+                        break;
+                    case 2:
+                        if (numberRacers != 0){
+                            // Decrement one lap
+                            numberRacers--;
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+                        }
+                }
+            }
+            else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+                switch(optionSelected){
+                    case 0:
+                        if (landScapeSelected != 3){
+                            // Change to the left circuit
+                            landScapeSelected++;
+
+                            // Get the name of the circuit
+                            circuitName.setString(tourLandScapes[landScapeSelected].getName());
+                            circuitName.setPosition((c.w.getSize().x / 2.f) - circuitName.getLocalBounds().width / 2.f,
+                                                     c.w.getSize().y / 2.f - 120.0f * c.screenScale);
+
+                            // Change the circuit texture to display
+                            circuitRoute.setTexture(circuits[landScapeSelected], true);
+                            circuitRoute.setScale(3.0f * c.screenScale, 3.0f * c.screenScale);
+                            circuitRoute.setPosition(shape.getPosition().x + (float(shape.getSize().x) / 2.f) -
+                                                    (float(circuitRoute.getLocalBounds().width ) / 2.f) * 3.0f * c.screenScale,
+                                                     c.w.getSize().y / 2.f - 70.f * c.screenScale);
+
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+                        }
+                        break;
+                    case 1:
+                        if (numberLaps != 5){
+                            // Increment one lap
+                            numberLaps++;
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+                        }
+                        break;
+                    case 2:
+                        if (numberRacers != 8){
+                            // Decrement one lap
+                            numberRacers++;
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+                        }
+                }
+            }
+
+            // Circuit identifier
+            circuitText.setString(to_string(landScapeSelected + 1));
+            circuitText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale + circuitIndicatorText.getLocalBounds().width + 5.f ,
+                                    c.w.getSize().y / 2.f + 100.0f * c.screenScale);
+
+            // Laps to run in the circuit
+            lapsText.setString(to_string(numberLaps));
+            lapsText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale + lapsIndicatorText.getLocalBounds().width + 5.f ,
+                                 c.w.getSize().y / 2.f + 140.0f * c.screenScale);
+
+            // Racers indicators text
+            racersText.setString(to_string(numberRacers));
+            racersText.setPosition(c.w.getSize().x / 2.f - 80.0f * c.screenScale + racersIndicatorText.getLocalBounds().width + 5.f,
+                                   c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+
+            // Draw the elements of the menu
+            c.w.draw(sprite);
+            c.w.draw(shape);
+            c.w.draw(mainText);
+            c.w.draw(circuitName);
+            c.w.draw(circuitRoute);
+            c.w.draw(circuitIndicatorText);
+            c.w.draw(lapsIndicatorText);
+            c.w.draw(racersIndicatorText);
+            c.w.draw(lapsText);
+            c.w.draw(racersText);
+            c.w.draw(circuitText);
+            c.w.draw(triangle2);
+
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+
+            sleep(milliseconds(120));
+
+            // Check if start key has been pressed
+            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                // Change the controllers of the car
+                startPressed = true;
+                r.soundEffects[2]->stop();
+                r.soundEffects[2]->play();
+            }
+            // Check if backspace key has been pressed
+            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                // Change the controllers of the car
+                backSpacePressed = true;
+                r.soundEffects[11]->stop();
+                r.soundEffects[11]->play();
+            }
+        }
+    }
+
+    if (startPressed){
+        r.soundTracks[1]->stop();
+        currentMap = &tourLandScapes[landScapeSelected];
+
+        // Back door
+        int bdTime = 0;
+        time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
+        score = 0;
+        level = -1;
+
+        // Initialize the checkpoint index
+        indexCheckPoint = 1;
+        checkPointPositions = tourLandScapes[landScapeSelected].getCheckPointPositions();
+
+        return VEHICLE_SELECTION;
+
+    }
+    else if (backSpacePressed){
+        return GAME_MODES_MENU;
+    }
 }

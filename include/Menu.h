@@ -146,7 +146,7 @@ void loadOptionsMenuConfiguration(const string path, Configuration& c);
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  */
-State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame);
+State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame, float& offsetLapIndicator, bool& newLap);
 
 
 
@@ -171,7 +171,6 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r);
 
 
 
-
 /**
  * Pantalla del ranking.
  * @param c
@@ -183,6 +182,17 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r);
  */
 State rankingMenu(Configuration &c, SoundPlayer& r, unsigned long scorePlayerGame,
                   int minutes, int decs, int cents_Second, const int typeOfGame);
+
+
+
+void updateGameConfiguration(const string path, const Difficult difficulty, const bool activeAI, const int volumeSoundtracks,
+                             const int volumeEffects, const bool pixelArt, const int fullScreen, const int axis_x,
+                             const int axis_y, const string controlLeft, const string controlRight, const string controlAccelerate,
+                             const string controlBrake, const string controlSoundtrack);
+
+
+State showLoadingAnimation(Configuration& c, SoundPlayer& r);
+
 
 
 #endif // MENU_H
