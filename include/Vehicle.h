@@ -1,11 +1,13 @@
-
+#pragma once
 
 #ifndef VEHICLE_H
 #define VEHICLE_H
 
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "Randomizer.h"
 #include "Menu.h"
+#include "Globals.h"
 
 using namespace std;
 using namespace sf;
@@ -73,7 +75,7 @@ public:
      * @param currentCodeImage
      * @param counterCodeImage
      */
-    Vehicle(float maxSpeed, float scale, int maxCounterToChange, float speed, float posX, float posY, float previousY,
+    Vehicle(float maxSpeed, float scale, int maxCounterToChange, float speedVehicle, float posX, float posY, float previousY,
             float minScreenX, float maxScreenX, const std::string &vehicle, int numTextures, int currentCodeImage,
             int counterCodeImage);
 
@@ -85,7 +87,7 @@ public:
     void setPosition(float pX, float pY);
 
 
-    void setVehicle();
+    void setVehicle(const int typeOfGame);
 
 
     /**
@@ -118,6 +120,10 @@ public:
      */
     float getAcceleration() const;
 };
+
+
+
+Vehicle::Direction randomDirection();
 
 
 #endif // VEHICLE_H

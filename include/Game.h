@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef GAME_H
 #define GAME_H
@@ -16,10 +16,14 @@
 #include "Minivan.h"
 #include "Police.h"
 #include "TrafficCar.h"
+#include "RivalCar.h"
 #include <SFML/Graphics.hpp>
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include "rapidxml_print.hpp"
+#include "Globals.h"
+#include "functional"
+
 
 using namespace sf;
 using namespace std;
@@ -60,8 +64,12 @@ class Game {
     Truck player4;
     Police player5;
 
+    mutex mtx;
 
     vector<TrafficCar> cars;
+
+    vector<RivalCar> rivals;
+
     float lastY;
     bool vehicleCrash;
 
@@ -94,9 +102,6 @@ class Game {
 
     // Clock counter of time
     Clock gameClockTime;
-
-    // Clock counter of time
-    Clock gameClockLap;
 
     // Clock to control the woman shout
     Clock womanShot;
@@ -204,8 +209,14 @@ class Game {
     // Lap indicator of lap
     float offsetLapIndicator;
 
-
+    // Control the time to show new lap indicator
     int timeElapsed;
+
+    // Control the new lap animation in Pole Position
+    bool shown;
+
+    // Threads of the game
+    thread timer0, timer1, timer2;
 
 
     int displayLapFactor;
@@ -214,17 +225,40 @@ class Game {
     int numberRacers;
 
 
+    vector<float*> rankingVehicles;
+
+
+    void storingRivalCars(Configuration& c);
+
+
+    void loadWorldTourPolePositionLandScape(Configuration& c, const string path, const int i, int timeLandscape, const int typeOfGame,
+                                            mutex tourLandScapesMutex[]);
+
+    void loadOutRunDrivingFuryDerramageLandScape(Configuration& c, const string path, const int i, int timeLandscape,
+                                                 const int typeOfGame, mutex tourLandScapesMutex[], vector<LandScape>& vm);
+
+    void updateTimeElapsed();
+
+
+    void updateTimeLandScape();
+
+
+    void updateScore();
+
+
+    int findPlayerPositionRanking(const float posYPlayer);
+
+
     /**
      * Load the Hud interface of the game
      */
-    void loadHudGame();
-
+    void loadHudGameWorldTourPolePosition();
 
 
     /**
-     * Draw the initial animation of the HUD
+     * Load the Hud interface of the game
      */
-    void drawHudAnimation(Configuration& c, SoundPlayer& r);
+    void loadHudGameOutRunDrivingFuryDerramage();
 
 
 
@@ -251,7 +285,15 @@ class Game {
      * Draw the HUD interface of the game
      * @param c is the configuration of the game
      */
-    void showHudInterface(Configuration &c);
+    void showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c);
+
+
+
+    /**
+     * Draw the HUD interface of the game
+     * @param c is the configuration of the game
+     */
+    void showHudInterfaceWorldTourPolePosition(Configuration &c);
 
 
 
@@ -312,7 +354,39 @@ class Game {
      * with the vehicles on the screen.
      * @param c is the configuration of the game
      */
-    void updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action, Vehicle::Direction &direction, int& terrain);
+    void updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                               Vehicle::Direction &direction, int& terrain);
+
+
+
+    /**
+     * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+     * with the vehicles on the screen.
+     * @param c is the configuration of the game
+     */
+    void updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                      Vehicle::Direction &direction, int& terrain);
+
+
+
+    /**
+     * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+     * with the vehicles on the screen.
+     * @param c is the configuration of the game
+     */
+    void updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                         Vehicle::Direction &direction, int& terrain);
+
+
+
+
+    /**
+     * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+     * with the vehicles on the screen.
+     * @param c is the configuration of the game
+     */
+    void updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                     Vehicle::Direction &direction, int& terrain);
 
 
 
@@ -426,7 +500,16 @@ public:
      * @param c is the configuration of the game
      * @return
      */
-    State play(Configuration &c, SoundPlayer& r);
+    State playWorldTourPolePosition(Configuration &c, SoundPlayer& r);
+
+
+
+    /**
+     * Updates the logic of the game and refreshes the screen until you leave the game.
+     * @param c is the configuration of the game
+     * @return
+     */
+    State playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r);
 
 
 

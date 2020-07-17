@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef KEYWORD_MAPPER_H
 #define KEYWORD_MAPPER_H

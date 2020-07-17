@@ -106,7 +106,9 @@ void Minivan::hitControl(const bool vehicleCrash) {
         acceleration = 0.0f;
     }
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
 
     if (xDest > 0.f && posX < xDest){
         if (!vehicleCrash){
@@ -191,7 +193,10 @@ Vehicle::Action Minivan::accelerationControl(Configuration &c, bool hasGotOut) {
     else if (a == NONE && acceleration > 0.0f)
         a = ACCELERATE;
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
+
     if (speed > 0.0f) {
         previousY = posY;
         posY += speed;
@@ -558,7 +563,7 @@ void Minivan::draw(Configuration &c, SoundPlayer &r, const Action &a, const Dire
 
     if (smoking || skidding || crashing) {
         if (!crashing){
-            maxCounterToChange = COUNTER + 2;
+            maxCounterToChange = COUNTER + 1;
         }
         else {
             if (getRealSpeed() < 20.f){
@@ -618,8 +623,8 @@ void Minivan::setSmoking(bool smoke) {
 }
 
 
-void Minivan::setVehicle(){
-    Vehicle::setVehicle();
+void Minivan::setVehicle(const int typeOfGame){
+    Vehicle::setVehicle(typeOfGame);
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;

@@ -131,7 +131,7 @@ public:
     void setSmoking(bool smoke);
 
 
-    void setVehicle();
+    void setVehicle(const int typeOfGame);
 
 
     float getHalfMaxSpeed();

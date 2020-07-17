@@ -105,7 +105,9 @@ void Police::hitControl(const bool vehicleCrash) {
         acceleration = 0.0f;
     }
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
 
     if (xDest > 0.f && posX < xDest){
         if (!vehicleCrash){
@@ -190,7 +192,10 @@ Vehicle::Action Police::accelerationControl(Configuration &c, bool hasGotOut) {
     else if (a == NONE && acceleration > 0.0f)
         a = ACCELERATE;
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
+
     if (speed > 0.0f) {
         previousY = posY;
         posY += speed;
@@ -565,7 +570,7 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
 
     if (smoking || skidding || crashing) {
         if (!crashing){
-            maxCounterToChange = COUNTER + 2;
+            maxCounterToChange = COUNTER + 1;
         }
         else {
             if (getRealSpeed() < 20.f){

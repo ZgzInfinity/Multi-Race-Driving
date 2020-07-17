@@ -2,41 +2,422 @@
 #include "../include/Game.h"
 
 
-
-/**
- * Load the Hud interface of the game
- */
-void Game::loadHudGame(){
-    // Load the elapsed time indicator with the time level indicator
-    // and the speed indicator and the checkpoint
-    Texture t;
-    for (int i = 1; i <= 6; i++){
-        // Load the textures of the three indicators
-        t.loadFromFile("Data/Hud/" + to_string(i) + ".png");
-        textures.push_back(t);
+void Game::storingRivalCars(Configuration& c){
+    // Keep space to store the cars
+    rivals.reserve(static_cast<unsigned long>(numberRacers));
+    if ((int)rivals.size() > numberRacers) {
+        while ((int)rivals.size() > numberRacers)
+            rivals.pop_back();
     }
-    if (typeOfGame == 1 || (typeOfGame >= 3 && typeOfGame <= 5)){
-        // Load the rest of textures necessary for the rest of game modes
-        for (int i = 7; i <= 8; i++){
-            // Load the textures of the rest of the game modes
-            t.loadFromFile("Data/Hud/" + to_string(i) + ".png");
-            textures.push_back(t);
+    else if ((int)cars.size() < numberRacers) {
+        RivalCar v;
+
+        float positY, positX;
+
+        // Control the initial position of the vehicle in the starting point
+        switch(numberRacers){
+            case 0:
+            case 1:
+                positY = 13.f;
+                break;
+            case 2:
+            case 3:
+                positY = 33.f;
+                break;
+            case 4:
+            case 5:
+                positY = 53.f;
+                break;
+            case 6:
+            case 7:
+                positY = 73.f;
+            default:
+                positY = 0.f;
         }
 
-        // Code of first landscape
-        int idFirstMap = 9;
+        // Initialize the position of the player
+        posArrival = numberRacers + 1;
 
-        // Fill the matrix with the tree maps
-        for (int i = 0; i <= 4; i++) {
-            for (int j = 0; j <= i; j++) {
-                t.loadFromFile("Data/Hud/" + to_string(idFirstMap) + ".png");
-                treeMap[i][j] = t;
-                idFirstMap++;
+        // Store the rival cars in the vector
+        for (int i = 0; i < numberRacers; i++) {
+
+            if (i % 2 == 0){
+                positX = 0.3f;
+            }
+            else {
+                positX = -0.3f;
+            }
+            // Set the scale of the vehicle
+            switch(typeOfVehicle){
+                case 0:
+                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 2.5f, COUNTER, "RivalCars/Motorbikes/Motorbike" + to_string(i + 1), positX,
+                                 positY, 28, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 7,
+                                 13, 7, 13, 21, 27, 21, 27, 1.15f);
+
+                    v.setAI(c.maxAggressiveness, c.level);
+                    rivals.push_back(v);
+                    break;
+                case 1:
+                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Devastators/Devastator" + to_string(i + 1), positX,
+                                 positY, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22, 5, 8, 23, 26, 9, 12, 27, 30, 13, 14,
+                                 31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24, 28, 33, 35, 1.15f);
+
+                    v.setAI(c.maxAggressiveness, c.level);
+                    rivals.push_back(v);
+                    break;
+                case 2:
+                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Minivans/Minivan" + to_string(i + 1), positX, positY,
+                                 Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
+                                 11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.15f);
+
+                    v.setAI(c.maxAggressiveness, c.level);
+                    rivals.push_back(v);
+                    break;
+                case 3:
+                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "RivalCars/Trucks/Truck" + to_string(i + 1), positX, positY,
+                                 Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
+                                 43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.15f);
+
+                    v.setAI(c.maxAggressiveness, c.level);
+                    rivals.push_back(v);
+            }
+            // Update the position of the staring vehicles
+            if (i % 2 != 0){
+                positY -= 20.f;
             }
         }
     }
 }
 
+
+void Game::loadWorldTourPolePositionLandScape(Configuration& c, const string path, const int i, int timeLandscape, const int typeOfGame,
+                                              mutex tourLandScapesMutex[])
+{
+    // Load the landscape using the correspond path
+    LandScape m(c, path + to_string(i + 1) + "/", "bg.png", timeLandscape, typeOfGame, numberRacers);
+
+    // Check if is the turn of the thread
+    tourLandScapesMutex[i].lock();
+
+    // Store the landscape
+    tourLandScapes.push_back(m);
+
+    // If it is not the last thread wakes up the next one
+    if (i != 3){
+        tourLandScapesMutex[i + 1].unlock();
+    }
+}
+
+
+
+void Game::loadOutRunDrivingFuryDerramageLandScape(Configuration& c, const string path, const int i, int timeLandscape,
+                                                   const int typeOfGame, mutex tourLandScapesMutex[], vector<LandScape>& vm)
+{
+    // Load the landscape using the correspond path
+    LandScape m(c, path, "bg.png", timeLandscape, typeOfGame, numberRacers);
+
+    // Check if the threads has the permission store the landscapes
+    tourLandScapesMutex[i].lock();
+
+    // Store the landscape in the vector
+    vm.push_back(m);
+
+    // Wake up to the next thread
+    if (i != 14){
+        tourLandScapesMutex[i + 1].unlock();
+    }
+}
+
+
+
+
+void Game::updateTimeElapsed(){
+
+    // Clock counter of time
+    Clock gameClockLap;
+
+    // Time to update the clock counter lap
+    Time shot_delayLap = seconds(0.01);
+
+    gameClockLap.restart();
+    elapsed3 = gameClockLap.getElapsedTime().asSeconds();
+
+    bool arrived = false , endOfGame = false, pause = false;
+
+    while(!arrived && !endOfGame && !pause){
+
+        mtx.lock();
+        pause = onPause;
+        mtx.unlock();
+
+        if (!pause){
+
+            // Sleep the thread
+            this_thread::sleep_for(chrono::milliseconds(50));
+
+            // Get the actual time
+            elapsed4 = gameClockLap.getElapsedTime().asSeconds();
+
+            // Check if a tenth of second has passed between both timestamps
+            if (elapsed4 - elapsed3 >= shot_delayLap.asSeconds()) {
+                mtx.lock();
+                cents_second += elapsed4;
+                if (cents_second >= 1.f) {
+                    cents_second -= 1.f;
+                    secs++;
+                    if (secs == 60.f) {
+                        secs = 0;
+                        minutes++;
+                    }
+                }
+                cents_secondTrip += elapsed4;
+                if (cents_secondTrip >= 1.f) {
+                    cents_secondTrip -= 1.f;
+                    secsTrip++;
+                    if (secsTrip == 60.f) {
+                        secsTrip = 0;
+                        minutesTrip++;
+                    }
+                }
+                gameClockLap.restart();
+                mtx.unlock();
+            }
+            mtx.lock();
+            arrived = arrival;
+            endOfGame = finalGame;
+            pause = onPause;
+            mtx.unlock();
+        }
+        else {
+            gameClockLap.restart();
+        }
+    }
+}
+
+
+
+void Game::updateTimeLandScape(){
+
+    // Initialize the clock counters of time
+    gameClockTime.restart().asSeconds();
+    elapsed1 = gameClockTime.restart().asSeconds();
+
+    // Time to update the clock counter
+    Time shot_delayTime = seconds(1.0);
+
+    bool arrived = false , endOfGame = false, pause = false;
+
+    while(!arrived && !endOfGame && !onPause){
+
+        mtx.lock();
+        pause = onPause;
+        mtx.unlock();
+
+        if (!pause){
+
+             // Sleep the thread
+            this_thread::sleep_for(chrono::milliseconds(50));
+
+            // Get the actual time
+            elapsed2 = gameClockTime.getElapsedTime().asSeconds();
+
+            // Check if a second has passed between both timestamps
+            if (elapsed2 - elapsed1 >= shot_delayTime.asSeconds()) {
+                // Draw time
+                mtx.lock();
+                time--;
+                mtx.unlock();
+                gameClockTime.restart();
+            }
+
+            mtx.lock();
+            arrived = arrival;
+            endOfGame = finalGame;
+            pause = onPause;
+            mtx.unlock();
+        }
+        else {
+            gameClockTime.restart();
+        }
+    }
+}
+
+
+
+void Game::updateScore(){
+
+    bool arrived = false , endOfGame = false, pause = false;
+    float speed;
+
+    while(!arrived && !endOfGame && !pause){
+
+        mtx.lock();
+        pause = onPause;
+        mtx.unlock();
+
+        if (!pause){
+
+            // Sleep the thread
+            this_thread::sleep_for(chrono::milliseconds(50));
+
+            switch(typeOfVehicle){
+                case 0:
+                    mainMutex.lock();
+                    speed = player.getRealSpeed();
+                    mainMutex.unlock();
+                    // Update the score of the player if the player is not stopped
+                    if (speed > 0.0f) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    break;
+                case 1:
+                    mainMutex.lock();
+                    speed = player2.getRealSpeed();
+                    mainMutex.unlock();
+                    // Update the score of the player if the player is not stopped
+                    if (speed > 0.0f) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player2.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    break;
+                case 2:
+                    mainMutex.lock();
+                    speed = player3.getRealSpeed();
+                    mainMutex.unlock();
+                    // Update the score of the player if the player is not stopped
+                    if (speed > 0.0f) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player3.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    break;
+                case 3:
+                    mainMutex.lock();
+                    speed = player4.getRealSpeed();
+                    mainMutex.unlock();
+                    // Update the score of the player if the player is not stopped
+                    if (speed > 0.0f) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player4.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    break;
+                case 4:
+                    mainMutex.lock();
+                    speed = player5.getRealSpeed();
+                    mainMutex.unlock();
+                    // Update the score of the player if the player is not stopped
+                    if (speed > 0.0f) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player5.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+            }
+        }
+        mainMutex.lock();
+        arrived = arrival;
+        endOfGame = finalGame;
+        pause = onPause;
+        mainMutex.unlock();
+
+    }
+}
+
+
+
+int Game::findPlayerPositionRanking(const float posYPlayer){
+    /*
+    int init = 0, last = rankingVehicles.size() - 1;
+    while (init != last){
+        int medium = (init + last) / 2;
+        if (*rankingVehicles[medium] < posYPlayer){
+            init = medium + 1;
+        }
+        else {
+            last = medium;
+        }
+    }
+    if (*rankingVehicles[init] == posYPlayer){
+        return init;
+    }
+    else {
+        return init + 1;
+    }
+    */
+    bool found = false;
+    int i = rankingVehicles.size() - 1;
+    while (!found && i >= 0){
+        if (*rankingVehicles[i] <= posYPlayer){
+            found = true;
+        }
+        else {
+            i--;
+        }
+    }
+    if (!found){
+        return numberRacers + 1;
+    }
+    else {
+        return numberRacers - i + 1;
+    }
+}
+
+
+
+/**
+ * Load the Hud interface of the game
+ */
+void Game::loadHudGameWorldTourPolePosition(){
+    // Load the elapsed time indicator with the time level indicator
+    // and the speed indicator and the checkpoint
+    Texture t;
+    for (int i = 1; i <= 4; i++){
+        // Load the textures of the three indicators
+        t.loadFromFile("Data/Hud/" + to_string(i) + ".png");
+        textures.push_back(t);
+    }
+    for (int i = 24; i <= 27; i++){
+        // Load the textures of the three indicators
+        t.loadFromFile("Data/Hud/" + to_string(i) + ".png");
+        textures.push_back(t);
+    }
+}
+
+
+
+
+/**
+ * Load the Hud interface of the game
+ */
+void Game::loadHudGameOutRunDrivingFuryDerramage(){
+    // Load the elapsed time indicator with the time level indicator
+    // and the speed indicator and the checkpoint
+    Texture t;
+    for (int i = 1; i <= 8; i++){
+        // Load the textures of the three indicators
+        t.loadFromFile("Data/Hud/" + to_string(i) + ".png");
+        textures.push_back(t);
+    }
+    // Code of first landscape
+    int idFirstMap = 9;
+
+    // Fill the matrix with the tree maps
+    for (int i = 0; i <= 4; i++) {
+        for (int j = 0; j <= i; j++) {
+            t.loadFromFile("Data/Hud/" + to_string(idFirstMap) + ".png");
+            treeMap[i][j] = t;
+            idFirstMap++;
+        }
+    }
+}
 
 
 /**
@@ -131,453 +512,6 @@ void Game::drawBonus(Configuration &c, int seconds, int decs_second) {
 
 
 /**
- * Draw the initial animation of the HUD
- */
-void Game::drawHudAnimation(Configuration& c, SoundPlayer& r){
-
-    float elapSedIndicator = 2.39f;
-    float elapsedTextLap = 3.55f;
-    float timeIndicator = 3.6f;
-    float timeHud = 4.83f;
-
-    float speedIndicator = -1.8f;
-    float speedText = 1.6f;
-
-    float levelInd = -1.8f;
-    float levelIndicator = -1.8f;
-
-    float scoreIndicator = 3.6f;
-    float scoreHud = 4.78f;
-
-    float treeIndicator = 1.6f;
-
-    float distanceIndicator = 6.6f;
-
-    float distancePanel = 6.3f;
-
-    float checkPointIndicator = 4.83f;
-
-    float checkPointDistance = 3.5f;
-
-    // Check the initial sound to reproduce
-    switch(typeOfGame){
-        case 0:
-            r.soundEffects[39]->stop();
-            r.soundEffects[39]->play();
-            break;
-        case 1:
-            r.soundEffects[38]->stop();
-            r.soundEffects[38]->play();
-            break;
-        case 2:
-            r.soundEffects[57]->stop();
-            r.soundEffects[57]->play();
-            break;
-        case 3:
-            r.soundEffects[37]->stop();
-            r.soundEffects[37]->play();
-            break;
-        case 4:
-            r.soundEffects[58]->stop();
-            r.soundEffects[58]->play();
-    }
-
-    for (int i = 0; i <= 200; i++){
-
-        // Detect the possible events
-        Event e;
-        c.window.pollEvent(e);
-
-        // Draw the landscape
-        currentMap->drawLandScape(c, cars, typeOfGame);
-
-        // Draw the vehicle
-        switch(typeOfVehicle){
-            case 0:
-                player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
-                break;
-            case 1:
-                player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
-                break;
-            case 2:
-                player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
-                break;
-            case 3:
-                player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
-                break;
-            case 4:
-                player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
-        }
-
-        Sprite s;
-
-        // Assign positions in the game console for the game panel indicators
-        const float up = float(c.w.getSize().y) / 10.0f;
-
-        // UP
-        s.setTexture(textures[0], true);
-        s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
-        const float separation = s.getGlobalBounds().width / 5.5f;
-        s.setPosition(separation, up - elapSedIndicator * s.getGlobalBounds().height);
-        float initial = separation + s.getGlobalBounds().width + separation;
-        c.w.draw(s);
-
-        // Indicator of the elapsed time
-        Text elapsedTime;
-        elapsedTime.setFont(c.fontElapsedTime);
-        elapsedTime.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
-        elapsedTime.setFillColor(Color::Green);
-
-        // Available time to complete the level
-        Text timeToPlay;
-        timeToPlay.setString("000");
-        timeToPlay.setFont(c.fontTimeToPlay);
-        timeToPlay.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-        timeToPlay.setFillColor(Color::Yellow);
-        timeToPlay.setOutlineColor(Color::Black);
-        timeToPlay.setOutlineThickness(3.0f * c.screenScale);
-        timeToPlay.setPosition(initial * 1.41f, up - timeIndicator * float(timeToPlay.getCharacterSize()));
-        timeToPlay.setString(to_string(time));
-        c.w.draw(timeToPlay);
-
-        initial += elapsedTime.getGlobalBounds().width + separation;
-        s.setTexture(textures[1], true);
-        s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
-        s.setPosition(initial * 1.15f, up - s.getGlobalBounds().height * timeHud);
-        c.w.draw(s);
-        initial += s.getGlobalBounds().width + separation;
-
-        // Initialize the HUD indicator of lap time
-        // Time of lap consumed
-        Text textLap;
-        textLap.setFont(c.fontElapsedTime);
-        textLap.setString("00:00:00");
-        textLap.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
-        textLap.setFillColor(Color::Green);
-        initial = float(c.w.getSize().x) - separation - textLap.getGlobalBounds().width;
-        textLap.setPosition(initial / 7.5f, up - elapsedTextLap * float(textLap.getCharacterSize()));
-        c.w.draw(textLap);
-        c.w.draw(s);
-
-        // DOWN
-        textures[2].loadFromFile("Data/Hud/7.png");
-        s.setTexture(textures[2], true);
-        s.setScale(2.f * c.screenScale, 1.5f * c.screenScale);
-        const float down = float(c.w.getSize().y) - s.getGlobalBounds().height * 1.5f;
-        s.setPosition(separation, float(c.w.getSize().y) - s.getGlobalBounds().height * 1.25f);
-        initial = separation + s.getGlobalBounds().width / 4.0f;
-
-        float speed;
-
-        switch(typeOfVehicle){
-            case 0:
-                speed = player.getRealSpeed();
-                break;
-            case 1:
-                speed = player2.getRealSpeed();
-                break;
-            case 2:
-                speed = player3.getRealSpeed();
-                break;
-            case 3:
-                speed = player4.getRealSpeed();
-                break;
-            case 4:
-                speed = player5.getRealSpeed();
-        }
-
-        textures[2].loadFromFile("Data/Hud/3.png",
-                                 IntRect(0, 0, static_cast<int>(speed * 117.0f / MAX_SPEED * c.screenScale),
-                                         static_cast<int>(20.0f * c.screenScale)));
-
-
-        s.setTexture(textures[2], true);
-        if (speed > 0.0f)
-            c.w.draw(s);
-
-        // Text
-        // HUD
-        Text sText;
-        sText.setFont(c.speedVehicle);
-        sText.setString("0001");
-        sText.setCharacterSize(static_cast<unsigned int>(int(70.0f * c.screenScale)));
-        sText.setFillColor(Color(206, 73, 73));
-        sText.setOutlineThickness(3.0f * c.screenScale);
-        sText.setPosition(initial - (sText.getLocalBounds().width * speedText), down - float(sText.getCharacterSize()));
-        initial += sText.getGlobalBounds().width;
-
-        string strSpeed;
-
-        switch(typeOfVehicle){
-        case 0:
-           strSpeed = to_string(player.getRealSpeed());
-           break;
-        case 1:
-            strSpeed = to_string(player2.getRealSpeed());
-            break;
-        case 2:
-            strSpeed = to_string(player3.getRealSpeed());
-            break;
-        case 3:
-            strSpeed = to_string(player4.getRealSpeed());
-            break;
-        case 4:
-            strSpeed = to_string(player5.getRealSpeed());
-        }
-
-        sText.setString(strSpeed.substr(0, strSpeed.find('.')));
-        c.w.draw(sText);
-
-        s.setTexture(textures[3], true);
-        s.setScale(2.f * c.screenScale, 2.f * c.screenScale);
-        s.setPosition(initial / 1.2f, down - s.getGlobalBounds().height * speedIndicator);
-        c.w.draw(s);
-
-        if (typeOfGame == 1 || (typeOfGame >= 3 && typeOfGame <= 5)){
-
-            // Draw the tree map label with level of the player
-            s.setTexture(treeMap[mapId.first][mapId.second], true);
-            s.setScale(2.f * c.screenScale, 2.f * c.screenScale);
-            initial = float(c.w.getSize().x) - separation - s.getGlobalBounds().width;
-            s.setPosition(initial * treeIndicator, down - s.getGlobalBounds().height);
-            c.w.draw(s);
-
-            // Initialize the HUD stage indicator
-            // Level indicator
-            Text textLevel;
-            textLevel.setFont(c.fontTimeToPlay);
-            textLevel.setString("0");
-            textLevel.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-            textLevel.setFillColor(Color(146, 194, 186));
-            textLevel.setOutlineColor(Color::Black);
-            textLevel.setOutlineThickness(3.0f * c.screenScale);
-            initial -= separation + textLevel.getGlobalBounds().width;
-            textLevel.setPosition(initial, down - levelInd * float(textLevel.getCharacterSize()));
-            textLevel.setString(to_string(level));
-            c.w.draw(textLevel);
-
-            s.setTexture(textures[6], true);
-            s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
-            initial -= separation + s.getGlobalBounds().width;
-            s.setPosition(initial * 1.03f, down - s.getGlobalBounds().height * levelIndicator);
-            c.w.draw(s);
-
-            // Score indicator
-            s.setTexture(textures[7], true);
-            s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
-            const float separation = s.getGlobalBounds().width / 5.5f;
-            s.setPosition(separation * 32.0f, up - scoreHud * s.getGlobalBounds().height);
-            initial = separation + s.getGlobalBounds().width + separation;
-            c.w.draw(s);
-
-            // Initialize the HUD indicator of score
-            // Score of the player displayed in the panel
-            Text textScore;
-            textScore.setFont(c.fontTimeToPlay);
-            textScore.setString(to_string(int(BONIFICATION) * 100));
-            textScore.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-            textScore.setFillColor(Color(183, 164, 190));
-            textScore.setOutlineColor(Color::Black);
-            textScore.setOutlineThickness(3.0f * c.screenScale);
-            textScore.setString(to_string(score));
-            textScore.setPosition(initial * 4.95f - textScore.getLocalBounds().width, up - scoreIndicator * float(textScore.getCharacterSize()));
-            c.w.draw(textScore);
-
-            // Add the distance tool bar if it's driving fury or Derramage mode
-            if (typeOfGame == 3 || typeOfGame == 4){
-
-                Text distanceText;
-                distanceText.setFont(c.fontTimeToPlay);
-                distanceText.setString(to_string(int(BONIFICATION) * 100));
-                distanceText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-                distanceText.setFillColor(Color(60, 235, 102));
-                distanceText.setOutlineColor(Color::Black);
-                distanceText.setOutlineThickness(3.0f * c.screenScale);
-                distanceText.setString("DISTANCE");
-                distanceText.setPosition(initial * distanceIndicator - distanceText.getLocalBounds().width, up * 2.5f - 2.6f * float(distanceText.getCharacterSize()));
-                c.w.draw(distanceText);
-
-                // Draw the rectangle
-                RectangleShape shape;
-                shape.setPosition(initial * distancePanel, up * 2.25f);
-                shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * c.screenScale));
-                shape.setOutlineColor(Color::Black);
-                shape.setOutlineThickness(3.0f * c.screenScale);
-                shape.setFillColor(Color(119, 195, 187));
-                c.w.draw(shape);
-
-                /*
-                Text healthText;
-                healthText.setFont(c.fontTimeToPlay);
-                healthText.setString(to_string(int(BONIFICATION) * 100));
-                healthText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-                healthText.setFillColor(Color(227, 17, 30));
-                healthText.setOutlineColor(Color::Black);
-                healthText.setOutlineThickness(3.0f * c.screenScale);
-                healthText.setString("HEALTH");
-                healthText.setPosition(initial / 1.1f - healthText.getLocalBounds().width, up * 2.5f - 2.6f * float(healthText.getCharacterSize()));
-                c.w.draw(healthText);
-
-                // Draw the rectangle
-                shape.setPosition(initial / 2.0f, up * 2.25f);
-                shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * c.screenScale));
-                shape.setOutlineColor(Color(43, 211, 30));
-                shape.setOutlineThickness(3.0f * c.screenScale);
-                shape.setFillColor(Color::Black);
-                c.w.draw(shape);
-                */
-            }
-        }
-        else {
-            // Check point indicator
-            Text checkPoint;
-            checkPoint.setFont(c.fontTimeToPlay);
-            checkPoint.setCharacterSize(static_cast<unsigned int>(int(27.0f * c.screenScale)));
-            checkPoint.setFillColor(Color::White);
-            checkPoint.setOutlineColor(Color::Black);
-            checkPoint.setOutlineThickness(3.0f * c.screenScale);
-
-            int distance;
-
-            // Check if it is the last checkPoint
-            if (indexCheckPoint % 4 != 0){
-                checkPoint.setString("NEXT CHECKPOINT");
-                checkPoint.setPosition(initial * 3.1f, up - checkPointIndicator * float(checkPoint.getCharacterSize()));
-                // Calculate the distance between the player and the checkpoint
-                switch(typeOfVehicle){
-                    case 0:
-                        distance = (checkPointPositions[indexCheckPoint - 1] - player.getPosY()) / 7;
-                        break;
-                    case 1:
-                        distance = (checkPointPositions[indexCheckPoint - 1] - player2.getPosY()) / 7;
-                        break;
-                    case 2:
-                        distance = (checkPointPositions[indexCheckPoint - 1] - player3.getPosY()) / 7;
-                        break;
-                    case 3:
-                        distance = (checkPointPositions[indexCheckPoint - 1] - player4.getPosY()) / 7;
-                        break;
-                    case 4:
-                        distance = (checkPointPositions[indexCheckPoint - 1] - player5.getPosY()) / 7;
-                }
-            }
-            else {
-                checkPoint.setString("GOAL IN");
-                checkPoint.setPosition(initial * 3.42f, up - checkPointIndicator * float(checkPoint.getCharacterSize()));
-
-                switch(typeOfVehicle){
-                    case 0:
-                        distance = (currentMap->getMaxY() - player.getPosY()) / 7;
-                        break;
-                    case 1:
-                        distance = (currentMap->getMaxY() - player2.getPosY()) / 7;
-                        break;
-                    case 2:
-                        distance = (currentMap->getMaxY() - player3.getPosY()) / 7;
-                        break;
-                    case 3:
-                        distance = (currentMap->getMaxY() - player4.getPosY()) / 7;
-                        break;
-                    case 4:
-                        distance = (currentMap->getMaxY() - player5.getPosY()) / 7;
-                }
-            }
-
-            c.w.draw(checkPoint);
-
-            // Distance to the next checkpoint
-            Text distanceCheckPoint;
-            distanceCheckPoint.setFont(c.fontTimeToPlay);
-            distanceCheckPoint.setString(to_string(distance) + " KM");
-            distanceCheckPoint.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-
-            // Check the color of the distance indicator
-            if (distance >= 100){
-                distanceCheckPoint.setFillColor(Color::Green);
-            }
-            else if(distance < 100 && distance >= 50){
-                distanceCheckPoint.setFillColor(Color::Yellow);
-            }
-            else {
-                distanceCheckPoint.setFillColor(Color::Red);
-            }
-            distanceCheckPoint.setOutlineColor(Color::Black);
-            distanceCheckPoint.setOutlineThickness(3.0f * c.screenScale);
-            distanceCheckPoint.setPosition(initial * 4.0f - distanceCheckPoint.getLocalBounds().width,
-                                           up - checkPointDistance * float(distanceCheckPoint.getCharacterSize()));
-            c.w.draw(distanceCheckPoint);
-        }
-
-        if (elapSedIndicator > 0.7f){
-            elapSedIndicator -= 0.0095f;
-        }
-
-        if (elapsedTextLap > 0.6f){
-            elapsedTextLap -= 0.0165f;
-        }
-
-        if (timeIndicator > 0.5f){
-            timeIndicator -= 0.01705f;
-        }
-
-        if (scoreIndicator > 0.5f){
-            scoreIndicator -= 0.01705f;
-        }
-
-        if (timeHud > 1.6f){
-            timeHud -= 0.01705;
-        }
-
-        if (scoreHud > 1.55f){
-            scoreHud -= 0.0173;
-        }
-
-        if (speedText > 0.26f){
-            speedText -= 0.008;
-        }
-
-        if (speedIndicator < 1.0f){
-            speedIndicator += 0.014;
-        }
-
-        if (levelInd < 1.0f){
-            levelInd += 0.014;
-        }
-
-        if (levelIndicator < 1.0f){
-            levelIndicator += 0.014;
-        }
-
-        if (treeIndicator > 1.0f){
-            treeIndicator -= 0.0030;
-        }
-
-        if (distanceIndicator > 5.6f){
-            distanceIndicator -= 0.0065f;
-        }
-
-        if (distancePanel > 5.14f){
-            distancePanel -= 0.0065f;
-        }
-
-        if (checkPointIndicator > 1.8f){
-            checkPointIndicator -= 0.0163;
-        }
-
-        if (checkPointDistance > 0.5f){
-            checkPointDistance -= 0.01705f;
-        }
-
-        Sprite bufferSprite(c.w.getTexture());
-        c.w.display();
-        c.window.draw(bufferSprite);
-        c.window.display();
-    }
-}
-
-
-
-/**
  * Draw the new lap animation
  * @param c is the configuration of the game
  * @param r is the sound reproducer of the game
@@ -609,23 +543,29 @@ void Game::drawNewLap(Configuration &c){
     lapText.setOutlineThickness(3.0f * c.screenScale);
 
     if (!onPause){
-        // Control the position of the lap indicator in axis x
-        if (timeElapsed != displayLapFactor){
-            if (offsetLapIndicator < 1.48f){
-                // Check if the indicator is coming or returning
-                offsetLapIndicator += 0.01075;
+        if (!shown){
+            // Control the position of the lap indicator in axis x
+            if (timeElapsed != displayLapFactor){
+                if (offsetLapIndicator < 1.48f){
+                    // Check if the indicator is coming or returning
+                    offsetLapIndicator += 0.01075;
+                }
+                else {
+                    // Time slept increased
+                    timeElapsed++;
+                }
             }
             else {
-                // Time slept increased
-                timeElapsed++;
-            }
-        }
-        else {
-            if (offsetLapIndicator > 1.f){
-                offsetLapIndicator -= 0.01075;
-            }
-            else {
-                timeElapsed = 0;
+                if (offsetLapIndicator > 1.f){
+                    offsetLapIndicator -= 0.01075;
+                    if (offsetLapIndicator < 1.f){
+                        offsetLapIndicator = 1.f;
+                    }
+                }
+                else {
+                    timeElapsed = 0;
+                    shown = true;
+                }
             }
         }
     }
@@ -639,7 +579,7 @@ void Game::drawNewLap(Configuration &c){
  * Draw the HUD interface of the game
  * @param c is the configuration of the game
  */
-void Game::showHudInterface(Configuration &c) {
+void Game::showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c) {
 
     // Sprite to draw the elements of the HUD interface
     Sprite s;
@@ -650,7 +590,7 @@ void Game::showHudInterface(Configuration &c) {
     // UP
     s.setTexture(textures[0], true);
     s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
-    const float separation = s.getGlobalBounds().width / 5.5f;
+    float separation = s.getGlobalBounds().width / 5.5f;
     s.setPosition(separation, up - 0.7f * s.getGlobalBounds().height);
     float initial = separation + s.getGlobalBounds().width + separation;
     c.w.draw(s);
@@ -701,7 +641,7 @@ void Game::showHudInterface(Configuration &c) {
     s.setPosition(separation, float(c.w.getSize().y) - s.getGlobalBounds().height * 1.25f);
     initial = separation + s.getGlobalBounds().width / 4.0f;
 
-    float speed;
+    float speed = 0.f;
 
     switch(typeOfVehicle){
         case 0:
@@ -767,178 +707,350 @@ void Game::showHudInterface(Configuration &c) {
     s.setPosition(initial / 1.2f, down - s.getGlobalBounds().height);
     c.w.draw(s);
 
-    if (typeOfGame == 1 || (typeOfGame >= 3 && typeOfGame <= 5)){
+    // Draw the tree map label with level of the player
+    s.setTexture(treeMap[mapId.first][mapId.second], true);
+    s.setScale(2.f * c.screenScale, 2.f * c.screenScale);
+    initial = float(c.w.getSize().x) - separation - s.getGlobalBounds().width;
+    s.setPosition(initial, down - s.getGlobalBounds().height);
+    c.w.draw(s);
 
-        // Draw the tree map label with level of the player
-        s.setTexture(treeMap[mapId.first][mapId.second], true);
-        s.setScale(2.f * c.screenScale, 2.f * c.screenScale);
-        initial = float(c.w.getSize().x) - separation - s.getGlobalBounds().width;
-        s.setPosition(initial, down - s.getGlobalBounds().height);
+    // Initialize the HUD stage indicator
+    // Level indicator
+    Text textLevel;
+    textLevel.setFont(c.fontTimeToPlay);
+    textLevel.setString("0");
+    textLevel.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+    textLevel.setFillColor(Color(146, 194, 186));
+    textLevel.setOutlineColor(Color::Black);
+    textLevel.setOutlineThickness(3.0f * c.screenScale);
+    initial -= separation + textLevel.getGlobalBounds().width;
+    textLevel.setPosition(initial, down - 1.0f * float(textLevel.getCharacterSize()));
+    textLevel.setString(to_string(level));
+    c.w.draw(textLevel);
+
+    s.setTexture(textures[6], true);
+    s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
+    initial -= separation + s.getGlobalBounds().width;
+    s.setPosition(initial * 1.03f, down - s.getGlobalBounds().height);
+    c.w.draw(s);
+
+    // Score indicator
+    s.setTexture(textures[7], true);
+    s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
+    separation = s.getGlobalBounds().width / 5.5f;
+    s.setPosition(separation * 32.0f, up - 1.55f * s.getGlobalBounds().height);
+    initial = separation + s.getGlobalBounds().width + separation;
+    c.w.draw(s);
+
+    // Initialize the HUD indicator of score
+    // Score of the player displayed in the panel
+    Text textScore;
+    textScore.setFont(c.fontTimeToPlay);
+    textScore.setString(to_string(int(BONIFICATION) * 100));
+    textScore.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    textScore.setFillColor(Color(183, 164, 190));
+    textScore.setOutlineColor(Color::Black);
+    textScore.setOutlineThickness(3.0f * c.screenScale);
+    textScore.setString(to_string(score));
+    textScore.setPosition(initial * 4.95f - textScore.getLocalBounds().width, up - 0.5f * float(textScore.getCharacterSize()));
+    c.w.draw(textScore);
+
+    // Add the distance tool bar if it's driving fury or Derramage mode
+    if (typeOfGame == 3 || typeOfGame == 4){
+
+        Text distanceText;
+        distanceText.setFont(c.fontTimeToPlay);
+        distanceText.setString(to_string(int(BONIFICATION) * 100));
+        distanceText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+        distanceText.setFillColor(Color(60, 235, 102));
+        distanceText.setOutlineColor(Color::Black);
+        distanceText.setOutlineThickness(3.0f * c.screenScale);
+        distanceText.setString("DISTANCE");
+        distanceText.setPosition(initial * 5.6f - distanceText.getLocalBounds().width, up * 2.5f - 2.6f * float(distanceText.getCharacterSize()));
+        c.w.draw(distanceText);
+
+        // Draw the rectangle
+        RectangleShape shape;
+        shape.setPosition(initial * 5.14f, up * 2.25f);
+        shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * c.screenScale));
+        shape.setOutlineColor(Color::Black);
+        shape.setOutlineThickness(3.0f * c.screenScale);
+        shape.setFillColor(Color(119, 195, 187));
+        c.w.draw(shape);
+
+        Text healthText;
+        healthText.setFont(c.fontTimeToPlay);
+        healthText.setString(to_string(int(BONIFICATION) * 100));
+        healthText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+        healthText.setFillColor(Color(227, 17, 30));
+        healthText.setOutlineColor(Color::Black);
+        healthText.setOutlineThickness(3.0f * c.screenScale);
+        healthText.setString("HEALTH");
+        healthText.setPosition(initial / 1.1f - healthText.getLocalBounds().width, up * 2.5f - 2.6f * float(healthText.getCharacterSize()));
+        c.w.draw(healthText);
+
+        // Draw the rectangle
+        shape.setPosition(initial / 2.0f, up * 2.25f);
+        shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * c.screenScale));
+        shape.setOutlineColor(Color(43, 211, 30));
+        shape.setOutlineThickness(3.0f * c.screenScale);
+        shape.setFillColor(Color::Black);
+        c.w.draw(shape);
+    }
+}
+
+
+
+
+/**
+ * Draw the HUD interface of the game
+ * @param c is the configuration of the game
+ */
+void Game::showHudInterfaceWorldTourPolePosition(Configuration &c) {
+
+    // Sprite to draw the elements of the HUD interface
+    Sprite s;
+
+    // Assign positions in the game console for the game panel indicators
+    const float up = float(c.w.getSize().y) / 10.0f;
+
+    // UP
+    s.setTexture(textures[0], true);
+    s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
+    const float separation = s.getGlobalBounds().width / 5.5f;
+    s.setPosition(separation, up - 0.7f * s.getGlobalBounds().height);
+    float initial = separation + s.getGlobalBounds().width + separation;
+    c.w.draw(s);
+
+    // Indicator of the elapsed time
+    Text elapsedTime;
+    elapsedTime.setFont(c.fontElapsedTime);
+    elapsedTime.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+    elapsedTime.setFillColor(Color::Green);
+
+    // Available time to complete the level
+    Text timeToPlay;
+    timeToPlay.setString("000");
+    timeToPlay.setFont(c.fontTimeToPlay);
+    timeToPlay.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    timeToPlay.setFillColor(Color::Yellow);
+    timeToPlay.setOutlineColor(Color::Black);
+    timeToPlay.setOutlineThickness(3.0f * c.screenScale);
+    timeToPlay.setPosition(initial * 1.41f, up - 0.5f * float(timeToPlay.getCharacterSize()));
+    timeToPlay.setString(to_string(time));
+    c.w.draw(timeToPlay);
+
+    initial += elapsedTime.getGlobalBounds().width + separation;
+    s.setTexture(textures[1], true);
+    s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
+    s.setPosition(initial * 1.15f, up - s.getGlobalBounds().height * 1.6f);
+    c.w.draw(s);
+    initial += s.getGlobalBounds().width + separation;
+
+    // Initialize the HUD indicator of lap time
+    // Time of lap consumed
+    Text textLap;
+    textLap.setFont(c.fontElapsedTime);
+    textLap.setString("00:00:00");
+    textLap.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    textLap.setFillColor(Color::Green);
+    initial = float(c.w.getSize().x) - separation - textLap.getGlobalBounds().width;
+    textLap.setPosition(initial / 7.5f, up - 0.6f * float(textLap.getCharacterSize()));
+    textLap.setString(lap);
+    c.w.draw(textLap);
+    c.w.draw(s);
+
+    // DOWN
+    textures[2].loadFromFile("Data/Hud/7.png");
+    s.setTexture(textures[2], true);
+    s.setScale(2.f * c.screenScale, 1.5f * c.screenScale);
+    const float down = float(c.w.getSize().y) - s.getGlobalBounds().height * 1.5f;
+    s.setPosition(separation, float(c.w.getSize().y) - s.getGlobalBounds().height * 1.25f);
+    initial = separation + s.getGlobalBounds().width / 4.0f;
+
+    float speed = 0.f;
+
+    switch(typeOfVehicle){
+        case 0:
+            speed = player.getRealSpeed();
+            break;
+        case 1:
+            speed = player2.getRealSpeed();
+            break;
+        case 2:
+            speed = player3.getRealSpeed();
+            break;
+        case 3:
+            speed = player4.getRealSpeed();
+            break;
+        case 4:
+            speed = player5.getRealSpeed();
+    }
+
+    textures[2].loadFromFile("Data/Hud/3.png",
+                             IntRect(0, 0, static_cast<int>(speed * 117.0f / MAX_SPEED * c.screenScale),
+                                     static_cast<int>(20.0f * c.screenScale)));
+
+
+    s.setTexture(textures[2], true);
+    if (speed > 0.0f)
         c.w.draw(s);
 
-        // Initialize the HUD stage indicator
-        // Level indicator
-        Text textLevel;
-        textLevel.setFont(c.fontTimeToPlay);
-        textLevel.setString("0");
-        textLevel.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
-        textLevel.setFillColor(Color(146, 194, 186));
-        textLevel.setOutlineColor(Color::Black);
-        textLevel.setOutlineThickness(3.0f * c.screenScale);
-        initial -= separation + textLevel.getGlobalBounds().width;
-        textLevel.setPosition(initial, down - 1.0f * float(textLevel.getCharacterSize()));
-        textLevel.setString(to_string(level));
-        c.w.draw(textLevel);
+    // Text
+    // HUD
+    Text sText;
+    sText.setFont(c.speedVehicle);
+    sText.setString("0001");
+    sText.setCharacterSize(static_cast<unsigned int>(int(70.0f * c.screenScale)));
+    sText.setFillColor(Color(206, 73, 73));
+    sText.setOutlineThickness(3.0f * c.screenScale);
+    sText.setPosition(initial - (sText.getLocalBounds().width * 0.26f), down - float(sText.getCharacterSize()));
+    initial += sText.getGlobalBounds().width;
 
-        s.setTexture(textures[6], true);
-        s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
-        initial -= separation + s.getGlobalBounds().width;
-        s.setPosition(initial * 1.03f, down - s.getGlobalBounds().height);
-        c.w.draw(s);
+    string strSpeed;
 
-        // Score indicator
-        s.setTexture(textures[7], true);
-        s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
-        const float separation = s.getGlobalBounds().width / 5.5f;
-        s.setPosition(separation * 32.0f, up - 1.55f * s.getGlobalBounds().height);
-        initial = separation + s.getGlobalBounds().width + separation;
-        c.w.draw(s);
+    switch(typeOfVehicle){
+    case 0:
+       strSpeed = to_string(player.getRealSpeed());
+       break;
+    case 1:
+        strSpeed = to_string(player2.getRealSpeed());
+        break;
+    case 2:
+        strSpeed = to_string(player3.getRealSpeed());
+        break;
+    case 3:
+        strSpeed = to_string(player4.getRealSpeed());
+        break;
+    case 4:
+        strSpeed = to_string(player5.getRealSpeed());
+    }
 
-        // Initialize the HUD indicator of score
-        // Score of the player displayed in the panel
-        Text textScore;
-        textScore.setFont(c.fontTimeToPlay);
-        textScore.setString(to_string(int(BONIFICATION) * 100));
-        textScore.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-        textScore.setFillColor(Color(183, 164, 190));
-        textScore.setOutlineColor(Color::Black);
-        textScore.setOutlineThickness(3.0f * c.screenScale);
-        textScore.setString(to_string(score));
-        textScore.setPosition(initial * 4.95f - textScore.getLocalBounds().width, up - 0.5f * float(textScore.getCharacterSize()));
-        c.w.draw(textScore);
+    sText.setString(strSpeed.substr(0, strSpeed.find('.')));
+    c.w.draw(sText);
 
-        // Add the distance tool bar if it's driving fury or Derramage mode
-        if (typeOfGame == 3 || typeOfGame == 4){
+    s.setTexture(textures[3], true);
+    s.setScale(2.f * c.screenScale, 2.f * c.screenScale);
+    s.setPosition(initial / 1.2f, down - s.getGlobalBounds().height);
+    c.w.draw(s);
 
-            Text distanceText;
-            distanceText.setFont(c.fontTimeToPlay);
-            distanceText.setString(to_string(int(BONIFICATION) * 100));
-            distanceText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-            distanceText.setFillColor(Color(60, 235, 102));
-            distanceText.setOutlineColor(Color::Black);
-            distanceText.setOutlineThickness(3.0f * c.screenScale);
-            distanceText.setString("DISTANCE");
-            distanceText.setPosition(initial * 5.6f - distanceText.getLocalBounds().width, up * 2.5f - 2.6f * float(distanceText.getCharacterSize()));
-            c.w.draw(distanceText);
+    if (numberRacers > 0){
+        Text positionInRace;
+        positionInRace.setFont(c.fontTimeToPlay);
+        positionInRace.setCharacterSize(static_cast<unsigned int>(int(70.0f * c.screenScale)));
+        positionInRace.setFillColor(Color::Red);
+        positionInRace.setOutlineColor(Color::Black);
+        positionInRace.setOutlineThickness(3.0f * c.screenScale);
 
-            // Draw the rectangle
-            RectangleShape shape;
-            shape.setPosition(initial * 5.14f, up * 2.25f);
-            shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * c.screenScale));
-            shape.setOutlineColor(Color::Black);
-            shape.setOutlineThickness(3.0f * c.screenScale);
-            shape.setFillColor(Color(119, 195, 187));
-            c.w.draw(shape);
+        Text ordinalPos;
+        ordinalPos.setFont(c.fontTimeToPlay);
+        ordinalPos.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+        ordinalPos.setFillColor(Color::Red);
+        ordinalPos.setOutlineColor(Color::Black);
+        ordinalPos.setOutlineThickness(3.0f * c.screenScale);
 
-            Text healthText;
-            healthText.setFont(c.fontTimeToPlay);
-            healthText.setString(to_string(int(BONIFICATION) * 100));
-            healthText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-            healthText.setFillColor(Color(227, 17, 30));
-            healthText.setOutlineColor(Color::Black);
-            healthText.setOutlineThickness(3.0f * c.screenScale);
-            healthText.setString("HEALTH");
-            healthText.setPosition(initial / 1.1f - healthText.getLocalBounds().width, up * 2.5f - 2.6f * float(healthText.getCharacterSize()));
-            c.w.draw(healthText);
+        string index;
+        switch(posArrival){
+            case 1:
+                index = "st";
+                break;
+            case 2:
+                index = "nd";
+                break;
+            case 3:
+                index = "rd";
+                break;
+            default:
+                index = "th";
+        }
 
-            // Draw the rectangle
-            shape.setPosition(initial / 2.0f, up * 2.25f);
-            shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * c.screenScale));
-            shape.setOutlineColor(Color(43, 211, 30));
-            shape.setOutlineThickness(3.0f * c.screenScale);
-            shape.setFillColor(Color::Black);
-            c.w.draw(shape);
+        positionInRace.setString(to_string(posArrival));
+        ordinalPos.setString(index);
+        positionInRace.setPosition(initial * 3.9f, down - 0.95f * float(positionInRace.getCharacterSize()));
+        ordinalPos.setPosition(initial * 3.9f + positionInRace.getLocalBounds().width + 5.f,
+                               down - 0.66f * float(positionInRace.getCharacterSize()));
+
+        c.w.draw(positionInRace);
+        c.w.draw(ordinalPos);
+    }
+
+    // Check point indicator
+    Text checkPoint;
+    checkPoint.setFont(c.fontTimeToPlay);
+    checkPoint.setCharacterSize(static_cast<unsigned int>(int(27.0f * c.screenScale)));
+    checkPoint.setFillColor(Color::White);
+    checkPoint.setOutlineColor(Color::Black);
+    checkPoint.setOutlineThickness(3.0f * c.screenScale);
+
+    int distance = 0;
+
+    // Check if it is the last checkPoint
+    if (indexCheckPoint % 4 != 0){
+        checkPoint.setString("NEXT CHECKPOINT");
+        checkPoint.setPosition(initial * 3.1f, up - 1.8f * float(checkPoint.getCharacterSize()));
+        // Calculate the distance between the player and the checkpoint
+        switch(typeOfVehicle){
+            case 0:
+                distance = (checkPointPositions[indexCheckPoint - 1] - player.getPosY()) / 7;
+                break;
+            case 1:
+                distance = (checkPointPositions[indexCheckPoint - 1] - player2.getPosY()) / 7;
+                break;
+            case 2:
+                distance = (checkPointPositions[indexCheckPoint - 1] - player3.getPosY()) / 7;
+                break;
+            case 3:
+                distance = (checkPointPositions[indexCheckPoint - 1] - player4.getPosY()) / 7;
+                break;
+            case 4:
+                distance = (checkPointPositions[indexCheckPoint - 1] - player5.getPosY()) / 7;
         }
     }
     else {
-        // Check point indicator
-        Text checkPoint;
-        checkPoint.setFont(c.fontTimeToPlay);
-        checkPoint.setCharacterSize(static_cast<unsigned int>(int(27.0f * c.screenScale)));
-        checkPoint.setFillColor(Color::White);
-        checkPoint.setOutlineColor(Color::Black);
-        checkPoint.setOutlineThickness(3.0f * c.screenScale);
+        checkPoint.setString("GOAL IN");
+        checkPoint.setPosition(initial * 3.42f, up - 1.8f * float(checkPoint.getCharacterSize()));
 
-        int distance;
-
-        // Check if it is the last checkPoint
-        if (indexCheckPoint % 4 != 0){
-            checkPoint.setString("NEXT CHECKPOINT");
-            checkPoint.setPosition(initial * 3.1f, up - 1.8f * float(checkPoint.getCharacterSize()));
-            // Calculate the distance between the player and the checkpoint
-            switch(typeOfVehicle){
-                case 0:
-                    distance = (checkPointPositions[indexCheckPoint - 1] - player.getPosY()) / 7;
-                    break;
-                case 1:
-                    distance = (checkPointPositions[indexCheckPoint - 1] - player2.getPosY()) / 7;
-                    break;
-                case 2:
-                    distance = (checkPointPositions[indexCheckPoint - 1] - player3.getPosY()) / 7;
-                    break;
-                case 3:
-                    distance = (checkPointPositions[indexCheckPoint - 1] - player4.getPosY()) / 7;
-                    break;
-                case 4:
-                    distance = (checkPointPositions[indexCheckPoint - 1] - player5.getPosY()) / 7;
-            }
+        switch(typeOfVehicle){
+            case 0:
+                distance = (currentMap->getMaxY() - player.getPosY()) / 7;
+                break;
+            case 1:
+                distance = (currentMap->getMaxY() - player2.getPosY()) / 7;
+                break;
+            case 2:
+                distance = (currentMap->getMaxY() - player3.getPosY()) / 7;
+                break;
+            case 3:
+                distance = (currentMap->getMaxY() - player4.getPosY()) / 7;
+                break;
+            case 4:
+                distance = (currentMap->getMaxY() - player5.getPosY()) / 7;
         }
-        else {
-            checkPoint.setString("GOAL IN");
-            checkPoint.setPosition(initial * 3.42f, up - 1.8f * float(checkPoint.getCharacterSize()));
-
-            switch(typeOfVehicle){
-                case 0:
-                    distance = (currentMap->getMaxY() - player.getPosY()) / 7;
-                    break;
-                case 1:
-                    distance = (currentMap->getMaxY() - player2.getPosY()) / 7;
-                    break;
-                case 2:
-                    distance = (currentMap->getMaxY() - player3.getPosY()) / 7;
-                    break;
-                case 3:
-                    distance = (currentMap->getMaxY() - player4.getPosY()) / 7;
-                    break;
-                case 4:
-                    distance = (currentMap->getMaxY() - player5.getPosY()) / 7;
-            }
-        }
-
-        c.w.draw(checkPoint);
-
-        // Distance to the next checkpoint
-        Text distanceCheckPoint;
-        distanceCheckPoint.setFont(c.fontTimeToPlay);
-        distanceCheckPoint.setString(to_string(distance) + " KM");
-        distanceCheckPoint.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-
-        // Check the color of the distance indicator
-        if (distance >= 100){
-            distanceCheckPoint.setFillColor(Color::Green);
-        }
-        else if(distance < 100 && distance >= 50){
-            distanceCheckPoint.setFillColor(Color::Yellow);
-        }
-        else {
-            distanceCheckPoint.setFillColor(Color::Red);
-        }
-        distanceCheckPoint.setOutlineColor(Color::Black);
-        distanceCheckPoint.setOutlineThickness(3.0f * c.screenScale);
-        distanceCheckPoint.setPosition(initial * 4.0f - distanceCheckPoint.getLocalBounds().width,
-                                       up - 0.5f * float(distanceCheckPoint.getCharacterSize()));
-        c.w.draw(distanceCheckPoint);
     }
+
+    c.w.draw(checkPoint);
+
+    // Distance to the next checkpoint
+    Text distanceCheckPoint;
+    distanceCheckPoint.setFont(c.fontTimeToPlay);
+    distanceCheckPoint.setString(to_string(distance) + " KM");
+    distanceCheckPoint.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+
+    // Check the color of the distance indicator
+    if (distance >= 100){
+        distanceCheckPoint.setFillColor(Color::Green);
+    }
+    else if(distance < 100 && distance >= 50){
+        distanceCheckPoint.setFillColor(Color::Yellow);
+    }
+    else {
+        distanceCheckPoint.setFillColor(Color::Red);
+    }
+    distanceCheckPoint.setOutlineColor(Color::Black);
+    distanceCheckPoint.setOutlineThickness(3.0f * c.screenScale);
+    distanceCheckPoint.setPosition(initial * 4.0f - distanceCheckPoint.getLocalBounds().width,
+                                   up - 0.5f * float(distanceCheckPoint.getCharacterSize()));
+    c.w.draw(distanceCheckPoint);
 }
 
 
@@ -1239,48 +1351,74 @@ void Game::showBonusIndications(Configuration &c, int seconds, int decs_second) 
 Game::Game(Configuration &c){
 
     // Variables to store the vehicle properties
-    string brandName, motorName, pathFile;
-    float max_speed, angle;
+    string brandNameMotorbike, motorNameMotorbike, pathFileMotorbike, brandNameDevastator, motorNameDevastator,
+           pathFileDevastator, brandNameMinivan, motorNameMinivan, pathFileMinivan, brandNameTruck, motorNameTruck,
+           pathFileTruck, brandNamePolice, motorNamePolice, pathFilePolice;
+
+    float max_speedMotorbike, angleMotorbike, max_speedDevastator, angleDevastator, max_speedMinivan,
+          angleMinivan, max_speedTruck, angleTruck, max_speedPolice, anglePolice;
+
+    // Array of threads
+    thread P[5];
 
     // Load the properties of the motorbike
-    pathFile = "Data/Vehicles/Motorbike/Configuration/Configuration.xml";
-    loadVehicleProperties(pathFile, brandName, max_speed, angle, motorName);
-
-    // Create the motorbike vehicle
-    player = Motorbike(max_speed, SPEED_FACTOR, max_speed * ACCELERATION_INCREMENT / MAX_SPEED, 2.5f, 2.5f,
-                       COUNTER, "Motorbike", 0.0f, RECTANGLE, brandName, angle, motorName);
+    pathFileMotorbike = "Data/Vehicles/Motorbike/Configuration/Configuration.xml";
 
     // Load the properties of the Devastator
-    pathFile = "Data/Vehicles/Devastator/Configuration/Configuration.xml";
-    loadVehicleProperties(pathFile, brandName, max_speed, angle, motorName);
+    pathFileDevastator = "Data/Vehicles/Devastator/Configuration/Configuration.xml";
+
+    // Load the properties of the Devastator
+    pathFileMinivan = "Data/Vehicles/Minivan/Configuration/Configuration.xml";
+
+    // Load the properties of the Devastator
+    pathFileTruck = "Data/Vehicles/Truck/Configuration/Configuration.xml";
+
+    // Load the properties of the Police car
+    pathFilePolice = "Data/Vehicles/Police/Configuration/Configuration.xml";
+
+    // Throw the threads that load the properties of each vehicle
+
+    thread loadMotorbike = thread(loadVehicleProperties, this, pathFileMotorbike, ref(brandNameMotorbike),
+                                  ref(max_speedMotorbike), ref(angleMotorbike), ref(motorNameMotorbike));
+
+    thread loadDevastator = thread(loadVehicleProperties, this, pathFileDevastator, ref(brandNameDevastator), ref(max_speedDevastator),
+                                  ref(angleDevastator), ref(motorNameDevastator));
+
+    thread loadMinivan = thread(loadVehicleProperties, this, pathFileMinivan, ref(brandNameMinivan), ref(max_speedMinivan),
+                                ref(angleMinivan), ref(motorNameMinivan));
+
+    thread loadTruck = thread (loadVehicleProperties, this, pathFileTruck, ref(brandNameTruck), ref(max_speedTruck), ref(angleTruck),
+                               ref(motorNameTruck));
+
+    thread loadPolice = thread (loadVehicleProperties, this, pathFilePolice, ref(brandNamePolice), ref(max_speedPolice), ref(anglePolice),
+                                ref(motorNamePolice));
+
+    // Control that all the threads have finished
+    loadMotorbike.join();
+    loadDevastator.join();
+    loadMinivan.join();
+    loadTruck.join();
+    loadPolice.join();
+
+    // Create the motorbike vehicle
+    player = Motorbike(max_speedMotorbike, SPEED_FACTOR, max_speedMotorbike * ACCELERATION_INCREMENT / MAX_SPEED, 2.5f, 2.5f,
+                       COUNTER, "Motorbike", 0.0f, RECTANGLE, brandNameMotorbike, angleMotorbike, motorNameMotorbike);
 
     // Create the Devastator vehicle
-    player2 = Devastator(max_speed, SPEED_FACTOR, max_speed * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
-                       COUNTER, "Devastator", 0.0f, RECTANGLE, brandName, angle, motorName);
-
-     // Load the properties of the Devastator
-    pathFile = "Data/Vehicles/Minivan/Configuration/Configuration.xml";
-    loadVehicleProperties(pathFile, brandName, max_speed, angle, motorName);
+    player2 = Devastator(max_speedDevastator, SPEED_FACTOR, max_speedDevastator * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
+                       COUNTER, "Devastator", 0.0f, RECTANGLE, brandNameDevastator, angleDevastator, motorNameDevastator);
 
     // Create the minivan vehicle
-    player3 = Minivan(max_speed, SPEED_FACTOR, max_speed * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
-                       COUNTER, "Minivan", 0.0f, RECTANGLE, brandName, angle, motorName);
-
-     // Load the properties of the Devastator
-    pathFile = "Data/Vehicles/Truck/Configuration/Configuration.xml";
-    loadVehicleProperties(pathFile, brandName, max_speed, angle, motorName);
+    player3 = Minivan(max_speedMinivan, SPEED_FACTOR, max_speedMinivan * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
+                       COUNTER, "Minivan", 0.0f, RECTANGLE, brandNameMinivan, angleMinivan, motorNameMinivan);
 
     // Load the properties of the Truck
-    player4 = Truck(max_speed, SPEED_FACTOR, max_speed * ACCELERATION_INCREMENT / MAX_SPEED, 4.5f, 4.5f,
-                       COUNTER, "Truck", 0.0f, RECTANGLE, brandName, angle, motorName);
-
-     // Load the properties of the Police car
-    pathFile = "Data/Vehicles/Police/Configuration/Configuration.xml";
-    loadVehicleProperties(pathFile, brandName, max_speed, angle, motorName);
+    player4 = Truck(max_speedTruck, SPEED_FACTOR, max_speedTruck * ACCELERATION_INCREMENT / MAX_SPEED, 4.5f, 4.5f,
+                       COUNTER, "Truck", 0.0f, RECTANGLE, brandNameTruck, angleTruck, motorNameTruck);
 
     // Create the properties of the police car
-    player5 = Police(max_speed, SPEED_FACTOR, max_speed * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
-                       COUNTER, "Police", 0.0f, RECTANGLE, brandName, angle, motorName);
+    player5 = Police(max_speedPolice, SPEED_FACTOR, max_speedPolice * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
+                       COUNTER, "Police", 0.0f, RECTANGLE, brandNamePolice, anglePolice, motorNamePolice);
 
 
     typeOfVehicle = 0;
@@ -1298,24 +1436,21 @@ Game::Game(Configuration &c){
     blink = false;
     arrival = false;
     updatedTimeCheck = false;
+    shown = false;
     woman_delay = seconds(5.0f);
     traffic_delay = seconds(2.f);
     blink_delay = seconds(0.5f);
     bonus_delay = seconds(0.01f);
 
-    minutes = 0;
-    secs = 0;
-    cents_second = 0;
     minutesTrip = 0;
     secsTrip = 0;
     cents_secondTrip = 0;
     timeCheck = 0;
-    posArrival = 1;
     numberLaps = 3;
     lapsDone = 1;
     timeElapsed = 0;
     offsetLapIndicator = 1.f;
-    numberRacers = 8;
+    numberRacers = 7;
 
     lap = "00:00:00";
     typeOfGame = 1;
@@ -1347,20 +1482,19 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
     timeCheck = 0;
     lap = "00:00:00";
     indexCheckPoint = 1;
-    posArrival = 1;
 
     switch(typeOfVehicle){
         case 0:
-            player.setVehicle();
+            player.setVehicle(typeOfGame);
             break;
         case 1:
-            player2.setVehicle();
+            player2.setVehicle(typeOfGame);
             break;
         case 2:
-            player3.setVehicle();
+            player3.setVehicle(typeOfGame);
             break;
         case 3:
-            player4.setVehicle();
+            player4.setVehicle(typeOfGame);
     }
 
     // Times of each scenario
@@ -1376,11 +1510,25 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
         path = "Data/Gamemodes/PolePosition/LandScapes/LandScape";
     }
 
-    // Loop for load the maps
-    for (int i = 0; i < 4; i++) {
-        // Load the landscape using the correspond path
-        LandScape m(c, path + to_string(i + 1) + "/", "bg.png", times[i], typeOfGame);
-        tourLandScapes.push_back(m);
+    // Array of mutex for control the storing order of the landscapes
+    mutex tourLandScapesMutex[4];
+
+    // Array of threads
+    thread P[4];
+
+    // Throw a thread for each landscape that has to be loaded
+    for (int i = 0; i < 4; i++){
+        // Lock all the mutex except the first one
+        if (i != 0){
+            tourLandScapesMutex[i].lock();
+        }
+        // Throw a thread to load the landscape i
+        P[i] = thread(loadWorldTourPolePositionLandScape, this, ref(c), path, i , times[i], typeOfGame, ref(tourLandScapesMutex));
+    }
+
+    // Wait until all threads have finished
+    for (int i = 0; i < 4; i++){
+        P[i].join();
     }
 
     // Index of the first landscape
@@ -1402,7 +1550,7 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
     }
 
     // Load the game mode hud
-    loadHudGame();
+    loadHudGameWorldTourPolePosition();
 
     if (typeOfGame == 2){
         return CIRCUIT_SELECTION_MENU;
@@ -1438,20 +1586,19 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     timeCheck = 0;
     lap = "00:00:00";
     indexCheckPoint = 1;
-    posArrival = 1;
 
     switch(typeOfVehicle){
         case 0:
-            player.setVehicle();
+            player.setVehicle(typeOfGame);
             break;
         case 1:
-            player2.setVehicle();
+            player2.setVehicle(typeOfGame);
             break;
         case 2:
-            player3.setVehicle();
+            player3.setVehicle(typeOfGame);
             break;
         case 3:
-            player4.setVehicle();
+            player4.setVehicle(typeOfGame);
     }
 
     // Control the loading of the landscapes
@@ -1481,19 +1628,40 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
             pathMode = "Data/Gamemodes/Delivery/LandScapes/LandScape";
     }
 
+    // Array of mutex to control the storing order
+    mutex landScapes[15];
+
+    for (int i = 1; i < 15; i++){
+        landScapes[i].lock();
+    }
 
     // Loop for load the maps
     for (int i = 0; i < 5; i++) {
+        // Vector of landscapes
         vector<LandScape> vm;
+
+        // Array of threads
+        thread P[i + 1];
+
+        // Load the landscapes
         for (int j = 0; j <= i; j++) {
-            // Load the landscape using the correspond path
-            LandScape m(c, pathMode + to_string(nm + 1) + "/", "bg.png", times[nm], typeOfGame);
-            vm.push_back(m);
+
+            // Throw a thread to load the nm landscape
+            P[j] = thread(loadOutRunDrivingFuryDerramageLandScape, this, ref(c), pathMode + to_string(nm + 1) + "/", nm, times[nm],
+                           typeOfGame, ref(landScapes), ref(vm));
+
             nm++;
         }
+
+        // Wait until all the threads have
+        for (int j = 0; j <= i; j++){
+            P[j].join();
+        }
+
         // Store the map in the matrix
         maps.emplace_back(vm);
     }
+
     mapId = make_pair(0, 0);
 
     // Back door
@@ -1527,13 +1695,13 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     if (mapId.first < 4)
         currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
     else {
-        goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
+        goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
         goalMap.setColorsLandScape(*currentMap);
         currentMap->addNewLandScape(&goalMap);
     }
 
     // Load the game mode hud
-    loadHudGame();
+    loadHudGameOutRunDrivingFuryDerramage();
 
     score = 0;
     level = mapId.first + 1;
@@ -1563,21 +1731,21 @@ void Game::checkDifficulty(Configuration &c) {
                 c.maxAggressiveness = 0.0f;
             break;
         case EASY:
-            numCars = 5;
+            numCars = 3;
             timeMul = 1.1f;
             scoreMul = 0.5f;
             if (c.enableAI)
                 c.maxAggressiveness = 0.25f;
             break;
         case NORMAL:
-            numCars = 10;
+            numCars = 6;
             timeMul = 1.0f;
             scoreMul = 1.0f;
             if (c.enableAI)
                 c.maxAggressiveness = 0.5f;
             break;
         case HARD:
-            numCars = 15;
+            numCars = 12;
             timeMul = 0.9f;
             scoreMul = 1.5f;
             if (c.enableAI)
@@ -1594,11 +1762,11 @@ void Game::checkDifficulty(Configuration &c) {
 
     // Vehicles
     cars.reserve(static_cast<unsigned long>(numCars));
-    if (cars.size() > numCars) {
-        while (cars.size() > numCars)
+    if ((int)cars.size() > numCars) {
+        while ((int)cars.size() > numCars)
             cars.pop_back();
     }
-    else if (cars.size() < numCars) {
+    else if ((int)cars.size() < numCars) {
         const int maxSprites = 6;
         const float vehicleScales[maxSprites] = {1.5f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f};
         for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
@@ -1609,7 +1777,7 @@ void Game::checkDifficulty(Configuration &c) {
     }
 
     for (TrafficCar &v : cars){
-        v.setAI(c.maxAggressiveness);
+        v.setAI(c.maxAggressiveness, c.level);
     }
 
 
@@ -1699,7 +1867,7 @@ float Game::getCents_SecondTrip() const {
  * @param c is the configuration of the game
  * @return
  */
-State Game::play(Configuration &c, SoundPlayer& r) {
+State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
 
     if (!inGame) {
         inGame = true;
@@ -1714,21 +1882,206 @@ State Game::play(Configuration &c, SoundPlayer& r) {
 
     c.window.setKeyRepeatEnabled(false);
 
-    // Time to update the clock counter
-    Time shot_delayTime = seconds(1.0);
-
-    // Time to update the clock counter lap
-    Time shot_delayLap = seconds(0.01);
-
     // Time to change again the soundtrack
     soundtrack_delay = seconds(3.0);
 
-    // Initialize the clock counters of time
-    gameClockTime.restart().asSeconds();
-    elapsed1 = gameClockTime.restart().asSeconds();
+    womanShot.restart();
+    elapsed5 = womanShot.getElapsedTime().asSeconds();
 
-    gameClockLap.restart();
-    elapsed3 = gameClockLap.getElapsedTime().asSeconds();
+    trafficCarSound.restart();
+    elapsed7 = trafficCarSound.getElapsedTime().asSeconds();
+
+    soundtrackClock.restart();
+    elapsed13 = soundtrackClock.getElapsedTime().asSeconds();
+
+    Vehicle::Action action;
+    Vehicle::Direction direction;
+
+    State status = PLAY_GAME;
+
+    int localTime;
+
+    if (!comeFromOptions){
+        // Thread to control the elapsed time
+        timer0 = thread(updateTimeElapsed, this);
+
+        // Thread to control the time of the landscape
+        timer1 = thread(updateTimeLandScape, this);
+    }
+
+    while (!finalGame && !arrival && c.window.isOpen()) {
+
+        // Detect the possible events
+        Event e{};
+        while (c.window.pollEvent(e)){
+            if (e.type == Event::Closed){
+                mtx.lock();
+                finalGame = true;
+                mtx.unlock();
+                timer0.join();
+                timer1.join();
+                return EXIT;
+            }
+        }
+
+        // Update the status of the game
+        if (typeOfGame == 0){
+            updateGameWorldTourStatus(c, r, action, direction, terrain);
+        }
+        else {
+            updateGamePolePositionStatus(c, r, action, direction, terrain);
+        }
+
+        // Control the final of the game
+        if (!finalGame && !arrival) {
+            // Check is the game is on pause
+            if (Keyboard::isKeyPressed(c.menuKey) || onPause) {
+                // Pause the game
+                r.soundEffects[1]->stop();
+                r.soundEffects[1]->play();
+                status = pause(c, r, action, direction);
+
+                // Control the exit of the game
+                if (status == OPTIONS) {
+                    comeFromOptions = true;
+                    mtx.lock();
+                    finalGame = true;
+                    mtx.unlock();
+                }
+                else if (status == START) {
+                    mtx.lock();
+                    finalGame = true;
+                    mtx.unlock();
+                    inGame = false;
+                    r.soundTracks[r.currentSoundtrack]->stop();
+                    return START;
+                }
+                else if (status == PLAY_GAME) {
+                    r.soundTracks[r.currentSoundtrack]->play();
+                    timer0 = thread(updateTimeElapsed, this);
+                    timer1 = thread(updateTimeLandScape, this);
+                }
+                else if (status == EXIT) {
+                    mtx.lock();
+                    finalGame = true;
+                    onPause = false;
+                    mtx.unlock();
+                    return EXIT;
+                }
+            }
+
+
+            // Update the indicators
+            mtx.lock();
+            lap = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
+            lap += (secs < 10) ? "0" + to_string(int(secs)) + ":" : to_string(int(secs)) + ":";
+            int cent_sec = cents_second * 100.f;
+            lap += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
+            mtx.unlock();
+
+            // Draw the HUD of the game
+            showHudInterfaceWorldTourPolePosition(c);
+
+            // Control if the music has been change by the player
+            checkSoundtrackChanging(c, r);
+
+
+            Sprite bufferSprite(c.w.getTexture());
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+
+            localTime = time;
+
+            if (localTime == 10) {
+                r.soundEffects[26]->stop();
+                r.soundEffects[26]->play();
+            }
+
+            // Check if the player has time to continue
+
+            if (localTime == 0) {
+                // Final game
+                mtx.lock();
+                finalGame = true;
+                mtx.unlock();
+            }
+        }
+    }
+
+    if (!comeFromOptions){
+        timer0.join();
+        timer1.join();
+    }
+
+    mtx.lock();
+    finalGame = false;
+    if (arrival) {
+        arrival = false;
+        mtx.unlock();
+        return CLASIFICATION;
+    }
+    mtx.unlock();
+
+    if (status != OPTIONS && status != START) {
+        // Draw the game over text in the console window
+        showGameOver(c);
+        r.soundTracks[r.currentSoundtrack]->stop();
+        r.soundEffects[25]->stop();
+        r.soundEffects[25]->play();
+        Sprite bufferSprite(c.w.getTexture());
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+        sleep(r.soundEffects[24]->getDuration());
+
+        bool startPressed = false;
+
+        r.soundTracks[13]->play();
+        while (!startPressed) {
+
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)) {
+                if (e.type == Event::Closed) {
+                    return EXIT;
+                }
+            }
+
+            startPressed = Keyboard::isKeyPressed(c.menuEnterKey);
+        }
+        r.soundTracks[13]->stop();
+        r.soundEffects[2]->stop();
+        r.soundEffects[2]->play();
+        return START;
+    }
+    return status;
+}
+
+
+
+/**
+ * Updates the logic of the game and refreshes the screen until you leave the game.
+ * @param c is the configuration of the game
+ * @return
+ */
+State Game::playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r) {
+
+    if (!inGame) {
+        inGame = true;
+        showsInitialAnimation(c, r);
+    }
+    else if ((typeOfGame == 0 || typeOfGame == 2) && !comeFromOptions){
+        showsInitialAnimation(c, r);
+    }
+
+    // Get the kind of terrain of the landscape
+    terrain = currentMap->getTerrain();
+
+    c.window.setKeyRepeatEnabled(false);
+
+    // Time to change again the soundtrack
+    soundtrack_delay = seconds(3.0);
 
     womanShot.restart();
     elapsed5 = womanShot.getElapsedTime().asSeconds();
@@ -1745,19 +2098,43 @@ State Game::play(Configuration &c, SoundPlayer& r) {
     Vehicle::Action action;
     Vehicle::Direction direction;
 
-    State status;
+    State status = PLAY_GAME;
+
+    int localTime;
+
+    if (!comeFromOptions){
+        // Thread to control the elapsed time
+        timer0 = thread(updateTimeElapsed, this);
+
+        // Thread to control the time of the landscape
+        timer1 = thread(updateTimeLandScape, this);
+
+        // Thread to counter the score of the game
+        timer2 = thread(updateScore, this);
+    }
 
     while (!finalGame && !arrival && c.window.isOpen()) {
         // Detect the possible events
         Event e{};
         while (c.window.pollEvent(e)){
             if (e.type == Event::Closed){
+                mtx.lock();
+                finalGame = true;
+                mtx.unlock();
+                timer0.join();
+                timer1.join();
+                timer2.join();
                 return EXIT;
             }
         }
 
         // Update the status of the game
-        updateGameStatus(c, r, action, direction, terrain);
+        if (typeOfGame == 3){
+            updateGameDrivingFuryStatus(c, r, action, direction, terrain);
+        }
+        else {
+            updateGameOutRunDerramageStatus(c, r, action, direction, terrain);
+        }
 
         // Control the final of the game
         if (!finalGame && !arrival) {
@@ -1771,112 +2148,43 @@ State Game::play(Configuration &c, SoundPlayer& r) {
                 // Control the exit of the game
                 if (status == OPTIONS) {
                     comeFromOptions = true;
+                    mtx.lock();
                     finalGame = true;
+                    mtx.unlock();
                 }
                 else if (status == START) {
+                    mtx.lock();
                     finalGame = true;
+                    mtx.unlock();
                     inGame = false;
                     r.soundTracks[r.currentSoundtrack]->stop();
                     return START;
                 }
                 else if (status == PLAY_GAME) {
                     r.soundTracks[r.currentSoundtrack]->play();
+                    timer0 = thread(updateTimeElapsed, this);
+                    timer1 = thread(updateTimeLandScape, this);
+                    timer2 = thread(updateScore, this);
                 }
                 else if (status == EXIT) {
+                    mtx.lock();
+                    finalGame = true;
+                    onPause = false;
+                    mtx.unlock();
                     return EXIT;
                 }
-                gameClockLap.restart();
-            }
-
-            float speed;
-
-            switch(typeOfVehicle){
-                case 0:
-                    speed = player.getRealSpeed();
-                    // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
-                        // Add score
-                        score += int(player.getRealSpeed() * scoreMul);
-                    }
-                    break;
-                case 1:
-                    speed = player2.getRealSpeed();
-                    // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
-                        // Add score
-                        score += int(player2.getRealSpeed() * scoreMul);
-                    }
-                    break;
-                case 2:
-                    speed = player3.getRealSpeed();
-                    // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
-                        // Add score
-                        score += int(player3.getRealSpeed() * scoreMul);
-                    }
-                    break;
-                case 3:
-                    speed = player4.getRealSpeed();
-                    // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
-                        // Add score
-                        score += int(player4.getRealSpeed() * scoreMul);
-                    }
-                    break;
-                case 4:
-                    speed = player5.getRealSpeed();
-                    // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
-                        // Add score
-                        score += int(player5.getRealSpeed() * scoreMul);
-                    }
-
-            }
-
-            // Get the actual time
-            elapsed4 = gameClockLap.getElapsedTime().asSeconds();
-
-            // Check if a tenth of second has passed between both timestamps
-            if (elapsed4 - elapsed3 >= shot_delayLap.asSeconds()) {
-                cents_second += elapsed4;
-                if (cents_second >= 1.f) {
-                    cents_second -= 1.f;
-                    secs++;
-                    if (secs == 60.f) {
-                        secs = 0;
-                        minutes++;
-                    }
-                }
-                cents_secondTrip += elapsed4;
-                if (cents_secondTrip >= 1.f) {
-                    cents_secondTrip -= 1.f;
-                    secsTrip++;
-                    if (secsTrip == 60.f) {
-                        secsTrip = 0;
-                        minutesTrip++;
-                    }
-                }
-                gameClockLap.restart();
-            }
-
-            // Get the actual time
-            elapsed2 = gameClockTime.getElapsedTime().asSeconds();
-
-            // Check if a second has passed between both timestamps
-            if (elapsed2 - elapsed1 >= shot_delayTime.asSeconds()) {
-                // Draw time
-                time--;
-                gameClockTime.restart();
             }
 
             // Update the indicators
+            mtx.lock();
             lap = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
             lap += (secs < 10) ? "0" + to_string(int(secs)) + ":" : to_string(int(secs)) + ":";
             int cent_sec = cents_second * 100.f;
             lap += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
+            mtx.unlock();
 
             // Draw the HUD of the game
-            showHudInterface(c);
+            showHudInterfaceOutRunDrivingFuryDerramage(c);
 
             // Control if the music has been change by the player
             checkSoundtrackChanging(c, r);
@@ -1887,32 +2195,41 @@ State Game::play(Configuration &c, SoundPlayer& r) {
             c.window.draw(bufferSprite);
             c.window.display();
 
-            if (time == 10) {
+            mtx.lock();
+            localTime = time;
+            mtx.unlock();
+
+            if (localTime == 10) {
                 r.soundEffects[26]->stop();
                 r.soundEffects[26]->play();
             }
 
             // Check if the player has time to continue
-            if (time == 0) {
+
+            if (localTime == 0) {
                 // Final game
+                mtx.lock();
                 finalGame = true;
+                mtx.unlock();
             }
         }
     }
 
-    finalGame = false;
+    if (!comeFromOptions){
+        timer0.join();
+        timer1.join();
+        timer2.join();
+    }
 
+    mtx.lock();
+    finalGame = false;
     if (arrival) {
         arrival = false;
-        if (typeOfGame == 0 || typeOfGame == 2){
-            // World tour and Pole Position modes
-            return CLASIFICATION;
-        }
-        else {
-            // The rest of the modes
-            return RANKING;
-        }
+        mtx.unlock();
+        // World tour and Pole Position modes
+        return RANKING;
     }
+    mtx.unlock();
 
     if (status != OPTIONS && status != START) {
         // Draw the game over text in the console window
@@ -1928,6 +2245,7 @@ State Game::play(Configuration &c, SoundPlayer& r) {
 
         bool startPressed = false;
         r.soundTracks[13]->play();
+
         while (!startPressed) {
 
             // Detect the possible events
@@ -1963,25 +2281,25 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
     if (indexLandScape == 0){
         r.soundTracks[r.currentSoundtrack]->stop();
-        startMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame);
+        startMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame, numberRacers);
         startMap->addNewLandScape(currentMap);
         startMap->setColorsLandScape(*currentMap);
 
         if (typeOfGame == 0){
             int bdTime = 0;
             time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
-            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
+            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
         else if (typeOfGame == 2){
             if (numberLaps == 1){
-                goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
+                goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
                 goalMap.setColorsLandScape(*currentMap);
                 currentMap->addNewLandScape(&goalMap);
             }
             else {
-                middleMap = LandScape(*currentMap, typeOfGame);
+                middleMap = LandScape(*currentMap, typeOfGame, numberRacers);
                 middleMap.setColorsLandScape(*currentMap);
                 currentMap->addNewLandScape(&middleMap);
             }
@@ -1989,12 +2307,12 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         currentMap = startMap;
     }
     else {
-        LandScape *initMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame);
+        LandScape *initMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame, numberRacers);
         initMap->addNewLandScape(currentMap);
         initMap->setColorsLandScape(*currentMap);
 
         if (typeOfGame == 0){
-            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
+            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
@@ -2019,10 +2337,10 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     blackShape.setSize(sf::Vector2f(c.w.getSize().x, c.w.getSize().y));
 
     // Draw the landscape animation
-    for (int i = 255; i >= 0; i -= 45){
+    for (int i = 255; i >= 0; i -= 15){
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, typeOfGame);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -2042,6 +2360,14 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                 player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
         }
 
+        // Draw the HUD of the game
+        if (typeOfGame == 0 || typeOfGame == 2){
+            showHudInterfaceWorldTourPolePosition(c);
+        }
+        else {
+            showHudInterfaceOutRunDrivingFuryDerramage(c);
+        }
+
         blackShape.setFillColor(Color(0, 0, 0, i));
         c.w.draw(blackShape);
 
@@ -2052,8 +2378,55 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         sleep(milliseconds(30));
     }
 
-     // Draw the hud animation
-    drawHudAnimation(c, r);
+
+
+    // Check the initial sound to reproduce
+    switch(typeOfGame){
+        case 0:
+            r.soundEffects[39]->stop();
+            r.soundEffects[39]->play();
+            while (r.soundEffects[39]->getStatus() != SoundSource::Stopped){}
+            break;
+        case 1:
+            r.soundEffects[38]->stop();
+            r.soundEffects[38]->play();
+            while (r.soundEffects[38]->getStatus() != SoundSource::Stopped){}
+            break;
+        case 2:
+            r.soundEffects[57]->stop();
+            r.soundEffects[57]->play();
+            while (r.soundEffects[57]->getStatus() != SoundSource::Stopped){}
+            break;
+        case 3:
+            r.soundEffects[37]->stop();
+            r.soundEffects[37]->play();
+            while (r.soundEffects[37]->getStatus() != SoundSource::Stopped){}
+            break;
+        case 4:
+            r.soundEffects[58]->stop();
+            r.soundEffects[58]->play();
+            while (r.soundEffects[58]->getStatus() != SoundSource::Stopped){}
+    }
+
+    // Reproduce motor sounds
+    r.soundEffects[28]->stop();
+    r.soundEffects[28]->play();
+
+    // Draw the semaphore
+    if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+        Sprite s;
+        s.setTexture(textures[4], true);
+        s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+        s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                             c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+        c.w.draw(s);
+
+        bufferSprite.setTexture(c.w.getTexture(), true);
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+        sleep(milliseconds(800));
+    }
 
     switch(typeOfVehicle){
         case 0:
@@ -2072,6 +2445,8 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
             player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
     }
 
+
+
     // Detect the possible events
     Event e;
 
@@ -2086,7 +2461,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
         // Draw map
         c.w.clear();
-        currentMap->drawLandScape(c, cars, typeOfGame);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame);
 
         switch(typeOfVehicle){
             case 0:
@@ -2105,9 +2480,24 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                 player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
         }
 
-        // Draw the HUD of the game
-        showHudInterface(c);
 
+        // Draw the HUD of the game
+        if (typeOfGame == 0 || typeOfGame == 2){
+            showHudInterfaceWorldTourPolePosition(c);
+        }
+        else {
+            showHudInterfaceOutRunDrivingFuryDerramage(c);
+        }
+
+        // Draw the semaphore
+        if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+            Sprite s;
+            s.setTexture(textures[4 + i], true);
+            s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+            s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                                 c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+            c.w.draw(s);
+        }
 
         bufferSprite.setTexture(c.w.getTexture(), true);
         c.w.display();
@@ -2123,7 +2513,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
                 // Draw map
                 c.w.clear();
-                currentMap->drawLandScape(c, cars, typeOfGame);
+                currentMap->drawLandScape(c, cars, rivals, typeOfGame);
 
                 switch(typeOfVehicle){
                     case 0:
@@ -2142,7 +2532,23 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                         player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
                 }
 
-                showHudInterface(c);
+                // Draw the HUD of the game
+                if (typeOfGame == 0 || typeOfGame == 2){
+                    showHudInterfaceWorldTourPolePosition(c);
+                }
+                else {
+                    showHudInterfaceOutRunDrivingFuryDerramage(c);
+                }
+
+                // Draw the semaphore
+                if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+                    Sprite s;
+                    s.setTexture(textures[4 + i], true);
+                    s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+                    s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                                         c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+                    c.w.draw(s);
+                }
 
                 bufferSprite.setTexture(c.w.getTexture(), true);
                 c.w.display();
@@ -2160,9 +2566,48 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         currentMap->addMapElelementIndex(semaphore, false);
         r.soundEffects[5]->stop();
         r.soundEffects[5]->play();
+
     }
+
+    // Draw the semaphore
+    if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+        Sprite s;
+        s.setTexture(textures[7], true);
+        s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+        s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                             c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+        c.w.draw(s);
+
+        bufferSprite.setTexture(c.w.getTexture(), true);
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+    }
+
+
     currentMap->addMapElelementIndex(flagger, false, -1);
     r.soundTracks[r.currentSoundtrack]->play();
+
+    // Reproduce the cars running
+    if ((typeOfGame == 0 || typeOfGame == 2) && numberRacers > 0){
+        switch(typeOfVehicle){
+            case 0:
+                r.soundEffects[30]->stop();
+                r.soundEffects[30]->play();
+                break;
+            case 1:
+                r.soundEffects[12]->stop();
+                r.soundEffects[12]->play();
+                break;
+            case 2:
+                r.soundEffects[41]->stop();
+                r.soundEffects[41]->play();
+                break;
+            case 3:
+                r.soundEffects[33]->stop();
+                r.soundEffects[33]->play();
+        }
+    }
     return PLAY_GAME;
 }
 
@@ -2269,7 +2714,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
     bonus.restart();
     elapsed11 = bonus.getElapsedTime().asSeconds(); // TODO: Esta marca solo se actualiza aquí ?????
 
-    int position;
+    int position = 0;
 
     switch(typeOfVehicle){
         case 0:
@@ -2299,7 +2744,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
         r.soundEffects[29]->play();
     }
 
-    float positionX, positionY;
+    float positionX = 0.f, positionY = 0.f;
 
     while (position < goalEnd) {
 
@@ -2307,6 +2752,14 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
         Event e{};
         while (c.window.pollEvent(e)) {
             if (e.type == Event::Closed) {
+                mtx.lock();
+                finalGame = true;
+                mtx.unlock();
+                timer0.join();
+                timer1.join();
+                if (typeOfGame != 0 && typeOfGame != 2){
+                    timer2.join();
+                }
                 return EXIT;
             }
         }
@@ -2338,7 +2791,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
         // Draw map
         c.w.clear();
-        currentMap->drawLandScape(c, cars, typeOfGame);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame);
 
         switch(typeOfVehicle){
             case 0:
@@ -2488,7 +2941,9 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
  * with the vehicles on the screen.
  * @param c is the configuration of the game
  */
-void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action, Vehicle::Direction &direction, int& terrain) {
+void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                     Vehicle::Direction &direction, int& terrain)
+{
 
     // Update camera
     switch(typeOfVehicle){
@@ -2503,269 +2958,91 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
             break;
         case 3:
             currentMap->updateCamera(player4.getPosX(), player4.getPosY() - RECTANGLE);
-            break;
-        case 4:
-            currentMap->updateCamera(player5.getPosX(), player5.getPosY() - RECTANGLE);
     }
 
+    // World tour and pole position modes
+    if (currentMap->isOutSideLandScape()) {
+        // Update player and vehicle positions
+        switch(typeOfVehicle){
+            case 0:
+                player.setPosition(player.getPosX() + currentMap->getOffsetX(), player.getPosY() - currentMap->getMaxY());
+                break;
+            case 1:
+                player2.setPosition(player2.getPosX() + currentMap->getOffsetX(), player2.getPosY() - currentMap->getMaxY());
+                break;
+            case 2:
+                player3.setPosition(player3.getPosX() + currentMap->getOffsetX(), player3.getPosY() - currentMap->getMaxY());
+                break;
+            case 3:
+                player4.setPosition(player4.getPosX() + currentMap->getOffsetX(), player4.getPosY() - currentMap->getMaxY());
+        }
 
-    switch (typeOfGame){
-        case 0:
-        case 2:
-            // World tour and pole position modes
-            if (currentMap->isOutSideLandScape()) {
-                // Update player and vehicle positions
+        for (TrafficCar &v : cars)
+            v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
 
-                switch(typeOfVehicle){
-                    case 0:
-                        player.setPosition(player.getPosX() + currentMap->getOffsetX(), player.getPosY() - currentMap->getMaxY());
-                        break;
-                    case 1:
-                        player2.setPosition(player2.getPosX() + currentMap->getOffsetX(), player2.getPosY() - currentMap->getMaxY());
-                        break;
-                    case 2:
-                        player3.setPosition(player3.getPosX() + currentMap->getOffsetX(), player3.getPosY() - currentMap->getMaxY());
-                        break;
-                    case 3:
-                        player4.setPosition(player4.getPosX() + currentMap->getOffsetX(), player4.getPosY() - currentMap->getMaxY());
-                        break;
-                    case 4:
-                        player5.setPosition(player5.getPosX() + currentMap->getOffsetX(), player5.getPosY() - currentMap->getMaxY());
-                }
+        for (RivalCar &v : rivals)
+            v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
 
-                if (typeOfGame != 2){
-                    for (TrafficCar &v : cars)
-                        v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
-                }
+        // Update to the map
+        if (level < 0){
+            level++;
+            currentMap = currentMap->getNextLeft();
+            checkPointPositions = currentMap->getCheckPointPositions();
+        }
+        else {
+            currentMap = &goalMap;
+        }
+    }
+    else {
+        // The player is still inside the landscape
+        float pos = 0.f, halfspeed = 0.f;
 
-                // Update to the map
-                if (level < 0){
-                    level++;
-                    currentMap = currentMap->getNextLeft();
-                    checkPointPositions = currentMap->getCheckPointPositions();
-                }
-                else {
-                    if (typeOfGame == 0){
-                        currentMap = &goalMap;
-                    }
-                    else if (typeOfGame == 2){
-                        currentMap = currentMap->getNextLeft();
-                        if (!currentMap->isFinalLandScape()){
-                            if (currentMap->isMiddleMap()){
-                                lapsDone++;
-                            }
-                            if (typeOfGame == 2){
-                                if (lapsDone <= numberLaps){
-                                    if (currentMap->isMiddleMap()){
-                                        currentMap->addNewLandScape(&tourLandScapes[landScapeSelected]);
-                                        checkPointPositions = tourLandScapes[landScapeSelected].getCheckPointPositions();
-                                        newLap = true;
-                                        time += 25;
-                                        if (lapsDone < numberLaps){
-                                            // New lap sound
-                                            r.soundEffects[55]->stop();
-                                            r.soundEffects[55]->play();
-                                            displayLapFactor = 70;
-                                        }
-                                        else {
-                                            // Final lap sound
-                                            r.soundTracks[r.currentSoundtrack]->pause();
-                                            r.soundEffects[56]->stop();
-                                            r.soundEffects[56]->play();
-                                            displayLapFactor = 130;
-                                        }
-                                    }
-                                    else {
-                                        if (lapsDone == numberLaps){
-                                             goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
-                                             goalMap.setColorsLandScape(*currentMap);
-                                             currentMap->addNewLandScape(&goalMap);
-                                        }
-                                        else {
-                                            middleMap = LandScape(*currentMap, typeOfGame);
-                                            middleMap.setColorsLandScape(*currentMap);
-                                            currentMap->addNewLandScape(&middleMap);
-                                            checkPointPositions = currentMap->getCheckPointPositions();
-                                        }
-                                    }
-                                    indexCheckPoint = 1;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else {
+        switch(typeOfVehicle){
+            case 0:
+                pos = player.getPosY();
+                halfspeed = player.getHalfMaxSpeed();
+                break;
+            case 1:
+                pos = player2.getPosY();
+                halfspeed = player2.getHalfMaxSpeed();
+                break;
+            case 2:
+                pos = player3.getPosY();
+                halfspeed = player3.getHalfMaxSpeed();
+                break;
+            case 3:
+                pos = player4.getPosY();
+                halfspeed = player4.getHalfMaxSpeed();
+        }
 
-                // The player is still inside the landscape
-                float pos, halfspeed;
+        if (pos >= checkPointPositions[indexCheckPoint - 1]){
+            // Increment the next checkpoint to pass
+            if (indexCheckPoint % 4 != 0){
+                indexCheckPoint++;
+                // Initialize the clock again
 
-                switch(typeOfVehicle){
-                    case 0:
-                        pos = player.getPosY();
-                        halfspeed = player.getHalfMaxSpeed();
-                        break;
-                    case 1:
-                        pos = player2.getPosY();
-                        halfspeed = player2.getHalfMaxSpeed();
-                        break;
-                    case 2:
-                        pos = player3.getPosY();
-                        halfspeed = player3.getHalfMaxSpeed();
-                        break;
-                    case 3:
-                        pos = player4.getPosY();
-                        halfspeed = player4.getHalfMaxSpeed();
-                        break;
-                    case 4:
-                        pos = player5.getPosY();
-                        halfspeed = player5.getHalfMaxSpeed();
-                }
+                // Reproduce checkpoint sound effect
+                r.soundEffects[24]->stop();
+                r.soundEffects[24]->play();
 
-                if (pos >= checkPointPositions[indexCheckPoint - 1]){
-                    // Increment the next checkpoint to pass
-                    if (indexCheckPoint % 4 != 0){
-                        indexCheckPoint++;
-                        // Activate the checkPoint animation
-                        checkPoint = true;
-                        // Initialize the clock again
-                        updatedTimeCheck = true;
-
-                        // Add the time to complete the landscape
-                        if (indexCheckPoint != 4){
-                            time += ((checkPointPositions[indexCheckPoint - 1] - pos) / (halfspeed * 65.f)) ;
-                        }
-                        else {
-                            time += ((currentMap->getMaxY() - pos) / (halfspeed * 60.f));
-                        }
-                        // Update the checkpoint time
-                        timeCheck = time;
-                    }
-                }
-
-                if (!checkPoint){
-                    // Update the time
-                    lapCheckPoint = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
-                    lapCheckPoint += (secs < 10) ? "0" + to_string(int(secs)) + ":" : to_string(int(secs)) + ":";
-                    int cent_sec = cents_second * 100.f;
-                    lapCheckPoint += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
-                }
-                else if (updatedTimeCheck){
-                    // Initialize the clock again to zero one time
-                    updatedTimeCheck = false;
-
-                    // Reproduce checkpoint sound effect
-                    r.soundEffects[24]->stop();
-                    r.soundEffects[24]->play();
-                }
-            }
-            if (currentMap->isFinalLandScape()) {
-                State status = showsGoalAnimation(c, r);
-                if (status == EXIT) {
-                    exit(1);
-                }
-                arrival = true;
-            }
-            break;
-        case 1:
-        case 3:
-        case 4:
-        case 5:
-            // Out Run and Driving Fury and Demarrage modes
-            if (currentMap->isOutSideLandScape()) {
-                if (currentMap->getNextLeft() != nullptr) {
-                    // Update player and vehicle positions
-                    switch(typeOfVehicle){
-                        case 0:
-                            player.setPosition(player.getPosX() + currentMap->getOffsetX(), player.getPosY() - currentMap->getMaxY());
-                            break;
-                        case 1:
-                            player2.setPosition(player2.getPosX() + currentMap->getOffsetX(), player2.getPosY() - currentMap->getMaxY());
-                            break;
-                        case 2:
-                            player3.setPosition(player3.getPosX() + currentMap->getOffsetX(), player3.getPosY() - currentMap->getMaxY());
-                            break;
-                        case 3:
-                            player4.setPosition(player4.getPosX() + currentMap->getOffsetX(), player4.getPosY() - currentMap->getMaxY());
-                            break;
-                        case 4:
-                            player5.setPosition(player5.getPosX() + currentMap->getOffsetX(), player5.getPosY() - currentMap->getMaxY());
-                    }
-
-                    for (TrafficCar &v : cars)
-                        v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
-
-                    const bool isInitMap = currentMap->isStartingLandScape();
-                    currentMap = currentMap->getNextLeft();
-                    terrain = currentMap->getTerrain();
-                    if (!isInitMap && !currentMap->isFinalLandScape()) {
-                        level++;
-                        // Update fork maps
-                        if (currentMap == &maps[mapId.first + 1][mapId.second + 1])
-                            mapId.second++;
-                        mapId.first++;
-
-                        if (mapId.first < 4)
-                            currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
-                        else {
-                            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame);
-                            goalMap.setColorsLandScape(*currentMap);
-                            currentMap->addNewLandScape(&goalMap);
-                        }
-                        // Update time when map changes
-                        time += int(float(currentMap->getTimeToPlay()) * timeMul);
-
-                        // Update the indicators
-                        if (!checkPoint) {
-                            lapCheckPoint = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
-                            lapCheckPoint += (secs < 10) ? "0" + to_string(int(secs)) + ":" : to_string(int(secs)) + ":";
-                            int cent_sec = cents_second * 100.f;
-                            lapCheckPoint += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
-
-
-                            // Initialize to zero the time
-                            cents_second = 0;
-                            secs = 0;
-                            minutes = 0;
-                        }
-                        checkPoint = true;
-                        timeCheck = time;
-                        // CheckPointEffect
-                        r.soundEffects[23]->stop();
-                        r.soundEffects[23]->play();
-                    }
-
-                    switch(typeOfVehicle){
-                        case 0:
-                            currentMap->updateCamera(player.getPosX(), player.getPosY() - RECTANGLE);
-                            break;
-                        case 1:
-                            currentMap->updateCamera(player2.getPosX(), player2.getPosY() - RECTANGLE);
-                            break;
-                        case 2:
-                            currentMap->updateCamera(player3.getPosX(), player3.getPosY() - RECTANGLE);
-                            break;
-                        case 3:
-                            currentMap->updateCamera(player4.getPosX(), player4.getPosY() - RECTANGLE);
-                            break;
-                        case 4:
-                            currentMap->updateCamera(player5.getPosX(), player5.getPosY() - RECTANGLE);
-                    }
-
-                    lastY = currentMap->getCameraPosY();
+                // Add the time to complete the landscape
+                if (indexCheckPoint != 4){
+                    time += ((checkPointPositions[indexCheckPoint - 1] - pos) / (halfspeed * 65.f)) ;
                 }
                 else {
-                    finalGame = true;
+                    time += ((currentMap->getMaxY() - pos) / (halfspeed * 60.f));
                 }
             }
-            if (currentMap->isFinalLandScape()) {
-                State status = showsGoalAnimation(c, r);
-                if (status == EXIT) {
-                    exit(1);
-                }
-                arrival = true;
-            }
-            break;
+        }
+    }
+    if (currentMap->isFinalLandScape()) {
+        State status = showsGoalAnimation(c, r);
+        if (status == EXIT) {
+            exit(1);
+        }
+        mtx.lock();
+        arrival = true;
+        mtx.unlock();
     }
 
     if (!finalGame && !arrival) {
@@ -2773,24 +3050,73 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
         if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
             lastY = currentMap->getCameraPosY() + float(c.renderLen);
         }
-        if (typeOfGame != 2){
-            for (TrafficCar &v : cars) {
-                if (currentMap->inFork(v.getPosY())) {
-                    v.setPosition(v.getPosX(), -RECTANGLE * DEL_DISTANCE * 3.0f);
-                }
-                else if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
-                    v.update(lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness);
-                    lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
-                }
-
-                float posY = v.getPosY();
-                v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
+        for (TrafficCar &v : cars) {
+            if (currentMap->inFork(v.getPosY())) {
+                v.setPosition(v.getPosX(), -RECTANGLE * DEL_DISTANCE * 3.0f);
             }
+            else if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
+                v.update(lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, c.level);
+                lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
+            }
+
+            float posY = v.getPosY();
+            v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
         }
+
+        Vehicle::Action a;
+        Vehicle::Direction d;
+
+        float positionX = 0.f, positionY = 0.f;
+
+        switch(typeOfVehicle){
+            case 0:
+                positionX = player.getPosY();
+                positionY = player.getPosX();
+                break;
+            case 1:
+                positionX = player2.getPosY();
+                positionY = player2.getPosX();
+                break;
+            case 2:
+                positionX = player3.getPosY();
+                positionY = player3.getPosX();
+                break;
+            case 3:
+                positionX = player4.getPosY();
+                positionY = player4.getPosX();
+        }
+
+        // Clear the ranking of the rivals for updating
+        rankingVehicles.clear();
+
+        // Update and prepare racers to draw
+        for (RivalCar &v : rivals) {
+            float directionCurve = currentMap->getCurveCoefficient(v.getPosY());
+
+            v.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, d, directionCurve,
+                     c.level, positionX, positionY);
+
+            lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
+
+            float posY = v.getPosY();
+
+            // Store the new position of the vehicle
+            rankingVehicles.push_back(&posY);
+
+            // Order the rivals cars of the race to build a temporary ranking
+            sort(rankingVehicles.begin(), rankingVehicles.end(), ascendingRanking);
+
+            // Get the new position of the player in the race
+            posArrival = findPlayerPositionRanking(positionY);
+
+            // Draw the vehicle
+            v.draw(a, d, currentMap->getElevation(posY));
+        }
+
 
         // Draw map with cars
         c.w.clear();
-        currentMap->drawLandScape(c, cars, typeOfGame);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -2814,15 +3140,14 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player.getPreviousY(), player.getPosY(), player.getPosX(),
                                                         player.getMinScreenX(), player.getMaxScreenX(), crashPos, typeOfGame);
-                    if (!crash && typeOfGame != 2)
-                        for (int i = 0; !vehicleCrash && i < cars.size(); i++)
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player.getPreviousY(), player.getPosY(),
                                                               player.getMinScreenX(), player.getMaxScreenX(),
                                                               crashPos);
 
                     if (crash || vehicleCrash) {
                         // Determine the type of collision
-                        int mode = rand_generator_int(0, 1);
                         player.setPosition(player.getPosX(), crashPos);
                         player.hitControl(vehicleCrash);
                         action = Vehicle::CRASH;
@@ -2832,10 +3157,13 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     }
                 }
 
-                if (typeOfGame != 2){
                 for (TrafficCar &v : cars)
                     v.autoControl(c, player.getPosX(), player.getPosY());
-                }
+
+                /*
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player.getPosX(), player.getPosY());
+                */
                 break;
             case 1:
                 if (!player2.isCrashing()) { // If not has crashed
@@ -2854,8 +3182,8 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player2.getPreviousY(), player2.getPosY(), player2.getPosX(),
                                                         player2.getMinScreenX(), player2.getMaxScreenX(), crashPos, typeOfGame);
-                    if (!crash && typeOfGame != 2)
-                        for (int i = 0; !vehicleCrash && i < cars.size(); i++)
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player2.getPreviousY(), player2.getPosY(),
                                                               player2.getMinScreenX(), player2.getMaxScreenX(),
                                                               crashPos);
@@ -2872,10 +3200,11 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     }
                 }
 
-                if (typeOfGame != 2){
-                    for (TrafficCar &v : cars)
-                        v.autoControl(c, player2.getPosX(), player2.getPosY());
-                }
+                for (TrafficCar &v : cars)
+                    v.autoControl(c, player2.getPosX(), player2.getPosY());
+
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player.getPosX(), player.getPosY());
                 break;
             case 2:
                 if (!player3.isCrashing()) { // If not has crashed
@@ -2894,8 +3223,8 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player3.getPreviousY(), player3.getPosY(), player3.getPosX(),
                                                         player3.getMinScreenX(), player3.getMaxScreenX(), crashPos, typeOfGame);
-                    if (!crash && typeOfGame != 2)
-                        for (int i = 0; !vehicleCrash && i < cars.size(); i++)
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player3.getPreviousY(), player3.getPosY(),
                                                               player3.getMinScreenX(), player3.getMaxScreenX(),
                                                               crashPos);
@@ -2912,10 +3241,11 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     }
                 }
 
-                if (typeOfGame != 2){
-                    for (TrafficCar &v : cars)
-                        v.autoControl(c, player3.getPosX(), player3.getPosY());
-                }
+                for (TrafficCar &v : cars)
+                    v.autoControl(c, player3.getPosX(), player3.getPosY());
+
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player.getPosX(), player.getPosY());
                 break;
             case 3:
                 if (!player4.isCrashing()) { // If not has crashed
@@ -2934,8 +3264,8 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     float crashPos;
                     bool crash = currentMap->hasCrashed(c, player4.getPreviousY(), player4.getPosY(), player4.getPosX(),
                                                         player4.getMinScreenX(), player4.getMaxScreenX(), crashPos, typeOfGame);
-                    if (!crash && typeOfGame != 2)
-                        for (int i = 0; !vehicleCrash && i < cars.size(); i++)
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
                             vehicleCrash = cars[i].hasCrashed(player4.getPreviousY(), player4.getPosY(),
                                                               player4.getMinScreenX(), player4.getMaxScreenX(),
                                                               crashPos);
@@ -2952,100 +3282,1131 @@ void Game::updateGameStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &a
                     }
                 }
 
-                if (typeOfGame != 2){
-                    for (TrafficCar &v : cars)
-                        v.autoControl(c, player4.getPosX(), player4.getPosY());
+                for (TrafficCar &v : cars)
+                    v.autoControl(c, player4.getPosX(), player4.getPosY());
+
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player.getPosX(), player.getPosY());
+        }
+        if (!finalGame && !arrival){
+            // Check if enemies are displayed on the screen
+            for (TrafficCar &v : cars) {
+                float distX, distY;
+
+                bool visible = true;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                        break;
+                    case 1:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                        break;
+                    case 2:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                        break;
+                    case 3:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
                 }
+
+                if (visible) {
+                    if (distY <= 20.f && distX <= 0.3f) {
+                        // Thread with sound of the woman
+                        elapsed6 = womanShot.getElapsedTime().asSeconds();
+                        if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
+                            // WomanSound
+                            r.soundEffects[13]->stop();
+                            r.soundEffects[14]->stop();
+                            r.soundEffects[15]->stop();
+                            r.soundEffects[rand_generator_int(13, 15)]->play();
+                            womanShot.restart();
+                        }
+                    }
+                    if (distY <= 30.f && distX <= 1.2f) {
+                        // Thread with sound of the woman
+                        elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                        if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                            // makeCarTrafficSound
+                            r.soundEffects[20]->stop();
+                            r.soundEffects[21]->stop();
+                            r.soundEffects[22]->stop();
+                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            trafficCarSound.restart();
+                        }
+                    }
+                }
+            }
+            // Check if enemies are displayed on the screen
+            for (RivalCar &v : rivals) {
+                float distX, distY;
+
+                bool visible = true;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                        break;
+                    case 1:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                        break;
+                    case 2:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                        break;
+                    case 3:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
+                }
+
+                if (visible) {
+                    if (distY <= 20.f && distX <= 0.3f) {
+                        // Thread with sound of the woman
+                        elapsed6 = womanShot.getElapsedTime().asSeconds();
+                        if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
+                            // WomanSound
+                            r.soundEffects[13]->stop();
+                            r.soundEffects[14]->stop();
+                            r.soundEffects[15]->stop();
+                            r.soundEffects[rand_generator_int(13, 15)]->play();
+                            womanShot.restart();
+                        }
+                    }
+                    if (distY <= 30.f && distX <= 1.2f) {
+                        // Thread with sound of the woman
+                        elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                        if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                            // makeCarTrafficSound
+                            r.soundEffects[20]->stop();
+                            r.soundEffects[21]->stop();
+                            r.soundEffects[22]->stop();
+                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            trafficCarSound.restart();
+                        }
+                    }
+                }
+            }
+            if (newLap) {
+                drawNewLap(c);
+                if (lapsDone < numberLaps){
+                    if (r.soundEffects[55]->getStatus() != SoundSource::Playing){
+                        newLap = false;
+                    }
+                }
+                else {
+                    if (r.soundEffects[56]->getStatus() != SoundSource::Playing){
+                        r.soundTracks[r.currentSoundtrack]->play();
+                        newLap = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+/**
+ * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+ * with the vehicles on the screen.
+ * @param c is the configuration of the game
+ */
+void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                        Vehicle::Direction &direction, int& terrain)
+{
+
+    // Update camera
+    switch(typeOfVehicle){
+        case 0:
+            currentMap->updateCamera(player.getPosX(), player.getPosY() - RECTANGLE);
+            break;
+        case 1:
+            currentMap->updateCamera(player2.getPosX(), player2.getPosY() - RECTANGLE);
+            break;
+        case 2:
+            currentMap->updateCamera(player3.getPosX(), player3.getPosY() - RECTANGLE);
+            break;
+        case 3:
+            currentMap->updateCamera(player4.getPosX(), player4.getPosY() - RECTANGLE);
+    }
+
+    // World tour and pole position modes
+    if (currentMap->isOutSideLandScape()) {
+        // Update player and vehicle positions
+        switch(typeOfVehicle){
+            case 0:
+                player.setPosition(player.getPosX() + currentMap->getOffsetX(), player.getPosY() - currentMap->getMaxY());
                 break;
-            case 4:
-                if (!player5.isCrashing()) { // If not has crashed
-                    action = player5.accelerationControl(c, currentMap->isOutSideRoad(player5.getPosX(), player5.getPosY()));
-                    direction = player5.rotationControl(c, currentMap->getCurveCoefficient(player5.getPosY()),
+            case 1:
+                player2.setPosition(player2.getPosX() + currentMap->getOffsetX(), player2.getPosY() - currentMap->getMaxY());
+                break;
+            case 2:
+                player3.setPosition(player3.getPosX() + currentMap->getOffsetX(), player3.getPosY() - currentMap->getMaxY());
+                break;
+            case 3:
+                player4.setPosition(player4.getPosX() + currentMap->getOffsetX(), player4.getPosY() - currentMap->getMaxY());
+        }
+
+        for (RivalCar &v : rivals)
+            v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
+
+        // Update to the map
+        if (level < 0){
+            level++;
+            currentMap = currentMap->getNextLeft();
+            checkPointPositions = currentMap->getCheckPointPositions();
+        }
+        else {
+            currentMap = currentMap->getNextLeft();
+            if (!currentMap->isFinalLandScape()){
+                if (currentMap->isMiddleMap()){
+                    lapsDone++;
+                }
+                if (typeOfGame == 2){
+                    if (lapsDone <= numberLaps){
+                        if (currentMap->isMiddleMap()){
+                            currentMap->addNewLandScape(&tourLandScapes[landScapeSelected]);
+                            checkPointPositions = tourLandScapes[landScapeSelected].getCheckPointPositions();
+                            newLap = true;
+                            time += 25;
+                            if (lapsDone < numberLaps){
+                                // New lap sound
+                                r.soundEffects[55]->stop();
+                                r.soundEffects[55]->play();
+                                displayLapFactor = 70;
+                            }
+                            else {
+                                // Final lap sound
+                                r.soundTracks[r.currentSoundtrack]->pause();
+                                r.soundEffects[56]->stop();
+                                r.soundEffects[56]->play();
+                                displayLapFactor = 130;
+                            }
+                        }
+                        else {
+                            if (lapsDone == numberLaps){
+                                 goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                                 goalMap.setColorsLandScape(*currentMap);
+                                 currentMap->addNewLandScape(&goalMap);
+                            }
+                            else {
+                                middleMap = LandScape(*currentMap, typeOfGame, numberRacers);
+                                middleMap.setColorsLandScape(*currentMap);
+                                currentMap->addNewLandScape(&middleMap);
+                                checkPointPositions = currentMap->getCheckPointPositions();
+                            }
+                        }
+                        indexCheckPoint = 1;
+                    }
+                }
+            }
+        }
+    }
+    else {
+        // The player is still inside the landscape
+        float pos = 0.f, halfspeed = 0.f;
+
+        switch(typeOfVehicle){
+            case 0:
+                pos = player.getPosY();
+                halfspeed = player.getHalfMaxSpeed();
+                break;
+            case 1:
+                pos = player2.getPosY();
+                halfspeed = player2.getHalfMaxSpeed();
+                break;
+            case 2:
+                pos = player3.getPosY();
+                halfspeed = player3.getHalfMaxSpeed();
+                break;
+            case 3:
+                pos = player4.getPosY();
+                halfspeed = player4.getHalfMaxSpeed();
+        }
+
+        if (pos >= checkPointPositions[indexCheckPoint - 1]){
+            // Increment the next checkpoint to pass
+            if (indexCheckPoint % 4 != 0){
+                indexCheckPoint++;
+                // Activate the checkPoint animation
+                checkPoint = true;
+                // Initialize the clock again
+                updatedTimeCheck = true;
+
+                // Add the time to complete the landscape
+                if (indexCheckPoint != 4){
+                    time += ((checkPointPositions[indexCheckPoint - 1] - pos) / (halfspeed * 65.f)) ;
+                }
+                else {
+                    time += ((currentMap->getMaxY() - pos) / (halfspeed * 60.f));
+                }
+                // Update the checkpoint time
+                timeCheck = time;
+            }
+        }
+
+        if (!checkPoint){
+            // Update the time
+            lapCheckPoint = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
+            lapCheckPoint += (secs < 10) ? "0" + to_string(int(secs)) + ":" : to_string(int(secs)) + ":";
+            int cent_sec = cents_second * 100.f;
+            lapCheckPoint += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
+        }
+        else if (updatedTimeCheck){
+            // Initialize the clock again to zero one time
+            updatedTimeCheck = false;
+
+            // Reproduce checkpoint sound effect
+            r.soundEffects[24]->stop();
+            r.soundEffects[24]->play();
+        }
+    }
+    if (currentMap->isFinalLandScape()) {
+        State status = showsGoalAnimation(c, r);
+        if (status == EXIT) {
+            exit(1);
+        }
+        mtx.lock();
+        arrival = true;
+        mtx.unlock();
+    }
+
+    if (!finalGame && !arrival) {
+        // Update and prepare cars to draw
+        if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
+            lastY = currentMap->getCameraPosY() + float(c.renderLen);
+        }
+
+        Vehicle::Action a;
+        Vehicle::Direction d;
+
+        float positionX = 0.f, positionY = 0.f;
+
+        switch(typeOfVehicle){
+            case 0:
+                positionX = player.getPosY();
+                positionY = player.getPosX();
+                break;
+            case 1:
+                positionX = player2.getPosY();
+                positionY = player2.getPosX();
+                break;
+            case 2:
+                positionX = player3.getPosY();
+                positionY = player3.getPosX();
+                break;
+            case 3:
+                positionX = player4.getPosY();
+                positionY = player4.getPosX();
+        }
+
+        if (numberRacers > 0){
+            // Clear the ranking of the rivals for updating
+            rankingVehicles.clear();
+
+            // Update and prepare racers to draw
+            for (RivalCar &v : rivals) {
+                float directionCurve = currentMap->getCurveCoefficient(v.getPosY());
+
+                v.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, d, directionCurve,
+                         c.level, positionX, positionY);
+
+                lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
+
+                float posY = v.getPosY();
+
+                // Store the new position of the vehicle
+                rankingVehicles.push_back(&posY);
+
+                // Draw the vehicle
+                v.draw(a, d, currentMap->getElevation(posY));
+            }
+
+            // Order the rivals cars of the race to build a temporary ranking
+            sort(rankingVehicles.begin(), rankingVehicles.end(), ascendingRanking);
+
+            // Get the new position of the player in the race
+            posArrival = findPlayerPositionRanking(positionY);
+        }
+
+        // Draw map with cars
+        c.w.clear();
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame);
+
+        // Player update and draw
+        action = Vehicle::CRASH;
+        direction = Vehicle::RIGHT;
+
+        switch(typeOfVehicle){
+            case 0:
+                if (!player.isCrashing()) { // If not has crashed
+                    action = player.accelerationControl(c, currentMap->isOutSideRoad(player.getPosX(), player.getPosY()));
+                    direction = player.rotationControl(c, currentMap->getCurveCoefficient(player.getPosY()),
+                                                          currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                }
+                else {
+                    player.hitControl(vehicleCrash);
+                }
+
+                player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()), terrain);
+
+                if (!player.isCrashing()) {
+                    float crashPos;
+                    bool crash = currentMap->hasCrashed(c, player.getPreviousY(), player.getPosY(), player.getPosX(),
+                                                        player.getMinScreenX(), player.getMaxScreenX(), crashPos, typeOfGame);
+
+                    if (crash) {
+                        // Determine the type of collision
+                        player.setPosition(player.getPosX(), crashPos);
+                        player.hitControl(vehicleCrash);
+                        action = Vehicle::CRASH;
+                        direction = Vehicle::RIGHT;
+
+                        player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()), terrain);
+                    }
+                }
+
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player.getPosX(), player.getPosY());
+
+                break;
+            case 1:
+                if (!player2.isCrashing()) { // If not has crashed
+                    action = player2.accelerationControl(c, currentMap->isOutSideRoad(player2.getPosX(), player2.getPosY()));
+                    direction = player2.rotationControl(c, currentMap->getCurveCoefficient(player2.getPosY()),
                                                            currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
                 }
                 else {
-                    player5.hitControl(vehicleCrash);
+                    player2.hitControl(vehicleCrash);
                 }
 
-                player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()), terrain);
+                player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()), terrain);
 
-                if (!player5.isCrashing()) {
+                if (!player2.isCrashing()) {
+                    float crashPos;
+                    bool crash = currentMap->hasCrashed(c, player2.getPreviousY(), player2.getPosY(), player2.getPosX(),
+                                                        player2.getMinScreenX(), player2.getMaxScreenX(), crashPos, typeOfGame);
+
+                    if (crash) {
+                        // Determine the type of collision
+                        player2.setModeCollision();
+                        player2.setPosition(player2.getPosX(), crashPos);
+                        player2.hitControl(vehicleCrash);
+                        action = Vehicle::CRASH;
+                        direction = Vehicle::RIGHT;
+
+                        player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()), terrain);
+                    }
+                }
+
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player2.getPosX(), player2.getPosY());
+
+                break;
+            case 2:
+                if (!player3.isCrashing()) { // If not has crashed
+                    action = player3.accelerationControl(c, currentMap->isOutSideRoad(player3.getPosX(), player3.getPosY()));
+                    direction = player3.rotationControl(c, currentMap->getCurveCoefficient(player3.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                }
+                else {
+                    player3.hitControl(vehicleCrash);
+                }
+
+                player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()), terrain);
+
+                if (!player3.isCrashing()) {
+                    float crashPos;
+                    bool crash = currentMap->hasCrashed(c, player3.getPreviousY(), player3.getPosY(), player3.getPosX(),
+                                                        player3.getMinScreenX(), player3.getMaxScreenX(), crashPos, typeOfGame);
+
+                    if (crash) {
+                        // Determine the type of collision
+                        player3.setModeCollision();
+                        player3.setPosition(player3.getPosX(), crashPos);
+                        player3.hitControl(vehicleCrash);
+                        action = Vehicle::CRASH;
+                        direction = Vehicle::RIGHT;
+
+                        player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()), terrain);
+                    }
+                }
+
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player3.getPosX(), player3.getPosY());
+
+                break;
+            case 3:
+                if (!player4.isCrashing()) { // If not has crashed
+                    action = player4.accelerationControl(c, currentMap->isOutSideRoad(player4.getPosX(), player4.getPosY()));
+                    direction = player4.rotationControl(c, currentMap->getCurveCoefficient(player4.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                }
+                else {
+                    player4.hitControl(vehicleCrash);
+                }
+
+                player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
+
+                if (!player4.isCrashing()) {
+                    float crashPos;
+                    bool crash = currentMap->hasCrashed(c, player4.getPreviousY(), player4.getPosY(), player4.getPosX(),
+                                                        player4.getMinScreenX(), player4.getMaxScreenX(), crashPos, typeOfGame);
+
+                    if (crash) {
+                        // Determine the type of collision
+                        player4.setModeCollision();
+                        player4.setPosition(player4.getPosX(), crashPos);
+                        player4.hitControl(vehicleCrash);
+                        action = Vehicle::CRASH;
+                        direction = Vehicle::RIGHT;
+
+                        player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
+                    }
+                }
+
+                for (RivalCar &v : rivals)
+                    v.autoControl(c, player3.getPosX(), player3.getPosY());
+        }
+        if (!finalGame && !arrival){
+            // Check if enemies are displayed on the screen
+            for (RivalCar &v : rivals) {
+                float distX, distY;
+
+                bool visible = true;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                        break;
+                    case 1:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                        break;
+                    case 2:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                        break;
+                    case 3:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
+                }
+
+                if (visible) {
+                    if (distY <= 20.f && distX <= 0.3f) {
+                        // Thread with sound of the woman
+                        elapsed6 = womanShot.getElapsedTime().asSeconds();
+                        if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
+                            // WomanSound
+                            r.soundEffects[13]->stop();
+                            r.soundEffects[14]->stop();
+                            r.soundEffects[15]->stop();
+                            r.soundEffects[rand_generator_int(13, 15)]->play();
+                            womanShot.restart();
+                        }
+                    }
+                    if (distY <= 30.f && distX <= 1.2f) {
+                        // Thread with sound of the woman
+                        elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                        if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                            // makeCarTrafficSound
+                            r.soundEffects[20]->stop();
+                            r.soundEffects[21]->stop();
+                            r.soundEffects[22]->stop();
+                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            trafficCarSound.restart();
+                        }
+                    }
+                }
+            }
+            if (newLap) {
+                drawNewLap(c);
+                if (lapsDone < numberLaps){
+                    if (r.soundEffects[55]->getStatus() != SoundSource::Playing){
+                        newLap = false;
+                        shown = false;
+                    }
+                }
+                else {
+                    if (r.soundEffects[56]->getStatus() != SoundSource::Playing){
+                        r.soundTracks[r.currentSoundtrack]->play();
+                        newLap = false;
+                        shown = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+/**
+ * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+ * with the vehicles on the screen.
+ * @param c is the configuration of the game
+ */
+void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                           Vehicle::Direction &direction, int& terrain)
+{
+    // Update camera
+    switch(typeOfVehicle){
+        case 0:
+            currentMap->updateCamera(player.getPosX(), player.getPosY() - RECTANGLE);
+            break;
+        case 1:
+            currentMap->updateCamera(player2.getPosX(), player2.getPosY() - RECTANGLE);
+            break;
+        case 2:
+            currentMap->updateCamera(player3.getPosX(), player3.getPosY() - RECTANGLE);
+            break;
+        case 3:
+            currentMap->updateCamera(player4.getPosX(), player4.getPosY() - RECTANGLE);
+    }
+
+    // Out Run and Driving Fury and Demarrage modes
+    if (currentMap->isOutSideLandScape()) {
+        if (currentMap->getNextLeft() != nullptr) {
+            // Update player and vehicle positions
+            switch(typeOfVehicle){
+                case 0:
+                    player.setPosition(player.getPosX() + currentMap->getOffsetX(), player.getPosY() - currentMap->getMaxY());
+                    break;
+                case 1:
+                    player2.setPosition(player2.getPosX() + currentMap->getOffsetX(), player2.getPosY() - currentMap->getMaxY());
+                    break;
+                case 2:
+                    player3.setPosition(player3.getPosX() + currentMap->getOffsetX(), player3.getPosY() - currentMap->getMaxY());
+                    break;
+                case 3:
+                    player4.setPosition(player4.getPosX() + currentMap->getOffsetX(), player4.getPosY() - currentMap->getMaxY());
+            }
+
+            for (TrafficCar &v : cars)
+                v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
+
+            const bool isInitMap = currentMap->isStartingLandScape();
+            currentMap = currentMap->getNextLeft();
+            terrain = currentMap->getTerrain();
+            if (!isInitMap && !currentMap->isFinalLandScape()) {
+                level++;
+                    // Update fork maps
+                if (currentMap == &maps[mapId.first + 1][mapId.second + 1])
+                    mapId.second++;
+                mapId.first++;
+
+                if (mapId.first < 4)
+                    currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
+                else {
+                    goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                    goalMap.setColorsLandScape(*currentMap);
+                    currentMap->addNewLandScape(&goalMap);
+                }
+
+                // Update time when map changes
+                time += int(float(currentMap->getTimeToPlay()) * timeMul);
+
+                // Update the indicators
+                if (!checkPoint) {
+                    lapCheckPoint = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
+                    lapCheckPoint += (secs < 10) ? "0" + to_string(int(secs)) + ":" : to_string(int(secs)) + ":";
+                    int cent_sec = cents_second * 100.f;
+                    lapCheckPoint += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
+
+                    // Initialize to zero the time
+                    cents_second = 0;
+                    secs = 0;
+                    minutes = 0;
+                }
+                checkPoint = true;
+                timeCheck = time;
+
+                // CheckPointEffect
+                r.soundEffects[23]->stop();
+                r.soundEffects[23]->play();
+            }
+
+            switch(typeOfVehicle){
+                case 0:
+                    currentMap->updateCamera(player.getPosX(), player.getPosY() - RECTANGLE);
+                    break;
+                case 1:
+                    currentMap->updateCamera(player2.getPosX(), player2.getPosY() - RECTANGLE);
+                    break;
+                case 2:
+                    currentMap->updateCamera(player3.getPosX(), player3.getPosY() - RECTANGLE);
+                    break;
+                case 3:
+                    currentMap->updateCamera(player4.getPosX(), player4.getPosY() - RECTANGLE);
+            }
+
+            lastY = currentMap->getCameraPosY();
+        }
+        else {
+            finalGame = true;
+        }
+    }
+    if (currentMap->isFinalLandScape()) {
+        State status = showsGoalAnimation(c, r);
+        if (status == EXIT) {
+            exit(1);
+        }
+        mtx.lock();
+        arrival = true;
+        mtx.unlock();
+    }
+
+    if (!finalGame && !arrival) {
+        // Update and prepare cars to draw
+        if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
+            lastY = currentMap->getCameraPosY() + float(c.renderLen);
+        }
+
+        for (TrafficCar &v : cars) {
+            if (currentMap->inFork(v.getPosY())) {
+                v.setPosition(v.getPosX(), -RECTANGLE * DEL_DISTANCE * 3.0f);
+            }
+            else if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
+                v.update(lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, c.level);
+                lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
+            }
+
+            float posY = v.getPosY();
+            v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
+        }
+
+        // Draw map with cars
+        c.w.clear();
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame);
+
+        // Player update and draw
+        action = Vehicle::CRASH;
+        direction = Vehicle::RIGHT;
+
+        switch(typeOfVehicle){
+            case 0:
+                if (!player.isCrashing()) { // If not has crashed
+                    action = player.accelerationControl(c, currentMap->isOutSideRoad(player.getPosX(), player.getPosY()));
+                    direction = player.rotationControl(c, currentMap->getCurveCoefficient(player.getPosY()),
+                                                          currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                }
+                else {
+                    player.hitControl(vehicleCrash);
+                }
+
+                player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()), terrain);
+
+                if (!player.isCrashing()) {
                     vehicleCrash = false;
                     float crashPos;
-                    bool crash = currentMap->hasCrashed(c, player5.getPreviousY(), player5.getPosY(), player5.getPosX(),
-                                                        player5.getMinScreenX(), player5.getMaxScreenX(), crashPos, typeOfGame);
-                    if (!crash && typeOfGame != 2)
-                        for (int i = 0; !vehicleCrash && i < cars.size(); i++)
-                            vehicleCrash = cars[i].hasCrashed(player5.getPreviousY(), player5.getPosY(),
-                                                              player5.getMinScreenX(), player5.getMaxScreenX(),
+                    bool crash = currentMap->hasCrashed(c, player.getPreviousY(), player.getPosY(), player.getPosX(),
+                                                        player.getMinScreenX(), player.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
+                            vehicleCrash = cars[i].hasCrashed(player.getPreviousY(), player.getPosY(),
+                                                              player.getMinScreenX(), player.getMaxScreenX(),
                                                               crashPos);
 
                     if (crash || vehicleCrash) {
                         // Determine the type of collision
-                        player5.setModeCollision();
-                        player5.setPosition(player5.getPosX(), crashPos);
-                        player5.hitControl(vehicleCrash);
+                        player.setPosition(player.getPosX(), crashPos);
+                        player.hitControl(vehicleCrash);
                         action = Vehicle::CRASH;
                         direction = Vehicle::RIGHT;
 
-                        player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()), terrain);
+                        player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()), terrain);
                     }
                 }
 
-                if (typeOfGame != 2){
-                    for (TrafficCar &v : cars)
-                        v.autoControl(c, player5.getPosX(), player5.getPosY());
+                for (TrafficCar &v : cars)
+                    v.autoControl(c, player.getPosX(), player.getPosY());
+                break;
+            case 1:
+                if (!player2.isCrashing()) { // If not has crashed
+                    action = player2.accelerationControl(c, currentMap->isOutSideRoad(player2.getPosX(), player2.getPosY()));
+                    direction = player2.rotationControl(c, currentMap->getCurveCoefficient(player2.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
                 }
+                else {
+                    player2.hitControl(vehicleCrash);
+                }
+
+                player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()), terrain);
+
+                if (!player2.isCrashing()) {
+                    vehicleCrash = false;
+                    float crashPos;
+                    bool crash = currentMap->hasCrashed(c, player2.getPreviousY(), player2.getPosY(), player2.getPosX(),
+                                                        player2.getMinScreenX(), player2.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
+                            vehicleCrash = cars[i].hasCrashed(player2.getPreviousY(), player2.getPosY(),
+                                                              player2.getMinScreenX(), player2.getMaxScreenX(),
+                                                              crashPos);
+
+                    if (crash || vehicleCrash) {
+                        // Determine the type of collision
+                        player2.setModeCollision();
+                        player2.setPosition(player2.getPosX(), crashPos);
+                        player2.hitControl(vehicleCrash);
+                        action = Vehicle::CRASH;
+                        direction = Vehicle::RIGHT;
+
+                        player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()), terrain);
+                    }
+                }
+
+                for (TrafficCar &v : cars)
+                    v.autoControl(c, player2.getPosX(), player2.getPosY());
+                break;
+            case 2:
+                if (!player3.isCrashing()) { // If not has crashed
+                    action = player3.accelerationControl(c, currentMap->isOutSideRoad(player3.getPosX(), player3.getPosY()));
+                    direction = player3.rotationControl(c, currentMap->getCurveCoefficient(player3.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                }
+                else {
+                    player3.hitControl(vehicleCrash);
+                }
+
+                player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()), terrain);
+
+                if (!player3.isCrashing()) {
+                    vehicleCrash = false;
+                    float crashPos;
+                    bool crash = currentMap->hasCrashed(c, player3.getPreviousY(), player3.getPosY(), player3.getPosX(),
+                                                        player3.getMinScreenX(), player3.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
+                            vehicleCrash = cars[i].hasCrashed(player3.getPreviousY(), player3.getPosY(),
+                                                              player3.getMinScreenX(), player3.getMaxScreenX(),
+                                                              crashPos);
+
+                    if (crash || vehicleCrash) {
+                        // Determine the type of collision
+                        player3.setModeCollision();
+                        player3.setPosition(player3.getPosX(), crashPos);
+                        player3.hitControl(vehicleCrash);
+                        action = Vehicle::CRASH;
+                        direction = Vehicle::RIGHT;
+
+                        player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()), terrain);
+                    }
+                }
+                for (TrafficCar &v : cars)
+                    v.autoControl(c, player3.getPosX(), player3.getPosY());
+                break;
+            case 3:
+                if (!player4.isCrashing()) { // If not has crashed
+                    action = player4.accelerationControl(c, currentMap->isOutSideRoad(player4.getPosX(), player4.getPosY()));
+                    direction = player4.rotationControl(c, currentMap->getCurveCoefficient(player4.getPosY()),
+                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                }
+                else {
+                    player4.hitControl(vehicleCrash);
+                }
+
+                player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
+
+                if (!player4.isCrashing()) {
+                    vehicleCrash = false;
+                    float crashPos;
+                    bool crash = currentMap->hasCrashed(c, player4.getPreviousY(), player4.getPosY(), player4.getPosX(),
+                                                        player4.getMinScreenX(), player4.getMaxScreenX(), crashPos, typeOfGame);
+                    if (!crash)
+                        for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
+                            vehicleCrash = cars[i].hasCrashed(player4.getPreviousY(), player4.getPosY(),
+                                                              player4.getMinScreenX(), player4.getMaxScreenX(),
+                                                              crashPos);
+
+                    if (crash || vehicleCrash) {
+                        // Determine the type of collision
+                        player4.setModeCollision();
+                        player4.setPosition(player4.getPosX(), crashPos);
+                        player4.hitControl(vehicleCrash);
+                        action = Vehicle::CRASH;
+                        direction = Vehicle::RIGHT;
+
+                        player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
+                    }
+                }
+
+                for (TrafficCar &v : cars)
+                    v.autoControl(c, player4.getPosX(), player4.getPosY());
         }
         if (!finalGame && !arrival){
             // Check if enemies are displayed on the screen
-            if (typeOfGame != 2){
-                for (TrafficCar &v : cars) {
-                    float distX, distY;
+            for (TrafficCar &v : cars) {
+                float distX, distY;
 
-                    bool visible;
+                bool visible = true;
 
-                    switch(typeOfVehicle){
-                        case 0:
-                            visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
-                            break;
-                        case 1:
-                            visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
-                            break;
-                        case 2:
-                            visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
-                            break;
-                        case 3:
-                            visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
-                            break;
-                        case 4:
-                            visible = v.isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
-                    }
+                switch(typeOfVehicle){
+                    case 0:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                        break;
+                    case 1:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                        break;
+                    case 2:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                        break;
+                    case 3:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
+                }
 
-                    if (visible) {
-                        if (distY <= 20.f && distX <= 0.3f) {
-                            // Thread with sound of the woman
-                            elapsed6 = womanShot.getElapsedTime().asSeconds();
-                            if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
-                                // WomanSound
-                                r.soundEffects[13]->stop();
-                                r.soundEffects[14]->stop();
-                                r.soundEffects[15]->stop();
-                                r.soundEffects[rand_generator_int(13, 15)]->play();
-                                womanShot.restart();
-                            }
+                if (visible) {
+                    if (distY <= 20.f && distX <= 0.3f) {
+                        // Thread with sound of the woman
+                        elapsed6 = womanShot.getElapsedTime().asSeconds();
+                        if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
+                            // WomanSound
+                            r.soundEffects[13]->stop();
+                            r.soundEffects[14]->stop();
+                            r.soundEffects[15]->stop();
+                            r.soundEffects[rand_generator_int(13, 15)]->play();
+                            womanShot.restart();
                         }
-                        if (distY <= 30.f && distX <= 1.2f) {
-                            // Thread with sound of the woman
-                            elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
-                            if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
-                                // makeCarTrafficSound
-                                r.soundEffects[20]->stop();
-                                r.soundEffects[21]->stop();
-                                r.soundEffects[22]->stop();
-                                r.soundEffects[rand_generator_int(20, 22)]->play();
-                                trafficCarSound.restart();
-                            }
+                    }
+                    if (distY <= 30.f && distX <= 1.2f) {
+                        // Thread with sound of the woman
+                        elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                        if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                            // makeCarTrafficSound
+                            r.soundEffects[20]->stop();
+                            r.soundEffects[21]->stop();
+                            r.soundEffects[22]->stop();
+                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            trafficCarSound.restart();
+                        }
+                    }
+                }
+            }
+            if (checkPoint) {
+                elapsed10 = blinkTime.getElapsedTime().asSeconds();
+                if (elapsed10 - elapsed9 >= blink_delay.asSeconds()) {
+                    blink = !blink;
+                    blinkTime.restart();
+                }
+                if (blink) {
+                    showCheckpointIndications(c, true);
+                    // BeepSound
+                    r.soundEffects[48]->stop();
+                    r.soundEffects[48]->play();
+                }
+                else {
+                    showCheckpointIndications(c, false);
+                }
+                if (timeCheck - time > 5) {
+                    checkPoint = false;
+                }
+            }
+            if (newLap) {
+                drawNewLap(c);
+                if (lapsDone < numberLaps){
+                    if (r.soundEffects[55]->getStatus() != SoundSource::Playing){
+                        newLap = false;
+                    }
+                }
+                else {
+                    if (r.soundEffects[56]->getStatus() != SoundSource::Playing){
+                        r.soundTracks[r.currentSoundtrack]->play();
+                        newLap = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+/**
+ * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+ * with the vehicles on the screen.
+ * @param c is the configuration of the game
+ */
+void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                       Vehicle::Direction &direction, int& terrain)
+{
+
+    currentMap->updateCamera(player5.getPosX(), player5.getPosY() - RECTANGLE);
+
+    // Out Run and Driving Fury and Demarrage modes
+    if (currentMap->isOutSideLandScape()) {
+        if (currentMap->getNextLeft() != nullptr) {
+
+            player5.setPosition(player5.getPosX() + currentMap->getOffsetX(), player5.getPosY() - currentMap->getMaxY());
+
+            for (TrafficCar &v : cars)
+                v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
+
+            const bool isInitMap = currentMap->isStartingLandScape();
+            currentMap = currentMap->getNextLeft();
+            terrain = currentMap->getTerrain();
+            if (!isInitMap && !currentMap->isFinalLandScape()) {
+                level++;
+                    // Update fork maps
+                if (currentMap == &maps[mapId.first + 1][mapId.second + 1])
+                    mapId.second++;
+                mapId.first++;
+
+                if (mapId.first < 4)
+                    currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
+                else {
+                    goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                    goalMap.setColorsLandScape(*currentMap);
+                    currentMap->addNewLandScape(&goalMap);
+                }
+
+                // Update time when map changes
+                time += int(float(currentMap->getTimeToPlay()) * timeMul);
+
+                // Update the indicators
+                if (!checkPoint) {
+                    lapCheckPoint = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
+                    lapCheckPoint += (secs < 10) ? "0" + to_string(int(secs)) + ":" : to_string(int(secs)) + ":";
+                    int cent_sec = cents_second * 100.f;
+                    lapCheckPoint += (cent_sec < 10) ? "0" + to_string(cent_sec) : to_string(cent_sec);
+
+                    // Initialize to zero the time
+                    cents_second = 0;
+                    secs = 0;
+                    minutes = 0;
+                }
+                checkPoint = true;
+                timeCheck = time;
+
+                // CheckPointEffect
+                r.soundEffects[23]->stop();
+                r.soundEffects[23]->play();
+            }
+
+            currentMap->updateCamera(player5.getPosX(), player5.getPosY() - RECTANGLE);
+
+            lastY = currentMap->getCameraPosY();
+        }
+        else {
+            finalGame = true;
+        }
+    }
+    if (currentMap->isFinalLandScape()) {
+        State status = showsGoalAnimation(c, r);
+        if (status == EXIT) {
+            exit(1);
+        }
+        mtx.lock();
+        arrival = true;
+        mtx.unlock();
+    }
+
+    if (!finalGame && !arrival) {
+        // Update and prepare cars to draw
+        if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
+            lastY = currentMap->getCameraPosY() + float(c.renderLen);
+        }
+
+        for (TrafficCar &v : cars) {
+            if (currentMap->inFork(v.getPosY())) {
+                v.setPosition(v.getPosX(), -RECTANGLE * DEL_DISTANCE * 3.0f);
+            }
+            else if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
+                v.update(lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, c.level);
+                lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
+            }
+
+            float posY = v.getPosY();
+            v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
+        }
+
+        // Draw map with cars
+        c.w.clear();
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame);
+
+        // Player update and draw
+        action = Vehicle::CRASH;
+        direction = Vehicle::RIGHT;
+
+        if (!player5.isCrashing()) { // If not has crashed
+            action = player5.accelerationControl(c, currentMap->isOutSideRoad(player5.getPosX(), player5.getPosY()));
+            direction = player5.rotationControl(c, currentMap->getCurveCoefficient(player5.getPosY()),
+                                                   currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+        }
+        else {
+            player5.hitControl(vehicleCrash);
+        }
+
+        player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()), terrain);
+
+        if (!player5.isCrashing()) {
+            vehicleCrash = false;
+            float crashPos;
+            bool crash = currentMap->hasCrashed(c, player5.getPreviousY(), player5.getPosY(), player5.getPosX(),
+                                                player5.getMinScreenX(), player5.getMaxScreenX(), crashPos, typeOfGame);
+            if (!crash && typeOfGame != 2)
+                for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++)
+                    vehicleCrash = cars[i].hasCrashed(player5.getPreviousY(), player5.getPosY(),
+                                                      player5.getMinScreenX(), player5.getMaxScreenX(),
+                                                      crashPos);
+
+            if (crash || vehicleCrash) {
+                // Determine the type of collision
+                player5.setModeCollision();
+                player5.setPosition(player5.getPosX(), crashPos);
+                player5.hitControl(vehicleCrash);
+                action = Vehicle::CRASH;
+                direction = Vehicle::RIGHT;
+
+                player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()), terrain);
+            }
+        }
+
+        for (TrafficCar &v : cars)
+            v.autoControl(c, player5.getPosX(), player5.getPosY());
+
+
+        if (!finalGame && !arrival){
+            // Check if enemies are displayed on the screen
+            for (TrafficCar &v : cars) {
+                float distX, distY;
+
+                bool visible = true;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                        break;
+                    case 1:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                        break;
+                    case 2:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                        break;
+                    case 3:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
+                        break;
+                    case 4:
+                        visible = v.isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
+                }
+
+                if (visible) {
+                    if (distY <= 20.f && distX <= 0.3f) {
+                        // Thread with sound of the woman
+                        elapsed6 = womanShot.getElapsedTime().asSeconds();
+                        if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
+                            // WomanSound
+                            r.soundEffects[13]->stop();
+                            r.soundEffects[14]->stop();
+                            r.soundEffects[15]->stop();
+                            r.soundEffects[rand_generator_int(13, 15)]->play();
+                            womanShot.restart();
+                        }
+                    }
+                    if (distY <= 30.f && distX <= 1.2f) {
+                        // Thread with sound of the woman
+                        elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                        if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                            // makeCarTrafficSound
+                            r.soundEffects[20]->stop();
+                            r.soundEffects[21]->stop();
+                            r.soundEffects[22]->stop();
+                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            trafficCarSound.restart();
                         }
                     }
                 }
@@ -3119,7 +4480,7 @@ void Game::loadPauseMenuConfiguration(const string path, Configuration& c){
                 // Check it is the node that contains the information of the color border of the panel
                 if ((string)panelProp->name() == "ColorPanel" || (string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -3169,7 +4530,7 @@ void Game::loadPauseMenuConfiguration(const string path, Configuration& c){
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -3212,7 +4573,7 @@ void Game::loadPauseMenuConfiguration(const string path, Configuration& c){
                 // Get the color font of the buttons
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
@@ -3238,7 +4599,7 @@ void Game::loadPauseMenuConfiguration(const string path, Configuration& c){
                 else if ((string)buttonProp->name() == "Buttons"){
                     // Local variables to store the attributes of the buttons
                     string contentButton;
-                    int buttonState;
+                    int buttonState = 0;
                     vector<Color> colorButtons;
                     Texture icon;
                     Sprite s;
@@ -3262,7 +4623,7 @@ void Game::loadPauseMenuConfiguration(const string path, Configuration& c){
                                 // Read the colors of the button
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
-                                    int colorRed, colorGreen, colorBlue;
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                                     // Iterate to get the information of the player menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
@@ -3317,27 +4678,32 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     c.w.clear();
 
     // Draw the map
-    currentMap->drawLandScape(c, cars, typeOfGame);
+    currentMap->drawLandScape(c, cars, rivals, typeOfGame);
 
     switch(typeOfVehicle){
         case 0:
-            player.draw(c, r, a, d, currentMap->getElevation(player.getPosY()), false);
+            player.draw(c, r, a, d, currentMap->getElevation(player.getPosY()), terrain, false);
             break;
         case 1:
-            player2.draw(c, r, a, d, currentMap->getElevation(player2.getPosY()), false);
+            player2.draw(c, r, a, d, currentMap->getElevation(player2.getPosY()), terrain, false);
             break;
         case 2:
-            player3.draw(c, r, a, d, currentMap->getElevation(player3.getPosY()), false);
+            player3.draw(c, r, a, d, currentMap->getElevation(player3.getPosY()), terrain, false);
             break;
         case 3:
-            player4.draw(c, r, a, d, currentMap->getElevation(player4.getPosY()), false);
+            player4.draw(c, r, a, d, currentMap->getElevation(player4.getPosY()), terrain, false);
             break;
         case 4:
-            player5.draw(c, r, a, d, currentMap->getElevation(player5.getPosY()), false);
+            player5.draw(c, r, a, d, currentMap->getElevation(player5.getPosY()), terrain, false);
     }
-    // Draw the vehicle of the player
 
-    showHudInterface(c);
+    // Draw the vehicle of the player
+    if (typeOfGame == 0 || typeOfGame == 2){
+        showHudInterfaceWorldTourPolePosition(c);
+    }
+    else {
+        showHudInterfaceOutRunDrivingFuryDerramage(c);
+    }
 
     if (newLap){
         if (lapsDone < numberLaps){
@@ -3363,7 +4729,18 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
 
     // Game in pause
+    mtx.lock();
     onPause = true;
+    mtx.unlock();
+
+    // Wait until all threads are death
+    if (!comeFromOptions){
+        timer0.join();
+        timer1.join();
+        if (typeOfGame != 0 && typeOfGame != 2){
+            timer2.join();
+        }
+    }
 
     // Control if the pause menu configuration file has been read or not
     if (!c.pauseMenuRead){
@@ -3499,7 +4876,9 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     switch (optionSelected) {
         case 0:
             // Resume button selected and reanudate the music
+            mtx.lock();
             onPause = false;
+            mtx.unlock();
             if (newLap){
                 if (lapsDone < numberLaps){
                     r.soundEffects[55]->play();
@@ -3514,7 +4893,11 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
             return OPTIONS;
         case 2:
             // Quit button selected
+            mtx.lock();
             onPause = false;
+            finalGame = true;
+            arrival = false;
+            mtx.unlock();
             return START;
         default:
             return EXIT;
@@ -3571,7 +4954,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -3620,7 +5003,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
                             // Get the kind of color to process
                             colorKind = (string)titleProp->name();
                             // Get the border color of the panel
-                            int colorRed, colorGreen, colorBlue;
+                            int colorRed = 0, colorGreen = 0, colorBlue = 0;
                             // Iterate to get the information of the player menu
                             for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                                 // Get the red color channel
@@ -3652,7 +5035,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
                 }
                 // Check if its the node of the border color of the panel
                 else if ((string)vehiclePanel->name() == "ColorBorder"){
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the background menu color
                     for (xml_node<> *colorChannel = vehiclePanel->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -3695,7 +5078,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
                             // Get the kind of color to process
                             colorKind = (string)titleProp->name();
                             // Get the border color of the panel
-                            int colorRed, colorGreen, colorBlue;
+                            int colorRed = 0, colorGreen = 0, colorBlue = 0;
                             // Iterate to get the information of the player menu
                             for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                                 // Get the red color channel
@@ -3746,7 +5129,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
                                     // Get the kind of color to process
                                     colorKind = (string)prop->name();
                                     // Get the border color of the panel
-                                    int colorRed, colorGreen, colorBlue;
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                                     // Iterate to get the information of the player menu
                                     for (xml_node<> *colorChannel = prop->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                                         // Get the red color channel
@@ -3782,7 +5165,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
                         }
                         // Check if it is the node of the border color
                         else if ((string)vehicleProp->name() == "ColorBorder"){
-                            int colorRed, colorGreen, colorBlue;
+                            int colorRed = 0, colorGreen = 0, colorBlue = 0;
                             // Iterate to get the information of the background menu color
                             for (xml_node<> *colorChannel = vehicleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                                 // Get the red color channel
@@ -3810,7 +5193,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
         }
         // Check the color buttons of the menu
         else if ((string)property->name() == "Buttons"){
-            int colorRed, colorGreen, colorBlue;
+            int colorRed = 0, colorGreen = 0, colorBlue = 0;
             // Iterate to get the information of the color buttons
             for (xml_node<> *colorChannel = property->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                 // Iterate to get the information of the background menu color
@@ -4404,6 +5787,12 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         // Store the car selected by the player
         typeOfVehicle = optionSelected;
 
+        // Store the rival cars
+        if (typeOfGame == 0 || typeOfGame == 2){
+            // Store the rival cars in the vector
+            storingRivalCars(c);
+        }
+
         if (typeOfGame == 2){
             return LOADING;
         }
@@ -4411,6 +5800,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             return LOAD_GAME;
         }
     }
+    return EXIT;
 }
 
 
@@ -4500,6 +5890,11 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     // Loads enemies and time
     checkDifficulty(c);
+
+    // Update the rival cars
+    if (typeOfGame == 0) {
+        storingRivalCars(c);
+    }
 
     // Set the scale of the console window
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
@@ -5388,20 +6783,19 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     timeCheck = 0;
     lap = "00:00:00";
     indexCheckPoint = 1;
-    posArrival = 1;
 
     switch(typeOfVehicle){
         case 0:
-            player.setVehicle();
+            player.setVehicle(typeOfGame);
             break;
         case 1:
-            player2.setVehicle();
+            player2.setVehicle(typeOfGame);
             break;
         case 2:
-            player3.setVehicle();
+            player3.setVehicle(typeOfGame);
             break;
         case 3:
-            player4.setVehicle();
+            player4.setVehicle(typeOfGame);
     }
 
     r.soundTracks[15]->stop();
@@ -5465,7 +6859,7 @@ void Game::loadCircuitMenuConfiguration(const string path, Configuration& c){
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -5520,7 +6914,7 @@ void Game::loadCircuitMenuConfiguration(const string path, Configuration& c){
                             // Get the kind of color to process
                             colorKind = (string)textProp->name();
                             // Get the border color of the panel
-                            int colorRed, colorGreen, colorBlue;
+                            int colorRed = 0, colorGreen = 0, colorBlue = 0;
                             // Iterate to get the information of the player menu
                             for (xml_node<> *colorChannel = textProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                                 // Get the red color channel
@@ -5553,7 +6947,7 @@ void Game::loadCircuitMenuConfiguration(const string path, Configuration& c){
                 // Check if it is the node that stores the information of the main text of the menu
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -5580,7 +6974,7 @@ void Game::loadCircuitMenuConfiguration(const string path, Configuration& c){
         // Check if it is the node that stores the information of the main text of the menu
         else if ((string)property->name() == "Indicators"){
             // Get the border color of the panel
-            int colorRed, colorGreen, colorBlue;
+            int colorRed = 0, colorGreen = 0, colorBlue = 0;
             // Iterate to get the information of the player menu
             for (xml_node<> *color = property->first_node(); color; color = color->next_sibling()){
                 // Get the kind of color to process
@@ -5929,7 +7323,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                         }
                         break;
                     case 2:
-                        if (numberRacers != 8){
+                        if (numberRacers != 7){
                             // Decrement one lap
                             numberRacers++;
                             r.soundEffects[0]->stop();
@@ -6011,4 +7405,5 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
     else if (backSpacePressed){
         return GAME_MODES_MENU;
     }
+    return EXIT;
 }

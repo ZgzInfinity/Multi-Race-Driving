@@ -105,7 +105,7 @@ inline void loadMainMenuConfiguration(const string path, Configuration& c){
                     else if ((string)propertyText->name() == "ColorText" || (string)propertyText->name() == "ColorBorder"){
                         colorKind = (string)propertyText->name();
                         // Channels of the RGB color
-                        int colorRed, colorGreen, colorBlue;
+                        int colorRed = 0, colorGreen = 0, colorBlue = 0;
                         // Iterate the different colors of the text
                         for (xml_node<> *color = propertyText->first_node(); color; color = color->next_sibling()){
                             // Red color channel
@@ -429,7 +429,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                 // Check it is the node that contains the information of the color border of the panel
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -474,7 +474,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -511,7 +511,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                 // Get the kind of color to process
                 colorKind = (string)descriptionProp->name();
                 // Get the border color of the panel
-                int colorRed, colorGreen, colorBlue;
+                int colorRed = 0, colorGreen = 0, colorBlue = 0;
                 // Iterate to get the information of the player menu
                 for (xml_node<> *colorChannel = descriptionProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                     // Get the red color channel
@@ -554,7 +554,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                 // Get the color font of the buttons
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
@@ -580,7 +580,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                 else if ((string)buttonProp->name() == "Buttons"){
                     // Local variables to store the attributes of the buttons
                     string contentButton;
-                    int buttonState;
+                    int buttonState = 0;
                     vector<Color> colorButtons;
                     Texture icon;
                     Sprite s;
@@ -604,7 +604,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                                 // Read the colors of the button
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
-                                    int colorRed, colorGreen, colorBlue;
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                                     // Iterate to get the information of the player menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
@@ -914,7 +914,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
     }
 
-    State status;
+    State status = PLAYER_MENU;
 
     switch(optionSelected){
         case 0:
@@ -979,7 +979,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                 // Check it is the node that contains the information of the color border of the panel
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -1024,7 +1024,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -1061,7 +1061,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                 // Get the kind of color to process
                 colorKind = (string)descriptionProp->name();
                 // Get the border color of the panel
-                int colorRed, colorGreen, colorBlue;
+                int colorRed = 0, colorGreen = 0, colorBlue = 0;
                 // Iterate to get the information of the player menu
                 for (xml_node<> *colorChannel = descriptionProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                     // Get the red color channel
@@ -1103,7 +1103,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                 // Get the color font of the buttons
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
@@ -1129,7 +1129,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                 else if ((string)buttonProp->name() == "Buttons"){
                     // Local variables to store the attributes of the buttons
                     string contentButton;
-                    int buttonState;
+                    int buttonState = 0;
                     vector<Color> colorButtons;
                     Texture icon;
                     Sprite s;
@@ -1153,7 +1153,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                                 // Read the colors of the button
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
-                                    int colorRed, colorGreen, colorBlue;
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                                     // Iterate to get the information of the player menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
@@ -1505,7 +1505,7 @@ void loadOptionsMenuConfiguration(const string path, Configuration& c){
                 // Check it is the node that contains the information of the color border of the panel
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -1550,7 +1550,7 @@ void loadOptionsMenuConfiguration(const string path, Configuration& c){
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -1593,7 +1593,7 @@ void loadOptionsMenuConfiguration(const string path, Configuration& c){
                 // Get the color font of the buttons
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
@@ -1619,7 +1619,7 @@ void loadOptionsMenuConfiguration(const string path, Configuration& c){
                 else if ((string)buttonProp->name() == "Buttons"){
                     // Local variables to store the attributes of the buttons
                     string contentButton;
-                    int buttonState;
+                    int buttonState = 0;
                     vector<Color> colorButtons;
                     Texture icon;
                     Sprite s;
@@ -1643,7 +1643,7 @@ void loadOptionsMenuConfiguration(const string path, Configuration& c){
                                 // Read the colors of the button
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
-                                    int colorRed, colorGreen, colorBlue;
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                                     // Iterate to get the information of the player menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
@@ -1733,7 +1733,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                 // Check it is the node that contains the information of the color border of the panel
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -1778,7 +1778,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -1821,7 +1821,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                 // Get the color font of the buttons
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
@@ -1847,7 +1847,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                 else if ((string)buttonProp->name() == "Buttons"){
                     // Local variables to store the attributes of the buttons
                     string contentButton;
-                    int buttonState;
+                    int buttonState = 0;
                     vector<Color> colorButtons;
                     Texture icon;
                     Sprite s;
@@ -1871,7 +1871,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                                 // Read the colors of the button
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
-                                    int colorRed, colorGreen, colorBlue;
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                                     // Iterate to get the information of the player menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
@@ -2476,11 +2476,10 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
                             // Local variables to store the attributes of the buttons
                             string contentButton;
-                            int buttonState;
                             vector<Color> colorButtons;
                             Texture icon;
                             Sprite s;
-                            int i, idButton = 0, posX, posY, widthButton, heightButton;
+                            int i, idButton = 0, posX = 0, posY = 0, widthButton = 0, heightButton = 0;
                             Button b;
 
                             // Add the buttons with the new resolution
@@ -2733,7 +2732,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
     c.comeFromOptions = true;
 
     // Update the xml configuration file
-    if (c.changeAnyParameter = true){
+    if (c.changeAnyParameter == true){
         const string path = "Data/Settings/Configuration.xml";
 
         KeywordMapper kM = KeywordMapper();
@@ -2817,7 +2816,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                 // Check it is the node that contains the information of the color border of the panel
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -2862,7 +2861,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                     // Get the kind of color to process
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
@@ -2905,7 +2904,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                 // Get the color font of the buttons
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
-                    int colorRed, colorGreen, colorBlue;
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                     // Iterate to get the information of the player menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
@@ -2931,7 +2930,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                 else if ((string)buttonProp->name() == "Buttons"){
                     // Local variables to store the attributes of the buttons
                     string contentButton;
-                    int buttonState;
+                    int buttonState = 0;
                     vector<Color> colorButtons;
                     Texture icon;
                     Sprite s;
@@ -2955,7 +2954,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                                 // Read the colors of the button
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
-                                    int colorRed, colorGreen, colorBlue;
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
                                     // Iterate to get the information of the player menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
@@ -3643,7 +3642,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
 
             // Show the rest of out runners
 
-            for (int i = record; i < 6 && i < scoreRankingPlayer.size(); i++) {
+            for (int i = record; i < 6 && i < (int)scoreRankingPlayer.size(); i++) {
                 scorePlayer.setString(to_string(scoreRankingPlayer[i].score));
                 scorePlayer.setPosition((c.w.getSize().x / 3.9f) - scorePlayer.getLocalBounds().width,
                                         (c.w.getSize().y / 4.5f) + 50.0f * c.screenScale * (float) (i + 2));

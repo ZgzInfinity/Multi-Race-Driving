@@ -107,7 +107,7 @@ vector<Score> getGlobalScores(Configuration& c, const int typeOfGame) {
 
 int isNewRecord(const vector<Score> &globalScores, unsigned long score) {
     int i = 0;
-    for (; i < globalScores.size() && i < 7; i++) {
+    for (; i < (int)globalScores.size() && i < 7; i++) {
         if (globalScores[i].score < score)
             return i;
     }

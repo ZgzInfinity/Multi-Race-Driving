@@ -3,19 +3,10 @@
 
 TrafficCar::TrafficCar(float maxSpeed, float speedMul, float scale, int maxCounterToChange, const string &vehicle, float pY) :
         Vehicle(maxSpeed / speedMul, scale, maxCounterToChange, 0, rand_generator_float(-0.5f, 0.5f),
-                pY, pY, 0, 0, vehicle, NUM_ENEMIES_TEXTURES, 1, 0), oriX(this->posX),
+                pY, pY, 0, 0, vehicle, Vehicle_TrafficCar::NUM_ENEMIES_TEXTURES, 1, 0), oriX(this->posX),
         currentDirection(RIGHT), calculatedPath(RIGHT), current_direction_counter(0), max_direction_counter(0),
         probAI(0), typeAI(OBSTACLE) {}
 
-Vehicle::Direction randomDirection() {
-    const float p = rand_generator_zero_one();
-    if (p < 0.6f)
-        return Vehicle::Direction::RIGHT;
-    else if (p < 0.8f)
-        return Vehicle::Direction::TURNRIGHT;
-    else
-        return Vehicle::Direction::TURNLEFT;
-}
 
 void TrafficCar::autoControl(const Configuration &c, float playerPosX, float playerPosY) {
     if (abs(playerPosY - posY) > float(c.renderLen) || rand_generator_zero_one() >= probAI) {
@@ -23,7 +14,7 @@ void TrafficCar::autoControl(const Configuration &c, float playerPosX, float pla
         if (current_direction_counter < max_direction_counter) {
             current_direction_counter++;
         } else {
-            max_direction_counter = rando_generator_zero_n(MAX_DIRECTION);
+            max_direction_counter = rando_generator_zero_n(Vehicle_TrafficCar::MAX_DIRECTION);
             current_direction_counter = 0;
             calculatedPath = randomDirection();
         }
@@ -128,7 +119,7 @@ void TrafficCar::autoControl(const Configuration &c, float playerPosX, float pla
     posY += speed;
 }
 
-void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness) {
+void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness, const Difficult& difficulty) {
     speed = maxSpeed * rand_generator_float(0.25f, 0.75f);
 
     posY = rand_generator_float(iniPos, endPos);
@@ -140,23 +131,54 @@ void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness) {
     minScreenX = 0;
     maxScreenX = 0;
 
-    setAI(maxAggressiveness);
+    setAI(maxAggressiveness, difficulty);
 }
 
-void TrafficCar::setAI(float maxAggressiveness) {
+void TrafficCar::setAI(float maxAggressiveness, const Difficult& difficulty) {
     if (maxAggressiveness == 0.0f)
         probAI = 0.0f;
     else
         probAI = rand_generator_float(maxAggressiveness / 2.0f, maxAggressiveness);
 
     const float p = rand_generator_zero_one();
-    if (p < 0.333f) {
-        typeAI = OBSTACLE;
-    } else if (p < 0.666f) {
-        typeAI = EVASIVE;
-    } else {
-        typeAI = INCONSTANT;
-        probAI *= 2.0f;
+    switch(difficulty){
+        case PEACEFUL:
+            break;
+        case EASY:
+            if (p < 0.1f) {
+                typeAI = INCONSTANT;
+            }
+            else if (p < 0.2f) {
+                typeAI = OBSTACLE;
+            }
+            else {
+                typeAI = EVASIVE;
+                probAI *= 2.0f;
+            }
+            break;
+        case NORMAL:
+            if (p < 0.2f) {
+                typeAI = INCONSTANT;
+            }
+            else if (p < 0.4f) {
+                typeAI = OBSTACLE;
+            }
+            else {
+                typeAI = EVASIVE;
+                probAI *= 2.0f;
+            }
+            break;
+        case HARD:
+            if (p < 0.2f) {
+                typeAI = INCONSTANT;
+            }
+            else if (p < 0.5f) {
+                typeAI = OBSTACLE;
+            }
+            else {
+                typeAI = EVASIVE;
+                probAI *= 2.0f;
+            }
     }
 }
 
@@ -167,7 +189,7 @@ void TrafficCar::draw(const Elevation &e, const float camX) {
         if (speed > 0.0f)
             current_code_image++;
 
-        if (textures.size() == NUM_ENEMIES_TEXTURES) {
+        if (textures.size() == Vehicle_TrafficCar::NUM_ENEMIES_TEXTURES) {
             if (e == FLAT) {
                 if (currentDirection == RIGHT) {
                     if (posX <= camX) {
@@ -252,8 +274,7 @@ bool TrafficCar::hasCrashed(float prevY, float currentY, float minX, float maxX,
     return false;
 }
 
-bool
-TrafficCar::isVisible(const Configuration &c, float minY, float playerX, float playerY, float &distanceX, float &distanceY) const {
+bool TrafficCar::isVisible(const Configuration &c, float minY, float playerX, float playerY, float &distanceX, float &distanceY) const {
     if (posY < minY || posY > minY + float(c.renderLen) || minScreenX < 0 || maxScreenX > c.w.getSize().y) {
         return false;
     } else {

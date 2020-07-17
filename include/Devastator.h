@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef DEVASTATOR_H
 #define DEVASTATOR_H
@@ -131,7 +132,7 @@ public:
     void setSmoking(bool smoke);
 
 
-    void setVehicle();
+    void setVehicle(const int typeOfGame);
 
 
     void setModeCollision();

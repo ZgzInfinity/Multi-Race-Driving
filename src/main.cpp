@@ -1,10 +1,12 @@
 
 
+#include <thread>
+#include "windows.h"
 #include "../include/Menu.h"
 #include "../include/Game.h"
 #include "../include/SoundPlayer.h"
-#include "windows.h"
 
+mutex mainMutex;
 
 #include <SFML/Graphics.hpp>
 
@@ -237,7 +239,13 @@ int main() {
                 }
                 case PLAY_GAME: {
                     // Start the corresponding game selected by the player
-                    state = engine.play(c, r);
+                    int typeOfGame = engine.typeGame();
+                    if (typeOfGame == 0 || typeOfGame == 2){
+                        state = engine.playWorldTourPolePosition(c, r);
+                    }
+                    else {
+                        state = engine.playOutRunDrivingFuryDerramage(c, r);
+                    }
                     break;
                 }
                 case CLASIFICATION: {

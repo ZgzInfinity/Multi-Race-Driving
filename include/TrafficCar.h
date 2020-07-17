@@ -10,9 +10,10 @@
 using namespace std;
 using namespace sf;
 
-
-const int MAX_DIRECTION = 1000;
-const int NUM_ENEMIES_TEXTURES = 16;
+namespace Vehicle_TrafficCar {
+    const int MAX_DIRECTION = 1000;
+    const int NUM_ENEMIES_TEXTURES = 16;
+}
 
 
 class TrafficCar : public Vehicle {
@@ -83,13 +84,13 @@ public:
      * @param endPos
      * @param maxAggressiveness, 0 <= maxAggressiveness <= 1
      */
-    void update(float iniPos, float endPos, float maxAggressiveness);
+    void update(float iniPos, float endPos, float maxAggressiveness, const Difficult& difficulty);
 
     /**
      * Actualiza la agresividad de la IA del vehículo con un valor aleatorio entre 0 y maxAggressiveness.
      * @param maxAggressiveness, 0 <= maxAggressiveness <= 1
      */
-    void setAI(float maxAggressiveness);
+    void setAI(float maxAggressiveness, const Difficult& difficulty);
 
     /**
      * Actualiza el sprite del vehículo enemigo.

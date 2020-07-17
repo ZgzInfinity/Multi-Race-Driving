@@ -31,13 +31,17 @@ SoundPlayer::SoundPlayer(const int volMusic, const int volEffects){
     string path = "Data/Soundtracks/Configuration/Configuration.xml";
 
     // Load the soundtracks of the game
-    loadSoundtracksOfGame(path);
+    thread soundtracksLoader = thread(loadSoundtracksOfGame, this, path);
 
     // Path of the xml configuration file of the sound effects
     path = "Data/SoundEffects/Configuration/Configuration.xml";
 
-    // Load the soundtracks of the game
-    loadSoundEffectsOfGame(path);
+    // Load the sound effects of the game
+    thread effecsLoader = thread(loadSoundEffectsOfGame, this, path);
+
+    // Wait until threads have finished
+    soundtracksLoader.join();
+    effecsLoader.join();
 }
 
 
@@ -62,16 +66,15 @@ void SoundPlayer::loadSoundtracksOfGame(const string pathFile){
     // Loop in order to iterate all the children of the principal node
     for (xml_node<> *soundtrack = nodeSoundTrack->first_node(); soundtrack; soundtrack = soundtrack->next_sibling()){
         // Create the pointer where the music is going to be allocated
+        loaderSounds.lock();
         auto soundTrack = make_unique<sf::Music>();
-
         // Open the soundtrack file and store it in the vector of soundtracks
         soundTrack->openFromFile((string)soundtrack->value());
-
         // Reproduce the soundtracks in loop
         soundTrack->setLoop(true);
-
         // Check if ir is or nor a soundtrack reproduced during the game
         soundTracks.push_back(move(soundTrack));
+        loaderSounds.unlock();
     }
 }
 
@@ -96,11 +99,14 @@ void SoundPlayer::loadSoundEffectsOfGame(const string pathFile){
 
     // Loop in order to iterate all the children of the principal node
     for (xml_node<> *effect = nodeSoundEffect->first_node(); effect; effect = effect->next_sibling()){
+
         // Create the pointer where the music is going to be allocated
+        loaderSounds.lock();
         auto soundEffect = make_unique<sf::Music>();
         // Open the sound effect file and store it in the vector of sound effects
         soundEffect->openFromFile((string)effect->value());
         soundEffects.push_back(move(soundEffect));
+        loaderSounds.unlock();
     }
 }
 

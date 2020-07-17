@@ -1,7 +1,7 @@
+#pragma once
 
-
-#ifndef OUTRUN_MAP_HPP
-#define OUTRUN_MAP_HPP
+#ifndef LANDSCAPE_H
+#define LANDSCAPE_H
 
 #include <cmath>
 #include <string>
@@ -12,6 +12,7 @@
 #include "Step.h"
 #include "Menu.h"
 #include "TrafficCar.h"
+#include "RivalCar.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include <SFML/Graphics.hpp>
@@ -103,6 +104,7 @@ class LandScape {
 
     // Kind of terrain
     int terrain;
+
 
 
     /**
@@ -309,8 +311,8 @@ class LandScape {
      * @param y2 is the upper left corner coordinate y of the rectangle to draw
      * @param dw2 is the the half of the rectangle's height
      */
-    void drawRoadTracks(RenderTexture& w, Color& dash, const int x1, const int w1, const int y1,
-                        const int dw1, const int x2, const int w2, const int y2, const int dw2);
+    inline void drawRoadTracks(RenderTexture& w, Color& dash, const int x1, const int w1, const int y1,
+                               const int dw1, const int x2, const int w2, const int y2, const int dw2);
 
 
 public:
@@ -326,7 +328,7 @@ public:
      * @param time is the time available to complete the landscape
      * @param typeOfGame represents the game mode selected by the player
      */
-    LandScape(Configuration &c, const string &path, const string &bgName, int time, const int typeOfGame);
+    LandScape(Configuration &c, const string &path, const string &bgName, int time, const int typeOfGame, const int numRivals);
 
 
 
@@ -336,12 +338,12 @@ public:
      * @param flagger is the flagger position while is announcing the start
      * @param semaphore is the color of the semaphore in the starting
      */
-    LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame);
+    LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals);
 
 
 
 
-    LandScape(const LandScape &landScape, const int typeOfGame);
+    LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals);
 
 
 
@@ -351,7 +353,7 @@ public:
      * @param flagger is the flagger position while is announcing the goal
      * @param semaphore is the color of the semaphore in the goal
      */
-    LandScape(int &flagger, int &goalEnd, const int typeOfGame);
+    LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals);
 
 
 
@@ -444,7 +446,7 @@ public:
      * @param c is the configuration of the player
      * @param vehicles is the vector with all the traffic cars
      */
-    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, const int typeOfGame);
+    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame);
 
 
 
@@ -594,7 +596,22 @@ void drawQuad(RenderTexture &w, Color c, int x1, int y1, int w1, int x2, int y2,
  * Returns true is the traffic car v1 is lower than the traffic car v2.
  * Otherwise returns false
  */
-bool ascendingSort(const TrafficCar *v1, const TrafficCar *v2);
+bool ascendingSortTrafficCars(const TrafficCar *v1, const TrafficCar *v2);
+
+
+
+/**
+ * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * Otherwise returns false
+ */
+bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2);
+
+
+/*
+ * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * Otherwise returns false
+ */
+bool ascendingRanking(const float *p1, const float *p2);
 
 
 

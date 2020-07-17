@@ -89,7 +89,12 @@ enum HitThresholdObject {
          * @param rW is the with of the road
          * @param zOffset is the offset in the axis Z
          */
-        void project(float camX, float camY, float camZ, float camD, float width, float height, float rW, float zOffset);
+         inline void project(float camX, float camY, float camZ, float camD, float width, float height, float rW, float zOffset){
+            scalingValue = camD / (1.0f + position_3d_z + zOffset - camZ);
+            position_2d_x = (1.0f + scalingValue * (position_3d_x - camX)) * width / 2.0f;
+            position_2d_y = (1.0f - scalingValue * (position_3d_y - camY)) * height / 2.0f;
+            position_2d_w = scalingValue * rW * width / 2.0f;
+         }
 
 
 
@@ -103,9 +108,77 @@ enum HitThresholdObject {
          * @param object is the element to draw in the screen
          * @param left control if the object has to be drawn on the left or on the right of the screen
          */
-        void drawSprite(RenderTexture &w, const std::vector<sf::Texture> &objs, const std::vector<float> &hitCoeff,
-                        const std::vector<HitThresholdObject> &hitCoeffType, const std::vector<float> &scaleCoeff,
-                        MapElement &object, bool left) const;
+         inline void drawSprite(RenderTexture &w, const std::vector<sf::Texture> &objs, const std::vector<float> &hitCoeff,
+                               const std::vector<HitThresholdObject> &hitCoeffType, const std::vector<float> &scaleCoeff,
+                               MapElement &object, bool left) const
+         {
+            // Sprite where the texture is going to be drawn
+            Sprite s(objs[object.codeMapElement]);
+
+            // Calculation of the dimensions of the object with the scaling factor
+            const float width = scaleCoeff[object.codeMapElement] * s.getTextureRect().width;
+            const float widthOri = s.getTextureRect().width;
+            const float height = scaleCoeff[object.codeMapElement] * s.getTextureRect().height;
+            const float heightOri = s.getTextureRect().height;
+
+            // Coordinates of the map element in the screen with its elevation
+            float destY = position_2d_y + 4.0f;
+            float destW = width * position_2d_w / SCALE_RESOLUTION;
+            float destH = height * position_2d_w / SCALE_RESOLUTION;
+
+            //offsetY
+            destY += destH * (-1.0f);
+
+            // Calculation the elevation
+            float clipH = destY + destH - clip;
+
+            // Elevation
+            if (clipH < 0){
+                clipH = 0;
+            }
+
+            // Check the elevation
+            if (clipH < destH) {
+
+                // Scaling the element
+                s.setScale(destW / widthOri, destH / heightOri);
+
+                // Right road side
+                float destX = position_2d_x + position_2d_w + object.offset * s.getGlobalBounds().width;
+
+                if (left){
+                    // Left road side
+                    destX = position_2d_x - position_2d_w - s.getGlobalBounds().width - object.offset * s.getGlobalBounds().width;
+                }
+
+                // Set the position and draw in the screen
+                s.setPosition(destX, destY);
+                w.draw(s);
+
+                // Control the hit coefficient of the map element
+                if (hitCoeffType[object.codeMapElement] == HIT_CENTER) {
+                    // Collision in the center of the map element
+                    object.spriteMinX = destX + (s.getGlobalBounds().width - s.getGlobalBounds().width * hitCoeff[object.codeMapElement]) / 2.0f;
+                }
+                else if (hitCoeffType[object.codeMapElement] == HIT_RIGHT) {
+                    // Collision with the element in the right part
+                    object.spriteMinX = destX + s.getGlobalBounds().width - s.getGlobalBounds().width * hitCoeff[object.codeMapElement];
+                }
+                else {
+                    // Collision in the left and in both sides only
+                    object.spriteMinX = destX;
+                }
+                object.spriteMaxX = object.spriteMinX + s.getGlobalBounds().width * hitCoeff[object.codeMapElement];
+
+                // Collision on the sides of the element but not in the center
+                if (hitCoeffType[object.codeMapElement] != HIT_SIDES) {
+                    object.spriteToSideX = 0.0f;
+                }
+                else {
+                    object.spriteToSideX = s.getGlobalBounds().width - (object.spriteMaxX - object.spriteMinX);
+                }
+            }
+         }
     };
 
 

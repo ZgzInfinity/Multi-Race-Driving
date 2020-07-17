@@ -370,7 +370,7 @@ inline void LandScape::addStep(float x, float y, float &z, float prevY, float cu
  * @return
  */
 Step *LandScape::getStep(const int n) {
-    if (n < newLines.size() || nextLeft == nullptr){
+    if (n < (int)newLines.size() || nextLeft == nullptr){
         return &newLines[n % newLines.size()];
     }
     else {
@@ -386,7 +386,7 @@ Step *LandScape::getStep(const int n) {
  * @return
  */
 Step LandScape::getStep(const int n) const {
-    if (n < newLines.size() || nextLeft == nullptr){
+    if (n < (int)newLines.size() || nextLeft == nullptr){
         return newLines[n % newLines.size()];
     }
     else {
@@ -402,7 +402,7 @@ Step LandScape::getStep(const int n) const {
  * @return
  */
 Step *LandScape::getLastStep(const int n) {
-    if ((n > 0 && n - 1 < newLines.size()) || nextLeft == nullptr)
+    if ((n > 0 && n - 1 < (int)newLines.size()) || nextLeft == nullptr)
         return &newLines[(n - 1) % newLines.size()];
     else
         return &nextLeft->newLines[(n - 1 - newLines.size()) % nextLeft->newLines.size()];
@@ -416,7 +416,7 @@ Step *LandScape::getLastStep(const int n) {
  * @return
  */
 Step LandScape::getLastStep(const int n) const {
-    if ((n > 0 && n - 1 < newLines.size()) || nextLeft == nullptr){
+    if ((n > 0 && n - 1 < (int)newLines.size()) || nextLeft == nullptr){
         return newLines[(n - 1) % newLines.size()];
     }
     else {
@@ -778,7 +778,7 @@ void LandScape::processRoadPart(xml_node<> * roadNode, float& curveCoeff, float&
  * @param child is a node of the xml file that points to the color of the grass information
  */
 inline void LandScape::parseColorGrassRoadScene(xml_node<> * child){
-    int colorRed, colorGreen, colorBlue, index = 0;
+    int colorRed = 0, colorGreen = 0, colorBlue = 0, index = 0;
     // Loop in order to iterate throughout the colors of the grass
     for (xml_node<> *color_node = child->first_node(); color_node; color_node = color_node->next_sibling()){
         // Loop for iterate the three color channels in RGB format
@@ -959,8 +959,8 @@ void LandScape::loadRoadProperties(const string& pathRoadFile){
  * @param y2 is the upper left corner coordinate y of the rectangle to draw
  * @param dw2 is the the half of the rectangle's height
  */
-void LandScape::drawRoadTracks(RenderTexture& w, Color& dash, const int x1, const int w1, const int y1,
-                    const int dw1, const int x2, const int w2, const int y2, const int dw2)
+inline void LandScape::drawRoadTracks(RenderTexture& w, Color& dash, const int x1, const int w1, const int y1,
+                       const int dw1, const int x2, const int w2, const int y2, const int dw2)
 {
     if (number_tracks == 2){
         drawQuad(w, dash, x1 + int(float(w1) * 0.5f), y1, dw1, x2 + int(float(w2) * 0.5f), y2, dw2);
@@ -983,9 +983,22 @@ void LandScape::drawRoadTracks(RenderTexture& w, Color& dash, const int x1, cons
  * @param typeOfGame represents the game mode selected by the player
  */
 LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
-                     const int time, const int typeOfGame) : posCameraX(0), posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
+                     const int time, const int typeOfGame, const int numRivals) : posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
                      startingLandScape(false), finalLandScape(false), middleLandScape(false), timeToPlay(time)
 {
+
+    if (typeOfGame == 0 || typeOfGame == 2){
+        if (numRivals == 0){
+            posCameraX = 0.f;
+        }
+        else {
+            posCameraX = -0.3f;
+        }
+    }
+    else {
+        posCameraX = 0.f;
+    }
+
     // Load the background texture of the map
     background.loadFromFile(path + bgName);
     background.setRepeated(true);
@@ -1046,16 +1059,50 @@ LandScape::LandScape(){}
  * @param flagger is the flagger position while is announcing the start
  * @param semaphore is the color of the semaphore in the starting
  */
-LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame) : background(landScape.background),
-                     posCameraX(0), posCameraY(0), nextLeft(nullptr), nextRight(nullptr), startingLandScape(true), finalLandScape(false),
-                     middleLandScape(false), timeToPlay(0)
+LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals) :
+                     background(landScape.background), posCameraY(0), nextLeft(nullptr), nextRight(nullptr), startingLandScape(true),
+                     finalLandScape(false), middleLandScape(false), timeToPlay(0)
 {
-    int rectangles, peopleDisplayed, treesDisplayed;
 
-    if (typeOfGame == 2){
-        rectangles = 180;
-        peopleDisplayed = 12;
+    if (typeOfGame == 0 || typeOfGame == 2){
+        if (numRivals == 0){
+            posCameraX = 0.f;
+        }
+        else {
+            posCameraX = -0.3f;
+        }
+    }
+    else {
+        posCameraX = 0.f;
+    }
+
+    int rectangles = 0, peopleDisplayed, treesDisplayed;
+
+    if (typeOfGame == 0 || typeOfGame == 2){
+        peopleDisplayed = 8;
         treesDisplayed = 6;
+        if (typeOfGame == 2){
+            switch(numRivals){
+                case 0:
+                case 1:
+                    rectangles = 50;
+                    break;
+                case 2:
+                case 3:
+                    rectangles = 55;
+                    break;
+                case 4:
+                case 5:
+                    rectangles = 60;
+                    break;
+                case 6:
+                case 7:
+                    rectangles = 65;
+                }
+        }
+        else {
+            rectangles = 65;
+        }
     }
     else {
         rectangles = 50;
@@ -1065,7 +1112,6 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
 
     // Map size
     const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // File with all the textures
-    const int nobjects = 19;
 
     // Colors
     roadColor[0] = landScape.roadColor[0];
@@ -1097,42 +1143,76 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
     }
 
     // Signals
-    leftSprites[6].codeMapElement = 6;
-    leftSprites[6].offset = -1;
-    rightSprites[6].codeMapElement = 11;
-    rightSprites[6].offset = -1;
+    leftSprites[rectangles - 44].codeMapElement = 6;
+    leftSprites[rectangles - 44].offset = -1;
+    rightSprites[rectangles - 44].codeMapElement = 11;
+    rightSprites[rectangles - 44].offset = -1;
 
     // Flagger
-    leftSprites[5].codeMapElement = 1;
+    leftSprites[rectangles - 45].codeMapElement = 1;
     if (typeOfGame == 0 || typeOfGame == 2){
-        leftSprites[5].offset = -2;
+        leftSprites[rectangles - 45].offset = -2;
     }
     else {
-        leftSprites[5].offset = -4;
+        leftSprites[rectangles - 45].offset = -4;
     }
 
-    rightSprites[4].codeMapElement = 10;
-    rightSprites[4].offset = -0.95f;
+    rightSprites[rectangles - 46].codeMapElement = 10;
+    rightSprites[rectangles - 46].offset = -0.95f;
 
     // Trees
-    leftSprites[3].codeMapElement = 18;
-    leftSprites[3].offset = -1.15f;
-    rightSprites[3].codeMapElement = 17;
-    rightSprites[3].offset = -1.15f;
+    leftSprites[rectangles - 47].codeMapElement = 18;
+    leftSprites[rectangles - 47].offset = -1.15f;
+    rightSprites[rectangles - 47].codeMapElement = 17;
+    rightSprites[rectangles - 47].offset = -1.15f;
 
     // Fill
-    for (int i = 7; i < rectangles; i++) {
-        if (i % treesDisplayed == 3) {
-            // Trees
-            leftSprites[i].codeMapElement = 18;
-            leftSprites[i].offset = -0.15f;
-            rightSprites[i].codeMapElement = 17;
-            rightSprites[i].offset = -0.15f;
+    if (typeOfGame == 0 || typeOfGame == 2){
+        for (int i = 0; i <= rectangles; i++) {
+            if (i >= 0 && i <= rectangles - 47){
+                if (i % treesDisplayed == 4) {
+                    // Trees
+                    leftSprites[i].codeMapElement = 18;
+                    leftSprites[i].offset = -0.15f;
+                    rightSprites[i].codeMapElement = 17;
+                    rightSprites[i].offset = -0.15f;
+                }
+                else if (i % peopleDisplayed == 1 && (typeOfGame <= 2 || typeOfGame > 4)) {
+                    // People
+                    leftSprites[i].codeMapElement = 15;
+                    rightSprites[i].codeMapElement = 14;
+                }
+            }
+            else if (i > rectangles - 42){
+                if (i % treesDisplayed == 4) {
+                    // Trees
+                    leftSprites[i].codeMapElement = 18;
+                    leftSprites[i].offset = -0.15f;
+                    rightSprites[i].codeMapElement = 17;
+                    rightSprites[i].offset = -0.15f;
+                }
+                else if (i % peopleDisplayed == 1 && (typeOfGame <= 2 || typeOfGame > 4)) {
+                    // People
+                    leftSprites[i].codeMapElement = 15;
+                    rightSprites[i].codeMapElement = 14;
+                }
+            }
         }
-        else if (i % peopleDisplayed == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
-            // People
-            leftSprites[i].codeMapElement = 15;
-            rightSprites[i].codeMapElement = 14;
+    }
+    else {
+        for (int i = 7; i < rectangles; i++) {
+            if (i % treesDisplayed == 3) {
+                // Trees
+                leftSprites[i].codeMapElement = 18;
+                leftSprites[i].offset = -0.15f;
+                rightSprites[i].codeMapElement = 17;
+                rightSprites[i].offset = -0.15f;
+            }
+            else if (i % peopleDisplayed == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
+                // People
+                leftSprites[i].codeMapElement = 15;
+                rightSprites[i].codeMapElement = 14;
+            }
         }
     }
 
@@ -1148,8 +1228,8 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
         mainColor = !mainColor;
     }
 
-    flagger = RECTANGLE * 5 + INTIAL_POS;
-    semaphore = RECTANGLE * 6 + INTIAL_POS;
+    flagger = RECTANGLE * (rectangles - 45) + INTIAL_POS;
+    semaphore = RECTANGLE * (rectangles - 44) + INTIAL_POS;
 }
 
 
@@ -1160,16 +1240,47 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
  * @param flagger is the flagger position while is announcing the start
  * @param semaphore is the color of the semaphore in the starting
  */
-LandScape::LandScape(const LandScape &landScape, const int typeOfGame) :
-                     background(landScape.background), posCameraX(0), posCameraY(0),
-                     nextLeft(nullptr), nextRight(nullptr), startingLandScape(false), finalLandScape(false),
-                     middleLandScape(true), timeToPlay(0)
+LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals) :
+                     background(landScape.background), posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
+                     startingLandScape(false), finalLandScape(false), middleLandScape(true), timeToPlay(0)
 {
-    int rectangles = 180;
+
+    if (typeOfGame == 0 || typeOfGame == 2){
+        if (numRivals == 0){
+            posCameraX = 0.f;
+        }
+        else {
+            posCameraX = -0.3f;
+        }
+    }
+    else {
+        posCameraX = 0.f;
+    }
+
+    int rectangles = 0;
+
+    if (typeOfGame == 2){
+        switch(numRivals){
+            case 0:
+            case 1:
+                rectangles = 50;
+                break;
+            case 2:
+            case 3:
+                rectangles = 55;
+                break;
+            case 4:
+            case 5:
+                rectangles = 60;
+                break;
+            case 6:
+            case 7:
+                rectangles = 65;
+        }
+    }
 
     // Map size
     const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // File with all the textures
-    const int nobjects = 19;
 
     vector<int> objectIndexes;
 
@@ -1185,24 +1296,24 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame) :
     }
 
     // Signals
-    leftSprites[6].codeMapElement = 6;
-    leftSprites[6].offset = -1;
-    rightSprites[6].codeMapElement = 11;
-    rightSprites[6].offset = -1;
+    leftSprites[rectangles - 44].codeMapElement = 6;
+    leftSprites[rectangles - 44].offset = -1;
+    rightSprites[rectangles - 44].codeMapElement = 11;
+    rightSprites[rectangles - 44].offset = -1;
 
     // Flagger
-    leftSprites[5].codeMapElement = 1;
-    leftSprites[5].offset = -2;
+    leftSprites[rectangles - 45].codeMapElement = 1;
+    leftSprites[rectangles - 45].offset = -2;
 
 
-    rightSprites[4].codeMapElement = 10;
-    rightSprites[4].offset = -0.95f;
+    rightSprites[rectangles - 46].codeMapElement = 10;
+    rightSprites[rectangles - 46].offset = -0.95f;
 
     // Trees
-    leftSprites[3].codeMapElement = 18;
-    leftSprites[3].offset = -1.15f;
-    rightSprites[3].codeMapElement = 17;
-    rightSprites[3].offset = -1.15f;
+    leftSprites[rectangles - 47].codeMapElement = 18;
+    leftSprites[rectangles - 47].offset = -1.15f;
+    rightSprites[rectangles - 47].codeMapElement = 17;
+    rightSprites[rectangles - 47].offset = -1.15f;
 
     // Fill
     for (int i = 7; i < rectangles; i++) {
@@ -1213,7 +1324,7 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame) :
             rightSprites[i].codeMapElement = 17;
             rightSprites[i].offset = -0.15f;
         }
-        else if (i % 12 == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
+        else if (i % 8 == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
             // People
             leftSprites[i].codeMapElement = 15;
             rightSprites[i].codeMapElement = 14;
@@ -1241,13 +1352,25 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame) :
  * @param flagger is the flagger position while is announcing the goal
  * @param semaphore is the color of the semaphore in the goal
  */
-LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame) : posCameraX(0), posCameraY(0),
-                     nextLeft(nullptr), nextRight(nullptr), startingLandScape(false), finalLandScape(true),
-                     middleLandScape(false), timeToPlay(0)
+LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals) : posCameraY(0), nextLeft(nullptr),
+                     nextRight(nullptr), startingLandScape(false), finalLandScape(true), middleLandScape(false),
+                     timeToPlay(0)
 {
+
+    if (typeOfGame == 0 || typeOfGame == 2){
+        if (numRivals == 0){
+            posCameraX = 0.f;
+        }
+        else {
+            posCameraX = -0.3f;
+        }
+    }
+    else {
+        posCameraX = 0.f;
+    }
+
     const int rectangles = 180; // Map size
     const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // Folder with common objects
-    const int nobjects = 19;
 
     vector<int> objectIndexes;
     loadMapElements(mapPath, objectIndexes);
@@ -1339,7 +1462,7 @@ void LandScape::setColorsLandScape(const LandScape &landScape) {
  * @param increment is how to code id has to be increased
  */
 void LandScape::addMapElelementIndex(int line, bool right, int increment) {
-    if (line < newLines.size()) {
+    if (line < (int)newLines.size()) {
         MapElement &sprite = right ? newLines[line].spriteNearRight : newLines[line].spriteNearLeft;
         if (sprite.codeMapElement > -1){
             sprite.codeMapElement += increment;
@@ -1514,7 +1637,8 @@ float LandScape::getCameraPosY() const {
  * @param c is the configuration of the player
  * @param vehicles is the vector with all the traffic cars
  */
-void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, const int typeOfGame) {
+void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame) {
+
     const int N = static_cast<const int>(newLines.size());
     const int startPos = int(posCameraY) % N;
     const int lastPos = startPos + c.renderLen - 1;
@@ -1533,13 +1657,28 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, co
     for (TrafficCar &v : vehicles){
         sortedVehicles.push_back(&v);
     }
-    sort(sortedVehicles.begin(), sortedVehicles.end(), ascendingSort);
+    sort(sortedVehicles.begin(), sortedVehicles.end(), ascendingSortTrafficCars);
 
     // Discard all the vehicles which are behind the player
     while (!sortedVehicles.empty() && (int(sortedVehicles.back()->getPosY()) < int(posCameraY) ||
                                        int(sortedVehicles.back()->getPosY()) > int(posCameraY) + c.renderLen - 1))
     {
         sortedVehicles.pop_back();
+    }
+
+    // Sort the traffic cars
+    vector<RivalCar *> sortedRivals;
+    sortedRivals.reserve(carRivals.size());
+    for (RivalCar &v : carRivals){
+        sortedRivals.push_back(&v);
+    }
+    sort(sortedRivals.begin(), sortedRivals.end(), ascendingSortRivalCars);
+
+    // Discard all the vehicles which are behind the player
+    while (!sortedRivals.empty() && (int(sortedRivals.back()->getPosY()) < int(posCameraY) ||
+                                       int(sortedRivals.back()->getPosY()) > int(posCameraY) + c.renderLen - 1))
+    {
+        sortedRivals.pop_back();
     }
 
     // Background drawing with possible movement in curves
@@ -1550,12 +1689,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, co
     sbg.setTextureRect(IntRect(0, 0, static_cast<int>(80.0f * sbg.getGlobalBounds().width), background.getSize().y));
     sbg.setPosition(0, 0);
 
-    if (typeOfGame == 2){
-        sbg.move(-16.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
-    }
-    else {
-        sbg.move(-8.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
-    }
+    sbg.move(-16.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
     c.w.draw(sbg);
 
     // Initialize lines
@@ -1592,10 +1726,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, co
         l = getStep(n);
         dx -= l->directionCurve;
         x -= dx;
-
-        // Prepare current step to be projected
-        l->project(posCameraX * width_road - x, camH, float(startPos * SEGL), c.camD,
-                   c.w.getSize().x, c.w.getSize().y, width_road, n < N ? 0.0f : newLines[newLines.size() - 1].position_3d_z);
 
         // Draw road
         if (visibleLines.back() == n) {
@@ -1783,6 +1913,30 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, co
             }
         }
 
+        if (typeOfGame == 0 || typeOfGame == 2){
+            // Draw rival cars
+            while (!sortedRivals.empty() && int(sortedRivals.back()->getPosY()) == n - startPos + int(posCameraY)) {
+
+                RivalCar *v = sortedRivals.back();
+                Sprite sv;
+                sv.setTexture(*v->getCurrentTexture(), true);
+                const float width = v->getScalingFactor() * sv.getTextureRect().width;
+                const float widthOri = sv.getTextureRect().width;
+                const float height = v->getScalingFactor() * sv.getTextureRect().height;
+                const float heightOri = sv.getTextureRect().height;
+                float destW = width * l->position_2d_w / SCALE_RESOLUTION;
+                float destH = height * l->position_2d_w / SCALE_RESOLUTION;
+
+                sv.setScale(destW / widthOri, destH / heightOri);
+                v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
+                v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
+                sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
+                c.w.draw(sv);
+
+                sortedRivals.pop_back();
+            }
+        }
+
         if (typeOfGame != 2){
             // Draw vehicles
             while (!sortedVehicles.empty() && int(sortedVehicles.back()->getPosY()) == n - startPos + int(posCameraY)) {
@@ -1823,15 +1977,8 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, co
  * @return
  */
 bool LandScape::hasCrashed(Configuration &c, float prevY, float currentY, float currentX, float minX, float maxX,
-                     float &crashPos, const int typeOfGame) const {
-    /*
-    if (inFork(currentY) || (this->getMaxY() - currentY <= 100.f && typeOfGame != 0 && typeOfGame != 2)){
-        c.renderLen = 300;
-    }
-    else {
-        c.renderLen = 450;
-    }
-    */
+                     float &crashPos, const int typeOfGame) const
+{
     if (inFork(currentY)){
         // has left the map
         if (abs(currentX) > 30.0f){
@@ -2074,7 +2221,7 @@ int LandScape::getTimeToPlay() const {
  * @param y2 is the upper bound vertex coordinate in axis y of the rectangle
  * @param w2 is the height of the rectangle
  */
-void drawQuad(RenderTexture &w, Color c, int x1, int y1, int w1, int x2, int y2, int w2) {
+inline void drawQuad(RenderTexture &w, Color c, int x1, int y1, int w1, int x2, int y2, int w2) {
     ConvexShape shape(4);
     shape.setFillColor(c);
     shape.setPoint(0, Vector2f(x1, y1));
@@ -2090,6 +2237,26 @@ void drawQuad(RenderTexture &w, Color c, int x1, int y1, int w1, int x2, int y2,
  * Returns true is the traffic car v1 is lower than the traffic car v2.
  * Otherwise returns false
  */
-bool ascendingSort(const TrafficCar *v1, const TrafficCar *v2) {
+bool ascendingSortTrafficCars(const TrafficCar *v1, const TrafficCar *v2) {
     return v1->getPosY() < v2->getPosY();
+}
+
+
+
+/**
+ * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * Otherwise returns false
+ */
+bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2) {
+    return v1->getPosY() < v2->getPosY();
+}
+
+
+
+/*
+ * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * Otherwise returns false
+ */
+bool ascendingRanking(const float *p1, const float *p2){
+    return p1 < p2;
 }

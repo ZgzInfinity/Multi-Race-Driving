@@ -1,4 +1,4 @@
-
+#pragma once
 
 /*
  * Module Reproductor interface file
@@ -10,6 +10,8 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <thread>
+#include <mutex>
 #include "SFML/Audio.hpp"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
@@ -39,7 +41,8 @@ struct SoundPlayer {
         // Control if the soundtrack has been change recently
         bool soundtrackChanged;
 
-
+        // Mutex to control the load of the soundtracks and sound effects
+        mutex loaderSounds;
 
         /**
          * Default constructor

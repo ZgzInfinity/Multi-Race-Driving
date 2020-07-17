@@ -106,7 +106,9 @@ void Truck::hitControl(const bool vehicleCrash) {
         acceleration = 0.0f;
     }
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
 
     if (xDest > 0.f && posX < xDest){
         if (!vehicleCrash){
@@ -191,7 +193,10 @@ Vehicle::Action Truck::accelerationControl(Configuration &c, bool hasGotOut) {
     else if (a == NONE && acceleration > 0.0f)
         a = ACCELERATE;
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
+
     if (speed > 0.0f) {
         previousY = posY;
         posY += speed;
@@ -495,7 +500,7 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
                         }
                     }
                     else { // Down
-                                                if (d == RIGHT) {
+                        if (d == RIGHT) {
                             if (current_code_image < 28 || current_code_image > 32)
                                 current_code_image = 28;
                         }
@@ -559,7 +564,7 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
 
     if (smoking || skidding || crashing) {
         if (!crashing){
-            maxCounterToChange = COUNTER + 2;
+            maxCounterToChange = COUNTER + 1;
         }
         else {
             if (getRealSpeed() < 20.f){
@@ -619,8 +624,8 @@ void Truck::setSmoking(bool smoke) {
 }
 
 
-void Truck::setVehicle(){
-    Vehicle::setVehicle();
+void Truck::setVehicle(const int typeOfGame){
+    Vehicle::setVehicle(typeOfGame);
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;

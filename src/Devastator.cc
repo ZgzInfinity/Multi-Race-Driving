@@ -106,7 +106,9 @@ crashing = true;
         acceleration = 0.0f;
     }
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
 
     if (xDest > 0.f && posX < xDest){
         if (!vehicleCrash){
@@ -191,7 +193,10 @@ Vehicle::Action Devastator::accelerationControl(Configuration &c, bool hasGotOut
     else if (a == NONE && acceleration > 0.0f)
         a = ACCELERATE;
 
+    mainMutex.lock();
     speed = sqrt(acceleration);
+    mainMutex.unlock();
+
     if (speed > 0.0f) {
         previousY = posY;
         posY += speed;
@@ -557,7 +562,7 @@ void Devastator::draw(Configuration &c, SoundPlayer &r, const Action &a, const D
 
     if (smoking || skidding || crashing) {
         if (!crashing){
-            maxCounterToChange = COUNTER + 2;
+            maxCounterToChange = COUNTER + 1;
         }
         else {
             if (getRealSpeed() < 20.f){
@@ -617,8 +622,8 @@ void Devastator::setSmoking(bool smoke) {
 }
 
 
-void Devastator::setVehicle(){
-    Vehicle::setVehicle();
+void Devastator::setVehicle(const int typeOfGame){
+    Vehicle::setVehicle(typeOfGame);
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;

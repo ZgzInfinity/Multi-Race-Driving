@@ -1,3 +1,4 @@
+#pragma once
 
 /*
  * Module Button interface file
@@ -26,8 +27,6 @@ using namespace rapidxml;
 enum button_states {
     // Normal state of the button
     BUTTON_IDLE = 0,
-    // Button pressed with the keywords or mouse
-    BUTTON_PRESSED,
     // Button hovered with the mouse or with the row cursor keywords
     BUTTON_HOVER,
 };
