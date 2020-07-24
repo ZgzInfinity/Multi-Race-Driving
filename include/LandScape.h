@@ -611,7 +611,7 @@ bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2);
  * Returns true is the traffic car v1 is lower than the traffic car v2.
  * Otherwise returns false
  */
-bool ascendingRanking(const float *p1, const float *p2);
+bool ascendingRanking(const float p1, const float p2);
 
 
 

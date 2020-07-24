@@ -8,7 +8,7 @@ Devastator::Devastator(){}
 Devastator::Devastator(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
                        const string &vehicle, float pX, float pY, const string brandName, const float angle,
                        const string motorName) : Vehicle(maxSpeed / speedMul, scaleX, maxCounterToChange,
-                                                 0.0f, pX, pY, pY, 0, 0, vehicle, Devastator_vehicle::PLAYER_TEXTURES, 1, 0),
+                                                 0.0f, pX, pX, pY, pY, 0, 0, vehicle, Devastator_vehicle::PLAYER_TEXTURES, 1, 0),
                                                  speedMul(speedMul), maxAcc(pow(maxSpeed / speedMul, 2.0f)),
                                                  accInc(accInc), scaleY(scaleY), acceleration(0),
                                                  minCrashAcc(0), xDest(1000), inertia(0), crashing(false),

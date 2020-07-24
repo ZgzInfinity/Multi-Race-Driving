@@ -24,6 +24,8 @@ class TrafficCar : public Vehicle {
 
     float probAI;
 
+    bool isTruck;
+
     /**
      * Tipos de IA:
      *      OBSTACLE: Intenta chocar con el jugador poniéndose en su trayectoria e intentando alcanzarlo.
@@ -47,7 +49,7 @@ public:
      * @param vehicle nombre del vehículo
      * @param pY
      */
-    TrafficCar(float maxSpeed, float speedMul, float scale, int maxCounterToChange, const std::string &vehicle, float pY);
+    TrafficCar(float maxSpeed, float speedMul, float scale, int maxCounterToChange, const std::string &vehicle, float pX, float pY, bool truck);
 
     /**
      * Actualiza la lógica del vehículo de manera automática para el movimiento actual.
@@ -146,6 +148,10 @@ public:
      * @return
      */
     bool isVisible(const Configuration &c, float minY, float playerX, float playerY, float &distanceX, float &distanceY) const;
+
+
+
+    bool getIsTruck() const;
 };
 
 

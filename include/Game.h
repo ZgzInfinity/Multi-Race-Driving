@@ -64,7 +64,7 @@ class Game {
     Truck player4;
     Police player5;
 
-    mutex mtx;
+    mutex mtx, mtx2;
 
     vector<TrafficCar> cars;
 
@@ -216,7 +216,7 @@ class Game {
     bool shown;
 
     // Threads of the game
-    thread timer0, timer1, timer2;
+    thread timer0, timer1, timer2, controllerPosition;
 
 
     int displayLapFactor;
@@ -225,7 +225,7 @@ class Game {
     int numberRacers;
 
 
-    vector<float*> rankingVehicles;
+    vector<float> rankingVehicles;
 
 
     void storingRivalCars(Configuration& c);

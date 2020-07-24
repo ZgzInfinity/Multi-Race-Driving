@@ -1674,13 +1674,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     }
     sort(sortedRivals.begin(), sortedRivals.end(), ascendingSortRivalCars);
 
-    // Discard all the vehicles which are behind the player
-    while (!sortedRivals.empty() && (int(sortedRivals.back()->getPosY()) < int(posCameraY) ||
-                                       int(sortedRivals.back()->getPosY()) > int(posCameraY) + c.renderLen - 1))
-    {
-        sortedRivals.pop_back();
-    }
-
     // Background drawing with possible movement in curves
     drawQuad(c.w, grassColor[0], 0, 0, c.w.getSize().x, 0, c.w.getSize().y, c.w.getSize().x);
     Sprite sbg;
@@ -1932,6 +1925,12 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
                 v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
                 sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
                 c.w.draw(sv);
+
+                // Check if the rival is smoking or not
+                if (v->getSmoking()){
+                    // Draw the smoking of the rival car
+                    v->drawSmokingPlayer(c, destW, destH, widthOri, heightOri, sv.getPosition().y + sv.getGlobalBounds().height * 0.8f);
+                }
 
                 sortedRivals.pop_back();
             }
@@ -2257,6 +2256,6 @@ bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2) {
  * Returns true is the traffic car v1 is lower than the traffic car v2.
  * Otherwise returns false
  */
-bool ascendingRanking(const float *p1, const float *p2){
-    return p1 < p2;
+bool ascendingRanking(const float p1, const float p2){
+    return p1 >= p2;
 }

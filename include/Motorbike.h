@@ -11,7 +11,7 @@ using namespace sf;
 
 namespace Motorbike_vehicle {
     const int FORCE_INERTIA = 8;
-    const int PLAYER_TEXTURES = 67;
+    const int PLAYER_TEXTURES = 80;
 }
 
 

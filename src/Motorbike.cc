@@ -8,7 +8,7 @@ Motorbike::Motorbike(){}
 Motorbike::Motorbike(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
                      const string &vehicle, float pX, float pY, const string brandName, const float angle,
                      const string motorName) : Vehicle(maxSpeed / speedMul, scaleX, maxCounterToChange,
-                                                0.0f, pX, pY, pY, 0, 0, vehicle, Motorbike_vehicle::PLAYER_TEXTURES, 1, 0),
+                                                0.0f, pX, pX, pY, pY, 0, 0, vehicle, Motorbike_vehicle::PLAYER_TEXTURES, 1, 0),
                                                 speedMul(speedMul), maxAcc(pow(maxSpeed / speedMul, 2.0f)), accInc(accInc),
                                                 scaleY(scaleY), acceleration(0),
                                                 minCrashAcc(0), xDest(1000), inertia(0), crashing(false),
@@ -88,6 +88,7 @@ float Motorbike::getRealSpeed() const {
     return speed * speedMul;
 }
 
+
 Vehicle::Action Motorbike::accelerationControl(Configuration &c, bool hasGotOut) {
     Action a = NONE;
     smoking = false;
@@ -149,12 +150,14 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
     if (speed > 0.0f) {
         if (isFinalMap && limitMap - posY <= 150.f){
             if (posX > 0.f){
+                previousX = posX;
                 posX -= 0.02f;
                 if (posX < 0.0f){
                     posX = 0.0f;
                 }
             }
             else if (posX < 0.0f) {
+                previousX = posX;
                 posX += 0.02f;
                 if (posX > 0.0f){
                     posX = 0.0f;
@@ -162,10 +165,14 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
             }
         }
         else {
-            if (speed < 0.66f * maxSpeed)
+            if (speed < 0.66f * maxSpeed){
+                previousX = posX;
                 posX -= angleTurning * curveCoefficient * sqrt(speed / 2.0f) * speed / maxSpeed;
-            else
+            }
+            else {
+                previousX = posX;
                 posX -= angleTurning * curveCoefficient * sqrt(speed) * speed / maxSpeed;
+            }
 
             if (abs(curveCoefficient) >= 0.33f && speed >= 0.66f * maxSpeed)
                 skidding = true;
@@ -178,12 +185,18 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
                     if (curveCoefficient > 0.0f)
                         skidding = false;
 
-                    if (speed < halfMaxSpeed)
+                    if (speed < halfMaxSpeed){
+                        previousX = posX;
                         posX -= 1.5f * angleTurning * speed / maxSpeed;
-                    else if (curveCoefficient == 0.0f)
+                    }
+                    else if (curveCoefficient == 0.0f){
+                        previousX = posX;
                         posX -= 1.25f * angleTurning * speed / maxSpeed;
-                    else
+                    }
+                    else {
+                        previousX = posX;
                         posX -= angleTurning * speed / maxSpeed;
+                    }
 
                     return TURNLEFT;
                 }
@@ -195,12 +208,18 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
                     if (curveCoefficient < 0.0f)
                         skidding = false;
 
-                    if (speed < halfMaxSpeed)
+                    if (speed < halfMaxSpeed){
+                        previousX = posX;
                         posX += 1.5f * angleTurning * speed / maxSpeed;
-                    else if (curveCoefficient == 0.0f)
+                    }
+                    else if (curveCoefficient == 0.0f){
+                        previousX = posX;
                         posX += 1.25f * angleTurning * speed / maxSpeed;
-                    else
+                    }
+                    else {
+                        previousX = posX;
                         posX += angleTurning * speed / maxSpeed;
+                    }
 
                     return TURNRIGHT;
                 }
@@ -533,13 +552,13 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         switch(terrain){
         case 0:
-            sprite.setTexture(textures[53 + current_code_image % 8], true);
+            sprite.setTexture(textures[66 + current_code_image % 8], true);
             break;
         case 1:
-            sprite.setTexture(textures[47 + current_code_image % 6], true);
+            sprite.setTexture(textures[60 + current_code_image % 6], true);
             break;
         case 2:
-            sprite.setTexture(textures[61 + current_code_image % 6], true);
+            sprite.setTexture(textures[74 + current_code_image % 6], true);
         }
         sprite.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
         sprite.setPosition(((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width,

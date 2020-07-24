@@ -3,88 +3,85 @@
 
 
 void Game::storingRivalCars(Configuration& c){
-    // Keep space to store the cars
-    rivals.reserve(static_cast<unsigned long>(numberRacers));
-    if ((int)rivals.size() > numberRacers) {
-        while ((int)rivals.size() > numberRacers)
-            rivals.pop_back();
+
+    // Clear the vector of rival cars
+    rivals.clear();
+
+    RivalCar v;
+
+    float positY, positX;
+
+    // Control the initial position of the vehicle in the starting point
+    switch(numberRacers){
+        case 0:
+        case 1:
+            positY = 13.f;
+            break;
+        case 2:
+        case 3:
+            positY = 33.f;
+            break;
+        case 4:
+        case 5:
+            positY = 53.f;
+            break;
+        case 6:
+        case 7:
+            positY = 73.f;
+            break;
+        default:
+            positY = 0.f;
     }
-    else if ((int)cars.size() < numberRacers) {
-        RivalCar v;
 
-        float positY, positX;
+    // Initialize the position of the player
+    posArrival = numberRacers + 1;
 
-        // Control the initial position of the vehicle in the starting point
-        switch(numberRacers){
+    // Store the rival cars in the vector
+    for (int i = 0; i < numberRacers; i++) {
+
+        if (i % 2 == 0){
+            positX = 0.3f;
+        }
+        else {
+            positX = -0.3f;
+        }
+        // Set the scale of the vehicle
+        switch(typeOfVehicle){
             case 0:
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 2.5f, COUNTER, "RivalCars/Motorbikes/Motorbike" + to_string(i + 1), positX,
+                             positY, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3, 8, 17, 22,
+                             9, 14, 23, 28, 7, 13, 7, 13, 21, 27, 21, 27, 1.15f);
+
+                v.setAI(c.maxAggressiveness, c.level);
+                rivals.push_back(v);
+                break;
             case 1:
-                positY = 13.f;
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Devastators/Devastator" + to_string(i + 1), positX,
+                             positY, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22, 5, 8, 23, 26, 9, 12, 27, 30, 13, 14,
+                             31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24, 28, 33, 35, 1.85f);
+
+                v.setAI(c.maxAggressiveness, c.level);
+                rivals.push_back(v);
                 break;
             case 2:
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Minivans/Minivan" + to_string(i + 1), positX, positY,
+                             Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
+                             11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.15f);
+
+                v.setAI(c.maxAggressiveness, c.level);
+                rivals.push_back(v);
+                break;
             case 3:
-                positY = 33.f;
-                break;
-            case 4:
-            case 5:
-                positY = 53.f;
-                break;
-            case 6:
-            case 7:
-                positY = 73.f;
-            default:
-                positY = 0.f;
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "RivalCars/Trucks/Truck" + to_string(i + 1), positX, positY,
+                             Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
+                             43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.15f);
+
+                v.setAI(c.maxAggressiveness, c.level);
+                rivals.push_back(v);
         }
-
-        // Initialize the position of the player
-        posArrival = numberRacers + 1;
-
-        // Store the rival cars in the vector
-        for (int i = 0; i < numberRacers; i++) {
-
-            if (i % 2 == 0){
-                positX = 0.3f;
-            }
-            else {
-                positX = -0.3f;
-            }
-            // Set the scale of the vehicle
-            switch(typeOfVehicle){
-                case 0:
-                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 2.5f, COUNTER, "RivalCars/Motorbikes/Motorbike" + to_string(i + 1), positX,
-                                 positY, 28, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 7,
-                                 13, 7, 13, 21, 27, 21, 27, 1.15f);
-
-                    v.setAI(c.maxAggressiveness, c.level);
-                    rivals.push_back(v);
-                    break;
-                case 1:
-                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Devastators/Devastator" + to_string(i + 1), positX,
-                                 positY, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22, 5, 8, 23, 26, 9, 12, 27, 30, 13, 14,
-                                 31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24, 28, 33, 35, 1.15f);
-
-                    v.setAI(c.maxAggressiveness, c.level);
-                    rivals.push_back(v);
-                    break;
-                case 2:
-                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Minivans/Minivan" + to_string(i + 1), positX, positY,
-                                 Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
-                                 11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.15f);
-
-                    v.setAI(c.maxAggressiveness, c.level);
-                    rivals.push_back(v);
-                    break;
-                case 3:
-                    v = RivalCar(MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "RivalCars/Trucks/Truck" + to_string(i + 1), positX, positY,
-                                 Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
-                                 43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.15f);
-
-                    v.setAI(c.maxAggressiveness, c.level);
-                    rivals.push_back(v);
-            }
-            // Update the position of the staring vehicles
-            if (i % 2 != 0){
-                positY -= 20.f;
-            }
+        // Update the position of the staring vehicles
+        if (i % 2 != 0){
+            positY -= 20.f;
         }
     }
 }
@@ -334,39 +331,21 @@ void Game::updateScore(){
 
 
 int Game::findPlayerPositionRanking(const float posYPlayer){
-    /*
-    int init = 0, last = rankingVehicles.size() - 1;
-    while (init != last){
-        int medium = (init + last) / 2;
-        if (*rankingVehicles[medium] < posYPlayer){
-            init = medium + 1;
-        }
-        else {
-            last = medium;
-        }
-    }
-    if (*rankingVehicles[init] == posYPlayer){
-        return init;
-    }
-    else {
-        return init + 1;
-    }
-    */
     bool found = false;
-    int i = rankingVehicles.size() - 1;
-    while (!found && i >= 0){
-        if (*rankingVehicles[i] <= posYPlayer){
-            found = true;
+    int i = 0, j = rankingVehicles.size() - 1;
+    while (!found && i <= j){
+        if (rankingVehicles[i] > posYPlayer){
+            i++;
         }
         else {
-            i--;
+            found = true;
         }
     }
     if (!found){
         return numberRacers + 1;
     }
     else {
-        return numberRacers - i + 1;
+        return i + 1;
     }
 }
 
@@ -1731,21 +1710,21 @@ void Game::checkDifficulty(Configuration &c) {
                 c.maxAggressiveness = 0.0f;
             break;
         case EASY:
-            numCars = 3;
+            numCars = 5;
             timeMul = 1.1f;
             scoreMul = 0.5f;
             if (c.enableAI)
                 c.maxAggressiveness = 0.25f;
             break;
         case NORMAL:
-            numCars = 6;
+            numCars = 10;
             timeMul = 1.0f;
             scoreMul = 1.0f;
             if (c.enableAI)
                 c.maxAggressiveness = 0.5f;
             break;
         case HARD:
-            numCars = 12;
+            numCars = 15;
             timeMul = 0.9f;
             scoreMul = 1.5f;
             if (c.enableAI)
@@ -1770,9 +1749,17 @@ void Game::checkDifficulty(Configuration &c) {
         const int maxSprites = 6;
         const float vehicleScales[maxSprites] = {1.5f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f};
         for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
-            TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                    "TrafficCars/Car" + to_string(1 + i % maxSprites), -RECTANGLE * DEL_DISTANCE * 3.0f);
-            cars.push_back(v);
+
+            if (1 + i % maxSprites == 4){
+                TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
+                    "TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                cars.push_back(v);
+            }
+            else {
+                TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
+                    "TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                cars.push_back(v);
+            }
         }
     }
 
@@ -2409,8 +2396,14 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     }
 
     // Reproduce motor sounds
-    r.soundEffects[28]->stop();
-    r.soundEffects[28]->play();
+    if (typeOfVehicle != 0){
+        r.soundEffects[28]->stop();
+        r.soundEffects[28]->play();
+    }
+    else {
+        r.soundEffects[68]->stop();
+        r.soundEffects[68]->play();
+    }
 
     // Draw the semaphore
     if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
@@ -2607,7 +2600,12 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                 r.soundEffects[33]->stop();
                 r.soundEffects[33]->play();
         }
+
+        for (RivalCar rival : rivals){
+            rival.setSmoking();
+        }
     }
+
     return PLAY_GAME;
 }
 
@@ -3063,27 +3061,30 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
             v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
         }
 
-        Vehicle::Action a;
-        Vehicle::Direction d;
+        Vehicle::Action a = Vehicle::CRASH;
 
-        float positionX = 0.f, positionY = 0.f;
+        float positionX = 0.f, positionY = 0.f, speedPlayer = 0.f;
 
         switch(typeOfVehicle){
             case 0:
-                positionX = player.getPosY();
-                positionY = player.getPosX();
+                positionX = player.getPosX();
+                positionY = player.getPosY();
+                speedPlayer = player.getSpeed();
                 break;
             case 1:
-                positionX = player2.getPosY();
-                positionY = player2.getPosX();
+                positionX = player2.getPosX();
+                positionY = player2.getPosY();
+                speedPlayer = player2.getSpeed();
                 break;
             case 2:
-                positionX = player3.getPosY();
-                positionY = player3.getPosX();
+                positionX = player3.getPosX();
+                positionY = player3.getPosY();
+                speedPlayer = player3.getSpeed();
                 break;
             case 3:
-                positionX = player4.getPosY();
-                positionY = player4.getPosX();
+                positionX = player4.getPosX();
+                positionY = player4.getPosY();
+                speedPlayer = player4.getSpeed();
         }
 
         // Clear the ranking of the rivals for updating
@@ -3093,26 +3094,133 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
         for (RivalCar &v : rivals) {
             float directionCurve = currentMap->getCurveCoefficient(v.getPosY());
 
-            v.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, d, directionCurve,
-                     c.level, positionX, positionY);
+            v.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, directionCurve,
+                     c.level, positionX, positionY, speedPlayer);
+
 
             lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
 
             float posY = v.getPosY();
 
+            vehicleCrash = false;
+            float crashPos;
+
             // Store the new position of the vehicle
-            rankingVehicles.push_back(&posY);
+            rankingVehicles.push_back(posY);
 
-            // Order the rivals cars of the race to build a temporary ranking
-            sort(rankingVehicles.begin(), rankingVehicles.end(), ascendingRanking);
+            // Check if the current rival car has crashed with a traffic car
+            for (int i = 0; !vehicleCrash && i < (int)rivals.size(); i++){
+                vehicleCrash = cars[i].hasCrashed(v.getPreviousY(), posY,
+                                                  v.getMinScreenX(), v.getMaxScreenX(), crashPos);
+            }
 
-            // Get the new position of the player in the race
-            posArrival = findPlayerPositionRanking(positionY);
+            if (vehicleCrash) {
+                // Determine the type of collision
+                v.setPosition(v.getPosX(), crashPos);
+                v.hitControl(vehicleCrash, r);
+                a = Vehicle::CRASH;
+            }
 
             // Draw the vehicle
-            v.draw(a, d, currentMap->getElevation(posY));
+            v.draw(a, currentMap->getElevation(posY));
+
+            vehicleCrash = false;
+
+        // Check if the player has crash with any rival car
+            switch(typeOfVehicle){
+                case 0:
+
+                    vehicleCrash = v.hasCrashed(player.getPosY(), player.getPreviousY(),
+                                                player.getMinScreenX(), player.getMaxScreenX(), crashPos);
+
+                    // Check it has been crash between player and rival
+                    if (vehicleCrash){
+                        if (player.getPreviousX() > v.getPreviousX()){
+                            player.setPosition(player.getPosX() + 2.f * player.getAngle(), player.getPosY() - 20.f);
+                        }
+                        else if (player.getPreviousX() < v.getPreviousX()){
+                            player.setPosition(player.getPosX() - 2.f * player.getAngle(), player.getPosY() - 20.f);
+                        }
+                    }
+                    player.setSmoking(true);
+                    break;
+                case 1:
+                    vehicleCrash = v.hasCrashed(player2.getPosY(), player2.getPreviousY(),
+                                                player2.getMinScreenX(), player2.getMaxScreenX(), crashPos);
+
+                    if (vehicleCrash){
+                        if (player2.getPreviousX() > v.getPreviousX()){
+                            player2.setPosition(player.getPosX() + 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                        }
+                        else if (player.getPreviousX() < v.getPreviousX()){
+                            player2.setPosition(player.getPosX() - 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                        }
+                    }
+                    player2.setSmoking(true);
+                    break;
+                case 2:
+                    vehicleCrash = v.hasCrashed(player3.getPosY(), player3.getPreviousY(),
+                                                player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
+
+                    if (vehicleCrash){
+                        if (player3.getPreviousX() > v.getPreviousX()){
+                            player3.setPosition(player.getPosX() + 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                        }
+                        else if (player.getPreviousX() < v.getPreviousX()){
+                            player3.setPosition(player.getPosX() - 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                        }
+                    }
+                    player3.setSmoking(true);
+                    break;
+                case 3:
+                    vehicleCrash = v.hasCrashed(player4.getPosY(), player4.getPreviousY(),
+                                                player4.getMinScreenX(), player4.getMaxScreenX(), crashPos);
+
+                    if (vehicleCrash){
+                        if (player4.getPreviousX() > v.getPreviousX()){
+                            player4.setPosition(player.getPosX() + 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                        }
+                        else if (player.getPreviousX() < v.getPreviousX()){
+                            player4.setPosition(player.getPosX() - 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                        }
+                    }
+                    player4.setSmoking(true);
+            }
+
+            // Reproduce sounds of collision
+            if (vehicleCrash){
+                // Voice sound
+                r.soundEffects[69]->stop();
+                r.soundEffects[70]->stop();
+                r.soundEffects[71]->stop();
+                r.soundEffects[72]->stop();
+                r.soundEffects[73]->stop();
+                r.soundEffects[74]->stop();
+                r.soundEffects[75]->stop();
+                r.soundEffects[rand_generator_int(69, 75)]->play();
+
+                // Collision sound
+                r.soundEffects[76]->stop();
+                r.soundEffects[77]->stop();
+                r.soundEffects[78]->stop();
+                r.soundEffects[79]->stop();
+                r.soundEffects[80]->stop();
+                r.soundEffects[81]->stop();
+                r.soundEffects[rand_generator_int(76, 81)]->play();
+            }
+            else{
+                player.setSmoking(false);
+                player2.setSmoking(false);
+                player3.setSmoking(false);
+                player4.setSmoking(false);
+            }
         }
 
+        // Order the rivals cars of the race to build a temporary ranking
+        sort(rankingVehicles.begin(), rankingVehicles.end(), ascendingRanking);
+
+        // Get the new position of the player in the race
+        posArrival = findPlayerPositionRanking(positionY);
 
         // Draw map with cars
         c.w.clear();
@@ -3160,10 +3268,6 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                 for (TrafficCar &v : cars)
                     v.autoControl(c, player.getPosX(), player.getPosY());
 
-                /*
-                for (RivalCar &v : rivals)
-                    v.autoControl(c, player.getPosX(), player.getPosY());
-                */
                 break;
             case 1:
                 if (!player2.isCrashing()) { // If not has crashed
@@ -3326,11 +3430,24 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                         // Thread with sound of the woman
                         elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
                         if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
-                            // makeCarTrafficSound
-                            r.soundEffects[20]->stop();
-                            r.soundEffects[21]->stop();
-                            r.soundEffects[22]->stop();
-                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            if (v.getIsTruck()){
+                                // Truck sound
+                                r.soundEffects[85]->stop();
+                                r.soundEffects[86]->stop();
+                                r.soundEffects[rand_generator_int(85, 86)]->play();
+                            }
+                            else {
+                                // Traffic car sound
+                                r.soundEffects[20]->stop();
+                                r.soundEffects[21]->stop();
+                                r.soundEffects[22]->stop();
+                                r.soundEffects[rand_generator_int(20, 22)]->play();
+
+                                r.soundEffects[59]->stop();
+                                r.soundEffects[60]->stop();
+                                r.soundEffects[61]->stop();
+                                r.soundEffects[rand_generator_int(59, 61)]->play();
+                            }
                             trafficCarSound.restart();
                         }
                     }
@@ -3357,27 +3474,15 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                 }
 
                 if (visible) {
-                    if (distY <= 20.f && distX <= 0.3f) {
-                        // Thread with sound of the woman
-                        elapsed6 = womanShot.getElapsedTime().asSeconds();
-                        if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
-                            // WomanSound
-                            r.soundEffects[13]->stop();
-                            r.soundEffects[14]->stop();
-                            r.soundEffects[15]->stop();
-                            r.soundEffects[rand_generator_int(13, 15)]->play();
-                            womanShot.restart();
-                        }
-                    }
                     if (distY <= 30.f && distX <= 1.2f) {
                         // Thread with sound of the woman
                         elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
                         if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
                             // makeCarTrafficSound
-                            r.soundEffects[20]->stop();
-                            r.soundEffects[21]->stop();
-                            r.soundEffects[22]->stop();
-                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            r.soundEffects[82]->stop();
+                            r.soundEffects[83]->stop();
+                            r.soundEffects[84]->stop();
+                            r.soundEffects[rand_generator_int(82, 84)]->play();
                             trafficCarSound.restart();
                         }
                     }
@@ -3576,26 +3681,29 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
         }
 
         Vehicle::Action a;
-        Vehicle::Direction d;
 
-        float positionX = 0.f, positionY = 0.f;
+        float positionX = 0.f, positionY = 0.f, speedPlayer = 0.f;
 
         switch(typeOfVehicle){
             case 0:
-                positionX = player.getPosY();
-                positionY = player.getPosX();
+                positionX = player.getPosX();
+                positionY = player.getPosY();
+                speedPlayer = player.getSpeed();
                 break;
             case 1:
-                positionX = player2.getPosY();
-                positionY = player2.getPosX();
+                positionX = player2.getPosX();
+                positionY = player2.getPosY();
+                speedPlayer = player2.getSpeed();
                 break;
             case 2:
-                positionX = player3.getPosY();
-                positionY = player3.getPosX();
+                positionX = player3.getPosX();
+                positionY = player3.getPosY();
+                speedPlayer = player3.getSpeed();
                 break;
             case 3:
-                positionX = player4.getPosY();
-                positionY = player4.getPosX();
+                positionX = player4.getPosX();
+                positionY = player4.getPosY();
+                speedPlayer = player4.getSpeed();
         }
 
         if (numberRacers > 0){
@@ -3606,18 +3714,122 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
             for (RivalCar &v : rivals) {
                 float directionCurve = currentMap->getCurveCoefficient(v.getPosY());
 
-                v.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, d, directionCurve,
-                         c.level, positionX, positionY);
+                v.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, directionCurve,
+                         c.level, positionX, positionY, speedPlayer);
 
                 lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
 
+                // Get the new position of the vehicle
                 float posY = v.getPosY();
 
+                // Check if the vehicle is or not in a curve
+                if (directionCurve != 0.f){
+                    // Check if the vehicle has finished the curve
+                    if (currentMap->getCurveCoefficient(posY)){
+                        // Vehicle goes straight on
+                        v.setOnStraight();
+                    }
+                }
+
                 // Store the new position of the vehicle
-                rankingVehicles.push_back(&posY);
+                rankingVehicles.push_back(posY);
 
                 // Draw the vehicle
-                v.draw(a, d, currentMap->getElevation(posY));
+                v.draw(a, currentMap->getElevation(posY));
+                vehicleCrash = false;
+                float crashPos;
+
+                // Check if the player has crash with any rival car
+                switch(typeOfVehicle){
+                    case 0:
+
+                        vehicleCrash = v.hasCrashed(player.getPosY(), player.getPreviousY(),
+                                                    player.getMinScreenX(), player.getMaxScreenX(), crashPos);
+
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player.getPreviousX() > v.getPreviousX()){
+                                player.setPosition(player.getPosX() + 2.f * player.getAngle(), player.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v.getPreviousX()){
+                                player.setPosition(player.getPosX() - 2.f * player.getAngle(), player.getPosY() - 20.f);
+                            }
+                        }
+                        player.setSmoking(true);
+                        break;
+                    case 1:
+                        vehicleCrash = v.hasCrashed(player2.getPosY(), player2.getPreviousY(),
+                                                    player2.getMinScreenX(), player2.getMaxScreenX(), crashPos);
+
+                        if (vehicleCrash){
+                            if (player2.getPreviousX() > v.getPreviousX()){
+                                player2.setPosition(player.getPosX() + 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v.getPreviousX()){
+                                player2.setPosition(player.getPosX() - 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                            }
+                        }
+                        player2.setSmoking(true);
+                        break;
+                    case 2:
+                        vehicleCrash = v.hasCrashed(player3.getPosY(), player3.getPreviousY(),
+                                                    player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
+
+                        if (vehicleCrash){
+                            if (player3.getPreviousX() > v.getPreviousX()){
+                                player3.setPosition(player.getPosX() + 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v.getPreviousX()){
+                                player3.setPosition(player.getPosX() - 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                            }
+                        }
+                        player3.setSmoking(true);
+                        break;
+                    case 3:
+                        vehicleCrash = v.hasCrashed(player4.getPosY(), player4.getPreviousY(),
+                                                    player4.getMinScreenX(), player4.getMaxScreenX(), crashPos);
+
+                        if (vehicleCrash){
+                            if (player4.getPreviousX() > v.getPreviousX()){
+                                player4.setPosition(player.getPosX() + 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v.getPreviousX()){
+                                player4.setPosition(player.getPosX() - 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                            }
+                        }
+                        player4.setSmoking(true);
+                }
+
+                // Reproduce sounds of collision
+                if (vehicleCrash){
+                    // Voice sound
+                    r.soundEffects[69]->stop();
+                    r.soundEffects[70]->stop();
+                    r.soundEffects[71]->stop();
+                    r.soundEffects[72]->stop();
+                    r.soundEffects[73]->stop();
+                    r.soundEffects[74]->stop();
+                    r.soundEffects[75]->stop();
+                    r.soundEffects[rand_generator_int(69, 75)]->play();
+
+                    // Collision sound
+                    r.soundEffects[76]->stop();
+                    r.soundEffects[77]->stop();
+                    r.soundEffects[78]->stop();
+                    r.soundEffects[79]->stop();
+                    r.soundEffects[80]->stop();
+                    r.soundEffects[81]->stop();
+                    r.soundEffects[rand_generator_int(76, 81)]->play();
+                }
+                else{
+                    player.setSmoking(false);
+                    player2.setSmoking(false);
+                    player3.setSmoking(false);
+                    player4.setSmoking(false);
+                }
+
+
+                v.setAI(c.maxAggressiveness, c.level);
             }
 
             // Order the rivals cars of the race to build a temporary ranking
@@ -3788,27 +4000,15 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
                 }
 
                 if (visible) {
-                    if (distY <= 20.f && distX <= 0.3f) {
-                        // Thread with sound of the woman
-                        elapsed6 = womanShot.getElapsedTime().asSeconds();
-                        if (elapsed6 - elapsed5 >= woman_delay.asSeconds()) {
-                            // WomanSound
-                            r.soundEffects[13]->stop();
-                            r.soundEffects[14]->stop();
-                            r.soundEffects[15]->stop();
-                            r.soundEffects[rand_generator_int(13, 15)]->play();
-                            womanShot.restart();
-                        }
-                    }
                     if (distY <= 30.f && distX <= 1.2f) {
                         // Thread with sound of the woman
                         elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
                         if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
                             // makeCarTrafficSound
-                            r.soundEffects[20]->stop();
-                            r.soundEffects[21]->stop();
-                            r.soundEffects[22]->stop();
-                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            r.soundEffects[82]->stop();
+                            r.soundEffects[83]->stop();
+                            r.soundEffects[84]->stop();
+                            r.soundEffects[rand_generator_int(82, 84)]->play();
                             trafficCarSound.restart();
                         }
                     }
@@ -4167,11 +4367,24 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                         // Thread with sound of the woman
                         elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
                         if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
-                            // makeCarTrafficSound
-                            r.soundEffects[20]->stop();
-                            r.soundEffects[21]->stop();
-                            r.soundEffects[22]->stop();
-                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            if (v.getIsTruck()){
+                                // Truck sound
+                                r.soundEffects[85]->stop();
+                                r.soundEffects[86]->stop();
+                                r.soundEffects[rand_generator_int(85, 86)]->play();
+                            }
+                            else {
+                                // Traffic car sound
+                                r.soundEffects[20]->stop();
+                                r.soundEffects[21]->stop();
+                                r.soundEffects[22]->stop();
+                                r.soundEffects[rand_generator_int(20, 22)]->play();
+
+                                r.soundEffects[59]->stop();
+                                r.soundEffects[60]->stop();
+                                r.soundEffects[61]->stop();
+                                r.soundEffects[rand_generator_int(59, 61)]->play();
+                            }
                             trafficCarSound.restart();
                         }
                     }
@@ -4401,11 +4614,24 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
                         // Thread with sound of the woman
                         elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
                         if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
-                            // makeCarTrafficSound
-                            r.soundEffects[20]->stop();
-                            r.soundEffects[21]->stop();
-                            r.soundEffects[22]->stop();
-                            r.soundEffects[rand_generator_int(20, 22)]->play();
+                            if (v.getIsTruck()){
+                                // Truck sound
+                                r.soundEffects[85]->stop();
+                                r.soundEffects[86]->stop();
+                                r.soundEffects[rand_generator_int(85, 86)]->play();
+                            }
+                            else {
+                                // Traffic car sound
+                                r.soundEffects[20]->stop();
+                                r.soundEffects[21]->stop();
+                                r.soundEffects[22]->stop();
+                                r.soundEffects[rand_generator_int(20, 22)]->play();
+
+                                r.soundEffects[59]->stop();
+                                r.soundEffects[60]->stop();
+                                r.soundEffects[61]->stop();
+                                r.soundEffects[rand_generator_int(59, 61)]->play();
+                            }
                             trafficCarSound.restart();
                         }
                     }
@@ -5274,7 +5500,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     Texture t;
     vector<Texture> vehicleTextures;
 
-    t.loadFromFile("Data/Vehicles/Motorbike/Images/c46.png");
+    t.loadFromFile("Data/Vehicles/Motorbike/Images/c59.png");
     vehicleTextures.push_back(t);
 
     t.loadFromFile("Data/Vehicles/Devastator/Images/c57.png");
@@ -6020,7 +6246,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         switch(typeOfVehicle){
             case 0:
-                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c47.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c60.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
@@ -6168,7 +6394,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     switch(typeOfVehicle){
         case 0:
-            vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c47.png");
+            vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c60.png");
             vehicle.setTexture(vehicleTexture, true);
             vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
             vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
@@ -6651,7 +6877,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         switch(typeOfVehicle){
             case 0:
-                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c47.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c60.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);

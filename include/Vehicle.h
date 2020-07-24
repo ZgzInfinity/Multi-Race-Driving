@@ -48,7 +48,7 @@ protected:
     int maxCounterToChange;
 
     float speed;
-    float posX, posY, previousY, minScreenX, maxScreenX;
+    float posX, previousX, posY, previousY, minScreenX, maxScreenX;
 
     vector<sf::Texture> textures;
     int current_code_image;
@@ -75,7 +75,7 @@ public:
      * @param currentCodeImage
      * @param counterCodeImage
      */
-    Vehicle(float maxSpeed, float scale, int maxCounterToChange, float speedVehicle, float posX, float posY, float previousY,
+    Vehicle(float maxSpeed, float scale, int maxCounterToChange, float speedVehicle, float posX, float previousX, float posY, float previousY,
             float minScreenX, float maxScreenX, const std::string &vehicle, int numTextures, int currentCodeImage,
             int counterCodeImage);
 
@@ -95,6 +95,9 @@ public:
      * @return
      */
     float getPosX() const;
+
+
+    float getPreviousX() const;
 
     /**
      * Devuelve la posición actual Y.
@@ -119,6 +122,13 @@ public:
      * @return
      */
     float getAcceleration() const;
+
+
+    /**
+     * Devuelve la posición actual X.
+     * @return
+     */
+    float getSpeed() const;
 };
 
 

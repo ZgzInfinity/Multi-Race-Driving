@@ -1,11 +1,14 @@
 
 #include "../include/TrafficCar.h"
 
-TrafficCar::TrafficCar(float maxSpeed, float speedMul, float scale, int maxCounterToChange, const string &vehicle, float pY) :
-        Vehicle(maxSpeed / speedMul, scale, maxCounterToChange, 0, rand_generator_float(-0.5f, 0.5f),
+TrafficCar::TrafficCar(float maxSpeed, float speedMul, float scale, int maxCounterToChange, const string &vehicle, float pX, float pY, bool truck) :
+        Vehicle(maxSpeed / speedMul, scale, maxCounterToChange, 0, rand_generator_float(-0.5f, 0.5f), pX,
                 pY, pY, 0, 0, vehicle, Vehicle_TrafficCar::NUM_ENEMIES_TEXTURES, 1, 0), oriX(this->posX),
         currentDirection(RIGHT), calculatedPath(RIGHT), current_direction_counter(0), max_direction_counter(0),
-        probAI(0), typeAI(OBSTACLE) {}
+        probAI(0), typeAI(OBSTACLE)
+    {
+        isTruck = truck;
+    }
 
 
 void TrafficCar::autoControl(const Configuration &c, float playerPosX, float playerPosY) {
@@ -135,48 +138,49 @@ void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness, con
 }
 
 void TrafficCar::setAI(float maxAggressiveness, const Difficult& difficulty) {
-    if (maxAggressiveness == 0.0f)
+    if (maxAggressiveness == 0.0f){
         probAI = 0.0f;
-    else
+    }
+    else {
         probAI = rand_generator_float(maxAggressiveness / 2.0f, maxAggressiveness);
+    }
 
     const float p = rand_generator_zero_one();
     switch(difficulty){
         case PEACEFUL:
-            break;
         case EASY:
-            if (p < 0.1f) {
-                typeAI = INCONSTANT;
-            }
-            else if (p < 0.2f) {
+            if (p <= 0.25) {
                 typeAI = OBSTACLE;
             }
-            else {
+            else if (p <= 0.75) {
                 typeAI = EVASIVE;
+            }
+            else {
+                typeAI = INCONSTANT;
                 probAI *= 2.0f;
             }
             break;
         case NORMAL:
-            if (p < 0.2f) {
-                typeAI = INCONSTANT;
-            }
-            else if (p < 0.4f) {
+            if (p <= 0.5f) {
                 typeAI = OBSTACLE;
             }
-            else {
+            else if (p <= 0.75f) {
                 typeAI = EVASIVE;
+            }
+            else {
+                typeAI = INCONSTANT;
                 probAI *= 2.0f;
             }
             break;
         case HARD:
-            if (p < 0.2f) {
-                typeAI = INCONSTANT;
-            }
-            else if (p < 0.5f) {
+            if (p <= 0.65f) {
                 typeAI = OBSTACLE;
             }
-            else {
+            else if (p <= 0.75f) {
                 typeAI = EVASIVE;
+            }
+            else {
+                typeAI = INCONSTANT;
                 probAI *= 2.0f;
             }
     }
@@ -282,4 +286,9 @@ bool TrafficCar::isVisible(const Configuration &c, float minY, float playerX, fl
         distanceY = abs(playerY - posY);
         return true;
     }
+}
+
+
+bool TrafficCar::getIsTruck() const{
+    return isTruck;
 }

@@ -6,10 +6,10 @@ Vehicle::Vehicle(){}
 
 
 Vehicle::Vehicle(const float maxSpeed, const float scale, const int maxCounterToChange, float speedVehicle, float posX,
-                 float posY, float previousY, float minScreenX, float maxScreenX, const string &vehicle,
+                 float previousX, float posY, float previousY, float minScreenX, float maxScreenX, const string &vehicle,
                  int numTextures,
                  int currentCodeImage, int counterCodeImage) : maxSpeed(maxSpeed), scale(scale),
-                                                               maxCounterToChange(maxCounterToChange), posX(posX), posY(posY),
+                                                               maxCounterToChange(maxCounterToChange), previousX(previousX), posX(posX), posY(posY),
                                                                previousY(previousY), minScreenX(minScreenX),
                                                                maxScreenX(maxScreenX),
                                                                current_code_image(currentCodeImage),
@@ -30,6 +30,7 @@ Vehicle::Vehicle(const float maxSpeed, const float scale, const int maxCounterTo
 void Vehicle::setPosition(float pX, float pY) {
     posX = pX;
     posY = pY;
+    previousX = pX;
     previousY = pY;
 }
 
@@ -49,6 +50,10 @@ float Vehicle::getPosX() const {
     return posX;
 }
 
+float Vehicle::getPreviousX() const {
+    return previousX;
+}
+
 float Vehicle::getPosY() const {
     return posY;
 }
@@ -66,6 +71,15 @@ float Vehicle::getAcceleration() const {
 }
 
 
+/**
+ * Devuelve la posición actual X.
+ * @return
+ */
+float Vehicle::getSpeed() const {
+    return speed;
+}
+
+
 
 Vehicle::Direction randomDirection() {
     const float p = rand_generator_zero_one();
@@ -76,3 +90,4 @@ Vehicle::Direction randomDirection() {
     else
         return Vehicle::Direction::TURNLEFT;
 }
+

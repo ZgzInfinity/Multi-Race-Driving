@@ -3,7 +3,7 @@
 
 RivalCar::RivalCar(){}
 
-RivalCar::RivalCar(float maxSpeed, float speedMul, float scale, int maxCounterToChange, const string &vehicle, float pX, float pY,
+RivalCar::RivalCar(int typeOfVehicle,float maxSpeed, float speedMul, float scale, int maxCounterToChange, const string &vehicle, float pX, float pY,
                    int totalTextures, int lowTextureRight, int highTextureRight, int lowTextureRightBrake, int highTextureRightBrake,
                    int lowTextureTurnleft, int highTextureTurnLeft, int lowTextureTurnLeftBrake, int highTextureTurnLeftBrake,
                    int lowTextureTurnRight, int highTextureTurnRight, int lowTextureTurnRightBrake, int highTextureTurnRightBrake,
@@ -12,14 +12,14 @@ RivalCar::RivalCar(float maxSpeed, float speedMul, float scale, int maxCounterTo
                    int highTextureTurnRightUp, int lowTextureTurnRightBrakeUp, int highTextureTurnRightBrakeUp, int mediumTurnLeft,
                    int mediumTurnRight, int mediumTurnLeftUp, int mediumTurnRightUp, int mediumTurnLeftBrake, int mediumTurnRightBrake,
                    int mediumTurnLeftBrakeUp, int mediumTurnRightBrakeUp, float scaling) :
-                    Vehicle(maxSpeed / speedMul, scale, maxCounterToChange, 0, pX,
+                    Vehicle(maxSpeed / speedMul, scale, maxCounterToChange, 0, pX, pX,
                     pY, pY, 0, 0, vehicle, totalTextures, 1, 0), oriX(this->posX),
                     currentDirection(RIGHT), calculatedPath(RIGHT), current_direction_counter(0), max_direction_counter(0),
                     probAI(0), typeAI(OBSTACLE)
 {
     // Assignment of the attributes
+    minTextureRightBrake = lowTextureRightBrake; maxTextureRightBrake = highTextureRightBrake; minTextureTurnLeft = lowTextureTurnleft;
     numTextures = totalTextures; minTextureRight = lowTextureRight; maxTextureRight = highTextureRight;
-    minTextureRightBrake = lowTextureRightBrake; maxTextureRightBrake = highTextureRightBrake; minTextureTurnleft = lowTextureTurnleft;
     maxTextureTurnLeft = highTextureTurnLeft; minTextureTurnLeftBrake = lowTextureTurnLeftBrake;
     maxTextureTurnLeftBrake = highTextureTurnLeftBrake; minTextureTurnRight = lowTextureTurnRight;
     maxTextureTurnRight = highTextureTurnRight; minTextureTurnRightBrake = lowTextureTurnRightBrake;
@@ -40,70 +40,648 @@ RivalCar::RivalCar(float maxSpeed, float speedMul, float scale, int maxCounterTo
     medTurnRightBrakeUp = mediumTurnRightBrakeUp;
 
     scalingFactor = scaling;
+    angleTurning = 0.f;
+    newPath = false;
+    onStraight = true;
+    crashing = false;
+    vehicleType = typeOfVehicle;
+    mode = -1;
+    xDest = 1000;
+    speedFactor = speedMul;
+    shoutDone = false;
+    smoking = false;
 }
 
 
+
+void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r) {
+    crashing = true;
+
+    if (!shoutDone){
+        shoutDone = true;
+
+        if (vehicleType == 0){
+            r.soundEffects[62]->stop();
+            r.soundEffects[63]->stop();
+            r.soundEffects[64]->stop();
+            r.soundEffects[65]->stop();
+            r.soundEffects[66]->stop();
+            r.soundEffects[rand_generator_int(62, 66)]->play();
+
+            r.soundEffects[67]->stop();
+            r.soundEffects[67]->play();
+        }
+    }
+
+    const float acc = getAcceleration();
+
+    if (speedCollision == 0.f){
+        speedCollision = getRealSpeed();
+        if (speedCollision < 60.f)
+            posY = posY + speed * 0.50f;
+    }
+
+    if (vehicleType == 0){
+        mainMutex.lock();
+        speed = sqrt(acc - ACCELERATION_INCREMENT);
+        mainMutex.unlock();
+
+        if (xDest > 0.f && posX < xDest){
+            posY = posY + speed * 0.20f;
+        }
+        else if (xDest < 0.f && posX > xDest) {
+            posY = posY + speed * 0.20f;
+        }
+
+        if (current_code_image == 41){
+            crashing = false;
+            xDest = 1000;
+            previousY = posY;
+            speedCollision = 0.0f;
+            posX = 0.0f;
+            speed = 0.f;
+        }
+    }
+    else {
+        crashing = true;
+
+        if (speedCollision == 0.f){
+            speedCollision = getRealSpeed();
+        }
+
+        if (xDest == 1000){
+            if (posX > 0.0f){
+                xDest = -(speed * 1.7f / maxSpeed);
+            }
+            else {
+                xDest = speed * 1.7f / maxSpeed;
+            }
+        }
+
+        if (xDest > 0.0f){
+            if (speedCollision <= 40.f){
+                posX = posX + (speed * angleTurning / maxSpeed) * 40.f;
+            }
+            else if (speedCollision > 40.f && speedCollision < 85.f){
+                posX = posX + (speed * angleTurning / maxSpeed) * 20.f;
+            }
+            else if (speedCollision >= 85.f && speedCollision < 100.f){
+                posX = posX + (speed * angleTurning / maxSpeed) * 10.f;
+            }
+            else if (speedCollision >= 100.f && speedCollision < 120.f){
+                posX = posX + (speed * angleTurning / maxSpeed) * 5.f;
+            }
+            else {
+                posX = posX + (speed * angleTurning / maxSpeed) * 1.5f;
+            }
+        }
+        else {
+            if (speedCollision <= 40.f){
+                posX = posX - (speed * angleTurning / maxSpeed) * 40.f;
+            }
+            else if (speedCollision > 40.f && speedCollision <= 85.f){
+                posX = posX - (speed * angleTurning / maxSpeed) * 20.f;
+            }
+            else if (speedCollision > 85.f && speedCollision < 100.f){
+                posX = posX - (speed * angleTurning / maxSpeed) * 10.f;
+            }
+            else if (speedCollision >= 100.f && speedCollision < 120.f){
+                posX = posX - (speed * angleTurning / maxSpeed) * 5.f;
+            }
+            else {
+                posX = posX - (speed * angleTurning / maxSpeed) * 1.5f;
+            }
+
+        }
+
+        speed = sqrt(acc - ACCELERATION_INCREMENT);
+
+
+        if (xDest > 0.f && posX < xDest){
+            if (!vehicleCrash){
+                posY = posY + speed * 7.f / maxSpeed;
+            }
+            else {
+                posY = posY - speed * 7.f / maxSpeed;
+            }
+        }
+        else if (xDest < 0.f && posX > xDest) {
+            if (!vehicleCrash){
+                posY = posY + speed * 7.f / maxSpeed;
+            }
+            else {
+                posY = posY - speed * 7.f / maxSpeed;
+            }
+        }
+
+        if (speed <= 0.f){
+            speed = 0.f;
+            crashing = false;
+            xDest = 1000;
+            previousY = posY;
+            mode = -1;
+            speedCollision = 0.0f;
+        }
+    }
+}
+
+
+bool RivalCar::isCrashing() const {
+    return crashing;
+}
+
+
+
+float RivalCar::getRealSpeed() const {
+    return speed * speedFactor;
+}
+
+
+void RivalCar::setSmoking(){
+    smoking = true;
+}
+
+
+float RivalCar::getSmoking() const {
+    return smoking;
+}
 
 void RivalCar::autoControl(const Configuration &c, float playerPosX, float playerPosY) {}
 
 
 
-void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAggressiveness, Action& a, Direction& d, float directionCurve,
-                      const Difficult& difficulty, const float playerPosX, const float playerPosY)
+void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAggressiveness, Action& a, float directionCurve,
+                      const Difficult& difficulty, const float playerPosX, const float playerPosY, const float playerSpeed)
 {
-    // Get the last speed;
+    // Store the current speed before updating
     lastSpeed = speed;
+    currentDirection = RIGHT;
 
-    // Update the speed of the car
-    const float acc = getAcceleration();
+    // Check if the player is on curve
+    if (directionCurve == 0.f){
+        if (abs(playerPosY - posY) < 100.f && posY > 90.f){
+            // AI
+            if (typeAI == OBSTACLE) {
+                const float acc = getAcceleration();
+                if (abs(playerPosX - posX) > INCREMENT_X) { // Rotation control
+                    // The vehicle is not in the player's path
+                    if (speed < halfMaxSpeed){
+                        speed = sqrt(acc + ACCELERATION_INCREMENT);
+                    }
 
-    // Control the speed of the vehicle
-    if (speed <= 0.4f){
-        // Increase the speed slowly
-        speed = sqrt(acc + ACCELERATION_INCREMENT);
+                    if (posX > playerPosX && posX > -0.9f) {
+                        posX -= INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNLEFT;
+                    }
+                    else if (posX < 0.9f) {
+                        posX += INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNRIGHT;
+                    }
+                }
+                else { // Acceleration control
+                    // The vehicle is in the player's path
+                    if (posY <= playerPosY){
+                        speed = sqrt(acc + ACCELERATION_INCREMENT);
+                    }
+                    else if (acc > ACCELERATION_INCREMENT){
+                        speed = sqrt(acc - ACCELERATION_INCREMENT);
+                    }
+                    else {
+                        speed = 0.0f;
+                    }
 
-        // Update the y position of the vehicle in the landscape
-        previousY = posY;
-        posY += speed;
-        a = BOOT;
-    }
-    else {
-        if (directionCurve != 0.f){
-            if (directionCurve > 0.f){
-                d = TURNRIGHT;
+                    currentDirection = RIGHT;
+                }
             }
-            else if (directionCurve < 0.f){
-                d = TURNLEFT;
+            else if (typeAI == EVASIVE) {
+                if (playerPosX <= -0.5) {
+                    float offsetX = INCREMENT_X * speed / maxSpeed;
+                    if (posX + offsetX <= 0.7f){
+                        posX += INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNRIGHT;
+                    }
+                    else {
+                        currentDirection = RIGHT;
+                    }
+                }
+                else if (playerPosX >= 0.5) {
+                    float offsetX = INCREMENT_X * speed / maxSpeed;
+                    if (posX + offsetX >= -0.7f){
+                        posX -= INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNLEFT;
+                    }
+                    else {
+                        currentDirection = RIGHT;
+                    }
+                }
+                else {
+                    if (posX > playerPosX) {
+                        float offsetX = INCREMENT_X * speed / maxSpeed;
+                        if (posX + offsetX <= 0.7f){
+                            posX += INCREMENT_X * speed / maxSpeed;
+                            currentDirection = TURNRIGHT;
+                        }
+                        else {
+                            currentDirection = RIGHT;
+                        }
+                    }
+                    else {
+                        float offsetX = INCREMENT_X * speed / maxSpeed;
+                        if (posX - offsetX >= -0.7f){
+                            posX -= INCREMENT_X * speed / maxSpeed;
+                            currentDirection = TURNLEFT;
+                        }
+                        else {
+                            currentDirection = RIGHT;
+                        }
+                    }
+                }
             }
-        }
-        // Control the distance between the player and the vehicle
-        if (abs(playerPosY - posY) > 3.0f * float(c.renderLen)){
-            if (speed > 50.f){
-                // Reduce speed;
-                speed = 0.65f * speed;
-                // Check if the vehicle has increased or reduced its speed
-                a = BRAKE;
-            }
-        }
-        else if (abs(playerPosY - posY) > 2.0f * float(c.renderLen)){
-            if (speed > 50.f){
-                // Reduce speed;
-                speed = 0.85f * speed;
-                // Check if the vehicle has increased or reduced its speed
-                a = BRAKE;
+            else { // INCONSTANT
+                if (currentDirection == TURNRIGHT) {
+                    const float prevPosX = posX;
+                    posX += INCREMENT_X * speed / maxSpeed;
+
+                    if (posX >= 0.9f){
+                        currentDirection = TURNLEFT;
+                    }
+                    else if (((prevPosX < -0.5f && posX >= -0.5f) || (prevPosX < 0.0f && posX >= 0.0f) ||
+                              (prevPosX < 0.5f && posX >= 0.5f)) && (rand_generator_zero_one() < 0.5f))
+                    {
+                        currentDirection = TURNRIGHT; // Lane change
+                    }
+                }
+                else if (currentDirection == TURNLEFT) {
+                    const float prevPosX = posX;
+                    posX -= INCREMENT_X * speed / maxSpeed;
+
+                    if (posX <= -0.9f){
+                        currentDirection = TURNRIGHT;
+                    }
+                    else if (((prevPosX > -0.5f && posX <= -0.5f) || (prevPosX > 0.0f && posX <= 0.0f) ||
+                              (prevPosX > 0.5f && posX <= 0.5f)) && (rand_generator_zero_one() < 0.5f))
+                    {
+                        currentDirection = TURNLEFT; // Lane change
+                    }
+                }
+                else {
+                    if (rand_generator_zero_one() < 0.5f){
+                        currentDirection = TURNRIGHT;
+                    }
+                    else {
+                        currentDirection = TURNLEFT;
+                    }
+                }
             }
         }
         else {
-            // Accelerate
-            speed = sqrt(acc + (ACCELERATION_INCREMENT / 2.f));
-            if (speed > maxSpeed){
-                speed = maxSpeed;
+            if (posX > 0.f && !onStraight){
+                posX -= rand_generator_float(0.03f, 0.06f);
+                onStraight = true;
+            }
+            else if (posX < 0.f && !onStraight){
+                posX += rand_generator_float(0.03f, 0.06f);
+                onStraight = true;
+            }
+
+            if (counter_code_image < max_direction_counter){
+                counter_code_image++;
+            }
+            else {
+                currentDirection = randomDirection();
+                counter_code_image = 0;
+                max_direction_counter = rando_generator_zero_n(Vehicle_RivalCar::MAX_DIRECTION);
+            }
+
+            float newX = posX, offsetX;
+            if (currentDirection == TURNRIGHT){
+                offsetX = INCREMENT_X * rand_generator_zero_one() * speed / maxSpeed;
+                if (newX + offsetX <= 0.7f){
+                    newX += offsetX;
+                }
+            }
+            else if (currentDirection == TURNLEFT){
+                offsetX = INCREMENT_X * rand_generator_zero_one() * speed / maxSpeed;
+                if (newX - offsetX >= -0.7f){
+                    newX -= offsetX;
+                }
+            }
+
+            if (newX < oriX - 0.35f || newX > oriX + 0.35f){
+                currentDirection = RIGHT;
+            }
+            else {
+                posX = newX;
+            }
+        }
+    }
+    else {
+        onStraight = false;
+
+        if (abs(playerPosY - posY) < 100.f && posY > 90.f){
+            // AI
+            if (typeAI == OBSTACLE) {
+                const float acc = getAcceleration();
+                if (abs(playerPosX - posX) > INCREMENT_X) { // Rotation control
+                    // The vehicle is not in the player's path
+                    if (posX > playerPosX && posX > -0.7f) {
+                        posX -= INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNLEFT;
+                    }
+                    else if (posX < 0.7f) {
+                        posX += INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNRIGHT;
+                    }
+                }
+                else { // Acceleration control
+                    // The vehicle is in the player's path
+                    if (acc > ACCELERATION_INCREMENT){
+                        speed = sqrt(acc - ACCELERATION_INCREMENT);
+                    }
+                    else {
+                        speed = 0.0f;
+                    }
+
+                    currentDirection = RIGHT;
+                }
+            }
+            else if (typeAI == EVASIVE) {
+                if (playerPosX <= -0.5) {
+                    float offsetX = INCREMENT_X * speed / maxSpeed;
+                    if (posX + offsetX <= 0.7f){
+                        posX += INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNRIGHT;
+                    }
+                    else {
+                        if (directionCurve > 0.f){
+                            currentDirection = TURNRIGHT;
+                        }
+                        else {
+                            currentDirection = TURNLEFT;
+                        }
+                    }
+                }
+                else if (playerPosX >= 0.5) {
+                    float offsetX = INCREMENT_X * speed / maxSpeed;
+                    if (posX - offsetX >= -0.7f){
+                        posX -= INCREMENT_X * speed / maxSpeed;
+                        currentDirection = TURNLEFT;
+                    }
+                    else {
+                        if (directionCurve > 0.f){
+                            currentDirection = TURNRIGHT;
+                        }
+                        else {
+                            currentDirection = TURNLEFT;
+                        }
+                    }
+                }
+                else {
+                    if (posX > playerPosX) {
+                        float offsetX = INCREMENT_X * speed / maxSpeed;
+                        if (posX + offsetX <= 0.7f){
+                            posX += INCREMENT_X * speed / maxSpeed;
+                            currentDirection = TURNRIGHT;
+                        }
+                        else {
+                            if (directionCurve > 0.f){
+                                currentDirection = TURNRIGHT;
+                            }
+                            else {
+                                currentDirection = TURNLEFT;
+                            }
+                        }
+                    }
+                    else {
+                        float offsetX = INCREMENT_X * speed / maxSpeed;
+                        if (posX - offsetX >= -0.7f){
+                            posX -= INCREMENT_X * speed / maxSpeed;
+                            currentDirection = TURNLEFT;
+                        }
+                        else {
+                            if (directionCurve > 0.f){
+                                currentDirection = TURNRIGHT;
+                            }
+                            else {
+                                currentDirection = TURNLEFT;
+                            }
+                        }
+                    }
+                }
+            }
+            else { // INCONSTANT
+                if (currentDirection == TURNRIGHT) {
+                    const float prevPosX = posX;
+                    posX += INCREMENT_X * speed / maxSpeed;
+
+                    if (posX >= 0.7f){
+                        currentDirection = TURNLEFT;
+                    }
+                    else if (((prevPosX < -0.5f && posX >= -0.5f) || (prevPosX < 0.0f && posX >= 0.0f) ||
+                              (prevPosX < 0.5f && posX >= 0.5f)) && (rand_generator_zero_one() < 0.5f))
+                    {
+                        currentDirection = TURNRIGHT; // Lane change
+                    }
+                }
+                else if (currentDirection == TURNLEFT) {
+                    const float prevPosX = posX;
+                    posX -= INCREMENT_X * speed / maxSpeed;
+
+                    if (posX <= -0.7f){
+                        currentDirection = TURNRIGHT;
+                    }
+                    else if (((prevPosX > -0.5f && posX <= -0.5f) || (prevPosX > 0.0f && posX <= 0.0f) ||
+                              (prevPosX > 0.5f && posX <= 0.5f)) && (rand_generator_zero_one() < 0.5f))
+                    {
+                        currentDirection = TURNLEFT; // Lane change
+                    }
+                }
+                else {
+                    if (rand_generator_zero_one() <= 0.333f){
+                        currentDirection = TURNRIGHT;
+                    }
+                    else if (rand_generator_zero_one() <= 0.666f){
+                        currentDirection = TURNLEFT;
+                    }
+                    else {
+                        currentDirection = RIGHT;
+                    }
+                }
+            }
+        }
+        else {
+            // Set and angle of turn for the curve
+            if (abs(posX >= 0.f) && abs(posX) <= 0.3f){
+                angleTurning = rand_generator_float(0.007f, 0.01f);
+            }
+            else if (abs(posX > 0.3f) && abs(posX) <= 0.7f){
+                angleTurning = rand_generator_float(0.003f, 0.007f);
+            }
+            else {
+                angleTurning = rand_generator_float(0.001f, 0.003f);
+            }
+
+            if (directionCurve > 0.f){
+                currentDirection = TURNRIGHT;
+            }
+            else {
+                currentDirection = TURNLEFT;
+            }
+            if (currentDirection == TURNRIGHT){
+                if (abs(posX) + angleTurning < 0.7f){
+                    posX += angleTurning;
+                }
+            }
+            else if (currentDirection == TURNLEFT){
+                if (abs(posX) + angleTurning < 0.7f){
+                    posX -= angleTurning;
+                }
+            }
+        }
+    }
+
+    // Update the speed of the vehicle
+    const float acc = getAcceleration();
+
+    // At the beginning all accelerate the same
+    if (posY <= 90.f){
+        // Increment speed of the rival car
+        speed = sqrt(acc + ACCELERATION_INCREMENT);
+        a = BOOT;
+        smoking = true;
+    }
+    else {
+        smoking = false;
+        a = BOOT;
+        // Avoid to reach impossible speeds only a 20 percent superior
+        if (posY - playerPosY >= c.renderLen){
+            // Each vehicle accelerates in a different mode
+            if (speed <= 1.8f){
+                speed = sqrt(acc + rand_generator_float(0.01f, 0.05f));
+                if (speed < 1.8f){
+                    speed = 1.8f;
+                }
             }
             a = ACCELERATE;
         }
-        previousY = posY;
-        posY += speed;
+        // Avoid to reach impossible speeds only a 20 percent superior
+        else if (posY - playerPosY > 0.f){
+            // Each vehicle accelerates in a different mode
+            float p = rand_generator_zero_one();
+            if (p > 0.7f){
+                if (playerSpeed < 1.6f){
+                    if (speed <= 1.6f){
+                        speed = sqrt(acc + rand_generator_float(0.01f, 0.03f)) * rand_generator_float(1.0f, 1.1f);
+                        if (speed < 1.6f){
+                            speed = 1.6f;
+                        }
+                    }
+                }
+                else {
+                    if (speed <= 1.8f){
+                        speed = sqrt(acc + rand_generator_float(0.01f, 0.03f)) * rand_generator_float(1.0f, 1.1f);
+                        if (speed < 1.8f){
+                            speed = 1.8f;
+                        }
+                    }
+                }
+            }
+            a = ACCELERATE;
+        }
+        else if (playerPosY - posY < 100.f) {
+            // Each vehicle accelerates in a different mode
+            if (speed > 1.9f){
+                speed = sqrt(acc + rand_generator_float(0.01f, 0.05f));
+                if (speed > 1.9f){
+                    speed = 1.9f;
+                }
+            }
+            a = ACCELERATE;
+        }
+        else {
+            // Each vehicle accelerates in a different mode
+            float p = rand_generator_zero_one();
+            if (p < 0.8f){
+                    if (speed > 1.9f){
+                    speed = sqrt(acc + rand_generator_float(0.01f, 0.05f));
+                    if (speed > 1.9f){
+                        speed = 1.9f;
+                    }
+                }
+            }
+            else {
+                speed = lastSpeed;
+            }
+            a = ACCELERATE;
+        }
+        if (directionCurve != 0.f){
+            if (posY > playerPosY){
+                float powerBraking, power;
+                float option = rand_generator_int(0, 2);
+                if (abs(directionCurve) >= 1.2f && abs(directionCurve) <= 1.9f){
+                    if (option == 1){
+                        powerBraking = rand_generator_float(0.001f, 0.01f);
+                        if (speed >= 1.4f){
+                            speed = sqrt(acc - powerBraking);
+                            smoking = true;
+                        }
+                        else {
+                            speed = 1.4f;
+                            smoking = false;
+                        }
+                    }
+                }
+                else if (abs(directionCurve) >= 0.8f && abs(directionCurve) < 1.2f){
+                    if (option == 1){
+                        powerBraking = rand_generator_float(0.001f, 0.01f);
+                        if (speed >= 1.5f){
+                            speed = sqrt(acc - powerBraking);
+                            smoking = true;
+                        }
+                        else {
+                            speed = 1.5f;
+                            smoking = false;
+                        }
+                    }
+                    else if (option == 2){
+                        power = rand_generator_float(0.001f, 0.01f);
+                        if (speed <= 1.6f){
+                            speed = sqrt(acc + power);
+                        }
+                        else {
+                            speed = 1.6f;
+                        }
+                    }
+                }
+                else if (abs(directionCurve) >= 0.3f && abs(directionCurve) < 0.8f){
+                    if (option == 1){
+                        powerBraking = rand_generator_float(0.001f, 0.01f);
+                        if (speed >= 1.7f){
+                            speed = sqrt(acc - powerBraking);
+                            smoking = true;
+                        }
+                        else {
+                            speed = 1.7f;
+                            smoking = false;
+                        }
+                    }
+                    else if (option == 2){
+                        power = rand_generator_float(0.001f, 0.01f);
+                        if (speed <= 1.8f){
+                            speed = sqrt(acc + power);
+                        }
+                        else {
+                            speed = 1.8f;
+                        }
+                    }
+                }
+            }
+            a = BRAKE;
+        }
     }
+    // Advance the vehicle
+    previousY = posY;
+    posY += speed;
 }
 
 
@@ -113,70 +691,62 @@ void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty) {
         probAI = 0.0f;
     }
     else {
-        probAI = rand_generator_float(maxAggressiveness / 2.0f, maxAggressiveness);
+        probAI = rand_generator_float(0.f, maxAggressiveness);
     }
 
     const float p = rand_generator_zero_one();
     switch(difficulty){
     case PEACEFUL:
-        if (p < 0.05f) {
-            typeAI = INCONSTANT;
-        }
-        else if (p < 0.1f) {
+        if (p < 0.1f) {
             typeAI = OBSTACLE;
         }
         else {
             typeAI = EVASIVE;
-            probAI *= 2.0f;
         }
         break;
     case EASY:
-        if (p < 0.2f) {
-            typeAI = INCONSTANT;
-        }
-        else if (p < 0.4f) {
+        if (p < 0.4f) {
             typeAI = OBSTACLE;
         }
         else {
             typeAI = EVASIVE;
-            probAI *= 2.0f;
         }
         break;
     case NORMAL:
-        if (p < 0.2f) {
-            typeAI = INCONSTANT;
-        }
-        else if (p < 0.5f) {
+        if (p < 0.5f) {
             typeAI = OBSTACLE;
         }
         else {
             typeAI = EVASIVE;
-            probAI *= 2.0f;
         }
         break;
     case HARD:
-        if (p < 0.1f) {
-            typeAI = INCONSTANT;
-        }
-        else if (p < 0.2f) {
+        if (p < 0.7f) {
             typeAI = OBSTACLE;
+            probAI *= 2.0f;
         }
         else {
             typeAI = EVASIVE;
-            probAI *= 2.0f;
         }
     }
 }
 
 
 
-void RivalCar::draw(const Action &a, const Direction &d, const Elevation &e) {
+void RivalCar::draw(const Action &a, const Elevation &e) {
+
+    if (smoking){
+        maxCounterToChange = COUNTER + 1;
+    }
+    else {
+        maxCounterToChange = COUNTER;
+    }
 
     // Draw
-    if (d != TURNLEFT){
+    if (currentDirection != TURNLEFT){
         firstTurnLeft = true;
     }
-    if (d != TURNRIGHT){
+    if (currentDirection != TURNRIGHT){
         firstTurnRight = true;
     }
 
@@ -190,14 +760,14 @@ void RivalCar::draw(const Action &a, const Direction &d, const Elevation &e) {
             if ((int)textures.size() == numTextures) {
                 if (a == ACCELERATE || a == BOOT) {
                     if (e == FLAT) {
-                        if (d == RIGHT) {
+                        if (currentDirection == RIGHT) {
                             if (current_code_image < minTextureRight || current_code_image > maxTextureRight)
                                 current_code_image = minTextureRight;
                         }
-                        else if (d == TURNLEFT) {
+                        else if (currentDirection == TURNLEFT) {
                             if (firstTurnLeft) {
-                                if (current_code_image < minTextureTurnleft || current_code_image > maxTextureTurnLeft)
-                                    current_code_image = minTextureTurnleft;
+                                if (current_code_image < minTextureTurnLeft || current_code_image > maxTextureTurnLeft)
+                                    current_code_image = minTextureTurnLeft;
                                 if (current_code_image == medTurnLeft)
                                     firstTurnLeft = false;
                             } else {
@@ -218,24 +788,24 @@ void RivalCar::draw(const Action &a, const Direction &d, const Elevation &e) {
                         }
                     }
                      else if (e == UP) {
-                        if (d == RIGHT) {
+                        if (currentDirection == RIGHT) {
                             if (current_code_image < minTextureUp || current_code_image > maxTextureUp)
                                 current_code_image = minTextureUp;
                         }
-                        else if (d == TURNLEFT) {
+                        else if (currentDirection == TURNLEFT) {
                             if (firstTurnLeft) {
                                 if (current_code_image < minTextureTurnLeftUp || current_code_image > maxTextureTurnLeftUp)
                                     current_code_image = minTextureTurnLeftUp;
                                 if (current_code_image == medTurnLeftUp)
                                     firstTurnLeft = false;
                             } else {
-                                if (current_code_image < medTurnLeftUp || current_code_image > maxTextureTurnLeftUp)
+                                if (current_code_image < medTurnLeftUp || current_code_image > minTextureTurnLeftUp)
                                     current_code_image = medTurnLeftUp;
                             }
                         }
                         else { // Turn right
                             if (firstTurnRight) {
-                                if (current_code_image < minTextureTurnRightUp || current_code_image > 18)
+                                if (current_code_image < minTextureTurnRightUp || current_code_image > maxTextureTurnRightUp)
                                     current_code_image = minTextureTurnRightUp;
                                 if (current_code_image == medTurnRightUp)
                                     firstTurnRight = false;
@@ -246,14 +816,14 @@ void RivalCar::draw(const Action &a, const Direction &d, const Elevation &e) {
                         }
                     }
                     else { // Down
-                        if (d == RIGHT) {
+                        if (currentDirection == RIGHT) {
                             if (current_code_image < minTextureRight || current_code_image > maxTextureRight)
                                 current_code_image = minTextureRight;
                         }
-                        else if (d == TURNLEFT) {
+                        else if (currentDirection == TURNLEFT) {
                             if (firstTurnLeft) {
-                                if (current_code_image < minTextureTurnleft || current_code_image > maxTextureTurnLeft)
-                                    current_code_image = minTextureTurnleft;
+                                if (current_code_image < minTextureTurnLeft || current_code_image > maxTextureTurnLeft)
+                                    current_code_image = minTextureTurnLeft;
                                 if (current_code_image == medTurnLeft)
                                     firstTurnLeft = false;
                             } else {
@@ -275,18 +845,18 @@ void RivalCar::draw(const Action &a, const Direction &d, const Elevation &e) {
                     }
                 } else if (a == BRAKE) {
                     if (e == FLAT) {
-                        if (d == RIGHT) {
+                        if (currentDirection == RIGHT) {
                             if (current_code_image < minTextureRightBrake || current_code_image > maxTextureRightBrake)
                                 current_code_image = minTextureRightBrake;
                         }
-                        else if (d == TURNLEFT) {
+                        else if (currentDirection == TURNLEFT) {
                             if (firstTurnLeft) {
-                                if (current_code_image < minTextureTurnLeftBrake || current_code_image > maxTextureTurnLeftBrakeUp)
+                                if (current_code_image < minTextureTurnLeftBrake || current_code_image > maxTextureTurnLeftBrake)
                                     current_code_image = minTextureTurnLeftBrake;
                                 if (current_code_image == medTurnLeftBrake)
                                     firstTurnLeft = false;
                             } else {
-                                if (current_code_image < medTurnLeftBrake || current_code_image > maxTextureTurnLeftBrakeUp)
+                                if (current_code_image < medTurnLeftBrake || current_code_image > maxTextureTurnLeftBrake)
                                     current_code_image = medTurnLeftBrake;
                             }
                         }
@@ -302,43 +872,42 @@ void RivalCar::draw(const Action &a, const Direction &d, const Elevation &e) {
                             }
                         }
                     } else if (e == UP) {
-                        if (d == RIGHT) {
+                        if (currentDirection == RIGHT) {
                             if (current_code_image < minTextureUpBrake || current_code_image > maxTextureUpBrake)
                                 current_code_image = minTextureUpBrake;
-                        } else if (d == TURNLEFT) {
+                        } else if (currentDirection == TURNLEFT) {
                             if (firstTurnLeft) {
-                                if (current_code_image < minTextureTurnLeftUp || current_code_image > maxTextureTurnLeftUp)
-                                    current_code_image = minTextureTurnLeftUp;
+                                if (current_code_image < minTextureTurnLeftBrakeUp || current_code_image > maxTextureTurnLeftBrakeUp)
+                                    current_code_image = minTextureTurnLeftBrakeUp;
                                 if (current_code_image == medTurnLeftBrakeUp)
                                     firstTurnLeft = false;
                             } else {
-                                if (current_code_image < medTurnLeftBrakeUp || current_code_image > maxTextureTurnLeftUp)
+                                if (current_code_image < medTurnLeftBrakeUp || current_code_image > maxTextureTurnLeftBrakeUp)
                                     current_code_image = medTurnLeftBrakeUp;
                             }
                         } else { // Turn right
                             if (firstTurnRight) {
-                                if (current_code_image < minTextureTurnRightUp || current_code_image > maxTextureTurnRightUp)
-                                    current_code_image = minTextureTurnRightUp;
+                                if (current_code_image < minTextureTurnRightBrakeUp || current_code_image > maxTextureTurnRightBrakeUp)
+                                    current_code_image = minTextureTurnRightBrakeUp;
                                 if (current_code_image == medTurnRightBrakeUp)
                                     firstTurnRight = false;
                             } else {
-                                if (current_code_image < medTurnRightBrakeUp || current_code_image > maxTextureTurnRightUp)
+                                if (current_code_image < medTurnRightBrakeUp || current_code_image > maxTextureTurnRightBrakeUp)
                                     current_code_image = medTurnRightBrakeUp;
                             }
                         }
                     } else { // Down
-                        if (d == RIGHT) {
+                        if (currentDirection == RIGHT) {
                             if (current_code_image < minTextureRightBrake || current_code_image > maxTextureRightBrake)
                                 current_code_image = minTextureRightBrake;
-                        }
-                        else if (d == TURNLEFT) {
+                        } else if (currentDirection == TURNLEFT) {
                             if (firstTurnLeft) {
-                                if (current_code_image < minTextureTurnLeftBrake || current_code_image > maxTextureTurnLeftBrakeUp)
+                                if (current_code_image < minTextureTurnLeftBrake || current_code_image > maxTextureTurnLeftBrake)
                                     current_code_image = minTextureTurnLeftBrake;
                                 if (current_code_image == medTurnLeftBrake)
                                     firstTurnLeft = false;
                             } else {
-                                if (current_code_image < medTurnLeftBrake || current_code_image > maxTextureTurnLeftBrakeUp)
+                                if (current_code_image < medTurnLeftBrake || current_code_image > maxTextureTurnLeftBrake)
                                     current_code_image = medTurnLeftBrake;
                             }
                         }
@@ -355,7 +924,45 @@ void RivalCar::draw(const Action &a, const Direction &d, const Elevation &e) {
                         }
                     }
                 }
-                // BE CAREFUL CRASH
+                else {
+                    switch(vehicleType){
+                        case 0:
+                            if (current_code_image < 46 || current_code_image > 58)
+                                current_code_image = 46;
+                            break;
+                        case 1:
+                            // Crash
+                            if (mode == 0) {
+                                if (current_code_image < 37 || current_code_image > 44)
+                                    current_code_image = 37;
+                            }
+                            else if (mode == 1) {
+                                if (current_code_image < 45 || current_code_image > 52)
+                                    current_code_image = 45;
+                            }
+                            break;
+                        case 2:
+                            if (mode == 0) {
+                                if (current_code_image < 29 || current_code_image > 36)
+                                    current_code_image = 29;
+                            }
+                            else if (mode == 1) {
+                                if (current_code_image < 37 || current_code_image > 44)
+                                    current_code_image = 37;
+                            }
+                            break;
+                        case 3:
+                            // Crash
+                            if (mode == 0) {
+                                if (current_code_image < 55 || current_code_image > 62)
+                                    current_code_image = 55;
+                            }
+                            else if (mode == 1) {
+                                if (current_code_image < 63 || current_code_image > 70)
+                                    current_code_image = 63;
+                            }
+                    }
+                }
             }
         }
         else {
@@ -392,6 +999,13 @@ float RivalCar::getScale() const {
 }
 
 
+
+float RivalCar::getPreviousY() const {
+    return previousY;
+}
+
+
+
 /**
  * Devuelve la escala actual del vehículo.
  * @return
@@ -425,4 +1039,33 @@ bool RivalCar::isVisible(const Configuration &c, float minY, float playerX, floa
         distanceY = abs(playerY - posY);
         return true;
     }
+}
+
+
+void RivalCar::setOnStraight(){
+    onStraight = true;
+}
+
+
+void RivalCar::drawSmokingPlayer(Configuration& c, const float destW, const float destH, const float widthOri, const float heightOri,
+                                 const float maxY)
+{
+    Sprite sv;
+    switch(vehicleType){
+        case 0:
+            sv.setTexture(textures[41 + current_code_image % 4], true);
+            break;
+        case 1:
+            sv.setTexture(textures[52 + current_code_image % 4], true);
+            break;
+        case 2:
+            sv.setTexture(textures[41 + current_code_image % 4], true);
+            break;
+        case 3:
+            sv.setTexture(textures[41 + current_code_image % 4], true);
+    }
+
+    sv.setScale(destW / widthOri, destH / heightOri);
+    sv.setPosition(minScreenX - 5.f, maxY);
+    c.w.draw(sv);
 }

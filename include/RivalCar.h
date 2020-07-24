@@ -19,21 +19,24 @@ namespace Vehicle_RivalCar {
 class RivalCar : public Vehicle {
     float oriX;
 
-    float lastSpeed;
+    float lastSpeed, angleTurning;
 
     Direction currentDirection, calculatedPath;
     int current_direction_counter, max_direction_counter;
 
-    bool firstTurnLeft, firstTurnRight;
+    bool firstTurnLeft, firstTurnRight, newPath, crashing,
+         onStraight, shoutDone, smoking;
+
+    int vehicleType;
 
     // Number of textures of textures of the vehicle
-    int numTextures;
+    int numTextures, mode;
 
     // Texture thresholds to control the movements of the vehicle
     int minTextureRight, maxTextureRight,
         minTextureRightBrake, maxTextureRightBrake;
 
-    int minTextureTurnleft, maxTextureTurnLeft,
+    int minTextureTurnLeft, maxTextureTurnLeft,
         minTextureTurnLeftBrake, maxTextureTurnLeftBrake;
 
     int minTextureTurnRight, maxTextureTurnRight,
@@ -52,7 +55,7 @@ class RivalCar : public Vehicle {
         medTurnLeftBrake, medTurnRightBrake, medTurnLeftBrakeUp,
         medTurnRightBrakeUp;
 
-    float probAI, scalingFactor;
+    float probAI, scalingFactor, speedCollision, xDest, speedFactor;
 
     /**
      * Tipos de IA:
@@ -83,7 +86,7 @@ public:
      * @param vehicle nombre del vehículo
      * @param pY
      */
-    RivalCar(float maxSpeed, float speedMul, float scale, int maxCounterToChange, const string &vehicle, float pX, float pY,
+    RivalCar(int typeOfVehicle, float maxSpeed, float speedMul, float scale, int maxCounterToChange, const string &vehicle, float pX, float pY,
              int totalTextures, int lowTextureRight, int highTextureRight, int lowTextureRightBrake, int highTextureRightBrake,
              int lowTextureTurnleft, int highTextureTurnLeft, int lowTextureTurnLeftBrake, int highTextureTurnLeftBrake,
              int lowTextureTurnRight, int highTextureTurnRight, int lowTextureTurnRightBrake, int highTextureTurnRightBrake,
@@ -93,7 +96,19 @@ public:
              int mediumTurnRight, int mediumTurnLeftUp, int mediumTurnRightUp, int mediumTurnLeftBrake, int mediumTurnRightBrake,
              int mediumTurnLeftBrakeUp, int mediumTurnRightBrakeUp, float scaling);
 
+    float getRealSpeed() const;
 
+
+    void setSmoking();
+
+
+    float getSmoking() const;
+
+
+    void hitControl(const bool vehicleCrash, SoundPlayer& r);
+
+
+    bool isCrashing() const;
 
     /**
      * Actualiza la lógica del vehículo de manera automática para el movimiento actual.
@@ -130,8 +145,8 @@ public:
      * @param endPos
      * @param maxAggressiveness, 0 <= maxAggressiveness <= 1
      */
-    void update(Configuration& c, float iniPos, float endPos, float maxAggressiveness, Action& a, Direction& d, float directionCurve,
-                const Difficult& difficulty, const float playerPosX, const float playerPosY);
+    void update(Configuration& c, float iniPos, float endPos, float maxAggressiveness, Action& a, float directionCurve,
+                const Difficult& difficulty, const float playerPosX, const float playerPosY, const float playerSpeed);
 
     /**
      * Actualiza la agresividad de la IA del vehículo con un valor aleatorio entre 0 y maxAggressiveness.
@@ -144,7 +159,7 @@ public:
      * @param e
      * @param camX actual de la cámara
      */
-    void draw(const Action &a, const Direction &d, const Elevation &e);
+    void draw(const Action &a, const Elevation &e);
 
     /**
      * Establece la coordenada X mínima que ocupa el vehículo.
@@ -169,6 +184,10 @@ public:
      * @return
      */
     float getScale() const;
+
+
+
+    float getPreviousY() const;
 
 
     /**
@@ -201,6 +220,15 @@ public:
      * @return
      */
     bool isVisible(const Configuration &c, float minY, float playerX, float playerY, float &distanceX, float &distanceY) const;
+
+
+
+    void setOnStraight();
+
+
+    void drawSmokingPlayer(Configuration& c, const float destW, const float destH, const float widthOri,
+                           const float heightOri, const float maxY);
+
 };
 
 
