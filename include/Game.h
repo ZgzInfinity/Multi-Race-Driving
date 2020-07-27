@@ -225,6 +225,9 @@ class Game {
     int numberRacers;
 
 
+    int colorCarSelected;
+
+
     vector<float> rankingVehicles;
 
 

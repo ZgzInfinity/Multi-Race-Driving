@@ -2732,7 +2732,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
     c.comeFromOptions = true;
 
     // Update the xml configuration file
-    if (c.changeAnyParameter == true){
+    if (c.changeAnyParameter){
         const string path = "Data/Settings/Configuration.xml";
 
         KeywordMapper kM = KeywordMapper();

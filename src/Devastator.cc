@@ -556,7 +556,12 @@ void Devastator::draw(Configuration &c, SoundPlayer &r, const Action &a, const D
         sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f);
     }
     else {
-        sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f - 15.f);
+        if (c.enablePixelArt){
+            sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f - 15.f);
+        }
+        else {
+            sprite.setPosition(minScreenX, ((float) c.w.getSize().y) * c.camD - sprite.getGlobalBounds().height / 2.0f - 30.f);
+        }
     }
     c.w.draw(sprite);
 

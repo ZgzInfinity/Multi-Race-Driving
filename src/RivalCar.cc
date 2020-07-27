@@ -1059,10 +1059,10 @@ void RivalCar::drawSmokingPlayer(Configuration& c, const float destW, const floa
             sv.setTexture(textures[52 + current_code_image % 4], true);
             break;
         case 2:
-            sv.setTexture(textures[41 + current_code_image % 4], true);
+            sv.setTexture(textures[44 + current_code_image % 4], true);
             break;
         case 3:
-            sv.setTexture(textures[41 + current_code_image % 4], true);
+            sv.setTexture(textures[70 + current_code_image % 4], true);
     }
 
     sv.setScale(destW / widthOri, destH / heightOri);

@@ -36,6 +36,15 @@ void Game::storingRivalCars(Configuration& c){
     // Initialize the position of the player
     posArrival = numberRacers + 1;
 
+    int j;
+    if (colorCarSelected == 7){
+        j = 0;
+    }
+    else {
+        j = colorCarSelected + 1;
+    }
+
+
     // Store the rival cars in the vector
     for (int i = 0; i < numberRacers; i++) {
 
@@ -48,33 +57,33 @@ void Game::storingRivalCars(Configuration& c){
         // Set the scale of the vehicle
         switch(typeOfVehicle){
             case 0:
-                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 2.5f, COUNTER, "RivalCars/Motorbikes/Motorbike" + to_string(i + 1), positX,
-                             positY, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3, 8, 17, 22,
-                             9, 14, 23, 28, 7, 13, 7, 13, 21, 27, 21, 27, 1.15f);
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 2.5f, COUNTER, "Data/Vehicles/Motorbikes/Motorbike" + to_string(j + 1),
+                             positX, positY, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3,
+                             8, 17, 22, 9, 14, 23, 28, 7, 13, 7, 13, 21, 27, 21, 27, 1.15f);
 
                 v.setAI(c.maxAggressiveness, c.level);
                 rivals.push_back(v);
                 break;
             case 1:
-                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Devastators/Devastator" + to_string(i + 1), positX,
-                             positY, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22, 5, 8, 23, 26, 9, 12, 27, 30, 13, 14,
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Devastators/Devastator" + to_string(j + 1),
+                             positX, positY, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22, 5, 8, 23, 26, 9, 12, 27, 30, 13, 14,
                              31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24, 28, 33, 35, 1.85f);
 
                 v.setAI(c.maxAggressiveness, c.level);
                 rivals.push_back(v);
                 break;
             case 2:
-                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "RivalCars/Minivans/Minivan" + to_string(i + 1), positX, positY,
-                             Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
-                             11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.15f);
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Minivans/Minivan" + to_string(j + 1),
+                             positX, positY, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
+                             11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.75f);
 
                 v.setAI(c.maxAggressiveness, c.level);
                 rivals.push_back(v);
                 break;
             case 3:
-                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "RivalCars/Trucks/Truck" + to_string(i + 1), positX, positY,
-                             Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
-                             43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.15f);
+                v = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "Data/Vehicles/Trucks/Truck" + to_string(j + 1),
+                             positX, positY, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
+                             43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 2.02f);
 
                 v.setAI(c.maxAggressiveness, c.level);
                 rivals.push_back(v);
@@ -82,6 +91,11 @@ void Game::storingRivalCars(Configuration& c){
         // Update the position of the staring vehicles
         if (i % 2 != 0){
             positY -= 20.f;
+        }
+
+        j++;
+        if (j == 8){
+            j = 0;
         }
     }
 }
@@ -1329,77 +1343,6 @@ void Game::showBonusIndications(Configuration &c, int seconds, int decs_second) 
  */
 Game::Game(Configuration &c){
 
-    // Variables to store the vehicle properties
-    string brandNameMotorbike, motorNameMotorbike, pathFileMotorbike, brandNameDevastator, motorNameDevastator,
-           pathFileDevastator, brandNameMinivan, motorNameMinivan, pathFileMinivan, brandNameTruck, motorNameTruck,
-           pathFileTruck, brandNamePolice, motorNamePolice, pathFilePolice;
-
-    float max_speedMotorbike, angleMotorbike, max_speedDevastator, angleDevastator, max_speedMinivan,
-          angleMinivan, max_speedTruck, angleTruck, max_speedPolice, anglePolice;
-
-    // Array of threads
-    thread P[5];
-
-    // Load the properties of the motorbike
-    pathFileMotorbike = "Data/Vehicles/Motorbike/Configuration/Configuration.xml";
-
-    // Load the properties of the Devastator
-    pathFileDevastator = "Data/Vehicles/Devastator/Configuration/Configuration.xml";
-
-    // Load the properties of the Devastator
-    pathFileMinivan = "Data/Vehicles/Minivan/Configuration/Configuration.xml";
-
-    // Load the properties of the Devastator
-    pathFileTruck = "Data/Vehicles/Truck/Configuration/Configuration.xml";
-
-    // Load the properties of the Police car
-    pathFilePolice = "Data/Vehicles/Police/Configuration/Configuration.xml";
-
-    // Throw the threads that load the properties of each vehicle
-
-    thread loadMotorbike = thread(loadVehicleProperties, this, pathFileMotorbike, ref(brandNameMotorbike),
-                                  ref(max_speedMotorbike), ref(angleMotorbike), ref(motorNameMotorbike));
-
-    thread loadDevastator = thread(loadVehicleProperties, this, pathFileDevastator, ref(brandNameDevastator), ref(max_speedDevastator),
-                                  ref(angleDevastator), ref(motorNameDevastator));
-
-    thread loadMinivan = thread(loadVehicleProperties, this, pathFileMinivan, ref(brandNameMinivan), ref(max_speedMinivan),
-                                ref(angleMinivan), ref(motorNameMinivan));
-
-    thread loadTruck = thread (loadVehicleProperties, this, pathFileTruck, ref(brandNameTruck), ref(max_speedTruck), ref(angleTruck),
-                               ref(motorNameTruck));
-
-    thread loadPolice = thread (loadVehicleProperties, this, pathFilePolice, ref(brandNamePolice), ref(max_speedPolice), ref(anglePolice),
-                                ref(motorNamePolice));
-
-    // Control that all the threads have finished
-    loadMotorbike.join();
-    loadDevastator.join();
-    loadMinivan.join();
-    loadTruck.join();
-    loadPolice.join();
-
-    // Create the motorbike vehicle
-    player = Motorbike(max_speedMotorbike, SPEED_FACTOR, max_speedMotorbike * ACCELERATION_INCREMENT / MAX_SPEED, 2.5f, 2.5f,
-                       COUNTER, "Motorbike", 0.0f, RECTANGLE, brandNameMotorbike, angleMotorbike, motorNameMotorbike);
-
-    // Create the Devastator vehicle
-    player2 = Devastator(max_speedDevastator, SPEED_FACTOR, max_speedDevastator * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
-                       COUNTER, "Devastator", 0.0f, RECTANGLE, brandNameDevastator, angleDevastator, motorNameDevastator);
-
-    // Create the minivan vehicle
-    player3 = Minivan(max_speedMinivan, SPEED_FACTOR, max_speedMinivan * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
-                       COUNTER, "Minivan", 0.0f, RECTANGLE, brandNameMinivan, angleMinivan, motorNameMinivan);
-
-    // Load the properties of the Truck
-    player4 = Truck(max_speedTruck, SPEED_FACTOR, max_speedTruck * ACCELERATION_INCREMENT / MAX_SPEED, 4.5f, 4.5f,
-                       COUNTER, "Truck", 0.0f, RECTANGLE, brandNameTruck, angleTruck, motorNameTruck);
-
-    // Create the properties of the police car
-    player5 = Police(max_speedPolice, SPEED_FACTOR, max_speedPolice * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
-                       COUNTER, "Police", 0.0f, RECTANGLE, brandNamePolice, anglePolice, motorNamePolice);
-
-
     typeOfVehicle = 0;
     lastY = 0;
     vehicleCrash = false;
@@ -1433,6 +1376,7 @@ Game::Game(Configuration &c){
 
     lap = "00:00:00";
     typeOfGame = 1;
+    colorCarSelected = 0;
 }
 
 
@@ -1686,6 +1630,19 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     level = mapId.first + 1;
     time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
 
+    if (typeOfGame == 3){
+        string path = "Data/Vehicles/Police/Configuration/Configuration.xml";
+        string brandName, motorName;
+        float max_speed, angle;
+
+        // Load the properties of the police car
+        loadVehicleProperties(path , brandName, max_speed, angle, motorName);
+
+        // Create the properties of the police car
+        player5 = Police(max_speed, SPEED_FACTOR, max_speed* ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
+                         COUNTER, "Data/Vehicles/Police", 0.0f, RECTANGLE, brandName, angle, motorName);
+    }
+
     // Start the game
     return LOADING;
 }
@@ -1752,12 +1709,12 @@ void Game::checkDifficulty(Configuration &c) {
 
             if (1 + i % maxSprites == 4){
                 TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                    "TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                    "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
                 cars.push_back(v);
             }
             else {
                 TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                    "TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                    "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
                 cars.push_back(v);
             }
         }
@@ -2411,7 +2368,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         s.setTexture(textures[4], true);
         s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
         s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
-                             c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+                             c.w.getSize().y / 2.f - 180.0f * c.screenScale);
         c.w.draw(s);
 
         bufferSprite.setTexture(c.w.getTexture(), true);
@@ -2488,7 +2445,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
             s.setTexture(textures[4 + i], true);
             s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
             s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
-                                 c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+                                 c.w.getSize().y / 2.f - 180.0f * c.screenScale);
             c.w.draw(s);
         }
 
@@ -2539,7 +2496,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                     s.setTexture(textures[4 + i], true);
                     s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
                     s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
-                                         c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+                                         c.w.getSize().y / 2.f - 180.0f * c.screenScale);
                     c.w.draw(s);
                 }
 
@@ -2568,7 +2525,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         s.setTexture(textures[7], true);
         s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
         s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
-                             c.w.getSize().y / 2.f - 220.0f * c.screenScale);
+                             c.w.getSize().y / 2.f - 180.0f * c.screenScale);
         c.w.draw(s);
 
         bufferSprite.setTexture(c.w.getTexture(), true);
@@ -2589,16 +2546,19 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                 r.soundEffects[30]->play();
                 break;
             case 1:
-                r.soundEffects[12]->stop();
-                r.soundEffects[12]->play();
+                r.soundEffects[28]->stop();
+                r.soundEffects[88]->stop();
+                r.soundEffects[88]->play();
                 break;
             case 2:
-                r.soundEffects[41]->stop();
-                r.soundEffects[41]->play();
+                r.soundEffects[28]->stop();
+                r.soundEffects[89]->stop();
+                r.soundEffects[89]->play();
                 break;
             case 3:
-                r.soundEffects[33]->stop();
-                r.soundEffects[33]->play();
+                r.soundEffects[28]->stop();
+                r.soundEffects[90]->stop();
+                r.soundEffects[90]->play();
         }
 
         for (RivalCar rival : rivals){
@@ -3136,13 +3096,34 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                     // Check it has been crash between player and rival
                     if (vehicleCrash){
                         if (player.getPreviousX() > v.getPreviousX()){
-                            player.setPosition(player.getPosX() + 2.f * player.getAngle(), player.getPosY() - 20.f);
+                            player.setPosition(player.getPosX() + 1.5f * player.getAngle(), player.getPosY() - 10.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player.setPosition(player.getPosX() - 2.f * player.getAngle(), player.getPosY() - 20.f);
+                            player.setPosition(player.getPosX() - 1.5f * player.getAngle(), player.getPosY() - 10.f);
                         }
                     }
-                    player.setSmoking(true);
+
+                    // Reproduce sounds of collision
+                    if (vehicleCrash){
+                        // Voice sound
+                        r.soundEffects[69]->stop();
+                        r.soundEffects[70]->stop();
+                        r.soundEffects[71]->stop();
+                        r.soundEffects[72]->stop();
+                        r.soundEffects[73]->stop();
+                        r.soundEffects[74]->stop();
+                        r.soundEffects[75]->stop();
+                        r.soundEffects[rand_generator_int(69, 75)]->play();
+
+                        // Collision sound
+                        r.soundEffects[76]->stop();
+                        r.soundEffects[77]->stop();
+                        r.soundEffects[78]->stop();
+                        r.soundEffects[79]->stop();
+                        r.soundEffects[80]->stop();
+                        r.soundEffects[81]->stop();
+                        r.soundEffects[rand_generator_int(76, 81)]->play();
+                    }
                     break;
                 case 1:
                     vehicleCrash = v.hasCrashed(player2.getPosY(), player2.getPreviousY(),
@@ -3150,13 +3131,14 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
                     if (vehicleCrash){
                         if (player2.getPreviousX() > v.getPreviousX()){
-                            player2.setPosition(player.getPosX() + 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                            player2.setPosition(player.getPosX() + 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player2.setPosition(player.getPosX() - 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                            player2.setPosition(player.getPosX() - 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
                         }
+                        r.soundEffects[87]->stop();
+                        r.soundEffects[87]->play();
                     }
-                    player2.setSmoking(true);
                     break;
                 case 2:
                     vehicleCrash = v.hasCrashed(player3.getPosY(), player3.getPreviousY(),
@@ -3164,13 +3146,14 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
                     if (vehicleCrash){
                         if (player3.getPreviousX() > v.getPreviousX()){
-                            player3.setPosition(player.getPosX() + 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                            player3.setPosition(player.getPosX() + 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player3.setPosition(player.getPosX() - 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                            player3.setPosition(player.getPosX() - 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
                         }
+                        r.soundEffects[87]->stop();
+                        r.soundEffects[87]->play();
                     }
-                    player3.setSmoking(true);
                     break;
                 case 3:
                     vehicleCrash = v.hasCrashed(player4.getPosY(), player4.getPreviousY(),
@@ -3178,41 +3161,14 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
                     if (vehicleCrash){
                         if (player4.getPreviousX() > v.getPreviousX()){
-                            player4.setPosition(player.getPosX() + 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                            player4.setPosition(player.getPosX() + 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player4.setPosition(player.getPosX() - 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                            player4.setPosition(player.getPosX() - 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
                         }
+                        r.soundEffects[87]->stop();
+                        r.soundEffects[87]->play();
                     }
-                    player4.setSmoking(true);
-            }
-
-            // Reproduce sounds of collision
-            if (vehicleCrash){
-                // Voice sound
-                r.soundEffects[69]->stop();
-                r.soundEffects[70]->stop();
-                r.soundEffects[71]->stop();
-                r.soundEffects[72]->stop();
-                r.soundEffects[73]->stop();
-                r.soundEffects[74]->stop();
-                r.soundEffects[75]->stop();
-                r.soundEffects[rand_generator_int(69, 75)]->play();
-
-                // Collision sound
-                r.soundEffects[76]->stop();
-                r.soundEffects[77]->stop();
-                r.soundEffects[78]->stop();
-                r.soundEffects[79]->stop();
-                r.soundEffects[80]->stop();
-                r.soundEffects[81]->stop();
-                r.soundEffects[rand_generator_int(76, 81)]->play();
-            }
-            else{
-                player.setSmoking(false);
-                player2.setSmoking(false);
-                player3.setSmoking(false);
-                player4.setSmoking(false);
             }
         }
 
@@ -3749,13 +3705,34 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
                         // Check it has been crash between player and rival
                         if (vehicleCrash){
                             if (player.getPreviousX() > v.getPreviousX()){
-                                player.setPosition(player.getPosX() + 2.f * player.getAngle(), player.getPosY() - 20.f);
+                                player.setPosition(player.getPosX() + 1.5f * player.getAngle(), player.getPosY() - 10.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player.setPosition(player.getPosX() - 2.f * player.getAngle(), player.getPosY() - 20.f);
+                                player.setPosition(player.getPosX() - 1.5f * player.getAngle(), player.getPosY() - 10.f);
                             }
                         }
-                        player.setSmoking(true);
+
+                        // Reproduce sounds of collision
+                        if (vehicleCrash){
+                            // Voice sound
+                            r.soundEffects[69]->stop();
+                            r.soundEffects[70]->stop();
+                            r.soundEffects[71]->stop();
+                            r.soundEffects[72]->stop();
+                            r.soundEffects[73]->stop();
+                            r.soundEffects[74]->stop();
+                            r.soundEffects[75]->stop();
+                            r.soundEffects[rand_generator_int(69, 75)]->play();
+
+                            // Collision sound
+                            r.soundEffects[76]->stop();
+                            r.soundEffects[77]->stop();
+                            r.soundEffects[78]->stop();
+                            r.soundEffects[79]->stop();
+                            r.soundEffects[80]->stop();
+                            r.soundEffects[81]->stop();
+                            r.soundEffects[rand_generator_int(76, 81)]->play();
+                        }
                         break;
                     case 1:
                         vehicleCrash = v.hasCrashed(player2.getPosY(), player2.getPreviousY(),
@@ -3763,13 +3740,14 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
                         if (vehicleCrash){
                             if (player2.getPreviousX() > v.getPreviousX()){
-                                player2.setPosition(player.getPosX() + 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                                player2.setPosition(player.getPosX() + 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player2.setPosition(player.getPosX() - 2.f * player2.getAngle(), player2.getPosY() - 20.f);
+                                player2.setPosition(player.getPosX() - 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
                             }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
                         }
-                        player2.setSmoking(true);
                         break;
                     case 2:
                         vehicleCrash = v.hasCrashed(player3.getPosY(), player3.getPreviousY(),
@@ -3777,13 +3755,14 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
                         if (vehicleCrash){
                             if (player3.getPreviousX() > v.getPreviousX()){
-                                player3.setPosition(player.getPosX() + 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                                player3.setPosition(player.getPosX() + 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player3.setPosition(player.getPosX() - 2.f * player3.getAngle(), player3.getPosY() - 20.f);
+                                player3.setPosition(player.getPosX() - 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
                             }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
                         }
-                        player3.setSmoking(true);
                         break;
                     case 3:
                         vehicleCrash = v.hasCrashed(player4.getPosY(), player4.getPreviousY(),
@@ -3791,44 +3770,15 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
                         if (vehicleCrash){
                             if (player4.getPreviousX() > v.getPreviousX()){
-                                player4.setPosition(player.getPosX() + 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                                player4.setPosition(player.getPosX() + 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player4.setPosition(player.getPosX() - 2.f * player4.getAngle(), player4.getPosY() - 20.f);
+                                player4.setPosition(player.getPosX() - 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
                             }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
                         }
-                        player4.setSmoking(true);
                 }
-
-                // Reproduce sounds of collision
-                if (vehicleCrash){
-                    // Voice sound
-                    r.soundEffects[69]->stop();
-                    r.soundEffects[70]->stop();
-                    r.soundEffects[71]->stop();
-                    r.soundEffects[72]->stop();
-                    r.soundEffects[73]->stop();
-                    r.soundEffects[74]->stop();
-                    r.soundEffects[75]->stop();
-                    r.soundEffects[rand_generator_int(69, 75)]->play();
-
-                    // Collision sound
-                    r.soundEffects[76]->stop();
-                    r.soundEffects[77]->stop();
-                    r.soundEffects[78]->stop();
-                    r.soundEffects[79]->stop();
-                    r.soundEffects[80]->stop();
-                    r.soundEffects[81]->stop();
-                    r.soundEffects[rand_generator_int(76, 81)]->play();
-                }
-                else{
-                    player.setSmoking(false);
-                    player2.setSmoking(false);
-                    player3.setSmoking(false);
-                    player4.setSmoking(false);
-                }
-
-
                 v.setAI(c.maxAggressiveness, c.level);
             }
 
@@ -5010,13 +4960,14 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     pauseShape.setOutlineThickness(5.0f * c.screenScale);
 
     Text textMenu;
-    textMenu.setPosition(c.w.getSize().x / 2.f - 75.0f * c.screenScale, c.w.getSize().y / 2.f - 150.0f * c.screenScale);
     textMenu.setFont(c.fontPauseMenu);
     textMenu.setFillColor(c.colorTitleTextPauseMenu);
     textMenu.setOutlineColor(c.colorTitleBorderPauseMenu);
     textMenu.setOutlineThickness(2.0f * c.screenScale);
     textMenu.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
     textMenu.setString(c.contentTitlePauseMenu);
+    textMenu.setPosition(c.w.getSize().x / 2.f - textMenu.getLocalBounds().width / 2.f,
+                         c.w.getSize().y / 2.f - 150.0f * c.screenScale);
 
     // Control if the start key is pressed or not
     bool startPressed = false;
@@ -5488,7 +5439,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     bool backSpacePressed = false;
 
     // Control the vehicle selected by the player
-    int optionSelected;
+    int optionSelected, colorSelected;
 
     c.w.clear(Color(0, 0, 0));
     Sprite bufferSprite(c.w.getTexture());
@@ -5498,24 +5449,59 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
     // Load the textures of the vehicles to show
     Texture t;
-    vector<Texture> vehicleTextures;
+    Texture vehicleTextures[4][8];
 
-    t.loadFromFile("Data/Vehicles/Motorbike/Images/c59.png");
-    vehicleTextures.push_back(t);
+    string path = "", imageCode = "";
 
-    t.loadFromFile("Data/Vehicles/Devastator/Images/c57.png");
-    vehicleTextures.push_back(t);
+    // Array of the vehicle's names
+    string vehicleNames[4][8];
 
-    t.loadFromFile("Data/Vehicles/Minivan/Images/c49.png");
-    vehicleTextures.push_back(t);
+    // Array of the  motor types of the vehicles
+    string motorNames[4][8];
 
-    t.loadFromFile("Data/Vehicles/Truck/Images/c75.png");
-    vehicleTextures.push_back(t);
+    // Array of the  maximum speed of the vehicles
+    float speedVehicles[4][8];
+
+    // Array of the angle of the vehicles
+    float angleVehicles[4][8];
+
+    // Variables to store the vehicle properties
+    string brandName, motorName, pathFile;
+    float max_speed, angle;
+
+    for (int i = 0; i < 4; i++){
+        if (i == 0){
+            path = "Data/Vehicles/Motorbikes/Motorbike";
+            imageCode = "c59.png";
+        }
+        else if (i == 1){
+            path = "Data/Vehicles/Devastators/Devastator";
+            imageCode = "c57.png";
+        }
+        else if (i == 2){
+            path = "Data/Vehicles/Minivans/Minivan";
+            imageCode = "c49.png";
+        }
+        else {
+            path = "Data/Vehicles/Trucks/Truck";
+            imageCode = "c75.png";
+        }
+        for (int j = 0; j < 8; j++){
+            t.loadFromFile(path + to_string(j + 1) + "/Images/" + imageCode);
+            vehicleTextures[i][j] = t;
+
+            loadVehicleProperties(path + to_string(j + 1) + "/Configuration/Configuration.xml", brandName, max_speed, angle, motorName);
+            vehicleNames[i][j] = brandName;
+            motorNames[i][j] = motorName;
+            angleVehicles[i][j] = angle;
+            speedVehicles[i][j] = max_speed;
+        }
+    }
 
     // Show the vehicle selected
     Sprite vehicleCar;
 
-    vehicleCar.setTexture(vehicleTextures[0], true);
+    vehicleCar.setTexture(vehicleTextures[0][0], true);
     vehicleCar.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
     vehicleCar.setPosition((c.w.getSize().x / 2.f) + 160.0f * c.screenScale, c.w.getSize().y / 2.f - 25.f * c.screenScale);
 
@@ -5523,6 +5509,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     while (!startPressed && !backSpacePressed) {
 
         optionSelected = 0;
+        colorSelected = 0;
 
         IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
         Sprite sprite(c.backgroundSelectionMenu, background);
@@ -5617,7 +5604,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
         // Main Text of the menu
         Text vehicleName;
-        vehicleName.setString(player.getBrandName());
+        vehicleName.setString(vehicleNames[0][0]);
         vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
         vehicleName.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
         vehicleName.setFont(c.fontVehicleSelectionMenuPanelTitle);
@@ -5627,7 +5614,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         vehicleName.setOutlineThickness(3.0f * c.screenScale);
 
         Text speed;
-        speed.setString(to_string(int(player.getTopSpeed())) + " KM/H");
+        speed.setString(to_string(int(speedVehicles[0][0])) + " KM/H");
         speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                      c.w.getSize().y / 2.f - 75.0f * c.screenScale);
         speed.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
@@ -5638,7 +5625,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         speed.setOutlineThickness(2.0f * c.screenScale);
 
         Text angle;
-        string value = to_string(player.getAngle());
+        string value = to_string(angleVehicles[0][0]);
         angle.setString(value.substr(0, value.find(".") + 3) + " RAD/S");
         angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                           c.w.getSize().y / 2.f - 5.0f * c.screenScale);
@@ -5650,7 +5637,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         angle.setOutlineThickness(2.0f * c.screenScale);
 
         Text motor;
-        motor.setString(player.getMotorName());
+        motor.setString(motorNames[0][0]);
         motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
                           c.w.getSize().y / 2.f + 65.0f * c.screenScale);
         motor.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
@@ -5661,7 +5648,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         motor.setOutlineThickness(2.0f * c.screenScale);
 
         Text acceleration;
-        value = to_string((player.getTopSpeed() / 2.f) / TIME_HALF_SPEED);
+        value = to_string((speedVehicles[0][0] / 2.f) / TIME_HALF_SPEED);
         acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
         acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
                                  c.w.getSize().y / 2.f + 135.0f * c.screenScale);
@@ -5712,32 +5699,32 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     switch(optionSelected){
                         case 1:
 
-                            accelerationText.setString("0 - " + to_string(int(player2.getTopSpeed()) / 2) + " KM/H:");
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
                             accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
                                                          c.w.getSize().y / 2.f + 135.0f * c.screenScale);
 
-                            vehicleCar.setTexture(vehicleTextures[1], true);
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
                             vehicleCar.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
                             vehicleCar.setPosition((c.w.getSize().x / 2.f) + 105.0f * c.screenScale,
                                                     c.w.getSize().y / 2.f - 5.f * c.screenScale);
 
-                            vehicleName.setString(player2.getBrandName());
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
                             vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player2.getTopSpeed())) + " KM/H");
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
-                            value = to_string(player2.getAngle());
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
                             angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
-                            motor.setString(player2.getMotorName());
+                            motor.setString(motorNames[optionSelected][colorSelected]);
                             motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f + 65.0f * c.screenScale);
 
-                            value = to_string((player2.getTopSpeed() / 2.f) / TIME_HALF_SPEED);
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
                             acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
                             acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
                                                      c.w.getSize().y / 2.f + 135.0f * c.screenScale);
@@ -5746,32 +5733,32 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                             break;
                         case 2:
 
-                            accelerationText.setString("0 - " + to_string(int(player3.getTopSpeed()) / 2) + " KM/H:");
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
                             accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
                                                          c.w.getSize().y / 2.f + 135.0f * c.screenScale);
 
-                            vehicleCar.setTexture(vehicleTextures[2], true);
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
                             vehicleCar.setScale(2.7f * c.screenScale, 3.2f * c.screenScale);
                             vehicleCar.setPosition((c.w.getSize().x / 2.f) + 100.0f * c.screenScale,
                                                     c.w.getSize().y / 2.f - 30.f * c.screenScale);
 
-                            vehicleName.setString(player3.getBrandName());
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
                             vehicleName.setPosition(c.w.getSize().x / 2.f + 153.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player3.getTopSpeed())) + " KM/H");
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
-                            value = to_string(player3.getAngle());
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
                             angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
-                            motor.setString(player3.getMotorName());
+                            motor.setString(motorNames[optionSelected][colorSelected]);
                             motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f + 65.0f * c.screenScale);
 
-                            value = to_string((player3.getTopSpeed() / 2.f) / TIME_HALF_SPEED);
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
                             acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
                             acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
                                                      c.w.getSize().y / 2.f + 135.0f * c.screenScale);
@@ -5780,32 +5767,32 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                             break;
                         case 3:
 
-                            accelerationText.setString("0 - " + to_string(int(player4.getTopSpeed()) / 2) + " KM/H:");
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
                             accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
                                                          c.w.getSize().y / 2.f + 135.0f * c.screenScale);
 
-                            vehicleCar.setTexture(vehicleTextures[3], true);
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
                             vehicleCar.setScale(2.7f * c.screenScale, 3.5f * c.screenScale);
                             vehicleCar.setPosition((c.w.getSize().x / 2.f) + 90.0f * c.screenScale,
                                                     c.w.getSize().y / 2.f - 55.f * c.screenScale);
 
-                            vehicleName.setString(player4.getBrandName());
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
                             vehicleName.setPosition(c.w.getSize().x / 2.f + 158.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player4.getTopSpeed())) + " KM/H");
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
-                            value = to_string(player4.getAngle());
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
                             angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
-                            motor.setString(player4.getMotorName());
+                            motor.setString(motorNames[optionSelected][colorSelected]);
                             motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f + 65.0f * c.screenScale);
 
-                            value = to_string((player4.getTopSpeed() / 2.f) / TIME_HALF_SPEED);
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
                             acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
                             acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
                                                      c.w.getSize().y / 2.f + 135.0f * c.screenScale);
@@ -5823,33 +5810,32 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
                     switch(optionSelected){
                         case 0:
-
-                            accelerationText.setString("0 - " + to_string(int(player.getTopSpeed()) / 2) + " KM/H:");
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
                             accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
                                                          c.w.getSize().y / 2.f + 135.0f * c.screenScale);
 
-                            vehicleCar.setTexture(vehicleTextures[0], true);
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
                             vehicleCar.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
                             vehicleCar.setPosition((c.w.getSize().x / 2.f) + 160.0f * c.screenScale,
                                                     c.w.getSize().y / 2.f - 25.f * c.screenScale);
 
-                            vehicleName.setString(player.getBrandName());
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
                             vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player.getTopSpeed())) + " KM/H");
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
-                            value = to_string(player.getAngle());
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
                             angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
-                            motor.setString(player.getMotorName());
+                            motor.setString(motorNames[optionSelected][colorSelected]);
                             motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f + 65.0f * c.screenScale);
 
-                            value = to_string((player.getTopSpeed() / 2.f) / TIME_HALF_SPEED);
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
                             acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
                             acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
                                                      c.w.getSize().y / 2.f + 135.0f * c.screenScale);
@@ -5858,32 +5844,32 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                             break;
                         case 1:
 
-                            accelerationText.setString("0 - " + to_string(int(player2.getTopSpeed()) / 2) + " KM/H:");
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
                             accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
                                                          c.w.getSize().y / 2.f + 135.0f * c.screenScale);
 
-                            vehicleCar.setTexture(vehicleTextures[1], true);
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
                             vehicleCar.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
                             vehicleCar.setPosition((c.w.getSize().x / 2.f) + 105.0f * c.screenScale,
                                                     c.w.getSize().y / 2.f - 5.f * c.screenScale);
 
-                            vehicleName.setString(player2.getBrandName());
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
                             vehicleName.setPosition(c.w.getSize().x / 2.f + 137.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player2.getTopSpeed())) + " KM/H");
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
-                            value = to_string(player2.getAngle());
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
                             angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
-                            motor.setString(player2.getMotorName());
+                            motor.setString(motorNames[optionSelected][colorSelected]);
                             motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f + 65.0f * c.screenScale);
 
-                            value = to_string((player2.getTopSpeed() / 2.f) / TIME_HALF_SPEED);
+                            value = to_string((angleVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
                             acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
                             acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
                                                      c.w.getSize().y / 2.f + 135.0f * c.screenScale);
@@ -5892,40 +5878,369 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                             break;
                         case 2:
 
-                            accelerationText.setString("0 - " + to_string(int(player3.getTopSpeed()) / 2) + " KM/H:");
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
                             accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
                                                          c.w.getSize().y / 2.f + 135.0f * c.screenScale);
 
-                            vehicleCar.setTexture(vehicleTextures[2], true);
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
                             vehicleCar.setScale(2.7f * c.screenScale, 3.2f * c.screenScale);
                             vehicleCar.setPosition((c.w.getSize().x / 2.f) + 100.0f * c.screenScale,
                                                     c.w.getSize().y / 2.f - 30.f * c.screenScale);
 
-                            vehicleName.setString(player3.getBrandName());
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
                             vehicleName.setPosition(c.w.getSize().x / 2.f + 153.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
 
-                            speed.setString(to_string(int(player3.getTopSpeed())) + " KM/H");
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
                             speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
-                            value = to_string(player3.getAngle());
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
                             angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
-                            motor.setString(player3.getMotorName());
+                            motor.setString(motorNames[optionSelected][colorSelected]);
                             motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f + 65.0f * c.screenScale);
 
-                            value = to_string((player3.getTopSpeed() / 2.f) / TIME_HALF_SPEED);
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
                             acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
                             acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
                                                      c.w.getSize().y / 2.f + 135.0f * c.screenScale);
 
                             triangle.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                            break;
+                        case 3:
+
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(2.7f * c.screenScale, 3.5f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 90.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 55.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 158.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle2.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
                     }
                 }
             }
+            // Check if the up or down cursor keys have been pressed or not
+            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+                // Up cursor pressed and change the soundtrack selected in the list
+                if (colorSelected != 7) {
+                    // Change the color appearance of both buttons
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                    colorSelected++;
+
+                    switch(optionSelected){
+                                                case 0:
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 160.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 25.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                            break;
+                        case 1:
+
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 105.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 5.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle2.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                            break;
+                        case 2:
+
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(2.7f * c.screenScale, 3.2f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 100.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 30.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 153.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle2.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                            break;
+                        case 3:
+
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(2.7f * c.screenScale, 3.5f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 90.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 55.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 158.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle2.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                    }
+                }
+            }
+            else if (Keyboard::isKeyPressed(Keyboard::Down)) {
+                // Up cursor pressed and change the soundtrack selected in the list
+                if (colorSelected != 0) {
+                    // Change the color appearance of both buttons
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                    colorSelected--;
+
+                    switch(optionSelected){
+                        case 0:
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 160.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 25.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                            break;
+                        case 1:
+
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 105.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 5.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 137.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((angleVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                            break;
+                        case 2:
+
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(2.7f * c.screenScale, 3.2f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 100.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 30.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 153.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                            break;
+                        case 3:
+
+                            accelerationText.setString("0 - " + to_string(int(speedVehicles[optionSelected][colorSelected]) / 2) + " KM/H:");
+                            accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale,
+                                                         c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            vehicleCar.setTexture(vehicleTextures[optionSelected][colorSelected], true);
+                            vehicleCar.setScale(2.7f * c.screenScale, 3.5f * c.screenScale);
+                            vehicleCar.setPosition((c.w.getSize().x / 2.f) + 90.0f * c.screenScale,
+                                                    c.w.getSize().y / 2.f - 55.f * c.screenScale);
+
+                            vehicleName.setString(vehicleNames[optionSelected][colorSelected]);
+                            vehicleName.setPosition(c.w.getSize().x / 2.f + 158.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+
+                            speed.setString(to_string(int(speedVehicles[optionSelected][colorSelected])) + " KM/H");
+                            speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                            value = to_string(angleVehicles[optionSelected][colorSelected]);
+                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                            motor.setString(motorNames[optionSelected][colorSelected]);
+                            motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                                              c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+
+                            value = to_string((speedVehicles[optionSelected][colorSelected] / 2.f) / TIME_HALF_SPEED);
+                            acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+                            acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                                                     c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+
+                            triangle2.setFillColor(c.vehicleSelectionMenuColorButtons[2]);
+                    }
+                }
+            }
+
+
 
             c.w.draw(sprite);
             c.w.draw(selectionVehicleText);
@@ -5950,7 +6265,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             c.w.display();
             c.window.draw(bufferSprite);
             c.window.display();
-            sleep(milliseconds(120));
+            sleep(milliseconds(160));
 
             // Check if start has been pressed
             if (Keyboard::isKeyPressed(Keyboard::Enter)) {
@@ -6012,7 +6327,44 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
         // Store the car selected by the player
         typeOfVehicle = optionSelected;
+        colorCarSelected = colorSelected;
 
+        if (typeOfGame != 3){
+
+            switch(typeOfVehicle){
+            case 0:
+                // Create the motorbike vehicle
+                player = Motorbike(speedVehicles[optionSelected][colorSelected], SPEED_FACTOR,
+                         speedVehicles[optionSelected][colorSelected] * ACCELERATION_INCREMENT / MAX_SPEED, 2.5f, 2.5f,
+                         COUNTER, "Data/Vehicles/Motorbikes/Motorbike" + to_string(colorSelected + 1), 0.0f, RECTANGLE,
+                         vehicleNames[optionSelected][colorSelected], angleVehicles[optionSelected][colorSelected],
+                         motorNames[optionSelected][colorSelected]);
+                break;
+            case 1:
+                // Create the Devastator vehicle
+                player2 = Devastator(speedVehicles[optionSelected][colorSelected], SPEED_FACTOR,
+                          speedVehicles[optionSelected][colorSelected] * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
+                          COUNTER,  "Data/Vehicles/Devastators/Devastator" + to_string(colorSelected + 1), 0.0f, RECTANGLE,
+                          vehicleNames[optionSelected][colorSelected], angleVehicles[optionSelected][colorSelected],
+                          motorNames[optionSelected][colorSelected]);
+                break;
+            case 2:
+                // Create the minivan vehicle
+                player3 = Minivan(speedVehicles[optionSelected][colorSelected], SPEED_FACTOR,
+                          speedVehicles[optionSelected][colorSelected] * ACCELERATION_INCREMENT / MAX_SPEED, 4.f, 4.f,
+                          COUNTER,  "Data/Vehicles/Minivans/Minivan" + to_string(colorSelected + 1), 0.0f, RECTANGLE,
+                          vehicleNames[optionSelected][colorSelected], angleVehicles[optionSelected][colorSelected],
+                          motorNames[optionSelected][colorSelected]);
+                break;
+            case 3:
+                // Load the properties of the Truck
+                player4 = Truck(speedVehicles[optionSelected][colorSelected], SPEED_FACTOR,
+                          speedVehicles[optionSelected][colorSelected] * ACCELERATION_INCREMENT / MAX_SPEED, 4.5f, 4.5f,
+                          COUNTER, "Data/Vehicles/Trucks/Truck" + to_string(colorSelected + 1), 0.0f, RECTANGLE,
+                          vehicleNames[optionSelected][colorSelected], angleVehicles[optionSelected][colorSelected],
+                          motorNames[optionSelected][colorSelected]);
+            }
+        }
         // Store the rival cars
         if (typeOfGame == 0 || typeOfGame == 2){
             // Store the rival cars in the vector
@@ -6246,25 +6598,25 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         switch(typeOfVehicle){
             case 0:
-                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c60.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Motorbikes/Motorbike" + to_string(colorCarSelected + 1) + "/Images/c60.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
                 break;
             case 1:
-                vehicleTexture.loadFromFile("Data/Vehicles/Devastator/Images/c38.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Devastators/Devastator" + to_string(colorCarSelected + 1) + "/Images/c38.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset + 17.f * c.screenScale);
                 break;
             case 2:
-                vehicleTexture.loadFromFile("Data/Vehicles/Minivan/Images/c30.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Minivans/Minivan" + to_string(colorCarSelected + 1) + "/Images/c30.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(2.7f * c.screenScale, 3.2f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset - 14.f * c.screenScale);
                 break;
             case 3:
-                vehicleTexture.loadFromFile("Data/Vehicles/Truck/Images/c56.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Trucks/Truck" + to_string(colorCarSelected + 1) + "/Images/c56.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(2.7f * c.screenScale, 3.5f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset - 20.f * c.screenScale);
@@ -6394,25 +6746,25 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     switch(typeOfVehicle){
         case 0:
-            vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c60.png");
+            vehicleTexture.loadFromFile("Data/Vehicles/Motorbikes/Motorbike" + to_string(colorCarSelected + 1) + "/Images/c60.png");
             vehicle.setTexture(vehicleTexture, true);
             vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
             vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
             break;
         case 1:
-            vehicleTexture.loadFromFile("Data/Vehicles/Devastator/Images/c38.png");
+            vehicleTexture.loadFromFile("Data/Vehicles/Devastators/Devastator" + to_string(colorCarSelected + 1) + "/Images/c38.png");
             vehicle.setTexture(vehicleTexture, true);
             vehicle.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
             vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset + 17.f * c.screenScale);
             break;
         case 2:
-            vehicleTexture.loadFromFile("Data/Vehicles/Minivan/Images/c30.png");
+            vehicleTexture.loadFromFile("Data/Vehicles/Minivans/Minivan" + to_string(colorCarSelected + 1) + "/Images/c30.png");
             vehicle.setTexture(vehicleTexture, true);
             vehicle.setScale(2.7f * c.screenScale, 3.2f * c.screenScale);
             vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset - 14.f * c.screenScale);
             break;
         case 3:
-            vehicleTexture.loadFromFile("Data/Vehicles/Truck/Images/c56.png");
+            vehicleTexture.loadFromFile("Data/Vehicles/Trucks/Truck" + to_string(colorCarSelected + 1) + "/Images/c56.png");
             vehicle.setTexture(vehicleTexture, true);
             vehicle.setScale(2.7f * c.screenScale, 3.5f * c.screenScale);
             vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset - 20.f * c.screenScale);
@@ -6877,24 +7229,25 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         switch(typeOfVehicle){
             case 0:
-                vehicleTexture.loadFromFile("Data/Vehicles/Motorbike/Images/c60.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Motorbikes/Motorbike" + to_string(colorCarSelected + 1) + "/Images/c60.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(1.6f * c.screenScale, 1.6f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale, c.w.getSize().y / carOffset - 2.f * c.screenScale);
                 break;
             case 1:
-                vehicleTexture.loadFromFile("Data/Vehicles/Devastator/Images/c38.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Devastators/Devastator" + to_string(colorCarSelected + 1) + "/Images/c38.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset + 17.f * c.screenScale);
                 break;
             case 2:
-                vehicleTexture.loadFromFile("Data/Vehicles/Minivan/Images/c30.png");
+                vehicleTexture.loadFromFile("Data/Vehicles/Minivans/Minivan" + to_string(colorCarSelected + 1) + "/Images/c30.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(2.7f * c.screenScale, 3.2f * c.screenScale);
                 vehicle.setPosition((c.w.getSize().x / 2.f) - 120.0f * c.screenScale, c.w.getSize().y / carOffset - 14.f * c.screenScale);
                 break;
             case 3:
+                vehicleTexture.loadFromFile("Data/Vehicles/Trucks/Truck" + to_string(colorCarSelected + 1) + "/Images/c56.png");
                 vehicleTexture.loadFromFile("Data/Vehicles/Truck/Images/c56.png");
                 vehicle.setTexture(vehicleTexture, true);
                 vehicle.setScale(2.7f * c.screenScale, 3.5f * c.screenScale);

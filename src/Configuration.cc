@@ -504,11 +504,11 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                         screenScale = float(w.getSize().x) / float(DEFAULT_WIDTH);
                         currentResized = true;
                         resized = true;
-
                     }
                     thresholdDescriptionX = w.getSize().x * SCREEN_HD_HEIGHT / DEFAULT_WIDTH;
                     thresholdDescriptionY = int((w.getSize().y * VERTICAL_OFFSET / DEFAULT_HEIGHT) * 1.2f);
                     imageOffset = float(w.getSize().y) * IMAGE_DEFAULT_OFFSET / DEFAULT_HEIGHT;
+                    changeAnyParameter = true;
                 }
                 else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                     if (resized) {
@@ -539,6 +539,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                         currentResized = true;
                         resized = true;
                     }
+                    changeAnyParameter = true;
                 }
                 thresholdDescriptionX = (w.getSize().x * SCREEN_HD_HEIGHT / DEFAULT_WIDTH);
                 thresholdDescriptionY = int((w.getSize().y * VERTICAL_OFFSET / DEFAULT_HEIGHT) * 1.2f);
@@ -551,12 +552,14 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                     if (enablePixelArt) {
                         enablePixelArt = false;
                         menuButtons[optionSelected + 2].setTextButton("Disabled");
+                        changeAnyParameter = true;
                     }
                 }
                 else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                     if (!enablePixelArt) {
                         enablePixelArt = true;
                         menuButtons[optionSelected + 2].setTextButton("Enabled");
+                        changeAnyParameter = true;
                     }
                 }
             }

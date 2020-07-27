@@ -20,7 +20,7 @@ Vehicle::Vehicle(const float maxSpeed, const float scale, const int maxCounterTo
     textures.reserve(static_cast<unsigned long>(numTextures));
     for (int i = 1; i <= numTextures; i++) {
         Texture t;
-        t.loadFromFile("Data/Vehicles/" + vehicle + "/Images/c" + to_string(i) + ".png");
+        t.loadFromFile(vehicle + "/Images/c" + to_string(i) + ".png");
         t.setSmooth(true);
         t.setRepeated(false);
         textures.push_back(t);
