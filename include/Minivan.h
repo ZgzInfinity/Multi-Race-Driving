@@ -11,7 +11,7 @@ using namespace sf;
 
 namespace Minivan_vehicle {
     const int FORCE_INERTIA = 5;
-    const int PLAYER_TEXTURES = 69;
+    const int PLAYER_TEXTURES = 77;
 }
 
 

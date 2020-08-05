@@ -1047,6 +1047,32 @@ LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
 
     // Load properties of the road
     loadRoadProperties(pathRoadFile);
+
+    // Load the texture indicator of the possible goal car
+    if (typeOfGame == 3){
+        // Load the texture
+        rowGoalCarIndicator.loadFromFile("Data/Hud/28.png");
+
+        // Establish the indicator text
+        goalCarIndicatorText.setFont(c.fontTimeToPlay);
+        goalCarIndicatorText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        goalCarIndicatorText.setFillColor(Color::Yellow);
+        goalCarIndicatorText.setOutlineColor(Color::Black);
+        goalCarIndicatorText.setOutlineThickness(3.0f * c.screenScale);
+        goalCarIndicatorText.setString("CRIMINAL IS HERE!");
+    }
+    else if (typeOfGame == 4){
+        // Load the texture
+        rowGoalCarIndicator.loadFromFile("Data/Hud/28.png");
+
+        // Establish the indicator text
+        goalCarIndicatorText.setFont(c.fontTimeToPlay);
+        goalCarIndicatorText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        goalCarIndicatorText.setFillColor(Color::Yellow);
+        goalCarIndicatorText.setOutlineColor(Color::Black);
+        goalCarIndicatorText.setOutlineThickness(3.0f * c.screenScale);
+        goalCarIndicatorText.setString("VEHICLE TO BE PASSED!");
+    }
 }
 
 
@@ -1637,7 +1663,8 @@ float LandScape::getCameraPosY() const {
  * @param c is the configuration of the player
  * @param vehicles is the vector with all the traffic cars
  */
-void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame) {
+void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame,
+                              RivalCar& goalCar, const bool displayGoalIndicator) {
 
     const int N = static_cast<const int>(newLines.size());
     const int startPos = int(posCameraY) % N;
@@ -1673,6 +1700,11 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         sortedRivals.push_back(&v);
     }
     sort(sortedRivals.begin(), sortedRivals.end(), ascendingSortRivalCars);
+
+
+    // Sort the traffic cars
+    vector<RivalCar *> sortedGoalCars;
+    sortedGoalCars.push_back(&goalCar);
 
     // Background drawing with possible movement in curves
     drawQuad(c.w, grassColor[0], 0, 0, c.w.getSize().x, 0, c.w.getSize().y, c.w.getSize().x);
@@ -1957,6 +1989,61 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
                 c.w.draw(sv);
 
                 sortedVehicles.pop_back();
+            }
+        }
+
+        // Draw the car to chase
+        if (typeOfGame == 3 || typeOfGame == 4){
+            // Draw rival cars
+            while (!sortedGoalCars.empty() && int(sortedGoalCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
+
+                RivalCar *v = sortedGoalCars.back();
+                Sprite sv;
+                sv.setTexture(*v->getCurrentTexture(), true);
+                const float width = v->getScalingFactor() * sv.getTextureRect().width;
+                const float widthOri = sv.getTextureRect().width;
+                const float height = v->getScalingFactor() * sv.getTextureRect().height;
+                const float heightOri = sv.getTextureRect().height;
+                float destW = width * l->position_2d_w / SCALE_RESOLUTION;
+                float destH = height * l->position_2d_w / SCALE_RESOLUTION;
+
+                sv.setScale(destW / widthOri, destH / heightOri);
+                v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
+                v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
+                sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
+                c.w.draw(sv);
+
+                // Check the drawing of the goal car indicator
+                if (displayGoalIndicator){
+                    Sprite sv2;
+                    sv2.setTexture(rowGoalCarIndicator, true);
+                    sv2.setScale(destW / widthOri, destH / heightOri);
+                    sv2.setPosition(v->getMinScreenX(), sv.getPosition().y - sv.getGlobalBounds().height - 8.f);
+                    c.w.draw(sv2);
+
+                    goalCarIndicatorText.setScale(destW / widthOri, destH / heightOri);
+                    goalCarIndicatorText.setPosition(v->getMinScreenX() - 10.f,
+                                                     sv2.getPosition().y - goalCarIndicatorText.getLocalBounds().height);
+                    c.w.draw(goalCarIndicatorText);
+                }
+
+                // Check if the rival is smoking or not
+                if (v->getSmoking()){
+                    // Draw the smoking of the rival car
+                    v->drawSmokingPlayer(c, destW, destH, widthOri, heightOri, sv.getPosition().y + sv.getGlobalBounds().height * 0.8f);
+                }
+                // Check if the rival is smoking or not
+                else if (v->getFiringSmoke()){
+                    // Draw the smoking of the rival car
+                    v->drawSmokingFirePlayer(c, destW, destH, widthOri, heightOri,
+                                             sv.getPosition().y + sv.getGlobalBounds().height * 0.7f);
+                }
+                else if (v->getFiring()){
+                    // Draw the smoking of the rival car
+                    v->drawFirePlayer(c, destW, destH, widthOri, heightOri,
+                                      sv.getPosition().y + sv.getGlobalBounds().height * 0.7f);
+                }
+                sortedGoalCars.pop_back();
             }
         }
     }

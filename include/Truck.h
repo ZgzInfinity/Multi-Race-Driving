@@ -11,7 +11,7 @@ using namespace sf;
 
 namespace Truck_vehicle {
     const int FORCE_INERTIA = 4;
-    const int PLAYER_TEXTURES = 95;
+    const int PLAYER_TEXTURES = 103;
 }
 
 

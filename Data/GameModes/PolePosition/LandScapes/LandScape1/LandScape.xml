@@ -109,7 +109,7 @@
 						<Code>31</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>45</Each>
+						<Each>72</Each>
 						<Offset>Random</Offset>
 						<Code>32</Code>
 					</SpriteFarRight>
@@ -166,7 +166,7 @@
 						<Code>18</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>48</Each>
+						<Each>81</Each>
 						<Offset>Random</Offset>
 						<Code>23</Code>
 					</SpriteFarRight>
@@ -187,7 +187,7 @@
 						<Code>2</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
-						<Each>46</Each>
+						<Each>96</Each>
 						<Offset>Random</Offset>
 						<Code>30</Code>
 					</SpriteFarLeft>
@@ -218,7 +218,7 @@
 						<Code>2</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>45</Each>
+						<Each>85</Each>
 						<Offset>Random</Offset>
 						<Code>23</Code>
 					</SpriteFarRight>
@@ -239,12 +239,12 @@
 						<Code>13</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
-						<Each>48</Each>
+						<Each>98</Each>
 						<Offset>Random</Offset>
 						<Code>30</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>31</Each>
+						<Each>81</Each>
 						<Offset>Random</Offset>
 						<Code>31</Code>
 					</SpriteFarRight>
@@ -270,12 +270,12 @@
 						<Code>21</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
-						<Each>30</Each>
+						<Each>70</Each>
 						<Offset>Random</Offset>
 						<Code>28</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>46</Each>
+						<Each>86</Each>
 						<Offset>Random</Offset>
 						<Code>27</Code>
 					</SpriteFarRight>
@@ -301,7 +301,7 @@
 						<Code>7</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>45</Each>
+						<Each>95</Each>
 						<Offset>Random</Offset>
 						<Code>18</Code>
 					</SpriteFarRight>
@@ -322,12 +322,12 @@
 						<Code>6</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
-						<Each>30</Each>
+						<Each>100</Each>
 						<Offset>Random</Offset>
 						<Code>29</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>45</Each>
+						<Each>85</Each>
 						<Offset>Random</Offset>
 						<Code>28</Code>
 					</SpriteFarRight>
@@ -436,7 +436,7 @@
 						<Code>20</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>45</Each>
+						<Each>75</Each>
 						<Offset>Random</Offset>
 						<Code>29</Code>
 					</SpriteFarRight>
@@ -457,12 +457,12 @@
 						<Code>14</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
-						<Each>30</Each>
+						<Each>98</Each>
 						<Offset>Random</Offset>
 						<Code>22</Code>
 					</SpriteFarLeft>
 					<SpriteFarRight>
-						<Each>45</Each>
+						<Each>95</Each>
 						<Offset>Random</Offset>
 						<Code>22</Code>
 					</SpriteFarRight>

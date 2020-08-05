@@ -16,7 +16,7 @@ namespace Police_vehicle {
 
 
 class Police : public Vehicle {
-    float speedMul, maxAcc, accInc, scaleY;
+    float topSpeed, speedMul, maxAcc, accInc, scaleY;
     float acceleration, minCrashAcc, xDest;
     int inertia;
 
@@ -134,6 +134,12 @@ public:
 
 
     float getHalfMaxSpeed();
+
+
+    float getAngle();
+
+
+    void setVehicle(const int typeOfGame);
 };
 
 

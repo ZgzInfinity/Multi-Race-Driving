@@ -25,7 +25,7 @@ class RivalCar : public Vehicle {
     int current_direction_counter, max_direction_counter;
 
     bool firstTurnLeft, firstTurnRight, newPath, crashing,
-         onStraight, shoutDone, smoking;
+         onStraight, shoutDone, smoking, firing, fireSmoking;;
 
     int vehicleType;
 
@@ -109,34 +109,6 @@ public:
 
 
     bool isCrashing() const;
-
-    /**
-     * Actualiza la lógica del vehículo de manera automática para el movimiento actual.
-     *
-     * La IA sólo se activará si la distancia entre el vehículo y el jugador es menor o igual a la distancia
-     * de render (rectángulos que ve el jugador).
-     *
-     * La agresividad de la IA está dentro de la clase (probAI). Es un valor entre 0 y 1 que indica la probabilidad de
-     * que la IA actúe en este movimiento.
-     *
-     *      Si la agresividad de la IA es 0, el movimiento será como en el juego original, es decir, el coche seguirá
-     *      a velocidad constante sin salirse de la carretera y siguiendo una trayectoria recta o con giro (elegida
-     *      de manera aleatoria) y sin ser influenciado por el jugador.
-     *
-     *      Si la agresividad de la IA es 1, el movimiento será controlado por la IA y su movimiento dependerá del tipo
-     *      de IA:
-     *          OBSTACLE: Intenta chocar con el jugador poniéndose en su trayectoria e intentando alcanzarlo.
-     *          EVASIVE: Huye al carril más alejado del jugador para intentar evitarlo.
-     *          INCONSTANT: Cambia de carriles muy a menudo sin tener en cuenta la posición del jugador.
-     *
-     *      Si la agresividad de la IA se encuentra entre 0 y 1, realiza una de las dos acciones descritas (original
-     *      o IA) con probabilidad p de que actúe la IA y p' = (1 - p) de que sea como en el original.
-     *
-     * @param c
-     * @param playerPosX
-     * @param playerPosY
-     */
-    void autoControl(const Configuration &c, float playerPosX, float playerPosY);
 
     /**
      * Inicializa el estado del vehículo. Actualiza la agresividad de la IA del vehículo con un valor aleatorio entre 0
@@ -228,6 +200,29 @@ public:
 
     void drawSmokingPlayer(Configuration& c, const float destW, const float destH, const float widthOri,
                            const float heightOri, const float maxY);
+
+
+    int getVehicleType();
+
+
+    void setFiring(const bool fire);
+
+
+    bool getFiring();
+
+
+    void setFiringSmoke(const bool fireSmoke);
+
+
+    void drawFirePlayer(Configuration& c, const float destW, const float destH, const float widthOri,
+                        const float heightOri, const float maxY);
+
+
+    void drawSmokingFirePlayer(Configuration& c, const float destW, const float destH, const float widthOri,
+                               const float heightOri, const float maxY);
+
+
+    bool getFiringSmoke();
 
 };
 

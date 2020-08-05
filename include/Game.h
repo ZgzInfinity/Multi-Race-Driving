@@ -70,8 +70,11 @@ class Game {
 
     vector<RivalCar> rivals;
 
+    RivalCar goalCar;
+
     float lastY;
     bool vehicleCrash;
+    bool drawingGoalCar;
 
     // Time to play
     int time;
@@ -118,6 +121,12 @@ class Game {
     // Count the time to change the soundtrack
     Clock soundtrackClock;
 
+    // Count the time to reproduce a police car sound
+    Clock policeCarClock;
+
+    // Count the time to reproduce a police car sound
+    Clock policeDriverClock;
+
     // Time to update the clock counter lap
     Time woman_delay;
 
@@ -132,6 +141,12 @@ class Game {
 
     // Time to change a the soundtrack
     Time soundtrack_delay;
+
+    // Time to reproduce a new police car sound
+    Time police_car_delay;
+
+    // Time to reproduce a sound of the police driver
+    Time police_driver_delay;
 
     // Actual level
     int level;
@@ -159,10 +174,9 @@ class Game {
     // Counter time to update the HUD indicators
     float elapsed1, elapsed2, elapsed3, elapsed4,
           elapsed5, elapsed6, elapsed7, elapsed8,
-          elapsed9, elapsed10, elapsed11, elapsed12;
-
-    // Counter of soundtrack updater
-    float elapsed13, elapsed14;
+          elapsed9, elapsed10, elapsed11, elapsed12,
+          elapsed13, elapsed14, elapsed15, elapsed16,
+          elapsed17, elapsed18;
 
     // Vector of textures for represent the game panel
     vector<Texture> textures;
@@ -229,6 +243,30 @@ class Game {
 
 
     vector<float> rankingVehicles;
+
+
+    bool displayGoalCarIndicator;
+
+
+    int lifeGoalCar;
+
+
+    int numCrashesGoalCar;
+
+
+    int lifeLostPerCrash;
+
+
+    int minutesRecord;
+
+
+    int secsRecord;
+
+
+    int centsSecondRecord;
+
+
+    string levelLapRecord;
 
 
     void storingRivalCars(Configuration& c);
@@ -576,6 +614,7 @@ public:
     State selectionCircuitMenu(Configuration& c, SoundPlayer& r);
 
 
+    void showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r);
 };
 
 

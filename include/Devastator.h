@@ -12,7 +12,7 @@ using namespace sf;
 
 namespace Devastator_vehicle {
     const int FORCE_INERTIA = 7;
-    const int PLAYER_TEXTURES = 77;
+    const int PLAYER_TEXTURES = 85;
 }
 
 

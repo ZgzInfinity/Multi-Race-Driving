@@ -105,6 +105,11 @@ class LandScape {
     // Kind of terrain
     int terrain;
 
+    // Texture of the goal car indicator
+    Texture rowGoalCarIndicator;
+
+    // Text indicator of the goal car
+    Text goalCarIndicatorText;
 
 
     /**
@@ -446,7 +451,8 @@ public:
      * @param c is the configuration of the player
      * @param vehicles is the vector with all the traffic cars
      */
-    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame);
+    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame,
+                       RivalCar& goalCar, const bool displayGoalIndicator);
 
 
 

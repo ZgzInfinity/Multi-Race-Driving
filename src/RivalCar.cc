@@ -50,6 +50,8 @@ RivalCar::RivalCar(int typeOfVehicle,float maxSpeed, float speedMul, float scale
     speedFactor = speedMul;
     shoutDone = false;
     smoking = false;
+    firing = false;
+    fireSmoking = false;
 }
 
 
@@ -205,8 +207,6 @@ void RivalCar::setSmoking(){
 float RivalCar::getSmoking() const {
     return smoking;
 }
-
-void RivalCar::autoControl(const Configuration &c, float playerPosX, float playerPosY) {}
 
 
 
@@ -623,7 +623,9 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
                         powerBraking = rand_generator_float(0.001f, 0.01f);
                         if (speed >= 1.4f){
                             speed = sqrt(acc - powerBraking);
-                            smoking = true;
+                            if (!fireSmoking && !firing){
+                                smoking = true;
+                            }
                         }
                         else {
                             speed = 1.4f;
@@ -636,7 +638,9 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
                         powerBraking = rand_generator_float(0.001f, 0.01f);
                         if (speed >= 1.5f){
                             speed = sqrt(acc - powerBraking);
-                            smoking = true;
+                            if (!fireSmoking && !firing){
+                                smoking = true;
+                            }
                         }
                         else {
                             speed = 1.5f;
@@ -658,7 +662,9 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
                         powerBraking = rand_generator_float(0.001f, 0.01f);
                         if (speed >= 1.7f){
                             speed = sqrt(acc - powerBraking);
-                            smoking = true;
+                            if (!fireSmoking && !firing){
+                                smoking = true;
+                            }
                         }
                         else {
                             speed = 1.7f;
@@ -1042,9 +1048,11 @@ bool RivalCar::isVisible(const Configuration &c, float minY, float playerX, floa
 }
 
 
+
 void RivalCar::setOnStraight(){
     onStraight = true;
 }
+
 
 
 void RivalCar::drawSmokingPlayer(Configuration& c, const float destW, const float destH, const float widthOri, const float heightOri,
@@ -1066,6 +1074,81 @@ void RivalCar::drawSmokingPlayer(Configuration& c, const float destW, const floa
     }
 
     sv.setScale(destW / widthOri, destH / heightOri);
-    sv.setPosition(minScreenX - 5.f, maxY);
+    if (vehicleType == 0){
+        sv.setPosition(minScreenX - 5.f, maxY - 5.f);
+    }
+    else {
+        sv.setPosition(minScreenX - 5.f, maxY - 10.f);
+    }
     c.w.draw(sv);
+}
+
+
+
+void RivalCar::drawFirePlayer(Configuration& c, const float destW, const float destH, const float widthOri,
+                              const float heightOri, const float maxY)
+{
+    Sprite sv;
+    switch(vehicleType){
+        case 1:
+            sv.setTexture(textures[77 + current_code_image % 4], true);
+            break;
+        case 2:
+            sv.setTexture(textures[69 + current_code_image % 4], true);
+            break;
+        case 3:
+            sv.setTexture(textures[95 + current_code_image % 4], true);
+    }
+
+    sv.setScale(destW / widthOri, destH / heightOri);
+    sv.setPosition(minScreenX - 35.f, maxY - 30.f);
+    c.w.draw(sv);
+}
+
+
+
+void RivalCar::drawSmokingFirePlayer(Configuration& c, const float destW, const float destH, const float widthOri,
+                                     const float heightOri, const float maxY)
+{
+    Sprite sv;
+    switch(vehicleType){
+        case 1:
+            sv.setTexture(textures[81 + current_code_image % 4], true);
+            break;
+        case 2:
+            sv.setTexture(textures[73 + current_code_image % 4], true);
+            break;
+        case 3:
+            sv.setTexture(textures[99 + current_code_image % 4], true);
+    }
+
+    sv.setScale(destW / widthOri, destH / heightOri);
+    sv.setPosition(minScreenX - 35.f, maxY - 30.f);
+    c.w.draw(sv);
+}
+
+
+int RivalCar::getVehicleType(){
+    return vehicleType;
+}
+
+
+
+void RivalCar::setFiring(const bool fire){
+    firing = fire;
+}
+
+
+bool RivalCar::getFiring(){
+    return firing;
+}
+
+
+void RivalCar::setFiringSmoke(const bool fireSmoke){
+    fireSmoking = fireSmoke;
+}
+
+
+bool RivalCar::getFiringSmoke(){
+    return fireSmoking;
 }

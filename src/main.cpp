@@ -186,6 +186,7 @@ int main() {
                     // Get the type of game selected by the user
                     int typeOfGame = engine.typeGame();
                     state = gameModesMenu(c, r, typeOfGame);
+
                     // Assign the type of game selected by the user
                     engine.setTypeOfGame(typeOfGame);
                     break;

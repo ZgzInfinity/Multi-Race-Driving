@@ -16,6 +16,7 @@ Police::Police(float maxSpeed, float speedMul, float accInc, float scaleX, float
                                                  firstCrash(true), firstTurnLeft(true),
                                                  firstTurnRight(true)
 {
+    topSpeed = maxSpeed;
     mode = -1;
     brand = brandName;
     motor = motorName;
@@ -208,12 +209,14 @@ Vehicle::Direction Police::rotationControl(Configuration &c, float curveCoeffici
     if (speed > 0.0f) {
         if (isFinalMap && limitMap - posY <= 150.f){
             if (posX > 0.f){
+                previousX = posX;
                 posX -= 0.02f;
                 if (posX < 0.0f){
                     posX = 0.0f;
                 }
             }
             else if (posX < 0.0f) {
+                previousX = posX;
                 posX += 0.02f;
                 if (posX > 0.0f){
                     posX = 0.0f;
@@ -221,10 +224,14 @@ Vehicle::Direction Police::rotationControl(Configuration &c, float curveCoeffici
             }
         }
         else {
-            if (speed < 0.66f * maxSpeed)
+            if (speed < 0.66f * maxSpeed){
+                previousX = posX;
                 posX -= angleTurning * curveCoefficient * sqrt(speed / 2.0f) * speed / maxSpeed;
-            else
+            }
+            else {
+                previousX = posX;
                 posX -= angleTurning * curveCoefficient * sqrt(speed) * speed / maxSpeed;
+            }
 
             if (abs(curveCoefficient) >= 0.33f && speed >= 0.66f * maxSpeed)
                 skidding = true;
@@ -237,13 +244,18 @@ Vehicle::Direction Police::rotationControl(Configuration &c, float curveCoeffici
                     if (curveCoefficient > 0.0f)
                         skidding = false;
 
-                    if (speed < halfMaxSpeed)
+                    if (speed < halfMaxSpeed){
+                        previousX = posX;
                         posX -= 1.5f * angleTurning * speed / maxSpeed;
-                    else if (curveCoefficient == 0.0f)
+                    }
+                    else if (curveCoefficient == 0.0f){
+                        previousX = posX;
                         posX -= 1.25f * angleTurning * speed / maxSpeed;
-                    else
+                    }
+                    else {
+                        previousX = posX;
                         posX -= angleTurning * speed / maxSpeed;
-
+                    }
                     return TURNLEFT;
                 }
             } else if (Keyboard::isKeyPressed(c.rightKey)) {
@@ -254,13 +266,18 @@ Vehicle::Direction Police::rotationControl(Configuration &c, float curveCoeffici
                     if (curveCoefficient < 0.0f)
                         skidding = false;
 
-                    if (speed < halfMaxSpeed)
+                    if (speed < halfMaxSpeed) {
+                        previousX = posX;
                         posX += 1.5f * angleTurning * speed / maxSpeed;
-                    else if (curveCoefficient == 0.0f)
+                    }
+                    else if (curveCoefficient == 0.0f) {
+                        previousX = posX;
                         posX += 1.25f * angleTurning * speed / maxSpeed;
-                    else
+                    }
+                    else {
+                        previousX = posX;
                         posX += angleTurning * speed / maxSpeed;
-
+                    }
                     return TURNRIGHT;
                 }
             } else if (inertia > 0) {
@@ -645,4 +662,25 @@ void Police::setModeCollision(){
 
 float Police::getHalfMaxSpeed(){
     return halfMaxSpeed;
+}
+
+
+float Police::getAngle(){
+    return angleTurning;
+}
+
+
+
+void Police::setVehicle(const int typeOfGame){
+    Vehicle::setVehicle(typeOfGame);
+    acceleration = 0.0f;
+    minCrashAcc = 0.0f;
+    inertia = 0.0f;
+    xDest = 0.0f;
+    accInc = topSpeed * ACCELERATION_INCREMENT / MAX_SPEED;
+    smoking = false;
+    skidding = false;
+    firstCrash = true;
+    firstTurnLeft = true;
+    firstTurnRight = true;
 }
