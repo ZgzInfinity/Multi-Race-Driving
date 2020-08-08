@@ -66,7 +66,8 @@ class RivalCar : public Vehicle {
     enum TypeAI {
         OBSTACLE,
         EVASIVE,
-        INCONSTANT
+        INCONSTANT,
+        MANIAC
     };
 
     TypeAI typeAI;
@@ -124,7 +125,7 @@ public:
      * Actualiza la agresividad de la IA del vehículo con un valor aleatorio entre 0 y maxAggressiveness.
      * @param maxAggressiveness, 0 <= maxAggressiveness <= 1
      */
-    void setAI(float maxAggressiveness, const Difficult& difficulty);
+    void setAI(float maxAggressiveness, const Difficult& difficulty, const int typeOfGame);
 
     /**
      * Actualiza el sprite del vehículo enemigo.

@@ -61,7 +61,7 @@ void Game::storingRivalCars(Configuration& c){
                              positX, positY, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3,
                              8, 17, 22, 9, 14, 23, 28, 7, 13, 7, 13, 21, 27, 21, 27, 1.15f);
 
-                v.setAI(c.maxAggressiveness, c.level);
+                v.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 rivals.push_back(v);
                 break;
             case 1:
@@ -69,7 +69,7 @@ void Game::storingRivalCars(Configuration& c){
                              positX, positY, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22, 5, 8, 23, 26, 9, 12, 27, 30, 13, 14,
                              31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24, 28, 33, 35, 1.85f);
 
-                v.setAI(c.maxAggressiveness, c.level);
+                v.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 rivals.push_back(v);
                 break;
             case 2:
@@ -77,7 +77,7 @@ void Game::storingRivalCars(Configuration& c){
                              positX, positY, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
                              11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.75f);
 
-                v.setAI(c.maxAggressiveness, c.level);
+                v.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 rivals.push_back(v);
                 break;
             case 3:
@@ -85,7 +85,7 @@ void Game::storingRivalCars(Configuration& c){
                              positX, positY, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
                              43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 2.02f);
 
-                v.setAI(c.maxAggressiveness, c.level);
+                v.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 rivals.push_back(v);
         }
         // Update the position of the staring vehicles
@@ -640,21 +640,23 @@ void Game::showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c) {
 
     float speed = 0.f;
 
-    switch(typeOfVehicle){
-        case 0:
-            speed = player.getRealSpeed();
-            break;
-        case 1:
-            speed = player2.getRealSpeed();
-            break;
-        case 2:
-            speed = player3.getRealSpeed();
-            break;
-        case 3:
-            speed = player4.getRealSpeed();
-            break;
-        case 4:
-            speed = player5.getRealSpeed();
+    if (typeOfGame == 3){
+        speed = player5.getRealSpeed();
+    }
+    else {
+        switch(typeOfVehicle){
+            case 0:
+                speed = player.getRealSpeed();
+                break;
+            case 1:
+                speed = player2.getRealSpeed();
+                break;
+            case 2:
+                speed = player3.getRealSpeed();
+                break;
+            case 3:
+                speed = player4.getRealSpeed();
+        }
     }
 
     textures[2].loadFromFile("Data/Hud/3.png",
@@ -679,22 +681,25 @@ void Game::showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c) {
 
     string strSpeed;
 
-    switch(typeOfVehicle){
-    case 0:
-       strSpeed = to_string(player.getRealSpeed());
-       break;
-    case 1:
-        strSpeed = to_string(player2.getRealSpeed());
-        break;
-    case 2:
-        strSpeed = to_string(player3.getRealSpeed());
-        break;
-    case 3:
-        strSpeed = to_string(player4.getRealSpeed());
-        break;
-    case 4:
+    if (typeOfGame == 3){
         strSpeed = to_string(player5.getRealSpeed());
     }
+    else {
+        switch(typeOfVehicle){
+            case 0:
+               strSpeed = to_string(player.getRealSpeed());
+               break;
+            case 1:
+                strSpeed = to_string(player2.getRealSpeed());
+                break;
+            case 2:
+                strSpeed = to_string(player3.getRealSpeed());
+                break;
+            case 3:
+                strSpeed = to_string(player4.getRealSpeed());
+            }
+    }
+
 
     sText.setString(strSpeed.substr(0, strSpeed.find('.')));
     c.w.draw(sText);
@@ -739,70 +744,86 @@ void Game::showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c) {
     initial = separation + s.getGlobalBounds().width + separation;
 
     if (typeOfGame == 1){
+        // Score of the player displayed in the panel
         c.w.draw(s);
-    }
-
-    Text recordText;
-    recordText.setFont(c.fontTimeToPlay);
-    recordText.setString(to_string(int(BONIFICATION) * 100));
-    recordText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-    recordText.setFillColor(Color::Green);
-    recordText.setOutlineColor(Color::Black);
-    recordText.setOutlineThickness(3.0f * c.screenScale);
-    recordText.setString("LEVEL RECORD");
-
-    // Initialize the HUD indicator of score
-    // Score of the player displayed in the panel
-    Text textScore;
-    textScore.setFont(c.fontTimeToPlay);
-    textScore.setString(to_string(int(BONIFICATION) * 100));
-    textScore.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-    textScore.setFillColor(Color(183, 164, 190));
-    textScore.setOutlineColor(Color::Black);
-    textScore.setOutlineThickness(3.0f * c.screenScale);
-
-    if (typeOfGame == 1){
+        Text textScore;
+        textScore.setFont(c.fontTimeToPlay);
+        textScore.setString(to_string(int(BONIFICATION) * 100));
+        textScore.setCharacterSize(static_cast<unsigned int>(int(27.0f * c.screenScale)));
+        textScore.setFillColor(Color(183, 164, 190));
+        textScore.setOutlineColor(Color::Black);
+        textScore.setOutlineThickness(3.0f * c.screenScale);
         textScore.setString(to_string(score));
         textScore.setPosition(initial * 4.95f - textScore.getLocalBounds().width, up - 0.5f * float(textScore.getCharacterSize()));
+        c.w.draw(textScore);
     }
     else {
-        recordText.setPosition(initial * 5.50f - recordText.getLocalBounds().width, up - 1.7f * float(recordText.getCharacterSize()));
-        textScore.setString(levelLapRecord);
-        textScore.setPosition(initial * 5.25f - textScore.getLocalBounds().width, up - 0.5f * float(textScore.getCharacterSize()));
-        c.w.draw(recordText);
-    }
-
-    c.w.draw(textScore);
-
-    // Add the distance tool bar if it's driving fury or Derramage mode
-    if (typeOfGame == 3 || typeOfGame == 4){
-
-        Text distanceText;
-        distanceText.setFont(c.fontTimeToPlay);
-        distanceText.setString(to_string(int(BONIFICATION) * 100));
-        distanceText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        distanceText.setFillColor(Color(60, 235, 102));
-        distanceText.setOutlineColor(Color::Black);
-        distanceText.setOutlineThickness(3.0f * c.screenScale);
-        distanceText.setString("DISTANCE");
-        distanceText.setPosition(initial * 5.6f - distanceText.getLocalBounds().width, up * 2.5f - 2.6f * float(distanceText.getCharacterSize()));
-        c.w.draw(distanceText);
-
-        // Draw the rectangle
-        RectangleShape shape;
-        shape.setPosition(initial * 5.14f, up * 2.25f);
-        if (c.isDefaultScreen){
-            shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * float(c.w.getSize().y) / DEFAULT_HEIGHT));
-        }
-        else {
-            shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * float(c.w.getSize().y) / DEFAULT_HEIGHT * 0.95f));
-        }
-        shape.setOutlineColor(Color::Black);
-        shape.setOutlineThickness(3.0f * c.screenScale);
-        shape.setFillColor(Color(119, 195, 187));
-        c.w.draw(shape);
+        // Check point indicator
+        Text checkPoint;
+        checkPoint.setFont(c.fontTimeToPlay);
+        checkPoint.setCharacterSize(static_cast<unsigned int>(int(27.0f * c.screenScale)));
+        checkPoint.setFillColor(Color::White);
+        checkPoint.setOutlineColor(Color::Black);
+        checkPoint.setOutlineThickness(3.0f * c.screenScale);
 
         if (typeOfGame == 3){
+            checkPoint.setString("DISTANCE TO CRIMINAL");
+            checkPoint.setPosition(initial * 3.6f, up - 1.8f * float(checkPoint.getCharacterSize()));
+        }
+        else {
+            checkPoint.setString("DISTANCE TO RIVAL");
+            checkPoint.setPosition(initial * 3.8f, up - 1.8f * float(checkPoint.getCharacterSize()));
+        }
+        c.w.draw(checkPoint);
+
+        // Distance to the next checkpoint
+        Text distanceCheckPoint;
+        distanceCheckPoint.setFont(c.fontTimeToPlay);
+        distanceCheckPoint.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+
+        // Check the color of the distance indicator
+        if (distanceGoalCar >= 100){
+            distanceCheckPoint.setFillColor(Color::Green);
+        }
+        else if (distanceGoalCar < 100 && distanceGoalCar >= 50){
+            distanceCheckPoint.setFillColor(Color::Yellow);
+        }
+        else if (distanceGoalCar < 50){
+            distanceCheckPoint.setFillColor(Color::Red);
+        }
+
+        if (updatedGoalCar){
+            distanceCheckPoint.setString("CALCULATING");
+            distanceCheckPoint.setFillColor(Color(183, 164, 190));
+            distanceCheckPoint.setPosition(initial * 5.2f - distanceCheckPoint.getLocalBounds().width,
+                                       up - 0.5f * float(distanceCheckPoint.getCharacterSize()));
+        }
+        else {
+            distanceCheckPoint.setString(to_string(distanceGoalCar) + " KM");
+            distanceCheckPoint.setPosition(initial * 5.f - distanceCheckPoint.getLocalBounds().width,
+                                       up - 0.5f * float(distanceCheckPoint.getCharacterSize()));
+        }
+
+        distanceCheckPoint.setOutlineColor(Color::Black);
+        distanceCheckPoint.setOutlineThickness(3.0f * c.screenScale);
+        c.w.draw(distanceCheckPoint);
+    }
+
+    bool drawHealthIndicator = false;
+
+    if (typeOfGame == 3){
+        if (c.enablePixelArt){
+            if (distanceGoalCar <= 30.f){
+                drawHealthIndicator = true;
+            }
+        }
+        else {
+            if (distanceGoalCar <= 120.f){
+                drawHealthIndicator = true;
+            }
+        }
+
+        if (drawHealthIndicator){
             Text healthText;
             healthText.setFont(c.fontTimeToPlay);
             healthText.setString(to_string(int(BONIFICATION) * 100));
@@ -815,6 +836,7 @@ void Game::showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c) {
             c.w.draw(healthText);
 
             // Draw the rectangle
+            RectangleShape shape;
             shape.setPosition(initial / 2.0f, up * 2.25f);
             if (c.isDefaultScreen){
                 shape.setSize(sf::Vector2f(40.0f * c.screenScale, 420.0f * float(c.w.getSize().y) / DEFAULT_HEIGHT));
@@ -1652,34 +1674,6 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     }
 
     mapId = make_pair(0, 0);
-
-    // Back door
-    int bdTime = 0;
-    ifstream fin("Data/backdoor.info");
-    if (fin.is_open()) {
-        int bdMap = 1;
-        while (!fin.eof()) {
-            string s;
-            fin >> s;
-            if (s == "MAP:" && !fin.eof()) {
-                fin >> bdMap;
-                if (bdMap > 0 && bdMap <= 15) {
-                    for (int i = 1; i < bdMap; i++) {
-                        if (mapId.second < mapId.first) {
-                            mapId.second++;
-                        } else {
-                            mapId.second = 0;
-                            mapId.first++;
-                        } // Level????????????????????????
-                    }
-                }
-            } else if (s == "TIME:" && !fin.eof()) {
-                fin >> bdTime;
-            }
-        }
-        fin.close();
-    }
-
     currentMap = &maps[mapId.first][mapId.second];
     if (mapId.first < 4)
         currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
@@ -1694,12 +1688,21 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
 
     score = 0;
     level = mapId.first + 1;
-    time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
+    time = int(float(currentMap->getTimeToPlay()) * timeMul);
 
     if (typeOfGame == 3){
         string path = "Data/Vehicles/Police/Configuration/Configuration.xml";
         string brandName, motorName;
         float max_speed, angle;
+        updatedGoalCar = false;
+        maxDistance = 1000;
+        distanceGoalCar = maxDistance;
+
+        totalStages = 3;
+        currentStage = 1;
+        goalCarStage = 2;
+        currentLandScape = 0;
+        typeOfVehicle = 4;
 
         // Load the properties of the police car
         loadVehicleProperties(path , brandName, max_speed, angle, motorName);
@@ -1718,26 +1721,27 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
         switch(vehicle){
             case 1:
                 goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Devastators/Devastator" +
-                             to_string(colorVehicle + 1), 0.f, 0.f, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
+                             to_string(colorVehicle + 1), 0.f, maxDistance, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
                              5, 8, 23, 26, 9, 12, 27, 30, 13, 14, 31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24,
                              28, 33, 35, 1.55f);
 
-                goalCar.setAI(c.maxAggressiveness, c.level);
+                goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 break;
             case 2:
                 goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Minivans/Minivan" + to_string(colorVehicle + 1),
-                             0.f, 0.f, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
+                             0.f, maxDistance, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
                              11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.45f);
 
-                goalCar.setAI(c.maxAggressiveness, c.level);
+                goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 break;
             case 3:
                 goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "Data/Vehicles/Trucks/Truck" + to_string(colorVehicle + 1),
-                             0.f, 0.f, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
+                             0.f, maxDistance, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
                              43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.50f);
 
-                goalCar.setAI(c.maxAggressiveness, c.level);
+                goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
         }
+
         displayGoalCarIndicator = true;
         lifeGoalCar = 100;
 
@@ -1769,16 +1773,17 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
             case HARD:
                 path += "Hard.xml";
         }
-
-        // Read the best mark of the level
-        readRecordFromLandScape(path, name, minutesRecord, secsRecord, centsSecondRecord);
-
-        levelLapRecord = "";
-        levelLapRecord = (minutesRecord < 10) ? "0" + to_string(int(minutesRecord)) + ":" : to_string(int(minutesRecord)) + ":";
-        levelLapRecord += (secsRecord < 10) ? "0" + to_string(int(secsRecord)) + ":" : to_string(int(secsRecord)) + ":";
-        levelLapRecord += (centsSecondRecord < 10) ? "0" + to_string(centsSecondRecord) : to_string(centsSecondRecord);
     }
     else if (typeOfGame == 4) {
+        updatedGoalCar = false;
+        maxDistance = 1000;
+        distanceGoalCar = maxDistance;
+        distanceAdvanced = maxDistance;
+
+        totalStages = 3;
+        currentStage = 1;
+        goalCarStage = 2;
+        currentLandScape = 0;
 
         // Select a color to the type of vehicle chosen
         int colorVehicle = rand_generator_int(0, 7);
@@ -1788,11 +1793,11 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
 
             // Load a Motorbike to chase
             goalCar = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 2.5f, COUNTER, "Data/Vehicles/Motorbikes/Motorbike" +
-                               to_string(colorVehicle + 1), 0.f, 0.f, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16,
+                               to_string(colorVehicle + 1), 0.f, maxDistance, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16,
                                3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 7, 13, 7, 13, 21, 27,
                                21, 27, 0.85f);
 
-            goalCar.setAI(c.maxAggressiveness, c.level);
+            goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
         }
         else {
             // Select a vehicle to chase
@@ -1802,25 +1807,25 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
             switch(vehicle){
                 case 1:
                     goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Devastators/Devastator" +
-                                 to_string(colorVehicle + 1), 0.f, 0.f, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
+                                 to_string(colorVehicle + 1), 0.f, maxDistance, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
                                  5, 8, 23, 26, 9, 12, 27, 30, 13, 14, 31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24,
                                  28, 33, 35, 1.55f);
 
-                    goalCar.setAI(c.maxAggressiveness, c.level);
+                    goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                     break;
                 case 2:
                     goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Minivans/Minivan" + to_string(colorVehicle + 1),
-                                 0.f, 0.f, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
+                                 0.f, maxDistance, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
                                  11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.45f);
 
-                    goalCar.setAI(c.maxAggressiveness, c.level);
+                    goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                     break;
                 case 3:
                     goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "Data/Vehicles/Trucks/Truck" + to_string(colorVehicle + 1),
-                                 0.f, 0.f, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
+                                 0.f, maxDistance, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
                                  43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.50f);
 
-                    goalCar.setAI(c.maxAggressiveness, c.level);
+                    goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
             }
         }
         displayGoalCarIndicator = true;
@@ -1853,14 +1858,6 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
             case HARD:
                 path += "Hard.xml";
         }
-
-        // Read the best mark of the level
-        readRecordFromLandScape(path, name, minutesRecord, secsRecord, centsSecondRecord);
-
-        levelLapRecord = "";
-        levelLapRecord = (minutesRecord < 10) ? "0" + to_string(int(minutesRecord)) + ":" : to_string(int(minutesRecord)) + ":";
-        levelLapRecord += (secsRecord < 10) ? "0" + to_string(int(secsRecord)) + ":" : to_string(int(secsRecord)) + ":";
-        levelLapRecord += (centsSecondRecord < 10) ? "0" + to_string(centsSecondRecord) : to_string(centsSecondRecord);
     }
 
     goalCar.setSmoking();
@@ -1885,7 +1882,7 @@ void Game::checkDifficulty(Configuration &c) {
             numCars = 0;
             timeMul = 1.1f;
             scoreMul = 0.25f;
-            numCrashesGoalCar = 12;
+            numCrashesGoalCar = 6;
             lifeLostPerCrash = int(100 / numCrashesGoalCar);
             if (c.enableAI){
                 c.maxAggressiveness = 0.0f;
@@ -1895,7 +1892,7 @@ void Game::checkDifficulty(Configuration &c) {
             numCars = 3;
             timeMul = 1.1f;
             scoreMul = 0.5f;
-            numCrashesGoalCar = 10;
+            numCrashesGoalCar = 7;
             lifeLostPerCrash = int(100 / numCrashesGoalCar);
             if (c.enableAI){
                 c.maxAggressiveness = 0.25f;
@@ -1905,7 +1902,7 @@ void Game::checkDifficulty(Configuration &c) {
             numCars = 8;
             timeMul = 1.0f;
             scoreMul = 1.0f;
-            numCrashesGoalCar = 16;
+            numCrashesGoalCar = 9;
             lifeLostPerCrash = int(100 / numCrashesGoalCar);
             if (c.enableAI){
                 c.maxAggressiveness = 0.5f;
@@ -1916,7 +1913,7 @@ void Game::checkDifficulty(Configuration &c) {
             numCars = 10;
             timeMul = 0.9f;
             scoreMul = 1.5f;
-            numCrashesGoalCar = 24;
+            numCrashesGoalCar = 11;
             lifeLostPerCrash = int(100 / numCrashesGoalCar);
             if (c.enableAI){
                 c.maxAggressiveness = 0.75f;
@@ -1936,18 +1933,34 @@ void Game::checkDifficulty(Configuration &c) {
     }
     else if ((int)cars.size() < numCars) {
         const int maxSprites = 6;
-        const float vehicleScales[maxSprites] = {1.5f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f};
-        for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
-
-            if (1 + i % maxSprites == 4){
-                TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                    "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
-                cars.push_back(v);
+        if (typeOfGame != 0 && typeOfGame != 2){
+            const float vehicleScales[maxSprites] = {1.3f, 1.8f, 1.8f, 1.8f, 1.8f, 1.8f};
+            for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
+                if (1 + i % maxSprites == 4){
+                    TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                    cars.push_back(v);
+                }
+                else {
+                    TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                    cars.push_back(v);
+                }
             }
-            else {
-                TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                    "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
-                cars.push_back(v);
+        }
+        else {
+            const float vehicleScales[maxSprites] = {1.9f, 2.4f, 2.4f, 2.4f, 2.4f, 2.4f};
+            for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
+                if (1 + i % maxSprites == 4){
+                    TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                    cars.push_back(v);
+                }
+                else {
+                    TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                    cars.push_back(v);
+                }
             }
         }
     }
@@ -2298,6 +2311,7 @@ State Game::playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r) {
     }
 
     while (!finalGame && !arrival && c.window.isOpen()) {
+
         // Detect the possible events
         Event e{};
         while (c.window.pollEvent(e)){
@@ -2397,35 +2411,43 @@ State Game::playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r) {
             if ((typeOfGame == 3 || typeOfGame == 4)){
                 // Check if a tenth of second has passed between both timestamps
                 if (c.enablePixelArt){
-                    if  (goalCar.getPosY() - posY <= 30.f){
+                    if  (goalCar.getPosY() - posY <= 30.f && currentLandScape >= goalCarStage){
                         // Dont display the goal car indicator
                         displayGoalCarIndicator = false;
+
+                        if (!goalNearCar){
+                            goalNearCar = true;
+                            r.soundEffects[105]->stop();
+                            r.soundEffects[105]->play();
+                        }
                     }
                     else {
                         // Dont display the goal car indicator
                         displayGoalCarIndicator = true;
-
-                        r.soundEffects[105]->stop();
-                        r.soundEffects[105]->play();
+                        goalNearCar = false;
                     }
                 }
                 else {
-                    if (goalCar.getPosY() - posY <= 120.f){
+                    if (goalCar.getPosY() - posY <= 120.f && currentLandScape >= goalCarStage){
                         // Dont display the goal car indicator
                         displayGoalCarIndicator = false;
+
+                        if (!goalNearCar){
+                            goalNearCar = true;
+                            r.soundEffects[105]->stop();
+                            r.soundEffects[105]->play();
+                        }
                     }
                     else {
                         // Dont display the goal car indicator
                         displayGoalCarIndicator = true;
-
-                        r.soundEffects[105]->stop();
-                        r.soundEffects[105]->play();
+                        goalNearCar = false;
                     }
                 }
             }
 
             // Check the possible police car sounds
-            if (typeOfGame == 3 && !displayGoalCarIndicator){
+            if (typeOfGame == 3 && !displayGoalCarIndicator && currentLandScape >= goalCarStage){
                 // Check if the police car sound has to be reproduced
                 elapsed16 = policeCarClock.getElapsedTime().asSeconds();
 
@@ -2486,7 +2508,13 @@ State Game::playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r) {
     }
 
     mtx.lock();
-    finalGame = false;
+    if (finalGame){
+        finalGame = false;
+        mtx.unlock();
+        if (typeOfGame == 3 || typeOfGame == 4){
+            return START;
+        }
+    }
     if (arrival) {
         arrival = false;
         mtx.unlock();
@@ -2617,7 +2645,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     for (int i = 255; i >= 0; i -= 15){
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -2733,123 +2761,211 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     // Detect the possible events
     Event e;
 
-    for (int i = 0; i < 3; i++) {
+    if (typeOfGame != 3){
+        for (int i = 0; i < 3; i++) {
 
-        // Detect the possible events
-        while (c.window.pollEvent(e)) {
-            if (e.type == Event::Closed) {
-                return EXIT;
+            // Detect the possible events
+            while (c.window.pollEvent(e)) {
+                if (e.type == Event::Closed) {
+                    return EXIT;
+                }
+            }
+
+            // Draw map
+            c.w.clear();
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
+
+            switch(typeOfVehicle){
+                case 0:
+                    player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
+                    break;
+                case 1:
+                    player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
+                    break;
+                case 2:
+                    player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
+                    break;
+                case 3:
+                    player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
+                    break;
+                case 4:
+                    player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
+            }
+
+
+            // Draw the HUD of the game
+            if (typeOfGame == 0 || typeOfGame == 2){
+                showHudInterfaceWorldTourPolePosition(c);
+            }
+            else {
+                showHudInterfaceOutRunDrivingFuryDerramage(c);
+            }
+
+            // Draw the semaphore
+            if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+                Sprite s;
+                s.setTexture(textures[4 + i], true);
+                s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+                s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                                     c.w.getSize().y / 2.f - 180.0f * c.screenScale);
+                c.w.draw(s);
+            }
+
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+
+            // Flagger
+            if (i == 2) {
+                for (; ms > 0; ms -= 200) {
+                    sleep(milliseconds(200));
+
+                    currentMap->addMapElelementIndex(flagger, false);
+
+                    // Draw map
+                    c.w.clear();
+                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
+
+                    switch(typeOfVehicle){
+                        case 0:
+                            player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
+                            break;
+                        case 1:
+                            player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
+                            break;
+                        case 2:
+                            player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
+                            break;
+                        case 3:
+                            player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
+                            break;
+                        case 4:
+                            player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
+                    }
+
+                    // Draw the HUD of the game
+                    if (typeOfGame == 0 || typeOfGame == 2){
+                        showHudInterfaceWorldTourPolePosition(c);
+                    }
+                    else {
+                        showHudInterfaceOutRunDrivingFuryDerramage(c);
+                    }
+
+                    // Draw the semaphore
+                    if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+                        Sprite s;
+                        s.setTexture(textures[4 + i], true);
+                        s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
+                        s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                                             c.w.getSize().y / 2.f - 180.0f * c.screenScale);
+                        c.w.draw(s);
+                    }
+
+                    bufferSprite.setTexture(c.w.getTexture(), true);
+                    c.w.display();
+                    c.window.draw(bufferSprite);
+                    c.window.display();
+                }
+            }
+
+            // Change semaphore state
+            if (ms > 0) {
+                sleep(milliseconds(ms));
+                r.soundEffects[4]->stop();
+                r.soundEffects[4]->play();
+            }
+            currentMap->addMapElelementIndex(semaphore, false);
+            r.soundEffects[5]->stop();
+            r.soundEffects[5]->play();
+
+        }
+    }
+    else {
+
+        Font f;
+        f.loadFromFile("Data/Fonts/Hetikademo.otf");
+
+        Text indicatorStart;
+        indicatorStart.setFont(f);
+        indicatorStart.setString("READY");
+        indicatorStart.setCharacterSize(static_cast<unsigned int>(int(55.0f * c.screenScale)));
+        indicatorStart.setFillColor(Color::Green);
+        indicatorStart.setOutlineColor(Color(12, 12, 12));
+        indicatorStart.setOutlineThickness(3.0f * c.screenScale);
+
+        for (int i = 0; i < 3; i++){
+            // Detect the possible events
+            while (c.window.pollEvent(e)) {
+                if (e.type == Event::Closed) {
+                    return EXIT;
+                }
+            }
+
+            if (i == 0){
+                r.soundEffects[111]->stop();
+                r.soundEffects[111]->play();
+            }
+            else if (i == 1){
+                indicatorStart.setString("SET");
+                r.soundEffects[112]->stop();
+                r.soundEffects[112]->play();
+            }
+            else if (i == 2){
+                indicatorStart.setString("GO");
+                r.soundEffects[113]->stop();
+                r.soundEffects[113]->play();
+            }
+
+            indicatorStart.setPosition(c.w.getSize().x / 2.f - indicatorStart.getLocalBounds().width / 2.f,
+                                       c.w.getSize().y / 2.f - 230.0f * c.screenScale);
+
+            // Draw map
+            c.w.clear();
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
+
+            switch(typeOfVehicle){
+                case 0:
+                    player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
+                    break;
+                case 1:
+                    player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
+                    break;
+                case 2:
+                    player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
+                    break;
+                case 3:
+                    player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
+                    break;
+                case 4:
+                    player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
+            }
+
+
+            // Draw the HUD of the game
+            if (typeOfGame == 0 || typeOfGame == 2){
+                showHudInterfaceWorldTourPolePosition(c);
+            }
+            else {
+                showHudInterfaceOutRunDrivingFuryDerramage(c);
+            }
+
+            c.w.draw(indicatorStart);
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+
+            if (i == 0){
+                while (r.soundEffects[111]->getStatus() != SoundSource::Stopped){}
+            }
+            else if (i == 1){
+                while (r.soundEffects[112]->getStatus() != SoundSource::Stopped){}
+            }
+            else if (i == 2){
+                while (r.soundEffects[113]->getStatus() != SoundSource::Stopped){}
             }
         }
-
-        // Draw map
-        c.w.clear();
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
-
-        switch(typeOfVehicle){
-            case 0:
-                player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
-                break;
-            case 1:
-                player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
-                break;
-            case 2:
-                player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
-                break;
-            case 3:
-                player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
-                break;
-            case 4:
-                player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
-        }
-
-
-        // Draw the HUD of the game
-        if (typeOfGame == 0 || typeOfGame == 2){
-            showHudInterfaceWorldTourPolePosition(c);
-        }
-        else {
-            showHudInterfaceOutRunDrivingFuryDerramage(c);
-        }
-
-        // Draw the semaphore
-        if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
-            Sprite s;
-            s.setTexture(textures[4 + i], true);
-            s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
-            s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
-                                 c.w.getSize().y / 2.f - 180.0f * c.screenScale);
-            c.w.draw(s);
-        }
-
-        bufferSprite.setTexture(c.w.getTexture(), true);
-        c.w.display();
-        c.window.draw(bufferSprite);
-        c.window.display();
-
-        // Flagger
-        if (i == 2) {
-            for (; ms > 0; ms -= 200) {
-                sleep(milliseconds(200));
-
-                currentMap->addMapElelementIndex(flagger, false);
-
-                // Draw map
-                c.w.clear();
-                currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
-
-                switch(typeOfVehicle){
-                    case 0:
-                        player.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player.getPosY()), -1);
-                        break;
-                    case 1:
-                        player2.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player2.getPosY()), -1);
-                        break;
-                    case 2:
-                        player3.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player3.getPosY()), -1);
-                        break;
-                    case 3:
-                        player4.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player4.getPosY()), -1);
-                        break;
-                    case 4:
-                        player5.draw(c, r, Vehicle::Action::NONE, Vehicle::Direction::RIGHT, currentMap->getElevation(player5.getPosY()), -1);
-                }
-
-                // Draw the HUD of the game
-                if (typeOfGame == 0 || typeOfGame == 2){
-                    showHudInterfaceWorldTourPolePosition(c);
-                }
-                else {
-                    showHudInterfaceOutRunDrivingFuryDerramage(c);
-                }
-
-                // Draw the semaphore
-                if (typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
-                    Sprite s;
-                    s.setTexture(textures[4 + i], true);
-                    s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
-                    s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
-                                         c.w.getSize().y / 2.f - 180.0f * c.screenScale);
-                    c.w.draw(s);
-                }
-
-                bufferSprite.setTexture(c.w.getTexture(), true);
-                c.w.display();
-                c.window.draw(bufferSprite);
-                c.window.display();
-            }
-        }
-
-        // Change semaphore state
-        if (ms > 0) {
-            sleep(milliseconds(ms));
-            r.soundEffects[4]->stop();
-            r.soundEffects[4]->play();
-        }
-        currentMap->addMapElelementIndex(semaphore, false);
-        r.soundEffects[5]->stop();
-        r.soundEffects[5]->play();
-
     }
 
     // Draw the semaphore
@@ -2960,7 +3076,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 place = "EIGHT PLACE";
         }
 
-        // Store the position
+
         positionText.setString(place);
         positionText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
         positionText.setFont(c.fontTimeToPlay);
@@ -2995,6 +3111,20 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
         r.soundEffects[54]->stop();
         r.soundEffects[54]->play();
     }
+    else if (typeOfGame == 3 || typeOfGame == 4){
+        r.soundEffects[45]->stop();
+        r.soundEffects[45]->play();
+
+        positionText.setString("MISSION FAILED");
+        positionText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+        positionText.setFont(c.fontTimeToPlay);
+        positionText.setStyle(Text::Bold);
+        positionText.setFillColor(Color::White);
+        positionText.setOutlineColor(Color::Black);
+        positionText.setOutlineThickness(5.0f * c.screenScale);
+        positionText.setPosition((c.w.getSize().x / 2.f) - (positionText.getLocalBounds().width / 2.f),
+                                 c.w.getSize().y / 2.f - 15.f * c.screenScale);
+    }
 
     // Hide enemies
     for (TrafficCar &v : cars)
@@ -3013,26 +3143,29 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
     int position = 0;
 
-    switch(typeOfVehicle){
-        case 0:
-            player.setPosition(player.getPosX(), 5.f);
-            position = int(player.getPosY());
-            break;
-        case 1:
-            player2.setPosition(player2.getPosX(), 5.f);
-            position = int(player2.getPosY());
-            break;
-        case 2:
-            player3.setPosition(player3.getPosX(), 5.f);
-            position = int(player3.getPosY());
-            break;
-        case 3:
-            player4.setPosition(player4.getPosX(), 5.f);
-            position = int(player4.getPosY());
-            break;
-        case 4:
-            player5.setPosition(player5.getPosX(), 5.f);
-            position = int(player5.getPosY());
+    if (typeOfGame == 3){
+        player5.setPosition(player5.getPosX(), 5.f);
+        position = int(player5.getPosY());
+    }
+    else {
+        switch(typeOfVehicle){
+            case 0:
+                player.setPosition(player.getPosX(), 5.f);
+                position = int(player.getPosY());
+                break;
+            case 1:
+                player2.setPosition(player2.getPosX(), 5.f);
+                position = int(player2.getPosY());
+                break;
+            case 2:
+                player3.setPosition(player3.getPosX(), 5.f);
+                position = int(player3.getPosY());
+                break;
+            case 3:
+                player4.setPosition(player4.getPosX(), 5.f);
+                position = int(player4.getPosY());
+                break;
+        }
     }
 
     // claps
@@ -3088,7 +3221,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
         // Draw map
         c.w.clear();
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
 
         switch(typeOfVehicle){
             case 0:
@@ -3110,9 +3243,14 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 player4.setPosition(player4.getPosX(), player4.getPosY() + 1);
                 player4.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
                         currentMap->getElevation(player4.getPosY()), currentMap->getTerrain(), false);
+                break;
+            case 4:
+                player5.setPosition(player5.getPosX(), player5.getPosY() + 1);
+                player5.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
+                        currentMap->getElevation(player5.getPosY()), currentMap->getTerrain(), false);
         }
 
-        if (typeOfGame == 0 || typeOfGame == 2){
+        if (typeOfGame != 1){
 
             elapsed2 = blinkClcok.getElapsedTime().asSeconds();
             // Change the color of the main text
@@ -3129,8 +3267,13 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 positionText.setOutlineColor(Color::Transparent);
             }
 
-
             c.w.draw(positionText);
+
+            // Move all the rivals
+            for (RivalCar& r :rivals){
+                r.setPosition(r.getPosX(), r.getPosY() + 1);
+                r.draw(Vehicle::ACCELERATE, currentMap->getElevation(r.getPosY()));
+            }
         }
 
         // Flager animation
@@ -3221,8 +3364,11 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
     if (typeOfGame == 0 || typeOfGame == 2){
         return CLASIFICATION;
     }
-    else {
+    else if (typeOfGame == 1){
         return RANKING;
+    }
+    else {
+        return START;
     }
 }
 
@@ -3336,7 +3482,6 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
         arrival = true;
         mtx.unlock();
     }
-
     if (!finalGame && !arrival) {
         // Update and prepare cars to draw
         if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
@@ -3397,13 +3542,74 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
             float posY = v.getPosY();
 
             vehicleCrash = false;
+            bool vehicleDetected = false;
             float crashPos;
 
             // Store the new position of the vehicle
             rankingVehicles.push_back(posY);
 
+            // Check if the rival car
+            for (int i = 0; !vehicleDetected && i < (int)cars.size(); i++){
+
+                float cordX = cars[i].getPosX();
+                float goalCarCordX = v.getPosX();
+
+                // Check if the vehicle is near or not
+                if (abs(goalCarCordX - cordX) <= 0.3f &&
+                    abs(v.getPosY() - cars[i].getPosY()) <= 20.f)
+                {
+                    vehicleDetected = true;
+                }
+
+                 // Control the possible track changing
+                if (vehicleDetected){
+                    float p;
+                    // Check the difficulty to control the speed of changing
+                    switch(c.level){
+                        case PEACEFUL:
+                            break;
+                        case EASY:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.5f){
+                                const float direction = rand_generator_zero_one();
+                                if (direction <= 0.5){
+                                    if (goalCarCordX < 0.f){
+                                        goalCarCordX += 0.01f;
+                                    }
+                                    else {
+                                        goalCarCordX -= 0.01f;
+                                    }
+                                }
+                            }
+                            break;
+                        case NORMAL:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.65f){
+                                if (goalCarCordX < 0.f){
+                                    goalCarCordX += 0.015f;
+                                }
+                                else {
+                                    goalCarCordX -= 0.015f;
+                                }
+                            }
+                            break;
+                        case HARD:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.8f){
+                                if (goalCarCordX < 0.f){
+                                    goalCarCordX += 0.02f;
+                                }
+                                else {
+                                    goalCarCordX -= 0.02f;
+                                }
+                            }
+                    }
+                    v.setPosition(goalCarCordX, v.getPosY());
+                }
+
+            }
             // Check if the current rival car has crashed with a traffic car
-            for (int i = 0; !vehicleCrash && i < (int)rivals.size(); i++){
+            for (int i = 0; i < (int)rivals.size(); i++){
                 vehicleCrash = cars[i].hasCrashed(v.getPreviousY(), posY,
                                                   v.getMinScreenX(), v.getMaxScreenX(), crashPos);
             }
@@ -3430,10 +3636,13 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                     // Check it has been crash between player and rival
                     if (vehicleCrash){
                         if (player.getPreviousX() > v.getPreviousX()){
-                            player.setPosition(player.getPosX() + 1.5f * player.getAngle(), player.getPosY() - 10.f);
+                            player.setPosition(player.getPosX() + 0.3f, player.getPosY() - 10.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player.setPosition(player.getPosX() - 1.5f * player.getAngle(), player.getPosY() - 10.f);
+                            player.setPosition(player.getPosX() - 0.3f, player.getPosY() - 10.f);
+                        }
+                        else {
+                            player.setPosition(player.getPosX(), player.getPosY() - 20.f);
                         }
 
                         // Voice sound
@@ -3462,10 +3671,13 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
                     if (vehicleCrash){
                         if (player2.getPreviousX() > v.getPreviousX()){
-                            player2.setPosition(player.getPosX() + 1.5f * player2.getAngle(), player2.getPosY() - 20.f);
+                            player2.setPosition(player.getPosX() + 0.3f, player2.getPosY() - 20.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player2.setPosition(player.getPosX() - 1.5f * player2.getAngle(), player2.getPosY() - 20.f);
+                            player2.setPosition(player.getPosX() - 0.3f, player2.getPosY() - 20.f);
+                        }
+                        else {
+                            player2.setPosition(player2.getPosX(), player2.getPosY() - 20.f);
                         }
                         r.soundEffects[87]->stop();
                         r.soundEffects[87]->play();
@@ -3476,11 +3688,14 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                                                 player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
 
                     if (vehicleCrash){
-                        if (player3.getPreviousX() > v.getPreviousX()){
-                            player3.setPosition(player.getPosX() + 1.5f * player3.getAngle(), player3.getPosY() - 20.f);
+                        if (player3.getPreviousX() >= v.getPreviousX()){
+                            player3.setPosition(player.getPosX() + 0.3f, player3.getPosY() - 20.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player3.setPosition(player.getPosX() - 1.5f * player3.getAngle(), player3.getPosY() - 20.f);
+                            player3.setPosition(player.getPosX() - 0.3f, player3.getPosY() - 20.f);
+                        }
+                        else {
+                            player3.setPosition(player3.getPosX(), player3.getPosY() - 20.f);
                         }
                         r.soundEffects[87]->stop();
                         r.soundEffects[87]->play();
@@ -3492,10 +3707,13 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
                     if (vehicleCrash){
                         if (player4.getPreviousX() > v.getPreviousX()){
-                            player4.setPosition(player.getPosX() + 1.5f * player4.getAngle(), player4.getPosY() - 20.f);
+                            player4.setPosition(player.getPosX() + 0.3f, player4.getPosY() - 20.f);
                         }
                         else if (player.getPreviousX() < v.getPreviousX()){
-                            player4.setPosition(player.getPosX() - 1.5f * player4.getAngle(), player4.getPosY() - 20.f);
+                            player4.setPosition(player.getPosX() - 0.3f, player4.getPosY() - 20.f);
+                        }
+                        else {
+                            player4.setPosition(player4.getPosX(), player4.getPosY() - 20.f);
                         }
                         r.soundEffects[87]->stop();
                         r.soundEffects[87]->play();
@@ -3511,7 +3729,7 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
         // Draw map with cars
         c.w.clear();
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -3763,20 +3981,6 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                             r.soundEffects[rand_generator_int(82, 84)]->play();
                             trafficCarSound.restart();
                         }
-                    }
-                }
-            }
-            if (newLap) {
-                drawNewLap(c);
-                if (lapsDone < numberLaps){
-                    if (r.soundEffects[55]->getStatus() != SoundSource::Playing){
-                        newLap = false;
-                    }
-                }
-                else {
-                    if (r.soundEffects[56]->getStatus() != SoundSource::Playing){
-                        r.soundTracks[r.currentSoundtrack]->play();
-                        newLap = false;
                     }
                 }
             }
@@ -4027,10 +4231,13 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
                         // Check it has been crash between player and rival
                         if (vehicleCrash){
                             if (player.getPreviousX() > v.getPreviousX()){
-                                player.setPosition(player.getPosX() + 1.5f * player.getAngle(), player.getPosY() - 10.f);
+                                player.setPosition(player.getPosX() + 0.3f, player.getPosY() - 20.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player.setPosition(player.getPosX() - 1.5f * player.getAngle(), player.getPosY() - 10.f);
+                                player.setPosition(player.getPosX() - 0.3f, player.getPosY() - 20.f);
+                            }
+                            else {
+                                player.setPosition(player.getPosX(), player.getPosY() - 20.f);
                             }
                         }
 
@@ -4062,10 +4269,13 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
                         if (vehicleCrash){
                             if (player2.getPreviousX() > v.getPreviousX()){
-                                player2.setPosition(player.getPosX() + 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
+                                player2.setPosition(player2.getPosX() + 0.3f, player2.getPosY() - 20.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player2.setPosition(player.getPosX() - 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
+                                player2.setPosition(player2.getPosX() - 0.3f, player2.getPosY() - 20.f);
+                            }
+                            else {
+                                player2.setPosition(player2.getPosX(), player2.getPosY() - 20.f);
                             }
                             r.soundEffects[87]->stop();
                             r.soundEffects[87]->play();
@@ -4077,10 +4287,13 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
                         if (vehicleCrash){
                             if (player3.getPreviousX() > v.getPreviousX()){
-                                player3.setPosition(player.getPosX() + 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
+                                player3.setPosition(player3.getPosX() + 0.3f, player3.getPosY() - 20.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player3.setPosition(player.getPosX() - 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
+                                player3.setPosition(player3.getPosX() - 0.3f, player3.getPosY() - 20.f);
+                            }
+                            else {
+                                player3.setPosition(player3.getPosX(), player3.getPosY() - 20.f);
                             }
                             r.soundEffects[87]->stop();
                             r.soundEffects[87]->play();
@@ -4092,16 +4305,19 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
                         if (vehicleCrash){
                             if (player4.getPreviousX() > v.getPreviousX()){
-                                player4.setPosition(player.getPosX() + 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
+                                player4.setPosition(player4.getPosX() + 0.3f, player4.getPosY() - 20.f);
                             }
                             else if (player.getPreviousX() < v.getPreviousX()){
-                                player4.setPosition(player.getPosX() - 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
+                                player4.setPosition(player4.getPosX() - 0.3f, player4.getPosY() - 20.f);
+                            }
+                            else {
+                                player4.setPosition(player4.getPosX(), player4.getPosY() - 20.f);
                             }
                             r.soundEffects[87]->stop();
                             r.soundEffects[87]->play();
                         }
                 }
-                v.setAI(c.maxAggressiveness, c.level);
+                v.setAI(c.maxAggressiveness, c.level, typeOfGame);
             }
 
             // Order the rivals cars of the race to build a temporary ranking
@@ -4113,7 +4329,7 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
         // Draw map with cars
         c.w.clear();
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -4318,6 +4534,12 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
 
     // Out Run and Driving Fury and Demarrage modes
     if (currentMap->isOutSideLandScape()) {
+
+        if (typeOfGame != 1){
+            // Increment the landscape
+            currentLandScape++;
+        }
+
         if (currentMap->getNextLeft() != nullptr) {
             // Update player and vehicle positions
             switch(typeOfVehicle){
@@ -4414,12 +4636,13 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
     }
 
     if (!finalGame && !arrival) {
+
         // Update and prepare cars to draw
         if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
             lastY = currentMap->getCameraPosY() + float(c.renderLen);
         }
 
-        if (typeOfGame == 4){
+        if (typeOfGame == 4 && currentLandScape >= goalCarStage){
             Vehicle::Action a;
 
             float positionX = player5.getPosX();
@@ -4443,6 +4666,67 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                 }
             }
 
+            if (typeOfGame == 4){
+                bool vehicleDetected = false;
+                // Check if the rival car
+                for (int i = 0; !vehicleDetected && i < (int)cars.size(); i++){
+
+                    float cordX = cars[i].getPosX();
+                    float goalCarCord = goalCar.getPosX();
+                    // Check if the vehicle is near or not
+                    if (abs(goalCarCord - cordX) <= 0.3f &&
+                        abs(goalCar.getPosY() - cars[i].getPosY()) <= 20.f)
+                    {
+                        vehicleDetected = true;
+                    }
+
+                    if (vehicleDetected){
+                            float p;
+                            // Check the difficulty to control the speed of changing
+                            switch(c.level){
+                                case PEACEFUL:
+                                    break;
+                                case EASY:
+                                    p = rand_generator_zero_one();
+                                    if (p <= 0.5f){
+                                        const float direction = rand_generator_zero_one();
+                                        if (direction <= 0.5){
+                                            if (goalCarCord < 0.f){
+                                                goalCarCord += 0.01f;
+                                            }
+                                            else {
+                                                goalCarCord -= 0.01f;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case NORMAL:
+                                    p = rand_generator_zero_one();
+                                    if (p <= 0.65f){
+                                        if (goalCarCord < 0.f){
+                                            goalCarCord += 0.015f;
+                                        }
+                                        else {
+                                            goalCarCord -= 0.015f;
+                                        }
+                                    }
+                                    break;
+                                case HARD:
+                                    p = rand_generator_zero_one();
+                                    if (p <= 0.8f){
+                                        if (goalCarCord < 0.f){
+                                            goalCarCord += 0.02f;
+                                        }
+                                        else {
+                                            goalCarCord -= 0.02f;
+                                        }
+                                    }
+                            }
+                        }
+                        goalCar.setPosition(goalCarCord, goalCar.getPosY());
+                }
+            }
+
             // Draw the vehicle
             goalCar.draw(a, currentMap->getElevation(posY));
             vehicleCrash = false;
@@ -4458,10 +4742,13 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                     // Check it has been crash between player and rival
                     if (vehicleCrash){
                         if (player.getPreviousX() > goalCar.getPreviousX()){
-                            player.setPosition(player.getPosX() + 1.5f * player.getAngle(), player.getPosY() - 10.f);
+                            player.setPosition(player.getPosX() + 0.3f, player.getPosY() - 20.f);
                         }
                         else if (player.getPreviousX() < goalCar.getPreviousX()){
-                            player.setPosition(player.getPosX() - 1.5f * player.getAngle(), player.getPosY() - 10.f);
+                            player.setPosition(player.getPosX() - 0.3f, player.getPosY() - 20.f);
+                        }
+                        else {
+                            player.setPosition(player.getPosX(), player.getPosY() - 20.f);
                         }
                     }
 
@@ -4493,10 +4780,13 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
 
                     if (vehicleCrash){
                         if (player2.getPreviousX() > goalCar.getPreviousX()){
-                            player2.setPosition(player.getPosX() + 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
+                            player2.setPosition(player2.getPosX() + 0.3f, player2.getPosY() - 20.f);
                         }
                         else if (player.getPreviousX() < goalCar.getPreviousX()){
-                            player2.setPosition(player.getPosX() - 1.5f * player2.getAngle(), player2.getPosY() - 10.f);
+                            player2.setPosition(player2.getPosX() - 0.3f, player2.getPosY() - 20.f);
+                        }
+                        else {
+                            player2.setPosition(player2.getPosX(), player2.getPosY() - 20.f);
                         }
                         r.soundEffects[87]->stop();
                         r.soundEffects[87]->play();
@@ -4508,10 +4798,13 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
 
                     if (vehicleCrash){
                         if (player3.getPreviousX() > goalCar.getPreviousX()){
-                            player3.setPosition(player.getPosX() + 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
+                            player3.setPosition(player3.getPosX() + 0.3f, player3.getPosY() - 20.f);
                         }
                         else if (player.getPreviousX() < goalCar.getPreviousX()){
-                            player3.setPosition(player.getPosX() - 1.5f * player3.getAngle(), player3.getPosY() - 10.f);
+                            player3.setPosition(player3.getPosX() - 0.3f, player3.getPosY() - 20.f);
+                        }
+                        else {
+                            player3.setPosition(player3.getPosX(), player3.getPosY() - 20.f);
                         }
                         r.soundEffects[87]->stop();
                         r.soundEffects[87]->play();
@@ -4523,10 +4816,13 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
 
                     if (vehicleCrash){
                         if (player4.getPreviousX() > goalCar.getPreviousX()){
-                            player4.setPosition(player.getPosX() + 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
+                            player4.setPosition(player.getPosX() + 0.3f, player4.getPosY() - 10.f);
                         }
                         else if (player.getPreviousX() < goalCar.getPreviousX()){
-                            player4.setPosition(player.getPosX() - 1.5f * player4.getAngle(), player4.getPosY() - 10.f);
+                            player4.setPosition(player.getPosX() - 0.3f, player4.getPosY() - 10.f);
+                        }
+                        else {
+                            player4.setPosition(player4.getPosX(), player4.getPosY() - 10.f);
                         }
                         r.soundEffects[87]->stop();
                         r.soundEffects[87]->play();
@@ -4547,9 +4843,14 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
             v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
         }
 
+        if (currentMap->inFork(goalCar.getPosY())) {
+            goalCar.setPosition(goalCar.getPosX(), -2.f * DEL_DISTANCE * 3.0f);
+            updatedGoalCar = true;
+        }
+
         // Draw map with cars
         c.w.clear();
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, (currentLandScape >= goalCarStage));
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -4564,6 +4865,20 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                 }
                 else {
                     player.hitControl(vehicleCrash);
+                }
+
+                if (currentLandScape >= goalCarStage){
+                    distanceGoalCar = goalCar.getPosY() - player.getPosY();
+                    if (distanceGoalCar < 0){
+                        distanceGoalCar = 0;
+                    }
+                }
+                else {
+                    distanceGoalCar = maxDistance;
+                }
+
+                if (currentLandScape >= goalCarStage && currentMap->inFork(player.getPosY())){
+                    updatedGoalCar = true;
                 }
 
                 player.draw(c, r, action, direction, currentMap->getElevation(player.getPosY()), terrain);
@@ -4601,6 +4916,20 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                 }
                 else {
                     player2.hitControl(vehicleCrash);
+                }
+
+                if (currentLandScape >= goalCarStage){
+                    distanceGoalCar = goalCar.getPosY() - player2.getPosY();
+                    if (distanceGoalCar < 0){
+                        distanceGoalCar = 0;
+                    }
+                }
+                else {
+                    distanceGoalCar = maxDistance;
+                }
+
+                if (currentLandScape >= goalCarStage && currentMap->inFork(player2.getPosY())){
+                    updatedGoalCar = true;
                 }
 
                 player2.draw(c, r, action, direction, currentMap->getElevation(player2.getPosY()), terrain);
@@ -4641,6 +4970,20 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                     player3.hitControl(vehicleCrash);
                 }
 
+                if (currentLandScape >= goalCarStage){
+                    distanceGoalCar = goalCar.getPosY() - player3.getPosY();
+                    if (distanceGoalCar < 0){
+                        distanceGoalCar = 0;
+                    }
+                }
+                else {
+                    distanceGoalCar = maxDistance;
+                }
+
+                if (currentLandScape >= goalCarStage && currentMap->inFork(player3.getPosY())){
+                    updatedGoalCar = true;
+                }
+
                 player3.draw(c, r, action, direction, currentMap->getElevation(player3.getPosY()), terrain);
 
                 if (!player3.isCrashing()) {
@@ -4678,6 +5021,20 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                     player4.hitControl(vehicleCrash);
                 }
 
+                if (currentLandScape >= goalCarStage){
+                    distanceGoalCar = goalCar.getPosY() - player4.getPosY();
+                    if (distanceGoalCar < 0){
+                        distanceGoalCar = 0;
+                    }
+                }
+                else {
+                    distanceGoalCar = maxDistance;
+                }
+
+                if (currentLandScape >= goalCarStage && currentMap->inFork(player4.getPosY())){
+                    updatedGoalCar = true;
+                }
+
                 player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
 
                 if (!player4.isCrashing()) {
@@ -4702,17 +5059,10 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                         player4.draw(c, r, action, direction, currentMap->getElevation(player4.getPosY()), terrain);
                     }
                 }
-
                 for (TrafficCar &v : cars)
                     v.autoControl(c, player4.getPosX(), player4.getPosY());
         }
         if (!finalGame && !arrival){
-            // Control if the goal car chased has been displayed
-            float distX, distY;
-            bool visible = true;
-
-            visible = goalCar.isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
-
             // Check if enemies are displayed on the screen
             for (TrafficCar &v : cars) {
                 float distX, distY;
@@ -4792,20 +5142,6 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                     checkPoint = false;
                 }
             }
-            if (newLap) {
-                drawNewLap(c);
-                if (lapsDone < numberLaps){
-                    if (r.soundEffects[55]->getStatus() != SoundSource::Playing){
-                        newLap = false;
-                    }
-                }
-                else {
-                    if (r.soundEffects[56]->getStatus() != SoundSource::Playing){
-                        r.soundTracks[r.currentSoundtrack]->play();
-                        newLap = false;
-                    }
-                }
-            }
         }
     }
 }
@@ -4825,7 +5161,13 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
 
     // Out Run and Driving Fury and Demarrage modes
     if (currentMap->isOutSideLandScape()) {
+
+        // Increment the landscape
+        currentLandScape++;
+
         if (currentMap->getNextLeft() != nullptr) {
+
+            updatedGoalCar = false;
 
             player5.setPosition(player5.getPosX() + currentMap->getOffsetX(), player5.getPosY() - currentMap->getMaxY());
 
@@ -4881,97 +5223,172 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
             finalGame = true;
         }
     }
-    if (typeOfGame == 3 && lifeGoalCar <= 0){
+    if (lifeGoalCar <= 0){
         // Criminal goal car has been defeated
         mtx.lock();
         arrival = true;
         mtx.unlock();
     }
+    if (currentMap->isFinalLandScape()) {
+        State status = showsGoalAnimation(c, r);
+        if (status == EXIT) {
+            exit(1);
+        }
+        mtx.lock();
+        finalGame = true;
+        mtx.unlock();
+    }
     if (!finalGame && !arrival) {
-        // Update and prepare cars to draw
+        // Control if the car is the player is inside the fork
+
+
         if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
             lastY = currentMap->getCameraPosY() + float(c.renderLen);
         }
 
-        Vehicle::Action a;
+        if (currentLandScape >= goalCarStage){
+            Vehicle::Action a;
 
-        float positionX = player5.getPosX();
-        float positionY = player5.getPosY();
-        float speedPlayer = player5.getSpeed();
+            float positionX = player5.getPosX();
+            float positionY = player5.getPosY();
+            float speedPlayer = player5.getSpeed();
 
-        float directionCurve = currentMap->getCurveCoefficient(goalCar.getPosY());
+            float directionCurve = currentMap->getCurveCoefficient(goalCar.getPosY());
 
-        goalCar.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a,
-                       directionCurve, c.level, positionX, positionY, speedPlayer);
+            goalCar.update(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a,
+                           directionCurve, c.level, positionX, positionY, speedPlayer);
 
-        // Get the new position of the vehicle
-        float posY = goalCar.getPosY();
+            // Get the new position of the vehicle
+            float posY = goalCar.getPosY();
 
-        // Check if the vehicle is or not in a curve
-        if (directionCurve != 0.f){
-            // Check if the vehicle has finished the curve
-            if (currentMap->getCurveCoefficient(posY)){
-                // Vehicle goes straight on
-                goalCar.setOnStraight();
+            // Check if the vehicle is or not in a curve
+            if (directionCurve != 0.f){
+                // Check if the vehicle has finished the curve
+                if (currentMap->getCurveCoefficient(posY)){
+                    // Vehicle goes straight on
+                    goalCar.setOnStraight();
+                }
             }
-        }
+            bool vehicleDetected = false;
 
-        // Draw the vehicle
-        goalCar.draw(a, currentMap->getElevation(posY));
-        vehicleCrash = false;
-        float crashPos;
+            // Check if the rival car
+            for (int i = 0; !vehicleDetected && i < (int)cars.size(); i++){
 
-        // Check if the player has crash with any rival car
-        vehicleCrash = goalCar.hasCrashed(player5.getPosY(), player5.getPreviousY(),
-                                          player5.getMinScreenX(), player5.getMaxScreenX(), crashPos);
+                float cordX = cars[i].getPosX();
+                float goalCarCord = goalCar.getPosX();
+                // Check if the vehicle is near or not
+                if (abs(goalCarCord - cordX) <= 0.3f &&
+                    abs(goalCar.getPosY() - cars[i].getPosY()) <= 20.f)
+                {
+                    vehicleDetected = true;
+                }
 
-        // Check it has been crash between player and rival
-        if (vehicleCrash){
-
-            r.soundEffects[87]->stop();
-            r.soundEffects[87]->play();
-
-            if (player5.getPreviousX() > goalCar.getPreviousX()){
-                player5.setPosition(player5.getPosX() + 4.5f * player5.getAngle(), player5.getPosY() - 20.f);
+                if (vehicleDetected){
+                        float p;
+                        // Check the difficulty to control the speed of changing
+                        switch(c.level){
+                            case PEACEFUL:
+                                break;
+                            case EASY:
+                                p = rand_generator_zero_one();
+                                if (p <= 0.5f){
+                                    const float direction = rand_generator_zero_one();
+                                    if (direction <= 0.5){
+                                        if (goalCarCord < 0.f){
+                                            goalCarCord += 0.02f;
+                                        }
+                                        else {
+                                            goalCarCord -= 0.02f;
+                                        }
+                                    }
+                                }
+                                break;
+                            case NORMAL:
+                                p = rand_generator_zero_one();
+                                if (p <= 0.65f){
+                                    if (goalCarCord < 0.f){
+                                        goalCarCord += 0.035f;
+                                    }
+                                    else {
+                                        goalCarCord -= 0.035f;
+                                    }
+                                }
+                                break;
+                            case HARD:
+                                p = rand_generator_zero_one();
+                                if (p <= 0.8f){
+                                    if (goalCarCord < 0.f){
+                                        goalCarCord += 0.05f;
+                                    }
+                                    else {
+                                        goalCarCord -= 0.05f;
+                                    }
+                                }
+                        }
+                    }
+                    goalCar.setPosition(goalCarCord, goalCar.getPosY());
             }
-            else if (player5.getPreviousX() < goalCar.getPreviousX()){
-                player5.setPosition(player5.getPosX() - 4.5f * player5.getAngle(), player5.getPosY() - 20.f);
+
+            // Draw the vehicle
+            goalCar.draw(a, currentMap->getElevation(posY));
+            vehicleCrash = false;
+            float crashPos;
+
+            // Check if the player has crash with any rival car
+            vehicleCrash = goalCar.hasCrashed(player5.getPosY(), player5.getPreviousY(),
+                                              player5.getMinScreenX(), player5.getMaxScreenX(), crashPos);
+
+            // Check it has been crash between player and rival
+            if (vehicleCrash){
+
+                r.soundEffects[87]->stop();
+                r.soundEffects[87]->play();
+
+                if (player5.getPreviousX() >= goalCar.getPreviousX()){
+                    player5.setPosition(player5.getPosX() + 0.3f, player5.getPosY() - 20.f);
+                }
+                else if (player5.getPreviousX() < goalCar.getPreviousX()){
+                    player5.setPosition(player5.getPosX() - 0.3f, player5.getPosY() - 20.f);
+                }
+                else {
+                    player5.setPosition(player5.getPosX(), player5.getPosY() - 20.f);
+                }
+
+                // Reduce the life of the goal car
+                if (goalCar.getVehicleType() == 3){
+                    // Reduce life per impact
+                    lifeGoalCar -= lifeLostPerCrash;
+                }
+                else {
+                    // Reduce the half of life per impact
+                    lifeGoalCar -= (lifeLostPerCrash / 2);
+                }
+
+                elapsed18 = policeDriverClock.getElapsedTime().asSeconds();
+
+                if (elapsed18 - elapsed17 >= police_driver_delay.asSeconds()){
+                    r.soundEffects[101]->stop();
+                    r.soundEffects[102]->stop();
+                    r.soundEffects[103]->stop();
+                    r.soundEffects[104]->stop();
+                    r.soundEffects[rand_generator_int(101, 104)]->play();
+
+                    policeDriverClock.restart();
+                }
             }
 
-            // Reduce the life of the goal car
-            if (goalCar.getVehicleType() == 3){
-                // Reduce life per impact
-                lifeGoalCar -= lifeLostPerCrash;
+            // Check if the fire has to be drawn or not
+            if (lifeGoalCar <= 50 && lifeGoalCar >= 25){
+                // The goalCar starts to smoke
+                goalCar.setFiringSmoke(true);
             }
-            else {
-                // Reduce the half of life per impact
-                lifeGoalCar -= (lifeLostPerCrash / 2);
+            else if (lifeGoalCar < 25){
+                // The goalCar starts to smoke
+                goalCar.setFiringSmoke(false);
+
+                // The goalCar starts to fire
+                goalCar.setFiring(true);
             }
-
-            elapsed18 = policeDriverClock.getElapsedTime().asSeconds();
-
-            if (elapsed18 - elapsed17 >= police_driver_delay.asSeconds()){
-                r.soundEffects[101]->stop();
-                r.soundEffects[102]->stop();
-                r.soundEffects[103]->stop();
-                r.soundEffects[104]->stop();
-                r.soundEffects[rand_generator_int(101, 104)]->play();
-
-                policeDriverClock.restart();
-            }
-        }
-
-        // Check if the fire has to be drawn or not
-        if (lifeGoalCar <= 50 && lifeGoalCar >= 25){
-            // The goalCar starts to smoke
-            goalCar.setFiringSmoke(true);
-        }
-        else if (lifeGoalCar < 25){
-            // The goalCar starts to smoke
-            goalCar.setFiringSmoke(false);
-
-            // The goalCar starts to fire
-            goalCar.setFiring(true);
         }
 
         // Update all the traffic vehicles
@@ -4988,9 +5405,14 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
             v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
         }
 
+        if (currentMap->inFork(goalCar.getPosY())) {
+            goalCar.setPosition(goalCar.getPosX(), -2.f * DEL_DISTANCE * 3.0f);
+            updatedGoalCar = true;
+        }
+
         // Draw map with cars
         c.w.clear();
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, currentLandScape >= goalCarStage);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -5003,6 +5425,20 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
         }
         else {
             player5.hitControl(vehicleCrash);
+        }
+
+        if (currentLandScape >= goalCarStage && currentMap->inFork(player5.getPosY())){
+            updatedGoalCar = true;
+        }
+
+        if (currentLandScape >= goalCarStage){
+            distanceGoalCar = goalCar.getPosY() - player5.getPosY();
+            if (distanceGoalCar < 0){
+                distanceGoalCar = 0;
+            }
+        }
+        else {
+            distanceGoalCar = maxDistance;
         }
 
         player5.draw(c, r, action, direction, currentMap->getElevation(player5.getPosY()), terrain);
@@ -5035,13 +5471,6 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
 
 
         if (!finalGame && !arrival){
-
-            // Control if the goal car chased has been displayed
-            float distX, distY;
-            bool visible = true;
-
-            visible = goalCar.isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
-
             // Check if enemies are displayed on the screen
             for (TrafficCar &v : cars) {
                 float distX, distY;
@@ -5122,20 +5551,6 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
                 }
                 if (timeCheck - time > 5) {
                     checkPoint = false;
-                }
-            }
-            if (newLap) {
-                drawNewLap(c);
-                if (lapsDone < numberLaps){
-                    if (r.soundEffects[55]->getStatus() != SoundSource::Playing){
-                        newLap = false;
-                    }
-                }
-                else {
-                    if (r.soundEffects[56]->getStatus() != SoundSource::Playing){
-                        r.soundTracks[r.currentSoundtrack]->play();
-                        newLap = false;
-                    }
                 }
             }
         }
@@ -5372,7 +5787,12 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     c.w.clear();
 
     // Draw the map
-    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+    if (typeOfGame < 3 || typeOfGame > 4){
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, false);
+    }
+    else {
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, (currentLandScape >= goalCarStage));
+    }
 
     switch(typeOfVehicle){
         case 0:
@@ -5574,7 +5994,7 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
             mtx.lock();
             onPause = false;
             mtx.unlock();
-            if (newLap){
+            if (typeOfGame == 2 && newLap){
                 if (lapsDone < numberLaps){
                     r.soundEffects[55]->play();
                 }
@@ -5983,6 +6403,13 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     // Array of the angle of the vehicles
     float angleVehicles[4][8];
 
+    // Vector with the current color selected for each car
+    int colorCars[4];
+
+    for (int i = 0; i < 4; i++){
+        colorCars[i] = 0;
+    }
+
     // Variables to store the vehicle properties
     string brandName, motorName, pathFile;
     float max_speed, angle;
@@ -6027,7 +6454,8 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     while (!startPressed && !backSpacePressed) {
 
         optionSelected = 0;
-        colorSelected = 0;
+
+        colorSelected = colorCars[optionSelected];
 
         IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
         Sprite sprite(c.backgroundSelectionMenu, background);
@@ -6226,6 +6654,8 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     r.soundEffects[0]->play();
                     optionSelected++;
 
+                    colorSelected = colorCars[optionSelected];
+
                     switch(optionSelected){
                         case 1:
 
@@ -6337,6 +6767,8 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
                     optionSelected--;
+
+                    colorSelected = colorCars[optionSelected];
 
                     switch(optionSelected){
                         case 0:
@@ -6483,7 +6915,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
+
                     colorSelected++;
+                    colorCars[optionSelected] = colorSelected;
 
                     switch(optionSelected){
                                                 case 0:
@@ -6629,7 +7063,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
+
                     colorSelected--;
+                    colorCars[optionSelected] = colorSelected;
 
                     switch(optionSelected){
                         case 0:
@@ -6769,8 +7205,6 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     }
                 }
             }
-
-
 
             c.w.draw(sprite);
             c.w.draw(selectionVehicleText);
@@ -7012,11 +7446,6 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     // Loads enemies and time
     checkDifficulty(c);
-
-    // Update the rival cars
-    if (typeOfGame == 0) {
-        storingRivalCars(c);
-    }
 
     // Set the scale of the console window
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
@@ -7418,7 +7847,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     }
 
     // Reproduce sound effect of record
-    if (record){
+    if (record && posArrival == 1){
         r.soundEffects[50]->stop();
         r.soundEffects[50]->play();
 
@@ -7699,9 +8128,10 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     startText.setOutlineColor(Color::Black);
     startText.setOutlineThickness(3.0f * c.screenScale);
 
+    if (posArrival == 1){
 
-    while(!startPressed){
-        // Detect the possible events
+        while(!startPressed){
+            // Detect the possible events
             Event e{};
             while (c.window.pollEvent(e)) {
                 if (e.type == Event::Closed) {
@@ -7774,6 +8204,144 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             }
 
             sleep(milliseconds(50));
+        }
+    }
+    else {
+        // Ask to the player repeat the game
+
+        Texture tex;
+        tex.loadFromFile("Data/Animations/RepeatingGame/crono.png");
+
+        RectangleShape shape2;
+        shape2.setPosition((c.w.getSize().x / 2.f) - 287.0f * c.screenScale, c.w.getSize().y / 2.f - 210.f * c.screenScale);
+        shape2.setSize(sf::Vector2f(590.0f * c.screenScale, 420.0f * c.screenScale));
+        shape2.setOutlineColor(Color(30, 159, 211));
+        shape2.setOutlineThickness(5.0f * c.screenScale);
+        shape2.setTexture(&tex, true);
+
+        Text continueText;
+        continueText.setString("CONTINUE?");
+        continueText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+        continueText.setFont(c.fontMenus);
+        continueText.setStyle(Text::Bold);
+        continueText.setFillColor(Color::White);
+        continueText.setOutlineColor(Color::Black);
+        continueText.setOutlineThickness(3.0f * c.screenScale);
+        continueText.setPosition((c.w.getSize().x / 2.f) - (continueText.getLocalBounds().width / 2.f),
+                                  c.w.getSize().y / 2.f - 180.0f * c.screenScale);
+
+        Text yesText;
+        yesText.setString("YES");
+        yesText.setCharacterSize(static_cast<unsigned int>(int(48.0f * c.screenScale)));
+        yesText.setFont(c.fontMenus);
+        yesText.setStyle(Text::Bold);
+        yesText.setFillColor(Color::Green);
+        yesText.setOutlineColor(Color::Black);
+        yesText.setOutlineThickness(3.0f * c.screenScale);
+        yesText.setPosition((c.w.getSize().x / 2.f) - (yesText.getLocalBounds().width / 2.f),
+                                  c.w.getSize().y / 2.f - 70.0f * c.screenScale);
+
+        Text noText;
+        noText.setString("NO");
+        noText.setCharacterSize(static_cast<unsigned int>(int(48.0f * c.screenScale)));
+        noText.setFont(c.fontMenus);
+        noText.setStyle(Text::Bold);
+        noText.setFillColor(Color::Green);
+        noText.setOutlineColor(Color::Black);
+        noText.setOutlineThickness(3.0f * c.screenScale);
+        noText.setPosition((c.w.getSize().x / 2.f) - (noText.getLocalBounds().width / 2.f),
+                                  c.w.getSize().y / 2.f + 70.0f * c.screenScale);
+
+        CircleShape triangle(20 * c.screenScale, 3);
+        triangle.setFillColor(Color::Yellow);
+        triangle.setOutlineColor(Color::Black);
+        triangle.setOutlineThickness(2.0f * c.screenScale);
+        triangle.setRotation(90);
+        triangle.setPosition(c.w.getSize().x / 2.f - 37.f * c.screenScale - 15.f, c.w.getSize().y / 2.f - 58.0f * c.screenScale);
+
+        bool startPressed = false;
+
+        bool sound = false;
+
+        int optionSelected = 0;
+
+        while (!startPressed){
+
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)) {
+                if (e.type == Event::Closed) {
+                    return EXIT;
+                }
+            }
+
+            // Check if the up or down cursor keys have been pressed or not
+            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+                if (optionSelected != 1){
+                    optionSelected++;
+                    triangle.setPosition(c.w.getSize().x / 2.f - 37.f * c.screenScale - 15.f,
+                                         c.w.getSize().y / 2.f + 80.0f * c.screenScale);
+
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                }
+            }
+            // Check if the up or down cursor keys have been pressed or not
+            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+                if (optionSelected != 0){
+                    optionSelected--;
+                    triangle.setPosition(c.w.getSize().x / 2.f - 37.f * c.screenScale - 15.f,
+                                         c.w.getSize().y / 2.f - 58.0f * c.screenScale);
+
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                }
+            }
+
+            c.w.draw(sprite);
+            c.w.draw(shape);
+            c.w.draw(titleText);
+            c.w.draw(totalTime);
+            c.w.draw(timeLap);
+            c.w.draw(vehicle);
+            c.w.draw(shape2);
+            c.w.draw(continueText);
+            c.w.draw(yesText);
+            c.w.draw(noText);
+            c.w.draw(triangle);
+
+            if (!sound){
+                sound = true;
+                r.soundEffects[110]->stop();
+                r.soundEffects[110]->play();
+            }
+
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+
+            sleep(milliseconds(50));
+
+            // Check if start has been pressed
+            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                // Change the controllers of the car
+                startPressed = true;
+                r.soundEffects[2]->stop();
+                r.soundEffects[2]->play();
+            }
+        }
+
+        // Control the option selected by the user
+        if (optionSelected == 1){
+            r.soundTracks[1]->stop();
+            r.soundTracks[1]->play();
+            return START;
+        }
+        else {
+            r.soundEffects[49]->stop();
+            r.soundEffects[49]->play();
+        }
     }
 
     mainTextArrived = false;
@@ -7963,10 +8531,13 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     level = -1;
 
     if (typeOfGame == 0){
-        indexLandScape++;
+        if (posArrival == 1){
+            indexLandScape++;
+        }
         currentMap = &tourLandScapes[indexLandScape];
         int bdTime = 0;
         time = int(float(tourLandScapes[indexLandScape].getTimeToPlay()) * timeMul) + bdTime;
+        storingRivalCars(c);
     }
 
     finalGame = false;
@@ -8008,9 +8579,24 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     // Reload a new rival
     if (typeOfGame == 3){
+        typeOfVehicle = 4;
+
+        // Increment the stage where the player plays
+        currentStage++;
+
+        if (currentStage > totalStages){
+            // Finish the game mode
+            return START;
+        }
+        else {
+            currentLandScape = 0;
+            goalCarStage++;
+        }
+
         string path = "Data/Vehicles/Police/Configuration/Configuration.xml";
         string brandName, motorName;
         float max_speed, angle;
+        updatedGoalCar = false;
 
         // Load the properties of the police car
         loadVehicleProperties(path , brandName, max_speed, angle, motorName);
@@ -8025,60 +8611,35 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         switch(vehicle){
             case 1:
                 goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Devastators/Devastator" +
-                             to_string(colorVehicle + 1), 0.f, 0.f, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
+                             to_string(colorVehicle + 1), 0., maxDistance, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
                              5, 8, 23, 26, 9, 12, 27, 30, 13, 14, 31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24,
                              28, 33, 35, 1.55f);
 
-                goalCar.setAI(c.maxAggressiveness, c.level);
+                goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 break;
             case 2:
                 goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Minivans/Minivan" + to_string(colorVehicle + 1),
-                             0.f, 0.f, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
+                             0.f, maxDistance, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
                              11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.45f);
 
-                goalCar.setAI(c.maxAggressiveness, c.level);
+                goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                 break;
             case 3:
                 goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "Data/Vehicles/Trucks/Truck" + to_string(colorVehicle + 1),
-                             0.f, 0.f, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
+                             0.f, maxDistance, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
                              43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.50f);
 
-                goalCar.setAI(c.maxAggressiveness, c.level);
+                goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
         }
 
-        // Back door
-        int bdTime = 0;
-        ifstream fin("Data/backdoor.info");
-        if (fin.is_open()) {
-            int bdMap = 1;
-            while (!fin.eof()) {
-                string s;
-                fin >> s;
-                if (s == "MAP:" && !fin.eof()) {
-                    fin >> bdMap;
-                    if (bdMap > 0 && bdMap <= 15) {
-                        for (int i = 1; i < bdMap; i++) {
-                            if (mapId.second < mapId.first) {
-                                mapId.second++;
-                            } else {
-                                mapId.second = 0;
-                                mapId.first++;
-                            } // Level????????????????????????
-                        }
-                    }
-                } else if (s == "TIME:" && !fin.eof()) {
-                    fin >> bdTime;
-                }
-            }
-            fin.close();
-        }
         displayGoalCarIndicator = true;
         lifeGoalCar = 100;
+        maxDistance = 1000;
+        distanceGoalCar = maxDistance;
         mapId = make_pair(0, 0);
         currentMap = &maps[mapId.first][mapId.second];
-        score = 0;
         level = mapId.first + 1;
-        time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
+        time = int(float(currentMap->getTimeToPlay()) * timeMul);
 
         // Read the current best mark of the level
         string name;
@@ -8108,16 +8669,30 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             case HARD:
                 path += "Hard.xml";
         }
-
-        // Read the best mark of the level
-        readRecordFromLandScape(path, name, minutesRecord, secsRecord, centsSecondRecord);
-
-        levelLapRecord = "";
-        levelLapRecord = (minutesRecord < 10) ? "0" + to_string(int(minutesRecord)) + ":" : to_string(int(minutesRecord)) + ":";
-        levelLapRecord += (secsRecord < 10) ? "0" + to_string(int(secsRecord)) + ":" : to_string(int(secsRecord)) + ":";
-        levelLapRecord += (centsSecondRecord < 10) ? "0" + to_string(centsSecondRecord) : to_string(centsSecondRecord);
     }
     else if (typeOfGame == 4){
+        // Increment the stage where the player plays
+        currentStage++;
+
+        switch(currentStage){
+            case 1:
+                distanceAdvanced = 2000;
+                break;
+            case 2:
+                distanceAdvanced = 3000;
+        }
+
+        if (currentStage > totalStages){
+            // Finish the game mode
+            return START;
+        }
+        else {
+            currentLandScape = 0;
+            goalCarStage++;
+        }
+
+        updatedGoalCar = false;
+
         // Select a color to the type of vehicle chosen
         int colorVehicle = rand_generator_int(0, 7);
 
@@ -8126,11 +8701,11 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
             // Load a Motorbike to chase
             goalCar = RivalCar(typeOfVehicle, MAX_SPEED, SPEED_FACTOR, 2.5f, COUNTER, "Data/Vehicles/Motorbikes/Motorbike" +
-                               to_string(colorVehicle + 1), 0.f, 0.f, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16,
+                               to_string(colorVehicle + 1), 0.f, maxDistance, Motorbike_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16,
                                3, 8, 17, 22, 9, 14, 23, 28, 1, 2, 15, 16, 3, 8, 17, 22, 9, 14, 23, 28, 7, 13, 7, 13, 21, 27,
                                21, 27, 0.85f);
 
-            goalCar.setAI(c.maxAggressiveness, c.level);
+            goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
         }
         else {
             // Select a vehicle to chase
@@ -8140,60 +8715,35 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             switch(vehicle){
                 case 1:
                     goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Devastators/Devastator" +
-                                 to_string(colorVehicle + 1), 0.f, 0.f, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
+                                 to_string(colorVehicle + 1), 0.f, maxDistance, Devastator_vehicle::PLAYER_TEXTURES, 1, 4, 19, 22,
                                  5, 8, 23, 26, 9, 12, 27, 30, 13, 14, 31, 32, 15, 16, 33, 34, 17, 18, 35, 36, 6, 10, 15, 17, 24,
                                  28, 33, 35, 1.55f);
 
-                    goalCar.setAI(c.maxAggressiveness, c.level);
+                    goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                     break;
                 case 2:
                     goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.f, COUNTER, "Data/Vehicles/Minivans/Minivan" + to_string(colorVehicle + 1),
-                                 0.f, 0.f, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
+                                 0.f, maxDistance, Minivan_vehicle::PLAYER_TEXTURES, 1, 2, 15, 16, 3, 5, 17, 19, 6, 8, 17, 19, 9, 10, 23, 24,
                                  11, 12, 25, 26, 13, 14, 20, 22, 3, 6, 11, 13, 17, 20, 25, 27, 1.45f);
 
-                    goalCar.setAI(c.maxAggressiveness, c.level);
+                    goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
                     break;
                 case 3:
                     goalCar = RivalCar(vehicle, MAX_SPEED, SPEED_FACTOR, 4.5f, COUNTER, "Data/Vehicles/Trucks/Truck" + to_string(colorVehicle + 1),
-                                 0.f, 0.f, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
+                                 0.f, maxDistance, Truck_vehicle::PLAYER_TEXTURES, 1, 5, 28, 32, 6, 10, 33, 37, 11, 15, 38, 42, 16, 19,
                                  43, 46, 20, 23, 47, 50, 24, 27, 51, 54, 7, 12, 21, 25, 34, 39, 48, 52, 1.50f);
 
-                    goalCar.setAI(c.maxAggressiveness, c.level);
+                    goalCar.setAI(c.maxAggressiveness, c.level, typeOfGame);
             }
         }
 
-        // Back door
-        int bdTime = 0;
-        ifstream fin("Data/backdoor.info");
-        if (fin.is_open()) {
-            int bdMap = 1;
-            while (!fin.eof()) {
-                string s;
-                fin >> s;
-                if (s == "MAP:" && !fin.eof()) {
-                    fin >> bdMap;
-                    if (bdMap > 0 && bdMap <= 15) {
-                        for (int i = 1; i < bdMap; i++) {
-                            if (mapId.second < mapId.first) {
-                                mapId.second++;
-                            } else {
-                                mapId.second = 0;
-                                mapId.first++;
-                            } // Level????????????????????????
-                        }
-                    }
-                } else if (s == "TIME:" && !fin.eof()) {
-                    fin >> bdTime;
-                }
-            }
-            fin.close();
-        }
         displayGoalCarIndicator = true;
         mapId = make_pair(0, 0);
         currentMap = &maps[mapId.first][mapId.second];
-        score = 0;
+        maxDistance = 1000;
+        distanceGoalCar = maxDistance;
         level = mapId.first + 1;
-        time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
+        time = int(float(currentMap->getTimeToPlay()) * timeMul);
 
         // Read the current best mark of the level
         string name;
@@ -8223,14 +8773,6 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             case HARD:
                 path += "Hard.xml";
         }
-
-        // Read the best mark of the level
-        readRecordFromLandScape(path, name, minutesRecord, secsRecord, centsSecondRecord);
-
-        levelLapRecord = "";
-        levelLapRecord = (minutesRecord < 10) ? "0" + to_string(int(minutesRecord)) + ":" : to_string(int(minutesRecord)) + ":";
-        levelLapRecord += (secsRecord < 10) ? "0" + to_string(int(secsRecord)) + ":" : to_string(int(secsRecord)) + ":";
-        levelLapRecord += (centsSecondRecord < 10) ? "0" + to_string(centsSecondRecord) : to_string(centsSecondRecord);
     }
     if (typeOfGame == 2){
         r.soundTracks[1]->play();
@@ -8907,7 +9449,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, (currentLandScape >= goalCarStage));
 
             player5.setPosition(player5.getPosX(), player5.getPosY() + 1);
             goalCar.setPosition(goalCar.getPosX(), goalCar.getPosY() + 1);
@@ -9024,7 +9566,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, currentLandScape >= goalCarStage);
 
             player5.setPosition(player5.getPosX(), player5.getPosY() + 1);
 
@@ -9082,7 +9624,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, (currentLandScape >= goalCarStage));
 
             player5.setPosition(player5.getPosX(), player5.getPosY() + 1);
 
@@ -9099,7 +9641,6 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
             c.window.draw(bufferSprite);
             c.window.display();
         }
-
     }
     else if (typeOfGame == 4){
         // Derramage
@@ -9153,7 +9694,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator);
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, displayGoalCarIndicator, (currentLandScape >= goalCarStage));
 
             switch(typeOfVehicle){
                 case 0:

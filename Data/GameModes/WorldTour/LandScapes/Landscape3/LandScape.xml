@@ -489,10 +489,10 @@
 			</Straight>
 		</P14>
 		<P15>
-			<Climbing elevation="8000">
+			<Climbing elevation="3000">
 				<P1>
 					<Direction>1.0</Direction>
-					<Road startPosGE="1490" finalPosLT="2000">
+					<Road startPosGE="1490" finalPosLT="1560">
 						<SpriteNearLeft>
 							<Each>48</Each>
 							<Offset>1.2</Offset>
@@ -518,10 +518,90 @@
 			</Climbing>
 		</P15>
 		<P16>
+			<Straight elevation="6000">
+				<Road startPosGT="1559" finalPosLT="1750">
+					<SpriteNearLeft>
+						<Each>87</Each>
+						<Offset>0.3</Offset>
+						<Code>12</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>90</Each>
+						<Offset>0.7</Offset>
+						<Code>16</Code>
+					</SpriteNearRight>
+					<SpriteFarLeft>
+						<Each>56</Each>
+						<Offset>Random</Offset>
+						<Code>11</Code>
+					</SpriteFarLeft>
+					<SpriteFarRight>
+						<Each>64</Each>
+						<Offset>Random</Offset>
+						<Code>10</Code>
+					</SpriteFarRight>
+				</Road>
+			</Straight>
+		</P16>
+		<P17>
+			<Climbing elevation="4000">
+				<P1>
+					<Direction>1.0</Direction>
+					<Road startPosGE="1750" finalPosLT="2000">
+						<SpriteNearLeft>
+							<Each>48</Each>
+							<Offset>1.2</Offset>
+							<Code>8</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>43</Each>
+							<Offset>1.7</Offset>
+							<Code>18</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>53</Each>
+							<Offset>Random</Offset>
+							<Code>20</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>57</Each>
+							<Offset>Random</Offset>
+							<Code>4</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+			</Climbing>
+		</P17>
+		<P18>
 			<Dropping elevation="6000">
 				<P1>
+					<Direction>0.0</Direction>
+					<Road startPosGT="1999" finalPosLE="2200">
+						<SpriteNearLeft>
+							<Each>87</Each>
+							<Offset>0.3</Offset>
+							<Code>25</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>90</Each>
+							<Offset>0.7</Offset>
+							<Code>7</Code>
+						</SpriteNearRight>
+						<SpriteFarLeft>
+							<Each>56</Each>
+							<Offset>Random</Offset>
+							<Code>5</Code>
+						</SpriteFarLeft>
+						<SpriteFarRight>
+							<Each>64</Each>
+							<Offset>Random</Offset>
+							<Code>23</Code>
+						</SpriteFarRight>
+					</Road>
+				</P1>
+				<P2>
 					<Direction>-1.5</Direction>
-					<Road startPosGT="1999" finalPosLT="2500">
+					<Road startPosGT="2200" finalPosLT="2500">
 						<SpriteNearLeft>
 							<Each>87</Each>
 							<Offset>0.3</Offset>
@@ -543,10 +623,10 @@
 							<Code>23</Code>
 						</SpriteFarRight>
 					</Road>
-				</P1>
+				</P2>
 			</Dropping>
-		</P15>
-		<P16>
+		</P18>
+		<P19>
 			<Climbing elevation="4000">
 				<P1>
 					<Direction>0.0</Direction>
@@ -574,8 +654,8 @@
 					</Road>
 				</P1>
 			</Climbing>
-		</P16>
-		<P17>
+		</P19>
+		<P20>
 			<Dropping elevation="8000">
 				<P1>
 					<Direction>0.0</Direction>
@@ -608,8 +688,8 @@
 					</Road>
 				</P1>
 			</Dropping>
-		</P17>
-		<P18>
+		</P20>
+		<P21>
 			<Climbing elevation="4000">
 				<P1>
 					<Direction>1.3</Direction>
@@ -637,8 +717,8 @@
 					</Road>
 				</P1>
 			</Climbing>
-		</P19>
-		<P20>
+		</P21>
+		<P22>
 			<Dropping elevation="4000">
 				<P1>
 					<Direction>-1.3</Direction>
@@ -666,8 +746,8 @@
 					</Road>
 				</P1>
 			</Dropping>
-		</P20>
-		<P21>
+		</P22>
+		<P23>
 			<Straight>
 				<Road startPosGT="3269" finalPosLT="3300">
 					<CheckPoint>
@@ -697,8 +777,8 @@
 					</SpriteFarRight>
 				</Road>
 			</Straight>
-		</P21>
-		<P22>
+		</P23>
+		<P24>
 			<Climbing elevation="4000">
 				<P1>
 					<Direction>1.2</Direction>
@@ -726,8 +806,8 @@
 					</Road>
 				</P1>
 			</Climbing>
-		</P22>
-		<P23>
+		</P24>
+		<P25>
 			<Dropping elevation="4000">
 				<P1>
 					<Direction>1.8</Direction>
@@ -755,8 +835,8 @@
 					</Road>
 				</P1>
 			</Dropping>
-		</P23>
-		<P24>
+		</P25>
+		<P26>
 			<Straight>
 				<Road startPosGE="3580" finalPosLT="3800">
 					<SpriteNearLeft>
@@ -781,7 +861,7 @@
 					</SpriteFarRight>
 				</Road>
 			</Straight>
-		</P24>
+		</P26>
 	</Terrain>
 	<Color_grass>
 		<CO1>

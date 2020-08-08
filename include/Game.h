@@ -257,16 +257,31 @@ class Game {
     int lifeLostPerCrash;
 
 
-    int minutesRecord;
+    bool updatedGoalCar;
 
 
-    int secsRecord;
+    int maxDistance;
 
 
-    int centsSecondRecord;
+    int totalStages;
 
 
-    string levelLapRecord;
+    int currentStage;
+
+
+    int goalCarStage;
+
+
+    int currentLandScape;
+
+
+    int distanceGoalCar;
+
+
+    bool goalNearCar;
+
+
+    int distanceAdvanced;
 
 
     void storingRivalCars(Configuration& c);

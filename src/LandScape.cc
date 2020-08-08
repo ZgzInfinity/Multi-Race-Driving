@@ -1130,6 +1130,11 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
             rectangles = 65;
         }
     }
+    else if (typeOfGame == 3) {
+        rectangles = 20;
+        treesDisplayed = 0;
+        peopleDisplayed = 0;
+    }
     else {
         rectangles = 50;
         treesDisplayed = 4;
@@ -1169,75 +1174,77 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
     }
 
     // Signals
-    leftSprites[rectangles - 44].codeMapElement = 6;
-    leftSprites[rectangles - 44].offset = -1;
-    rightSprites[rectangles - 44].codeMapElement = 11;
-    rightSprites[rectangles - 44].offset = -1;
+    if (typeOfGame != 3){
+        leftSprites[rectangles - 44].codeMapElement = 6;
+        leftSprites[rectangles - 44].offset = -1;
+        rightSprites[rectangles - 44].codeMapElement = 11;
+        rightSprites[rectangles - 44].offset = -1;
 
-    // Flagger
-    leftSprites[rectangles - 45].codeMapElement = 1;
-    if (typeOfGame == 0 || typeOfGame == 2){
-        leftSprites[rectangles - 45].offset = -2;
-    }
-    else {
-        leftSprites[rectangles - 45].offset = -4;
-    }
+        // Flagger
+        leftSprites[rectangles - 45].codeMapElement = 1;
+        if (typeOfGame == 0 || typeOfGame == 2){
+            leftSprites[rectangles - 45].offset = -2;
+        }
+        else {
+            leftSprites[rectangles - 45].offset = -4;
+        }
 
-    rightSprites[rectangles - 46].codeMapElement = 10;
-    rightSprites[rectangles - 46].offset = -0.95f;
+        rightSprites[rectangles - 46].codeMapElement = 10;
+        rightSprites[rectangles - 46].offset = -0.95f;
 
-    // Trees
-    leftSprites[rectangles - 47].codeMapElement = 18;
-    leftSprites[rectangles - 47].offset = -1.15f;
-    rightSprites[rectangles - 47].codeMapElement = 17;
-    rightSprites[rectangles - 47].offset = -1.15f;
+        // Trees
+        leftSprites[rectangles - 47].codeMapElement = 18;
+        leftSprites[rectangles - 47].offset = -1.15f;
+        rightSprites[rectangles - 47].codeMapElement = 17;
+        rightSprites[rectangles - 47].offset = -1.15f;
 
-    // Fill
-    if (typeOfGame == 0 || typeOfGame == 2){
-        for (int i = 0; i <= rectangles; i++) {
-            if (i >= 0 && i <= rectangles - 47){
-                if (i % treesDisplayed == 4) {
-                    // Trees
-                    leftSprites[i].codeMapElement = 18;
-                    leftSprites[i].offset = -0.15f;
-                    rightSprites[i].codeMapElement = 17;
-                    rightSprites[i].offset = -0.15f;
+        // Fill
+        if (typeOfGame == 0 || typeOfGame == 2){
+            for (int i = 0; i <= rectangles; i++) {
+                if (i >= 0 && i <= rectangles - 47){
+                    if (i % treesDisplayed == 4) {
+                        // Trees
+                        leftSprites[i].codeMapElement = 18;
+                        leftSprites[i].offset = -0.15f;
+                        rightSprites[i].codeMapElement = 17;
+                        rightSprites[i].offset = -0.15f;
+                    }
+                    else if (i % peopleDisplayed == 1 && (typeOfGame <= 2 || typeOfGame > 4)) {
+                        // People
+                        leftSprites[i].codeMapElement = 15;
+                        rightSprites[i].codeMapElement = 14;
+                    }
                 }
-                else if (i % peopleDisplayed == 1 && (typeOfGame <= 2 || typeOfGame > 4)) {
-                    // People
-                    leftSprites[i].codeMapElement = 15;
-                    rightSprites[i].codeMapElement = 14;
-                }
-            }
-            else if (i > rectangles - 42){
-                if (i % treesDisplayed == 4) {
-                    // Trees
-                    leftSprites[i].codeMapElement = 18;
-                    leftSprites[i].offset = -0.15f;
-                    rightSprites[i].codeMapElement = 17;
-                    rightSprites[i].offset = -0.15f;
-                }
-                else if (i % peopleDisplayed == 1 && (typeOfGame <= 2 || typeOfGame > 4)) {
-                    // People
-                    leftSprites[i].codeMapElement = 15;
-                    rightSprites[i].codeMapElement = 14;
+                else if (i > rectangles - 42){
+                    if (i % treesDisplayed == 4) {
+                        // Trees
+                        leftSprites[i].codeMapElement = 18;
+                        leftSprites[i].offset = -0.15f;
+                        rightSprites[i].codeMapElement = 17;
+                        rightSprites[i].offset = -0.15f;
+                    }
+                    else if (i % peopleDisplayed == 1 && (typeOfGame <= 2 || typeOfGame > 4)) {
+                        // People
+                        leftSprites[i].codeMapElement = 15;
+                        rightSprites[i].codeMapElement = 14;
+                    }
                 }
             }
         }
-    }
-    else {
-        for (int i = 7; i < rectangles; i++) {
-            if (i % treesDisplayed == 3) {
-                // Trees
-                leftSprites[i].codeMapElement = 18;
-                leftSprites[i].offset = -0.15f;
-                rightSprites[i].codeMapElement = 17;
-                rightSprites[i].offset = -0.15f;
-            }
-            else if (i % peopleDisplayed == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
-                // People
-                leftSprites[i].codeMapElement = 15;
-                rightSprites[i].codeMapElement = 14;
+        else {
+            for (int i = 7; i < rectangles; i++) {
+                if (i % treesDisplayed == 3) {
+                    // Trees
+                    leftSprites[i].codeMapElement = 18;
+                    leftSprites[i].offset = -0.15f;
+                    rightSprites[i].codeMapElement = 17;
+                    rightSprites[i].offset = -0.15f;
+                }
+                else if (i % peopleDisplayed == 0 && (typeOfGame <= 2 || typeOfGame > 4)) {
+                    // People
+                    leftSprites[i].codeMapElement = 15;
+                    rightSprites[i].codeMapElement = 14;
+                }
             }
         }
     }
@@ -1664,7 +1671,7 @@ float LandScape::getCameraPosY() const {
  * @param vehicles is the vector with all the traffic cars
  */
 void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame,
-                              RivalCar& goalCar, const bool displayGoalIndicator) {
+                              RivalCar& goalCar, const bool displayGoalIndicator, const bool drawGoalCar) {
 
     const int N = static_cast<const int>(newLines.size());
     const int startPos = int(posCameraY) % N;
@@ -1701,10 +1708,11 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     }
     sort(sortedRivals.begin(), sortedRivals.end(), ascendingSortRivalCars);
 
-
     // Sort the traffic cars
     vector<RivalCar *> sortedGoalCars;
-    sortedGoalCars.push_back(&goalCar);
+    if (drawGoalCar){
+        sortedGoalCars.push_back(&goalCar);
+    }
 
     // Background drawing with possible movement in curves
     drawQuad(c.w, grassColor[0], 0, 0, c.w.getSize().x, 0, c.w.getSize().y, c.w.getSize().x);
@@ -1993,7 +2001,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         }
 
         // Draw the car to chase
-        if (typeOfGame == 3 || typeOfGame == 4){
+        if ((typeOfGame == 3 || typeOfGame == 4) && drawGoalCar){
             // Draw rival cars
             while (!sortedGoalCars.empty() && int(sortedGoalCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
 

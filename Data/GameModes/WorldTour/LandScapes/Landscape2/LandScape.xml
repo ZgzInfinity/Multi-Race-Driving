@@ -697,10 +697,10 @@
 			</Climbing>
 		</P21>
 		<P22>
-			<Dropping elevation="9000">
+			<Dropping elevation="4000">
 				<P1>
 					<Direction>-1.8</Direction>
-					<Road startPosGT="2499" finalPosLE="2600">
+					<Road startPosGT="2499" finalPosLE="2580">
 						<SpriteNearLeft>
 							<Each>76</Each>
 							<Offset>0.3</Offset>
@@ -725,7 +725,7 @@
 				</P1>
 				<P2>
 					<Direction>1.8</Direction>
-					<Road startPosGT="2600" finalPosLE="2700">
+					<Road startPosGT="2580" finalPosLE="2680">
 						<SpriteNearLeft>
 							<Each>88</Each>
 							<Offset>0.2</Offset>
@@ -750,7 +750,7 @@
 				</P2>
 				<P3>
 					<Direction>0.0</Direction>
-					<Road startPosGE="2701" finalPosLE="2760">
+					<Road startPosGE="2680" finalPosLE="2760">
 						<SpriteNearLeft>
 							<Each>71</Each>
 							<Offset>1.2</Offset>
@@ -776,62 +776,10 @@
 			</Dropping>
 		</P22>
 		<P23>
-			<Curve direction="0.3">
-				<Road startPosGT="2760" finalPosLT="2700">
-					<SpriteNearLeft>
-						<Each>67</Each>
-						<Offset>0.2</Offset>
-						<Code>6</Code>
-					</SpriteNearLeft>
-					<SpriteNearRight>
-						<Each>90</Each>
-						<Offset>0.2</Offset>
-						<Code>17</Code>
-					</SpriteNearRight>
-					<SpriteFarLeft>
-						<Each>65</Each>
-						<Offset>Random</Offset>
-						<Code>28</Code>
-					</SpriteFarLeft>
-					<SpriteFarRight>
-						<Each>78</Each>
-						<Offset>Random</Offset>
-						<Code>29</Code>
-					</SpriteFarRight>
-				</Road>
-			</Curve>
-		</P23>
-		<P24>
-			<Straight>
-				<Road startPosGE="2700" finalPosLE="2750">
-					<SpriteNearLeft>
-						<Each>67</Each>
-						<Offset>0.2</Offset>
-						<Code>4</Code>
-					</SpriteNearLeft>
-					<SpriteNearRight>
-						<Each>90</Each>
-						<Offset>0.2</Offset>
-						<Code>6</Code>
-					</SpriteNearRight>
-					<SpriteFarLeft>
-						<Each>65</Each>
-						<Offset>3.4</Offset>
-						<Code>30</Code>
-					</SpriteFarLeft>
-					<SpriteFarRight>
-						<Each>78</Each>
-						<Offset>Random</Offset>
-						<Code>29</Code>
-					</SpriteFarRight>
-				</Road>
-			</Straight>
-		</P24>
-		<P25>
 			<Climbing elevation="6000">
 				<P1>
 					<Direction>0.0</Direction>
-					<Road startPosGT="2750" finalPosLE="2830">
+					<Road startPosGT="2760" finalPosLE="2830">
 						<SpriteNearLeft>
 							<Each>62</Each>
 							<Offset>0.3</Offset>
@@ -855,8 +803,8 @@
 					</Road>
 				</P1>
 			</Climbing>
-		</P25>
-		<P26>
+		</P23>
+		<P24>
 			<Curve direction="-1.3">
 				<Road startPosGE="2831" finalPosLT="2950">
 					<SpriteNearLeft>
@@ -881,8 +829,8 @@
 					</SpriteFarRight>
 				</Road>
 			</Curve>
-		</P26>
-		<P27>
+		</P24>
+		<P25>
 			<Curve direction="1.5">
 				<Road startPosGE="2950" finalPosLT="3000">
 					<SpriteNearLeft>
@@ -907,8 +855,8 @@
 					</SpriteFarRight>
 				</Road>
 			</Curve>
-		</P27>
-		<P28>
+		</P25>
+		<P26>
 			<Climbing elevation="4000">
 				<P1>
 					<Direction>0.8</Direction>
@@ -936,8 +884,8 @@
 					</Road>
 				</P1>
 			</Climbing>
-		</P28>
-		<P29>
+		</P26>
+		<P27>
 			<Climbing elevation="4000">
 				<P1>
 					<Direction>-0.8</Direction>
@@ -965,8 +913,8 @@
 					</Road>
 				</P1>
 			</Climbing>
-		</P29>
-		<P30>
+		</P27>
+		<P28>
 			<Straight>
 				<Road startPosGE="3181" finalPosLT="3250">
 					<SpriteNearLeft>
@@ -991,7 +939,7 @@
 					</SpriteFarRight>
 				</Road>
 			</Straight>
-		</P30>
+		</P28>
 	</Terrain>
 	<Color_grass>
 		<CO1>

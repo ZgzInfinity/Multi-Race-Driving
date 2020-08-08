@@ -552,7 +552,7 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
             maxCounterToChange = COUNTER + 1;
         }
     }
-    else if (outSideRoad){
+    else if (outSideRoad && speed != 0.f){
         maxCounterToChange = COUNTER;
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         switch(terrain){

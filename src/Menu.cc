@@ -1180,9 +1180,9 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                                 // Creation of the button and addition to the vector
                                 // Creation of the button and addition to the vector
                                 posX = c.w.getSize().x / 2.f - 280.0f * c.screenScale;
-                                posY = c.w.getSize().y / 2.f - (149.0f - idButton * 62.f) * c.screenScale;
+                                posY = c.w.getSize().y / 2.f - (149.0f - idButton * 75.f) * c.screenScale;
                                 widthButton = 200.0f * c.screenScale;
-                                heightButton = 30.0f * c.screenScale;
+                                heightButton = 40.0f * c.screenScale;
 
                                 // Creation of the button
                                 Button b = Button(posX, posY, widthButton, heightButton, c.fontGameModeMenu,
@@ -1236,7 +1236,7 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
 
         // Change the state of the first color
         Button b = Button(c.w.getSize().x / 2.f - 280.0f * c.screenScale, c.w.getSize().y / 2.f - 149.0f * c.screenScale,
-                          200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuGameModeButtons, c.gameModeMenuButtons[0].getTextButton(),
+                          200.0f * c.screenScale, 40.0f * c.screenScale, c.fontMenuGameModeButtons, c.gameModeMenuButtons[0].getTextButton(),
                           c.gameModeMenuButtons[0].getIdleColorButton(), c.gameModeMenuButtons[0].getHoverColorButton(),
                           c.gameModeMenuButtons[0].getFontColorButton(), 1, c.screenScale);
 
@@ -1249,8 +1249,8 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
         // Eliminate the buttons of the right column
         for (int i = 1; i < numButtons; i++){
             // Change the state of the first color
-            Button b = Button(c.w.getSize().x / 2.f - 280.0f * c.screenScale, c.w.getSize().y / 2.f - (149.0f - i * 62.f) * c.screenScale,
-                              200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuGameModeButtons, c.gameModeMenuButtons[i].getTextButton(),
+            Button b = Button(c.w.getSize().x / 2.f - 280.0f * c.screenScale, c.w.getSize().y / 2.f - (149.0f - i * 75.f) * c.screenScale,
+                              200.0f * c.screenScale, 40.0f * c.screenScale, c.fontMenuGameModeButtons, c.gameModeMenuButtons[i].getTextButton(),
                               c.gameModeMenuButtons[i].getIdleColorButton(), c.gameModeMenuButtons[i].getHoverColorButton(),
                               c.gameModeMenuButtons[i].getFontColorButton(), 0, c.screenScale);
 

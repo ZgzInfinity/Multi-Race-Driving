@@ -620,15 +620,15 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
         sprite.setPosition(((float) c.w.getSize().x) / 2.0f, j - sprite.getGlobalBounds().height);
         c.w.draw(sprite);
     }
-    else if (outSideRoad){
+    else if (outSideRoad && speed != 0.f){
         maxCounterToChange = COUNTER;
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         switch(terrain){
         case 0:
-            sprite.setTexture(textures[54 + current_code_image % 8], true);
+            sprite.setTexture(textures[60 + current_code_image % 8], true);
             break;
         case 1:
-            sprite.setTexture(textures[60 + current_code_image % 6], true);
+            sprite.setTexture(textures[54 + current_code_image % 6], true);
             break;
         case 2:
             sprite.setTexture(textures[68 + current_code_image % 6], true);

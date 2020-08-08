@@ -297,7 +297,7 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
                     }
                 }
             }
-            else { // INCONSTANT
+            else if (typeAI == INCONSTANT) {
                 if (currentDirection == TURNRIGHT) {
                     const float prevPosX = posX;
                     posX += INCREMENT_X * speed / maxSpeed;
@@ -330,6 +330,53 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
                     }
                     else {
                         currentDirection = TURNLEFT;
+                    }
+                }
+            }
+            else {
+                // MANIAC
+                bool vehicleDetected;
+                if (vehicleDetected){
+                    float p, cordX;
+                    // Check the difficulty to control the speed of changing
+                    switch(c.level){
+                        case PEACEFUL:
+                            break;
+                        case EASY:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.5f){
+                                const float direction = rand_generator_zero_one();
+                                if (direction <= 0.5){
+                                    if (cordX < 0.f){
+                                        cordX += 0.02f;
+                                    }
+                                    else {
+                                        cordX -= 0.02f;
+                                    }
+                                }
+                            }
+                            break;
+                        case NORMAL:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.65f){
+                                if (cordX < 0.f){
+                                    cordX += 0.035f;
+                                }
+                                else {
+                                    cordX -= 0.035f;
+                                }
+                            }
+                            break;
+                        case HARD:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.8f){
+                                if (cordX < 0.f){
+                                    cordX += 0.05f;
+                                }
+                                else {
+                                    cordX -= 0.05f;
+                                }
+                            }
                     }
                 }
             }
@@ -469,7 +516,7 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
                     }
                 }
             }
-            else { // INCONSTANT
+            else if (typeAI == INCONSTANT){
                 if (currentDirection == TURNRIGHT) {
                     const float prevPosX = posX;
                     posX += INCREMENT_X * speed / maxSpeed;
@@ -505,6 +552,53 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
                     }
                     else {
                         currentDirection = RIGHT;
+                    }
+                }
+            }
+            else {
+                // MANIAC
+                bool vehicleDetected;
+                if (vehicleDetected){
+                    float p;
+                    // Check the difficulty to control the speed of changing
+                    switch(c.level){
+                        case PEACEFUL:
+                            break;
+                        case EASY:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.5f){
+                                const float direction = rand_generator_zero_one();
+                                if (direction <= 0.5){
+                                    if (posX < 0.f){
+                                        posX += 0.01f;
+                                    }
+                                    else {
+                                        posX -= 0.01f;
+                                    }
+                                }
+                            }
+                            break;
+                        case NORMAL:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.65f){
+                                if (posX < 0.f){
+                                    posX += 0.015f;
+                                }
+                                else {
+                                    posX -= 0.015f;
+                                }
+                            }
+                            break;
+                        case HARD:
+                            p = rand_generator_zero_one();
+                            if (p <= 0.8f){
+                                if (posX < 0.f){
+                                    posX += 0.02f;
+                                }
+                                else {
+                                    posX -= 0.02f;
+                                }
+                            }
                     }
                 }
             }
@@ -692,7 +786,7 @@ void RivalCar::update(Configuration& c, float iniPos, float endPos, float maxAgg
 
 
 
-void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty) {
+void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty, const int typeOfGame) {
     if (maxAggressiveness == 0.0f){
         probAI = 0.0f;
     }
@@ -700,39 +794,44 @@ void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty) {
         probAI = rand_generator_float(0.f, maxAggressiveness);
     }
 
-    const float p = rand_generator_zero_one();
-    switch(difficulty){
-    case PEACEFUL:
-        if (p < 0.1f) {
-            typeAI = OBSTACLE;
-        }
-        else {
-            typeAI = EVASIVE;
-        }
-        break;
-    case EASY:
-        if (p < 0.4f) {
-            typeAI = OBSTACLE;
-        }
-        else {
-            typeAI = EVASIVE;
-        }
-        break;
-    case NORMAL:
-        if (p < 0.5f) {
-            typeAI = OBSTACLE;
-        }
-        else {
-            typeAI = EVASIVE;
-        }
-        break;
-    case HARD:
-        if (p < 0.7f) {
-            typeAI = OBSTACLE;
-            probAI *= 2.0f;
-        }
-        else {
-            typeAI = EVASIVE;
+    if (typeOfGame == 3){
+        typeAI = MANIAC;
+    }
+    else {
+        const float p = rand_generator_zero_one();
+        switch(difficulty){
+        case PEACEFUL:
+            if (p < 0.1f) {
+                typeAI = OBSTACLE;
+            }
+            else {
+                typeAI = EVASIVE;
+            }
+            break;
+        case EASY:
+            if (p < 0.4f) {
+                typeAI = OBSTACLE;
+            }
+            else {
+                typeAI = EVASIVE;
+            }
+            break;
+        case NORMAL:
+            if (p < 0.5f) {
+                typeAI = OBSTACLE;
+            }
+            else {
+                typeAI = EVASIVE;
+            }
+            break;
+        case HARD:
+            if (p < 0.7f) {
+                typeAI = OBSTACLE;
+                probAI *= 2.0f;
+            }
+            else {
+                typeAI = EVASIVE;
+            }
         }
     }
 }

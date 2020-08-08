@@ -149,27 +149,6 @@
 					<D3>Mode inspired in Need for Speed Undercover game.</D3>
 				</Description>
 			</B4>
-			<B5>
-				<Content>Delivery</Content>
-				<InitialState>0</InitialState>
-				<Colors>
-					<C1>
-						<R>249</R>
-						<G>54</G>
-						<B>46</B>
-					</C1>
-					<C2>
-						<R>255</R>
-						<G>255</G>
-						<B>255</B>
-					</C2>
-				</Colors>
-				<Description>
-					<D1>Deliver a package to a specific point</D1> 
-					<D2>before any of your rivals do.</D2>
-					<D3>Game mode inspired in Crazy taxi.</D3>
-				</Description>
-			</B5>
 		</Buttons>
 	</MenuButtons>
 </GameModesMenu>

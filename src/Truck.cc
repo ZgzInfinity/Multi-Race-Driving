@@ -602,7 +602,7 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
         sprite.setPosition(((float) c.w.getSize().x) / 2.0f, j - sprite.getGlobalBounds().height);
         c.w.draw(sprite);
     }
-    else if (outSideRoad){
+    else if (outSideRoad && speed != 0.f){
         maxCounterToChange = COUNTER;
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         switch(terrain){

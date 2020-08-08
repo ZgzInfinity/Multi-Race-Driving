@@ -452,7 +452,7 @@ public:
      * @param vehicles is the vector with all the traffic cars
      */
     void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame,
-                       RivalCar& goalCar, const bool displayGoalIndicator);
+                       RivalCar& goalCar, const bool displayGoalIndicator, const bool drawGoalCar);
 
 
 
