@@ -23,9 +23,9 @@ SoundPlayer::SoundPlayer(const int volMusic, const int volEffects){
     // Store the titles of the soundtracks
     titleSoundtracks[0] = "REDLINE SHUFFLE";   titleSoundtracks[5] = "EGYPTIAN CROSSING";
     titleSoundtracks[1] = "HOUSE SPECIAL";     titleSoundtracks[6] = "SPRINTER";
-    titleSoundtracks[2] = "WINNING ROAD";      titleSoundtracks[7] = "SOUND MAGICAL SHOWER";
-    titleSoundtracks[3] = "BLUEGRASS BOGGIE";  titleSoundtracks[8] = "PASSING BREZZE";
-    titleSoundtracks[4] = "DEADWOOD RIDING";   titleSoundtracks[9] = "SPLASH WAVE";
+    titleSoundtracks[2] = "WINNING ROAD";      titleSoundtracks[7] = "FUNKY SEA";
+    titleSoundtracks[3] = "BLUEGRASS BOGGIE";  titleSoundtracks[8] = "BOOTY SHAKER";
+    titleSoundtracks[4] = "ROADKILL JAM";      titleSoundtracks[9] = "EURO HOUSE";
 
     // Path of the xml configuration file of the soundtracks
     string path = "Data/Soundtracks/Configuration/Configuration.xml";

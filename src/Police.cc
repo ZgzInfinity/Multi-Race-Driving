@@ -304,8 +304,8 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
         if (speed > 0.0f) {
             if (a == BOOT) {
                 // Acceleration sound
-                r.soundEffects[12]->stop();
-                r.soundEffects[12]->play();
+                r.soundEffects[114]->stop();
+                r.soundEffects[114]->play();
             }
             if (r.soundEffects[35]->getStatus() != SoundSource::Playing) {
                 // Siren sound

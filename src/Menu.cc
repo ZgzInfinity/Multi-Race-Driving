@@ -684,7 +684,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         string pathFile = "Data/Menus/PlayerMenu/Configuration/PlayerMenu.xml";
         loadPlayerMenuConfiguration(pathFile, c);
     }
-    else if (!c.comeFromOptions) {
+    else {
         int numButtons = int(c.menuPlayerButtons.size());
 
         // Description of the button
@@ -731,7 +731,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
     c.window.display();
 
     // Control the option selected by the user
-    int optionSelected;
+    int optionSelected = 0;
 
     // While start and backspace have not been pressed
     while (!startPressed && !backSpacePressed) {
@@ -783,15 +783,6 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         descriptionText.setFillColor(c.colorFontMenuPlayerButtons);
         descriptionText.setCharacterSize(25 * c.screenScale);
         descriptionText.setFont(c.fontMenuPlayerButtons);
-
-        if (c.comeFromOptions){
-            // Paint the correct button of the menu
-            optionSelected = 2;
-            c.comeFromOptions = false;
-        }
-        else {
-            optionSelected = 0;
-        }
 
         // Until the start keyword is not pressed
         while (!startPressed && !backSpacePressed) {

@@ -280,7 +280,7 @@
 			</Dropping>
 		</P5>
 		<P6>
-			<Curve direction="-1.7">
+			<Curve direction="1.7">
 				<Road startPosGT="421" finalPosLT="471">
 					<SpriteNearLeft>
 						<Each>81</Each>
@@ -387,14 +387,14 @@
 					<Direction>-1.8</Direction>
 					<Road startPosGT="628" finalPosLE="670">
 						<SpriteNearLeft>
-							<Each>82</Each>
-							<Offset>0.3</Offset>
-							<Code>3</Code>
-						</SpriteNearLeft>
-						<SpriteNearRight>
 							<Each>73</Each>
 							<Offset>0.4</Offset>
 							<Code>8</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
+							<Each>82</Each>
+							<Offset>0.3</Offset>
+							<Code>2</Code>
 						</SpriteNearRight>
 						<SpriteFarLeft>
 							<Each>43</Each>
@@ -574,14 +574,14 @@
 			<Curve direction="-1.6">
 				<Road startPosGT="780" finalPosLE="820">
 					<SpriteNearLeft>
-						<Each>78</Each>
-						<Offset>0.1</Offset>
-						<Code>3</Code>
-					</SpriteNearLeft>
-					<SpriteNearRight>
 						<Each>82</Each>
 						<Offset>0.3</Offset>
 						<Code>31</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>78</Each>
+						<Offset>0.1</Offset>
+						<Code>2</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
 						<Each>22</Each>

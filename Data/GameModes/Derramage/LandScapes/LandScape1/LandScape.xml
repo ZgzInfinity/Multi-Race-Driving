@@ -174,12 +174,12 @@
 					<Road startPosGE="230" finalPosLE="430">
 						<SpriteNearLeft>
 							<Each>85</Each>
-							<Offset>-0.8</Offset>
+							<Offset>0.1</Offset>
 							<Code>10</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
 							<Each>85</Each>
-							<Offset>-0.8</Offset>
+							<Offset>0.2</Offset>
 							<Code>11</Code>
 						</SpriteNearRight>
 						<SpriteFarLeft>
@@ -387,12 +387,12 @@
 				<Road startPosGE="1022" finalPosLE="1122">
 					<SpriteNearLeft>
 						<Each>82</Each>
-						<Offset>-0.8</Offset>
+						<Offset>0.2</Offset>
 						<Code>10</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
 						<Each>89</Each>
-						<Offset>-0.8</Offset>
+						<Offset>0.1</Offset>
 						<Code>11</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>

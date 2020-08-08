@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Settings>
-	<Difficulty>Hard</Difficulty>
-	<AI>Enabled</AI>
+	<Difficulty>Normal</Difficulty>
+	<AI>Disabled</AI>
 	<Volume_Soundtracks>100</Volume_Soundtracks>
 	<Volume_Effects>100</Volume_Effects>
 	<PixelArt>Disabled</PixelArt>

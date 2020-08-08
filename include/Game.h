@@ -51,6 +51,7 @@ class Game {
 
     // Matrix of landscapes for Out Run Driving fury and Derramage modes
     vector<vector<LandScape>> maps;
+    vector<vector<LandScape>> referencedMaps;
     pair<int, int> mapId;
     LandScape *currentMap;
     LandScape goalMap;
@@ -257,7 +258,7 @@ class Game {
     int lifeLostPerCrash;
 
 
-    bool updatedGoalCar;
+    bool updatedGoalCar, updatedPlayerCar;
 
 
     int maxDistance;
