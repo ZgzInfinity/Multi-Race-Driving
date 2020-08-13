@@ -218,14 +218,14 @@
 					<Direction>0.0</Direction>
 					<Road startPosGT="350" finalPosLT="430">
 						<SpriteNearLeft>
-							<Each>70</Each>
+							<Each>61</Each>
 							<Offset>0.3</Offset>
-							<Code>27</Code>
+							<Code>13</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
-							<Each>70</Each>
+							<Each>65</Each>
 							<Offset>0.3</Offset>
-							<Code>28</Code>
+							<Code>13</Code>
 						</SpriteNearRight>
 						<SpriteFarLeft>
 							<Each>51</Each>

@@ -5,13 +5,21 @@
 
 State introAnimation(Configuration &c, SoundPlayer& r) {
 
+    r.soundTracks[0]->play();
+
     // Vector of images with the logo of Sega
     Texture t;
-    vector<Texture> segaIcons;
-    Sprite segaIcon;
+    Sprite icon;
+
+    // Loading the icon texture
+    t.loadFromFile("Data/Animations/IntroAnimation/Icon.png");
+
+    // Load the texture in the sprite reseting the last texture
+    icon.setTexture(t, true);
+    icon.setScale(c.screenScale, c.screenScale);
 
     // Iterate throughout all the icons of sega
-    for (int i = 1; i < NUM_SEGA_ICONS; i++) {
+    for (int i = 1; i < TIME_ANIMATION; i++) {
 
         // Detect the possible events
         Event e{};
@@ -20,29 +28,34 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
                 return EXIT;
             }
         }
-        // Loading the icon texture
-        t.loadFromFile("Data/Animations/SegaAnimation/segaLogo" + to_string(i) + ".png");
-        segaIcons.push_back(t);
-        // Load the texture in the sprite reseting the last texture
-        segaIcon.setTexture(segaIcons.at(static_cast<unsigned long>(i - 1)), true);
-        segaIcon.setScale(c.screenScale, c.screenScale);
-        if (i == 1) {
-            segaIcon.setPosition((c.w.getSize().x - segaIcon.getGlobalBounds().width) / 2.0f,
-                                 (c.w.getSize().y - segaIcon.getGlobalBounds().height) / 2.0f);
-        }
-        c.w.draw(segaIcon);
+
+        icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
+                             (c.w.getSize().y - icon.getGlobalBounds().height) / 2.0f);
+
+
+        c.w.clear();
+        c.w.draw(icon);
         // Show the logos in the console
         Sprite bufferSprite(c.w.getTexture());
         c.w.display();
         c.window.draw(bufferSprite);
         c.window.display();
+
         // Sleep the process to see the menu icons correctly
         sleep(milliseconds(40));
     }
 
-    // Wait until sound stops
-    r.soundEffects[27]->play();
-    while (r.soundEffects[27]->getStatus() == SoundSource::Playing){
+
+    // Loading the icon texture
+    t.loadFromFile("Data/Animations/IntroAnimation/Presents.png");
+
+    // Load the texture in the sprite reseting the last texture
+    icon.setTexture(t, true);
+    icon.setScale(c.screenScale, c.screenScale);
+
+    // Iterate throughout all the icons of sega
+    for (int i = 1; i < TIME_ANIMATION; i++) {
+
         // Detect the possible events
         Event e{};
         while (c.window.pollEvent(e)) {
@@ -50,6 +63,21 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
                 return EXIT;
             }
         }
+
+        icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
+                             (c.w.getSize().y - icon.getGlobalBounds().height) / 2.0f);
+
+
+        c.w.clear();
+        c.w.draw(icon);
+        // Show the logos in the console
+        Sprite bufferSprite(c.w.getTexture());
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+
+        // Sleep the process to see the menu icons correctly
+        sleep(milliseconds(40));
     }
     return START;
 }
@@ -230,7 +258,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[1].setFillColor(c.colorTexts[1]);
     textElements[1].setOutlineColor(c.colorBorders[1]);
     textElements[1].setOutlineThickness(3.0f * c.screenScale);
-    float initialX = c.w.getSize().x - 2.0f * textElements[1].getGlobalBounds().width, initialY =
+    float initialX = c.w.getSize().x - 1.2f * textElements[1].getGlobalBounds().width, initialY =
             c.w.getSize().y - 2.0f * float(textElements[1].getCharacterSize());
     textElements[1].setPosition(initialX, initialY);
 
@@ -249,7 +277,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[3].setFillColor(c.colorTexts[3]);
     textElements[3].setOutlineColor(c.colorBorders[4]);
     textElements[3].setOutlineThickness(3.0f * c.screenScale);
-    textElements[3].setPosition(initialX, initialY);
+    textElements[3].setPosition(initialX / 2.5f, initialY);
 
     initialY -= 2.0f * textElements[3].getGlobalBounds().height;
     textElements[4].setString(c.contents[4]);
@@ -258,7 +286,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[4].setFillColor(c.colorTexts[4]);
     textElements[4].setOutlineColor(c.colorBorders[4]);
     textElements[4].setOutlineThickness(3.0f * c.screenScale);
-    textElements[4].setPosition(initialX, initialY);
+    textElements[4].setPosition(initialX / 2.5f, initialY);
 
     initialY -= 2.0f * textElements[4].getGlobalBounds().height;
     textElements[5].setString(c.contents[5]);
@@ -267,7 +295,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[5].setFillColor(c.colorTexts[5]);
     textElements[5].setOutlineColor(c.colorBorders[5]);
     textElements[5].setOutlineThickness(3.0f * c.screenScale);
-    textElements[5].setPosition(initialX, initialY);
+    textElements[5].setPosition(initialX / 2.5f, initialY);
 
     // Partial state of the game
     State state = START;
@@ -285,10 +313,6 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     blinkClcok.restart().asSeconds();
     elapsed1 = blinkClcok.restart().asSeconds();
     bool blink = true;
-
-    // Reproduce the soundtrack of the main menu
-    r.soundTracks[1]->stop();
-    r.soundTracks[0]->play();
 
     // While the console window is opened
     while (c.window.isOpen()) {
@@ -920,6 +944,8 @@ State playerMenu(Configuration &c, SoundPlayer& r){
 
     // Control the backspace key
     if (backSpacePressed){
+        r.soundTracks[1]->stop();
+        r.soundTracks[0]->play();
         status = START;
     }
 
@@ -2319,6 +2345,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.optionsMenuButtons.size() - 1) / 2) {
                     // Change the color appearance of both buttons
+                    r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
                     optionSelected++;
                     c.optionsMenuButtons[optionSelected].setButtonState(BUTTON_HOVER);
@@ -2330,6 +2357,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
             else if (Keyboard::isKeyPressed(Keyboard::Up)) {
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
+                    r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
                     optionSelected--;
                     // Change the color appearance of both buttons
@@ -2347,6 +2375,10 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     // Check if left or right cursor keys have been pressed or not
                     if (Keyboard::isKeyPressed(Keyboard::Left)) {
                         if (c.level != PEACEFUL) {
+
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+
                             // Change the difficult level
                             if (c.level == EASY) {
                                 c.level = PEACEFUL;
@@ -2365,6 +2397,10 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     }
                     else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                         if (c.level != HARD) {
+
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
+
                             // Change the difficult level
                             if (c.level == PEACEFUL) {
                                 c.level = EASY;
@@ -2387,6 +2423,8 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     // Check if left or right cursor keys have been pressed or not
                     if (Keyboard::isKeyPressed(Keyboard::Left)) {
                         if (c.enableAI) {
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
                             c.enableAI = false;
                             c.optionsMenuButtons[optionSelected + 5].setTextButton("Disabled");
                             c.changeAnyParameter = true;
@@ -2394,6 +2432,8 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     }
                     else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                         if (!c.enableAI) {
+                            r.soundEffects[0]->stop();
+                            r.soundEffects[0]->play();
                             c.enableAI = true;
                             c.optionsMenuButtons[optionSelected + 5].setTextButton("Enabled");
                             c.changeAnyParameter = true;
@@ -3487,7 +3527,8 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
         if (record == -1) {
 
             start.setString("PRESS START");
-            start.setPosition(c.w.getSize().x / 2.77f, (c.w.getSize().y / 4.5f) + 400.0f);
+            start.setPosition(c.w.getSize().x / 2.f - start.getLocalBounds().width / 2.f,
+                             (c.w.getSize().y / 4.5f) + 400.0f);
 
             // There is not a new record
             for (int i = 1; i <= 7; i++) {
@@ -3541,12 +3582,13 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
 
             if (lettersIntroduced != 3) {
                 start.setString("ENTER YOUR NAME");
-                start.setPosition(c.w.getSize().x / 3.4f, (c.w.getSize().y / 4.5f) + 400.0f);
             }
             else {
                 start.setString("PRESS START");
-                start.setPosition(c.w.getSize().x / 2.77f, (c.w.getSize().y / 4.5f) + 400.0f);
             }
+            start.setPosition(c.w.getSize().x / 2.f - start.getLocalBounds().width / 2.f,
+                             (c.w.getSize().y / 4.5f) + 400.0f);
+
 
             // There is a new record
             // Show all the out runners with a higher score
@@ -3768,8 +3810,8 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
                    static_cast<unsigned int>(c.window.getView().getSize().y));
         c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
     }
-    r.soundTracks[1]->play();
-    return GAME_MODES_MENU;
+    r.soundTracks[0]->play();
+    return START;
 }
 
 

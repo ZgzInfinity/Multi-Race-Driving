@@ -122,7 +122,7 @@
 		<P4>
 			<Dropping elevation="8000">
 				<P1>
-					<Direction>-1.2</Direction>
+					<Direction>-0.7</Direction>
 					<Road startPosGT="190" finalPosLT="300">
 						<SpriteNearLeft>
 							<Each>102</Each>
@@ -172,7 +172,7 @@
 					</Road>
 				</P2>
 				<P3>
-					<Direction>1.65</Direction>
+					<Direction>1.1</Direction>
 					<Road startPosGE="421" finalPosLE="540">
 						<SpriteNearLeft>
 							<Each>95</Each>
@@ -251,7 +251,7 @@
 			</Straight>
 		</P6>
 		<P5>
-			<Curve direction="-1.5">
+			<Curve direction="-0.8">
 				<Road startPosGT="650" finalPosLT="700">
 					<SpriteNearLeft>
 						<Each>76</Each>
@@ -333,7 +333,7 @@
 		<P7>
 			<Dropping elevation="6000">
 				<P1>
-					<Direction>-1.2</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGT="849" finalPosLE="900">
 						<SpriteNearLeft>
 							<Each>92</Each>
@@ -441,7 +441,7 @@
 		<P9>
 			<Dropping elevation="6000">
 				<P1>
-					<Direction>-1.7</Direction>
+					<Direction>-1.3</Direction>
 					<Road startPosGE="1101" finalPosLT="1300">
 						<SpriteNearLeft>
 							<Each>108</Each>

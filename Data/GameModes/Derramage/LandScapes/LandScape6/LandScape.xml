@@ -220,17 +220,17 @@
 						<SpriteNearLeft>
 							<Each>70</Each>
 							<Offset>0.3</Offset>
-							<Code>27</Code>
+							<Code>12</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
 							<Each>70</Each>
 							<Offset>0.3</Offset>
-							<Code>28</Code>
+							<Code>15</Code>
 						</SpriteNearRight>
 						<SpriteFarLeft>
 							<Each>51</Each>
 							<Offset>Random</Offset>
-							<Code>21</Code>
+							<Code>14</Code>
 						</SpriteFarLeft>
 						<SpriteFarRight>
 							<Each>58</Each>
@@ -242,7 +242,7 @@
 			</Climbing>
 		</P8>
 		<P9>
-			<Curve direction="-1.3">
+			<Curve direction="-1.1">
 				<Road startPosGE="430" finalPosLT="480">
 					<SpriteNearLeft>
 						<Each>69</Each>
@@ -268,7 +268,7 @@
 			</Curve>
 		</P9>
 		<P10>
-			<Curve direction="1.2">
+			<Curve direction="0.9">
 				<Road startPosGE="480" finalPosLT="530">
 					<SpriteNearLeft>
 						<Each>63</Each>
@@ -424,7 +424,7 @@
 			</Straight>
 		</P12>
 		<P13>
-			<Curve direction="1.8">
+			<Curve direction="1.3">
 				<Road startPosGE="871" finalPosLT="922">
 					<SpriteNearLeft>
 						<Each>72</Each>
@@ -537,7 +537,7 @@
 			</Climbing>
 		</P13>
 		<P14>
-			<Curve direction="-1.8">
+			<Curve direction="-1.1">
 				<Road startPosGE="1173" finalPosLT="1273">
 					<SpriteNearLeft>
 						<Each>67</Each>
@@ -563,7 +563,7 @@
 			</Curve>
 		</P14>
 		<P15>
-			<Curve direction="1.8">
+			<Curve direction="1.2">
 				<Road startPosGE="1273" finalPosLT="1373">
 					<SpriteNearLeft>
 						<Each>73</Each>

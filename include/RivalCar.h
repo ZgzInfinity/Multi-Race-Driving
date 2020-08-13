@@ -118,8 +118,21 @@ public:
      * @param endPos
      * @param maxAggressiveness, 0 <= maxAggressiveness <= 1
      */
-    void update(Configuration& c, float iniPos, float endPos, float maxAggressiveness, Action& a, float directionCurve,
-                const Difficult& difficulty, const float playerPosX, const float playerPosY, const float playerSpeed);
+    void updateModeA(Configuration& c, float iniPos, float endPos, float maxAggressiveness, Action& a, float directionCurve,
+                     const Difficult& difficulty, const float playerPosX, const float playerPosY, const float playerSpeed,
+                     const bool vehicleDetected);
+
+
+    /**
+     * Inicializa el estado del vehículo. Actualiza la agresividad de la IA del vehículo con un valor aleatorio entre 0
+     * y maxAggressiveness.
+     * @param iniPos
+     * @param endPos
+     * @param maxAggressiveness, 0 <= maxAggressiveness <= 1
+     */
+    void updateModeB(Configuration& c, float iniPos, float endPos, float maxAggressiveness, Action& a, float directionCurve,
+                     const Difficult& difficulty, const float playerPosX, const float playerPosY, const float playerSpeed,
+                     const bool vehicleDetected);
 
     /**
      * Actualiza la agresividad de la IA del vehículo con un valor aleatorio entre 0 y maxAggressiveness.
@@ -224,6 +237,18 @@ public:
 
 
     bool getFiringSmoke();
+
+
+
+    void setModeCollision();
+
+
+
+    int getMode();
+
+
+
+    void update(float iniPos, float endPos);
 
 };
 

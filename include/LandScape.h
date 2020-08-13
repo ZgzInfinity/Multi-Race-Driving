@@ -23,7 +23,7 @@ using namespace rapidxml;
 
 
 const float M_PI = 3.14159265358979323846;
-const float BGS = 0.525F;
+const float BGS = 0.755F;
 const float LIMIT_FORK = 0.03f;
 const float FORK_RADIUS = 10.0f;
 

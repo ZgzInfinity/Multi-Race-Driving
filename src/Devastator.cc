@@ -11,7 +11,7 @@ Devastator::Devastator(float maxSpeed, float speedMul, float accInc, float scale
                                                  0.0f, pX, pX, pY, pY, 0, 0, vehicle, Devastator_vehicle::PLAYER_TEXTURES, 1, 0),
                                                  speedMul(speedMul), maxAcc(pow(maxSpeed / speedMul, 2.0f)),
                                                  accInc(accInc), scaleY(scaleY), acceleration(0),
-                                                 minCrashAcc(0), xDest(1000), inertia(0), crashing(false),
+                                                 minCrashAcc(0), xDest(1000.f), inertia(0), crashing(false),
                                                  smoking(false), skidding(false),
                                                  firstCrash(true), firstTurnLeft(true),
                                                  firstTurnRight(true)
@@ -30,24 +30,26 @@ float Devastator::getPreviousY() const {
 }
 
 void Devastator::hitControl(const bool vehicleCrash) {
-crashing = true;
+    crashing = true;
     smoking = false;
     skidding = false;
 
     if (speedCollision == 0.f){
         speedCollision = getRealSpeed();
     }
-
-    if (xDest == 1000){
-        if (posX > 0.0f){
+    if (xDest == 1000.f){
+        if (posX > 0.f){
             xDest = -(acceleration * 1.7f / maxAcc);
+
         }
         else {
             xDest = acceleration * 1.7f / maxAcc;
         }
     }
+    else {
+    }
 
-    if (xDest > 0.0f){
+    if (xDest > 0.f){
         if (speedCollision <= 40.f){
             posX = posX + (acceleration * angleTurning / maxAcc) * 40.f;
         }
@@ -84,7 +86,7 @@ crashing = true;
     }
 
     if (vehicleCrash){
-        if (minCrashAcc <= 0.0f) { // Only first time
+        if (minCrashAcc <= 0.f) { // Only first time
             minCrashAcc = (speed * 0.1555f) * (speed * 0.1555f);
             acceleration = (speed * 0.75f) * (speed * 0.75f);
         }
@@ -632,7 +634,6 @@ void Devastator::setVehicle(const int typeOfGame){
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;
-    xDest = 0.0f;
     accInc = topSpeed * ACCELERATION_INCREMENT / MAX_SPEED;
     smoking = false;
     skidding = false;

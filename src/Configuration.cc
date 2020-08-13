@@ -474,6 +474,8 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                     if (resized) {
                         resized = false;
                     } else if (resIndex > -1) {
+                        r.soundEffects[0]->stop();
+                        r.soundEffects[0]->play();
                         resIndex--;
                         menuButtons[optionSelected + 2].setTextButton(resIndex > -1 ?
                                                                       to_string(resolutions[resIndex].first) + "x" +
@@ -515,6 +517,8 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                         resized = false;
                     }
                     if (resIndex < int(resolutions.size()) - 1 && !resized) {
+                        r.soundEffects[0]->stop();
+                        r.soundEffects[0]->play();
                         resIndex++;
                         menuButtons[optionSelected + 2].setTextButton(to_string(resolutions[resIndex].first) + "x" +
                                                                       to_string(resolutions[resIndex].second));
@@ -550,6 +554,8 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                 // Check if left or right cursor keys have been pressed or not
                 if (Keyboard::isKeyPressed(Keyboard::Left)) {
                     if (enablePixelArt) {
+                        r.soundEffects[0]->stop();
+                        r.soundEffects[0]->play();
                         enablePixelArt = false;
                         menuButtons[optionSelected + 2].setTextButton("Disabled");
                         changeAnyParameter = true;
@@ -557,6 +563,8 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                 }
                 else if (Keyboard::isKeyPressed(Keyboard::Right)) {
                     if (!enablePixelArt) {
+                        r.soundEffects[0]->stop();
+                        r.soundEffects[0]->play();
                         enablePixelArt = true;
                         menuButtons[optionSelected + 2].setTextButton("Enabled");
                         changeAnyParameter = true;
@@ -602,7 +610,7 @@ Font initializeFontElapsedTime() {
 
 Font initializeFontTimeToPlay() {
     Font f;
-    if (!f.loadFromFile("Data/Fonts/zorque.ttf")) exit(1);
+    if (!f.loadFromFile("Data/Fonts/DisposableDroid.ttf")) exit(1);
     return f;
 }
 

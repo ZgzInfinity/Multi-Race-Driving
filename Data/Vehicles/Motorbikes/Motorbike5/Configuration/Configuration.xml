@@ -1,6 +1,6 @@
 <Motorbike>
 	<Name>Suzuki GSX-RR</Name>
 	<MaxSpeed>300</MaxSpeed>
-	<Angle>0.050</Angle>
+	<Angle>0.049</Angle>
 	<Motor>Yamaha yzWR 250</Motor>
 </Motorbike>

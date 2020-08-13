@@ -318,10 +318,10 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
                 r.soundEffects[6]->play();
             }
             r.soundEffects[6]->setVolume((33.0f + 67.0f * speed / maxSpeed) * float(r.volumeEffects) / 100.f);
-            if (skidding && r.soundEffects[8]->getStatus() != SoundSource::Playing) {
+            if (skidding && r.soundEffects[27]->getStatus() != SoundSource::Playing) {
                 // Skidding sound
-                r.soundEffects[8]->stop();
-                r.soundEffects[8]->play();
+                r.soundEffects[27]->stop();
+                r.soundEffects[27]->play();
             }
             if (outSideRoad && r.soundEffects[53]->getStatus() != SoundSource::Playing) {
                 // Outside sound
@@ -337,7 +337,7 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
             r.soundEffects[12]->stop();
             r.soundEffects[6]->stop();
             r.soundEffects[35]->stop();
-            r.soundEffects[8]->stop();
+            r.soundEffects[27]->stop();
             r.soundEffects[53]->stop();
         }
 
@@ -359,7 +359,7 @@ void Police::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direc
         r.soundEffects[12]->stop();
         r.soundEffects[6]->stop();
         r.soundEffects[35]->stop();
-        r.soundEffects[8]->stop();
+        r.soundEffects[27]->stop();
         r.soundEffects[53]->stop();
         r.soundEffects[17]->stop();
         r.soundEffects[18]->stop();
@@ -676,7 +676,6 @@ void Police::setVehicle(const int typeOfGame){
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;
-    xDest = 0.0f;
     accInc = topSpeed * ACCELERATION_INCREMENT / MAX_SPEED;
     smoking = false;
     skidding = false;

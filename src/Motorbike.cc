@@ -35,37 +35,36 @@ void Motorbike::hitControl(const bool vehicleCrash) {
 
     if (speedCollision == 0.f){
         speedCollision = getRealSpeed();
-        if (speedCollision < 60.f)
-            posY = posY + acceleration * 0.50f;
+        if (speedCollision < 60.f){
+            posY = posY + 10.f;
+        }
+        else if (speedCollision < 140.f){
+            posY = posY + 8.f;
+        }
     }
-
-    acceleration -= accInc * 2.5f;
-
-    if (speed > 1.333f * halfMaxSpeed){
-        acceleration -= accInc * 7.5f;
-    }
-    else if (speed > halfMaxSpeed){
-        acceleration -= accInc * 5.0f;
-    }
-    else if (speed > 0.5f * halfMaxSpeed){
+    else {
         acceleration -= accInc * 2.5f;
-    }
 
-    if (acceleration < 0.0f){
-        acceleration = 0.0f;
-    }
+        if (speed > 1.333f * halfMaxSpeed){
+            acceleration -= accInc * 7.5f;
+        }
+        else if (speed > halfMaxSpeed){
+            acceleration -= accInc * 5.0f;
+        }
+        else if (speed > 0.5f * halfMaxSpeed){
+            acceleration -= accInc * 2.5f;
+        }
 
-    mainMutex.lock();
-    speed = sqrt(acceleration);
-    mainMutex.unlock();
+        if (acceleration < 0.0f){
+            acceleration = 0.0f;
+        }
 
-    if (xDest > 0.f && posX < xDest){
+        mainMutex.lock();
+        speed = sqrt(acceleration);
+        mainMutex.unlock();
+
         posY = posY + acceleration * 0.20f;
     }
-    else if (xDest < 0.f && posX > xDest) {
-        posY = posY + acceleration * 0.20f;
-    }
-
     if (current_code_image == 41){
         acceleration = minCrashAcc;
         speed = sqrt(acceleration);
@@ -589,7 +588,6 @@ void Motorbike::setVehicle(const int typeOfGame){
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;
-    xDest = 0.0f;
     accInc = topSpeed * ACCELERATION_INCREMENT / MAX_SPEED;
     smoking = false;
     skidding = false;

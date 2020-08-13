@@ -1484,6 +1484,7 @@ void LandScape::setColorsLandScape(const LandScape &landScape) {
     number_tracks = landScape.number_tracks;
     limit_rumble = landScape.limit_rumble;
     terrain = landScape.terrain;
+    name = landScape.name;
 }
 
 
@@ -1718,7 +1719,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     drawQuad(c.w, grassColor[0], 0, 0, c.w.getSize().x, 0, c.w.getSize().y, c.w.getSize().x);
     Sprite sbg;
     sbg.setTexture(background);
-    sbg.setScale( Vector2f(2.0f * (float) c.w.getSize().x / background.getSize().x, (float) c.w.getSize().y * BGS / background.getSize().y));
+    sbg.setScale(Vector2f(2.0f * (float) c.w.getSize().x / background.getSize().x, (float) c.w.getSize().y * BGS / background.getSize().y));
     sbg.setTextureRect(IntRect(0, 0, static_cast<int>(80.0f * sbg.getGlobalBounds().width), background.getSize().y));
     sbg.setPosition(0, 0);
 

@@ -31,7 +31,7 @@ int rando_generator_zero_n(int n) {
 /**
  * Returns a integer random number between a lower bound and an upper bound numbers
  * @param lower is the lower bound number of the interval
-  * @param upper is the upper bound number of the interval
+ * @param upper is the upper bound number of the interval
  * @return
  */
 int rand_generator_int(int lower, int upper) {

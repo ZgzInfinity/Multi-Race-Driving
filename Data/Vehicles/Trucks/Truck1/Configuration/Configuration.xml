@@ -1,6 +1,6 @@
 <Truck>
 	<Name>Scania XLION</Name>
 	<MaxSpeed>240</MaxSpeed>
-	<Angle>0.044</Angle>
+	<Angle>0.046</Angle>
 	<Motor>DAF 95XF 430</Motor>
 </Truck>

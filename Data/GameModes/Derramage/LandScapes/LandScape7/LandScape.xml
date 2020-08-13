@@ -196,7 +196,7 @@
 			</Curve>
 		</P5>
 		<P6>
-			<Curve direction="1.8">
+			<Curve direction="1.4">
 				<Road startPosGT="470" finalPosLT="540">
 					<SpriteNearLeft>
 						<Each>89</Each>
@@ -357,7 +357,7 @@
 			</Climbing>
 		</P10>
 		<P11>
-			<Curve direction="-1.6">
+			<Curve direction="-1.4">
 				<Road startPosGT="959" finalPosLE="1060">
 					<SpriteNearLeft>
 						<Each>84</Each>

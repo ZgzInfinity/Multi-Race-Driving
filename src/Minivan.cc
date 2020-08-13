@@ -633,7 +633,6 @@ void Minivan::setVehicle(const int typeOfGame){
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;
-    xDest = 0.0f;
     accInc = topSpeed * ACCELERATION_INCREMENT / MAX_SPEED;
     smoking = false;
     skidding = false;

@@ -89,12 +89,12 @@
 		<P3>
 			<Climbing elevation="6000">
 				<P1>
-					<Direction>1.0</Direction>
+					<Direction>0.0</Direction>
 					<Road startPosGT="179" finalPosLT="250">
 						<SpriteNearLeft>
 							<Each>92</Each>
 							<Offset>0.2</Offset>
-							<Code>3</Code>
+							<Code>1</Code>
 						</SpriteNearLeft>
 						<SpriteNearRight>
 							<Each>85</Each>

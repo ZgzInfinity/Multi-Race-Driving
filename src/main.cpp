@@ -5,6 +5,7 @@
 #include "../include/Menu.h"
 #include "../include/Game.h"
 #include "../include/SoundPlayer.h"
+#include "../include/LindaDriver.h"
 
 mutex mainMutex;
 

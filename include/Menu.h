@@ -21,7 +21,7 @@ using namespace std;
 using namespace sf;
 using namespace rapidxml;
 
-const int NUM_SEGA_ICONS = 39;
+const int TIME_ANIMATION = 39;
 const int NUM_SOUNDTRACKS = 4;
 
 

@@ -86,7 +86,7 @@
 					</Road>
 				</P1>
 				<P2>
-					<Direction>-1.7</Direction>
+					<Direction>-1.5</Direction>
 					<Road startPosGT="160" finalPosLT="220">
 						<SpriteNearLeft>
 							<Each>83</Each>
@@ -140,7 +140,7 @@
 					</Road>
 				</P1>
 				<P2>
-					<Direction>1.7</Direction>
+					<Direction>1.4</Direction>
 					<Road startPosGT="269" finalPosLT="330">
 						<SpriteNearLeft>
 							<Each>83</Each>
@@ -245,7 +245,7 @@
 			</Straight>
 		</P6>
 		<P7>
-			<Curve direction="1.8">
+			<Curve direction="1.4">
 				<Road startPosGT="470" finalPosLT="570">
 					<SpriteNearLeft>
 						<Each>97</Each>
@@ -272,7 +272,7 @@
 		</P7>
 		<P8>
 			<Straight>
-				<Road startPosGE="570" finalPosLE="620">
+				<Road startPosGE="570" finalPosLE="670">
 					<SpriteNearLeft>
 						<Each>86</Each>
 						<Offset>0.2</Offset>
@@ -298,7 +298,7 @@
 		</P8>
 		<P9>
 			<Curve direction="-1.5">
-				<Road startPosGT="620" finalPosLE="721">
+				<Road startPosGT="670" finalPosLE="721">
 					<SpriteNearLeft>
 						<Each>107</Each>
 						<Offset>0.3</Offset>
@@ -433,7 +433,7 @@
 					</Road>
 				</P1>
 				<P2>
-					<Direction>1.65</Direction>
+					<Direction>1.35</Direction>
 					<Road startPosGE="1100" finalPosLE="1300">
 						<SpriteNearLeft>
 							<Each>102</Each>
