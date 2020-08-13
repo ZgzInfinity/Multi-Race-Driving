@@ -40,9 +40,6 @@ vector<Score> getGlobalScores(Configuration& c, const int typeOfGame) {
 
     // Control the difficulty of the game
     switch (c.level){
-        case PEACEFUL:
-            path += "Peaceful.xml";
-            break;
         case EASY:
             path += "Easy.xml";
             break;
@@ -121,35 +118,10 @@ int isNewRecord(const vector<Score> &globalScores, unsigned long score) {
 bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, const int typeOfGame, Configuration & c) {
 
     // xml file which stores the player with the highest score in the level
-    string path = "Data/Records/";
-
-    // Control the game mode selected by the player
-    switch(typeOfGame){
-        case 1:
-            path += "OutRun/Scores_";
-            break;
-        case 3:
-            path += "DrivingFury/Scores_";
-            break;
-        case 4:
-            path += "Derramage/Scores_";
-    }
-
-    // Control if the player has played with the AI enabled or not
-    if (c.enableAI){
-        // Active AI
-        path += "Enabled_";
-    }
-    else {
-        // Disabled AI
-        path += "Disabled_";
-    }
+    string path = "Data/Records/OutRun/Scores_";
 
     // Control the difficulty of the game
     switch (c.level){
-        case PEACEFUL:
-            path += "Peaceful.xml";
-            break;
         case EASY:
             path += "Easy.xml";
             break;

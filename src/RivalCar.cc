@@ -45,7 +45,6 @@ RivalCar::RivalCar(int typeOfVehicle,float maxSpeed, float speedMul, float scale
     onStraight = true;
     crashing = false;
     vehicleType = typeOfVehicle;
-    mode = -1;
     xDest = 1000;
     speedFactor = speedMul;
     shoutDone = false;
@@ -56,7 +55,7 @@ RivalCar::RivalCar(int typeOfVehicle,float maxSpeed, float speedMul, float scale
 
 
 
-void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r) {
+void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlayerY) {
     crashing = true;
 
     if (!shoutDone){
@@ -68,10 +67,58 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r) {
             r.soundEffects[64]->stop();
             r.soundEffects[65]->stop();
             r.soundEffects[66]->stop();
-            r.soundEffects[rand_generator_int(62, 66)]->play();
-
             r.soundEffects[67]->stop();
-            r.soundEffects[67]->play();
+
+            if (posPlayerY >= posY){
+                // The rival car is behind
+                int soundCode = rand_generator_int(62, 66);
+
+                r.soundEffects[soundCode]->setVolume(int(posY / posPlayerY * 100.f));
+                r.soundEffects[67]->setVolume(int(posY / posPlayerY * 100.f));
+
+                r.soundEffects[soundCode]->play();
+                r.soundEffects[67]->play();
+
+            }
+            else {
+                // The player is behind
+                int soundCode = rand_generator_int(62, 66);
+
+                r.soundEffects[soundCode]->setVolume(int(posPlayerY / posY * 100.f));
+                r.soundEffects[67]->setVolume(int(posPlayerY / posY * 100.f));
+
+                r.soundEffects[soundCode]->play();
+                r.soundEffects[67]->play();
+            }
+        }
+        else {
+            r.soundEffects[17]->stop();
+            r.soundEffects[18]->stop();
+            r.soundEffects[19]->stop();
+
+            r.soundEffects[17]->play();
+
+            if (posPlayerY >= posY){
+                // The rival car is behind
+                int soundCode = rand_generator_int(18, 19);
+
+                r.soundEffects[soundCode]->setVolume(int(posY / posPlayerY * 100.f));
+                r.soundEffects[17]->setVolume(int(posY / posPlayerY * 100.f));
+
+                r.soundEffects[soundCode]->play();
+                r.soundEffects[17]->play();
+
+            }
+            else {
+                // The player is behind
+                int soundCode = rand_generator_int(18, 19);
+
+                r.soundEffects[soundCode]->setVolume(int(posPlayerY / posY * 100.f));
+                r.soundEffects[17]->setVolume(int(posPlayerY / posY * 100.f));
+
+                r.soundEffects[soundCode]->play();
+                r.soundEffects[17]->play();
+            }
         }
     }
 
@@ -88,102 +135,54 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r) {
         speed = sqrt(acc - ACCELERATION_INCREMENT);
         mainMutex.unlock();
 
-        if (xDest > 0.f && posX < xDest){
-            posY = posY + speed * 0.20f;
-        }
-        else if (xDest < 0.f && posX > xDest) {
-            posY = posY + speed * 0.20f;
-        }
+        posY = posY + 0.1f;
 
-        if (current_code_image == 41){
+        if (current_code_image == 58){
             crashing = false;
             xDest = 1000;
             previousY = posY;
             speedCollision = 0.0f;
-            posX = 0.0f;
-            speed = 0.f;
+            posX = 0.f;
+            speed = 0.4f;
         }
     }
     else {
-        crashing = true;
-
-        if (speedCollision == 0.f){
-            speedCollision = getRealSpeed();
-        }
-
         if (xDest == 1000){
-            if (posX > 0.0f){
-                xDest = -(speed * 1.7f / maxSpeed);
-            }
-            else {
-                xDest = speed * 1.7f / maxSpeed;
-            }
+            xDest = posX;
         }
 
-        if (xDest > 0.0f){
-            if (speedCollision <= 40.f){
-                posX = posX + (speed * angleTurning / maxSpeed) * 40.f;
-            }
-            else if (speedCollision > 40.f && speedCollision < 85.f){
-                posX = posX + (speed * angleTurning / maxSpeed) * 20.f;
-            }
-            else if (speedCollision >= 85.f && speedCollision < 100.f){
-                posX = posX + (speed * angleTurning / maxSpeed) * 10.f;
-            }
-            else if (speedCollision >= 100.f && speedCollision < 120.f){
-                posX = posX + (speed * angleTurning / maxSpeed) * 5.f;
-            }
-            else {
-                posX = posX + (speed * angleTurning / maxSpeed) * 1.5f;
-            }
+        if (xDest >= 0.f){
+            posX -= 0.03f;
         }
         else {
-            if (speedCollision <= 40.f){
-                posX = posX - (speed * angleTurning / maxSpeed) * 40.f;
-            }
-            else if (speedCollision > 40.f && speedCollision <= 85.f){
-                posX = posX - (speed * angleTurning / maxSpeed) * 20.f;
-            }
-            else if (speedCollision > 85.f && speedCollision < 100.f){
-                posX = posX - (speed * angleTurning / maxSpeed) * 10.f;
-            }
-            else if (speedCollision >= 100.f && speedCollision < 120.f){
-                posX = posX - (speed * angleTurning / maxSpeed) * 5.f;
-            }
-            else {
-                posX = posX - (speed * angleTurning / maxSpeed) * 1.5f;
-            }
-
+            posX += 0.03f;
         }
 
-        speed = sqrt(acc - ACCELERATION_INCREMENT);
+        posY = posY - 0.2f;
 
+        int maxCode = 0;
 
-        if (xDest > 0.f && posX < xDest){
-            if (!vehicleCrash){
-                posY = posY + speed * 7.f / maxSpeed;
-            }
-            else {
-                posY = posY - speed * 7.f / maxSpeed;
-            }
-        }
-        else if (xDest < 0.f && posX > xDest) {
-            if (!vehicleCrash){
-                posY = posY + speed * 7.f / maxSpeed;
-            }
-            else {
-                posY = posY - speed * 7.f / maxSpeed;
-            }
+        switch(vehicleType){
+            case 0:
+                maxCode = 58;
+                break;
+            case 1:
+                maxCode = 44;
+                break;
+            case 2:
+                maxCode = 36;
+                break;
+            case 3:
+                maxCode = 62;
         }
 
-        if (speed <= 0.f){
-            speed = 0.f;
+        if (current_code_image == maxCode){
             crashing = false;
             xDest = 1000;
             previousY = posY;
-            mode = -1;
             speedCollision = 0.0f;
             shoutDone = false;
+            speed = 0.4f;
         }
     }
 }
@@ -341,8 +340,6 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
                     float p, cordX = 0.f;
                     // Check the difficulty to control the speed of changing
                     switch(c.level){
-                        case PEACEFUL:
-                            break;
                         case EASY:
                             p = rand_generator_zero_one();
                             if (p <= 0.5f){
@@ -558,13 +555,10 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
             }
             else {
                 // MANIAC
-                bool vehicleDetected;
                 if (vehicleDetected){
                     float p;
                     // Check the difficulty to control the speed of changing
                     switch(c.level){
-                        case PEACEFUL:
-                            break;
                         case EASY:
                             p = rand_generator_zero_one();
                             if (p <= 0.5f){
@@ -639,7 +633,7 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
     const float acc = getAcceleration();
 
     // At the beginning all accelerate the same
-    if (posY <= 90.f){
+    if (posY <= 90.f || speed <= 0.8f){
         // Increment speed of the rival car
         speed = sqrt(acc + ACCELERATION_INCREMENT);
         a = BOOT;
@@ -683,7 +677,7 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
             }
             a = ACCELERATE;
         }
-        else if (playerPosY - posY < 100.f) {
+        else if (playerPosY - posY < 70.f) {
             // Each vehicle accelerates in a different mode
             if (speed > 2.1f){
                 speed = sqrt(acc + rand_generator_float(0.01f, 0.05f));
@@ -697,10 +691,10 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
             // Each vehicle accelerates in a different mode
             float p = rand_generator_zero_one();
             if (p < 0.8f){
-                    if (speed > 2.3f){
+                    if (speed > 2.5f){
                     speed = sqrt(acc + rand_generator_float(0.01f, 0.05f));
-                    if (speed > 2.3f){
-                        speed = 2.3f;
+                    if (speed > 2.5f){
+                        speed = 2.5f;
                     }
                 }
             }
@@ -714,7 +708,7 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
                 float powerBraking, power;
                 float option = rand_generator_int(0, 2);
                 if (abs(directionCurve) >= 1.2f && abs(directionCurve) <= 1.9f){
-                    if (option == 1){
+                    if (option == 1 && acc > 0.f){
                         powerBraking = rand_generator_float(0.001f, 0.01f);
                         if (speed >= 1.5f){
                             speed = sqrt(acc - powerBraking);
@@ -729,7 +723,7 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
                     }
                 }
                 else if (abs(directionCurve) >= 0.8f && abs(directionCurve) < 1.2f){
-                    if (option == 1){
+                    if (option == 1 && acc > 0.f){
                         powerBraking = rand_generator_float(0.001f, 0.01f);
                         if (speed >= 1.6f){
                             speed = sqrt(acc - powerBraking);
@@ -753,7 +747,7 @@ void RivalCar::updateModeA(Configuration& c, float iniPos, float endPos, float m
                     }
                 }
                 else if (abs(directionCurve) >= 0.3f && abs(directionCurve) < 0.8f){
-                    if (option == 1){
+                    if (option == 1 && acc > 0.f){
                         powerBraking = rand_generator_float(0.001f, 0.01f);
                         if (speed >= 1.7f){
                             speed = sqrt(acc - powerBraking);
@@ -917,8 +911,6 @@ void RivalCar::updateModeB(Configuration& c, float iniPos, float endPos, float m
                     float p;
                     // Check the difficulty to control the speed of changing
                     switch(c.level){
-                        case PEACEFUL:
-                            break;
                         case EASY:
                             p = rand_generator_zero_one();
                             if (p <= 0.5f){
@@ -1161,8 +1153,6 @@ void RivalCar::updateModeB(Configuration& c, float iniPos, float endPos, float m
                     float p;
                     // Check the difficulty to control the speed of changing
                     switch(c.level){
-                        case PEACEFUL:
-                            break;
                         case EASY:
                             p = rand_generator_zero_one();
                             if (p <= 0.5f){
@@ -1405,8 +1395,6 @@ void RivalCar::updateModeB(Configuration& c, float iniPos, float endPos, float m
     // Advance the vehicle
     previousY = posY;
     posY += speed;
-
-    cout << "DESPUES " << posY << endl;
 }
 
 
@@ -1425,14 +1413,6 @@ void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty, const
     else {
         const float p = rand_generator_zero_one();
         switch(difficulty){
-        case PEACEFUL:
-            if (p < 0.1f) {
-                typeAI = OBSTACLE;
-            }
-            else {
-                typeAI = EVASIVE;
-            }
-            break;
         case EASY:
             if (p < 0.4f) {
                 typeAI = OBSTACLE;
@@ -1661,36 +1641,16 @@ void RivalCar::draw(const Action &a, const Elevation &e) {
                                 current_code_image = 46;
                             break;
                         case 1:
-                            // Crash
-                            if (mode == 0) {
-                                if (current_code_image < 37 || current_code_image > 44)
-                                    current_code_image = 37;
-                            }
-                            else if (mode == 1) {
-                                if (current_code_image < 45 || current_code_image > 52)
-                                    current_code_image = 45;
-                            }
+                            if (current_code_image < 37 || current_code_image > 44)
+                                current_code_image = 37;
                             break;
                         case 2:
-                            if (mode == 0) {
-                                if (current_code_image < 29 || current_code_image > 36)
-                                    current_code_image = 29;
-                            }
-                            else if (mode == 1) {
-                                if (current_code_image < 37 || current_code_image > 44)
-                                    current_code_image = 37;
-                            }
+                            if (current_code_image < 29 || current_code_image > 36)
+                                current_code_image = 29;
                             break;
                         case 3:
-                            // Crash
-                            if (mode == 0) {
-                                if (current_code_image < 55 || current_code_image > 62)
-                                    current_code_image = 55;
-                            }
-                            else if (mode == 1) {
-                                if (current_code_image < 63 || current_code_image > 70)
-                                    current_code_image = 63;
-                            }
+                            if (current_code_image < 55 || current_code_image > 62)
+                                current_code_image = 55;
                     }
                 }
             }
@@ -1873,24 +1833,32 @@ bool RivalCar::getFiringSmoke(){
 }
 
 
-void RivalCar::setModeCollision(){
-    if (mode == -1){
-        mode = rand_generator_int(0, 1);
+
+bool RivalCar::inCrash(){
+    switch(vehicleType){
+        case 0:
+            if (current_code_image >= 46 && current_code_image <= 58){
+                return true;
+            }
+            break;
+        case 1:
+            if (current_code_image >= 37 && current_code_image <= 44){
+                return true;
+            }
+            break;
+        case 2:
+            if (current_code_image >= 29 && current_code_image <= 36){
+                return true;
+            }
+            break;
+        case 3:
+            if (current_code_image >= 55 && current_code_image <= 62){
+                return true;
+            }
     }
+    return false;
 }
 
 
-
-void RivalCar::update(float iniPos, float endPos) {
-
-    posY = rand_generator_float(iniPos, endPos);
-    previousY = posY;
-
-    current_direction_counter = 0;
-    max_direction_counter = 0;
-
-    minScreenX = 0;
-    maxScreenX = 0;
-}
 
 

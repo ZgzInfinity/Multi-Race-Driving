@@ -16,7 +16,7 @@ using namespace sf;
 using namespace std;
 
 
-void loadGameConfiguration (const string path, Difficult& difficulty, bool& activeAI, int& volumeSoundtracks,
+void loadGameConfiguration (const string path, Difficult& difficulty, int& volumeSoundtracks,
                             int& volumeEffects, bool& pixelArt, bool& fullScreen, int& axis_x, int& axis_y, string& controlLeft,
                             string& controlRight, string& controlAccelerate, string& controlBrake,
                             string& controlSoundtrack)
@@ -36,11 +36,7 @@ void loadGameConfiguration (const string path, Difficult& difficulty, bool& acti
         // Check if it's the node that control the difficulty of the level
         if ((string)property->name() == "Difficulty"){
             // Get the difficulty value
-            if ((string)property->value() == "Peaceful"){
-                // Level peaceful
-                difficulty = PEACEFUL;
-            }
-            else if ((string)property->value() == "Easy"){
+            if ((string)property->value() == "Easy"){
                 // Level easy
                 difficulty = EASY;
             }
@@ -51,16 +47,6 @@ void loadGameConfiguration (const string path, Difficult& difficulty, bool& acti
             else if ((string)property->value() == "Hard"){
                 // Level hard
                 difficulty = HARD;
-            }
-        }
-        // Check the AI configuration
-        else if ((string)property->name() == "AI"){
-            // Get if the AI is enabled
-            if ((string)property->value() == "Disabled"){
-                activeAI = false;
-            }
-            else {
-                activeAI = true;
             }
         }
         // Check if it`s the node that controls the soundtracks volume
@@ -143,15 +129,15 @@ int main() {
 
     // Variables to control the configuration of the game
     Difficult difficulty;
-    bool activeAI, pixelArt, fullScreen;
+    bool pixelArt, fullScreen;
     int volumeSoundtracks, volumeEffects, axis_x, axis_y;
     string controlLeft, controlRight, controlAccelerate, controlBrake, controlSoundtrack;
 
-    loadGameConfiguration(path, difficulty, activeAI, volumeSoundtracks, volumeEffects, pixelArt, fullScreen, axis_x, axis_y,
+    loadGameConfiguration(path, difficulty, volumeSoundtracks, volumeEffects, pixelArt, fullScreen, axis_x, axis_y,
                           controlLeft, controlRight, controlAccelerate, controlBrake, controlSoundtrack);
 
     // Creation of the configuration module of the game
-    Configuration c(difficulty, activeAI, pixelArt, fullScreen, axis_x, axis_y, controlLeft, controlRight, controlAccelerate,
+    Configuration c(difficulty, pixelArt, fullScreen, axis_x, axis_y, controlLeft, controlRight, controlAccelerate,
                     controlBrake, controlSoundtrack);
 
     // Creation of the reproductor module of the game

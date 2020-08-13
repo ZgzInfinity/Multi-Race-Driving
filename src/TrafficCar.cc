@@ -147,7 +147,6 @@ void TrafficCar::setAI(float maxAggressiveness, const Difficult& difficulty) {
 
     const float p = rand_generator_zero_one();
     switch(difficulty){
-        case PEACEFUL:
         case EASY:
             if (p <= 0.25) {
                 typeAI = OBSTACLE;

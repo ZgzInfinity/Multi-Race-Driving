@@ -185,7 +185,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, unsigned long scorePlayerGam
 
 
 
-void updateGameConfiguration(const string path, const Difficult difficulty, const bool activeAI, const int volumeSoundtracks,
+void updateGameConfiguration(const string path, const Difficult difficulty, const int volumeSoundtracks,
                              const int volumeEffects, const bool pixelArt, const int fullScreen, const int axis_x,
                              const int axis_y, const string controlLeft, const string controlRight, const string controlAccelerate,
                              const string controlBrake, const string controlSoundtrack);

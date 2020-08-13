@@ -1684,9 +1684,9 @@ void loadOptionsMenuConfiguration(const string path, Configuration& c){
                                 }
                                 // Creation of the button and addition to the vector
                                 posX = c.w.getSize().x / 2.f - 270.0f * c.screenScale;
-                                posY = c.w.getSize().y / 2.f - (130.0f - idButton * 70.0f) * c.screenScale;
+                                posY = c.w.getSize().y / 2.f - (100.0f - idButton * 70.0f) * c.screenScale;
                                 widthButton = 200.0f * c.screenScale;
-                                heightButton = 30.0f * c.screenScale;
+                                heightButton = 40.0f * c.screenScale;
 
                                 // Creation of the button
                                 Button b = Button(posX, posY, widthButton, heightButton, c.fontMenuOptionsButtons,
@@ -1980,7 +1980,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         }
         // Change the state of the first color
         Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - 70.0f * c.screenScale,
-                          200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, c.soundMenuButtons[0].getTextButton(),
+                          200.0f * c.screenScale, 40.0f * c.screenScale, c.fontMenuOptionsButtons, c.soundMenuButtons[0].getTextButton(),
                           c.soundMenuButtons[0].getIdleColorButton(), c.soundMenuButtons[0].getHoverColorButton(),
                           c.soundMenuButtons[0].getFontColorButton(), 1, c.screenScale);
 
@@ -1990,7 +1990,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         for (int i = 1; i < int(c.soundMenuButtons.size()); i++){
             // Change the state of the first color
             Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - (70.0f - i * 70.f) * c.screenScale,
-                              200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, c.soundMenuButtons[i].getTextButton(),
+                              200.0f * c.screenScale, 40.0f * c.screenScale, c.fontMenuOptionsButtons, c.soundMenuButtons[i].getTextButton(),
                               c.soundMenuButtons[i].getIdleColorButton(), c.soundMenuButtons[i].getHoverColorButton(),
                               c.soundMenuButtons[i].getFontColorButton(), 0, c.screenScale);
 
@@ -2031,13 +2031,13 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
     // Option configurations
     c.soundMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
                              c.w.getSize().y / 2.f - 70.0f * c.screenScale, 200.0f * c.screenScale,
-                             30.0f * c.screenScale, c.fontMenuSoundButtons,
+                             40.0f * c.screenScale, c.fontMenuSoundButtons,
                              to_string(r.volumeMusic), c.soundMenuButtons[0].getIdleColorButton(), c.soundMenuButtons[0].getHoverColorButton(),
                              c.soundMenuButtons[0].getFontColorButton(), 1, c.screenScale);
 
 
     c.soundMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale, c.w.getSize().y / 2.f,
-                             200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuSoundButtons,
+                             200.0f * c.screenScale, 40.0f * c.screenScale, c.fontMenuSoundButtons,
                              to_string(r.volumeEffects), c.soundMenuButtons[1].getIdleColorButton(), c.soundMenuButtons[1].getHoverColorButton(),
                              c.soundMenuButtons[1].getFontColorButton(), 0, c.screenScale);
 
@@ -2207,7 +2207,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         }
 
         // Change the state of the first color
-        Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - 130.0f * c.screenScale,
+        Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - 100.0f * c.screenScale,
                           200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, c.optionsMenuButtons[0].getTextButton(),
                           c.optionsMenuButtons[0].getIdleColorButton(), c.optionsMenuButtons[0].getHoverColorButton(),
                           c.optionsMenuButtons[0].getFontColorButton(), 1, c.screenScale);
@@ -2217,7 +2217,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         // Eliminate the buttons of the right column
         for (int i = 1; i < int(c.optionsMenuButtons.size()); i++){
             // Change the state of the first color
-            Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - (130.0f - i * 70.f) * c.screenScale,
+            Button b = Button(c.w.getSize().x / 2.f - 270.0f * c.screenScale, c.w.getSize().y / 2.f - (100.0f - i * 70.f) * c.screenScale,
                               200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuOptionsButtons, c.optionsMenuButtons[i].getTextButton(),
                               c.optionsMenuButtons[i].getIdleColorButton(), c.optionsMenuButtons[i].getHoverColorButton(),
                               c.optionsMenuButtons[i].getFontColorButton(), 0, c.screenScale);
@@ -2256,8 +2256,8 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         c.optMenuBackground = sprite;
 
         RectangleShape shape;
-        shape.setPosition((c.w.getSize().x / 2.f) - 350.0f * c.screenScale, c.w.getSize().y / 2.f - 250.0f * c.screenScale);
-        shape.setSize(sf::Vector2f(710.0f * c.screenScale, 500.0f * c.screenScale));
+        shape.setPosition((c.w.getSize().x / 2.f) - 350.0f * c.screenScale, c.w.getSize().y / 2.f - 198.0f * c.screenScale);
+        shape.setSize(sf::Vector2f(710.0f * c.screenScale, 400.0f * c.screenScale));
         shape.setOutlineColor(c.colorBorderPanelOptionsMenu);
         shape.setOutlineThickness(5.0f * c.screenScale);
         shape.setTexture(&c.optionsMenuPanelBack, true);
@@ -2272,15 +2272,12 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         optionsText.setOutlineColor(c.colorTitleBorderOptionsMenu);
         optionsText.setOutlineThickness(5.0f * c.screenScale);
         optionsText.setPosition((c.w.getSize().x / 2.f) - optionsText.getLocalBounds().width / 2.f,
-                                 c.w.getSize().y / 2.f - 230.0f * c.screenScale);
+                                 c.w.getSize().y / 2.f - 180.0f * c.screenScale);
 
         // Option configurations
 
         string difficulty;
         switch (c.level) {
-            case PEACEFUL:
-                difficulty = "Peaceful";
-                break;
             case EASY:
                 difficulty = "Easy";
                 break;
@@ -2295,36 +2292,29 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         const string submenu = "Menu", access = "Press Enter", saved = "Saved!";
 
         c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                          c.w.getSize().y / 2.f - 130.0f * c.screenScale, 200.0f * c.screenScale,
-                                          30.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                          c.w.getSize().y / 2.f - 100.0f * c.screenScale, 200.0f * c.screenScale,
+                                          40.0f * c.screenScale, c.fontMenuPlayerButtons,
                                           difficulty, c.optionsMenuButtons[0].getIdleColorButton(),
                                           c.optionsMenuButtons[0].getHoverColorButton(),
                                           c.optionsMenuButtons[0].getFontColorButton(), 1, c.screenScale);
 
         c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                          c.w.getSize().y / 2.f - 60.0f * c.screenScale, 200.0f * c.screenScale,
-                                          30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                          c.enableAI ? "Enabled" : "Disabled", c.optionsMenuButtons[1].getIdleColorButton(),
-                                          c.optionsMenuButtons[1].getHoverColorButton(),
-                                          c.optionsMenuButtons[1].getFontColorButton(), 0, c.screenScale);
-
-        c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                          c.w.getSize().y / 2.f + 10.0f * c.screenScale, 200.0f * c.screenScale,
-                                          30.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                          c.w.getSize().y / 2.f - 30.0f * c.screenScale, 200.0f * c.screenScale,
+                                          40.0f * c.screenScale, c.fontMenuPlayerButtons,
                                           submenu, c.optionsMenuButtons[2].getIdleColorButton(),
                                           c.optionsMenuButtons[2].getHoverColorButton(),
                                           c.optionsMenuButtons[2].getFontColorButton(), 0, c.screenScale);
 
         c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                          c.w.getSize().y / 2.f + 80.0f * c.screenScale, 200.0f * c.screenScale,
-                                          30.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                          c.w.getSize().y / 2.f + 40.0f * c.screenScale, 200.0f * c.screenScale,
+                                          40.0f * c.screenScale, c.fontMenuPlayerButtons,
                                           submenu, c.optionsMenuButtons[3].getIdleColorButton(),
                                           c.optionsMenuButtons[3].getHoverColorButton(),
                                           c.optionsMenuButtons[3].getFontColorButton(), 0, c.screenScale);
 
         c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                          c.w.getSize().y / 2.f + 150.0f * c.screenScale, 200.0f * c.screenScale,
-                                          30.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                          c.w.getSize().y / 2.f + 110.0f * c.screenScale, 200.0f * c.screenScale,
+                                          40.0f * c.screenScale, c.fontMenuPlayerButtons,
                                           submenu, c.optionsMenuButtons[4].getIdleColorButton(),
                                           c.optionsMenuButtons[4].getHoverColorButton(),
                                           c.optionsMenuButtons[4].getFontColorButton(), 0, c.screenScale);
@@ -2350,8 +2340,8 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     optionSelected++;
                     c.optionsMenuButtons[optionSelected].setButtonState(BUTTON_HOVER);
                     c.optionsMenuButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
-                    c.optionsMenuButtons[optionSelected + 5].setButtonState(BUTTON_HOVER);
-                    c.optionsMenuButtons[optionSelected + 4].setButtonState(BUTTON_IDLE);
+                    c.optionsMenuButtons[optionSelected + 4].setButtonState(BUTTON_HOVER);
+                    c.optionsMenuButtons[optionSelected + 3].setButtonState(BUTTON_IDLE);
                 }
             }
             else if (Keyboard::isKeyPressed(Keyboard::Up)) {
@@ -2363,8 +2353,8 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     // Change the color appearance of both buttons
                     c.optionsMenuButtons[optionSelected].setButtonState(BUTTON_HOVER);
                     c.optionsMenuButtons[optionSelected + 1].setButtonState(BUTTON_IDLE);
-                    c.optionsMenuButtons[optionSelected + 5].setButtonState(BUTTON_HOVER);
-                    c.optionsMenuButtons[optionSelected + 6].setButtonState(BUTTON_IDLE);
+                    c.optionsMenuButtons[optionSelected + 4].setButtonState(BUTTON_HOVER);
+                    c.optionsMenuButtons[optionSelected + 5].setButtonState(BUTTON_IDLE);
                 }
             }
 
@@ -2374,23 +2364,18 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                 case 0:
                     // Check if left or right cursor keys have been pressed or not
                     if (Keyboard::isKeyPressed(Keyboard::Left)) {
-                        if (c.level != PEACEFUL) {
+                        if (c.level != EASY) {
 
                             r.soundEffects[0]->stop();
                             r.soundEffects[0]->play();
 
-                            // Change the difficult level
-                            if (c.level == EASY) {
-                                c.level = PEACEFUL;
-                                c.optionsMenuButtons[optionSelected + 5].setTextButton("Peaceful");
-                            }
                             if (c.level == NORMAL) {
                                 c.level = EASY;
-                                c.optionsMenuButtons[optionSelected + 5].setTextButton("Easy");
+                                c.optionsMenuButtons[optionSelected + 4].setTextButton("Easy");
                             }
                             else if (c.level == HARD) {
                                 c.level = NORMAL;
-                                c.optionsMenuButtons[optionSelected + 5].setTextButton("Normal");
+                                c.optionsMenuButtons[optionSelected + 4].setTextButton("Normal");
                             }
                             c.changeAnyParameter = true;
                         }
@@ -2402,49 +2387,22 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             r.soundEffects[0]->play();
 
                             // Change the difficult level
-                            if (c.level == PEACEFUL) {
-                                c.level = EASY;
-                                c.optionsMenuButtons[optionSelected + 5].setTextButton("Easy");
-                            }
                             if (c.level == EASY) {
                                 c.level = NORMAL;
-                                c.optionsMenuButtons[optionSelected + 5].setTextButton("Normal");
+                                c.optionsMenuButtons[optionSelected + 4].setTextButton("Normal");
                             }
                             else if (c.level == NORMAL) {
                                 c.level = HARD;
-                                c.optionsMenuButtons[optionSelected + 5].setTextButton("Hard");
+                                c.optionsMenuButtons[optionSelected + 4].setTextButton("Hard");
                             }
                             c.changeAnyParameter = true;
                         }
                     }
+                    c.optionsMenuButtons[optionSelected + 5].setTextButton(submenu);
                     break;
                 case 1:
-                    // AI aggressiveness level
-                    // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::Left)) {
-                        if (c.enableAI) {
-                            r.soundEffects[0]->stop();
-                            r.soundEffects[0]->play();
-                            c.enableAI = false;
-                            c.optionsMenuButtons[optionSelected + 5].setTextButton("Disabled");
-                            c.changeAnyParameter = true;
-                        }
-                    }
-                    else if (Keyboard::isKeyPressed(Keyboard::Right)) {
-                        if (!c.enableAI) {
-                            r.soundEffects[0]->stop();
-                            r.soundEffects[0]->play();
-                            c.enableAI = true;
-                            c.optionsMenuButtons[optionSelected + 5].setTextButton("Enabled");
-                            c.changeAnyParameter = true;
-                        }
-                    }
-
-                    c.optionsMenuButtons[optionSelected + 6].setTextButton(submenu);
-                    break;
-                case 2:
                     // Change the volume of the game
-                    c.optionsMenuButtons[optionSelected + 5].setTextButton(access);
+                    c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
                     if (Keyboard::isKeyPressed(Keyboard::Enter)) {
@@ -2455,15 +2413,15 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             return status;
                         }
                         if (c.modifiedConfig) {
-                            c.optionsMenuButtons[optionSelected + 5].setTextButton(saved);
+                            c.optionsMenuButtons[optionSelected + 4].setTextButton(saved);
                         }
                     }
 
-                    c.optionsMenuButtons[optionSelected + 6].setTextButton(submenu);
+                    c.optionsMenuButtons[optionSelected + 5].setTextButton(submenu);
                     break;
-                case 3:
+                case 2:
                     // Change the graphics of the game
-                    c.optionsMenuButtons[optionSelected + 5].setTextButton(access);
+                    c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
                     if (Keyboard::isKeyPressed(Keyboard::Enter)) {
@@ -2486,24 +2444,21 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             shape.setOutlineThickness(5.0f * c.screenScale);
                             shape.setTexture(&c.optionsMenuPanelBack, true);
 
-                            // Main Text of the menu
                             optionsText.setString(c.contentTitleOptionsMenu);
-                            optionsText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
                             optionsText.setFont(c.fontOptionsMenu);
+                            optionsText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
                             optionsText.setStyle(Text::Bold | Text::Underlined);
                             optionsText.setFillColor(c.colorTitleTextOptionsMenu);
                             optionsText.setOutlineColor(c.colorTitleBorderOptionsMenu);
                             optionsText.setOutlineThickness(5.0f * c.screenScale);
                             optionsText.setPosition((c.w.getSize().x / 2.f) - optionsText.getLocalBounds().width / 2.f,
-                                                     c.w.getSize().y / 2.f - 230.0f * c.screenScale);
+                                                     c.w.getSize().y / 2.f - 180.0f * c.screenScale);
 
-                            c.optionsMenuButtons[optionSelected + 5].setTextButton(saved);
+                            c.optionsMenuButtons[optionSelected + 4].setTextButton(saved);
+
                             shape.setPosition((c.w.getSize().x / 2.f) - 350.0f * c.screenScale,
                                               c.w.getSize().y / 2.f - 250.0f * c.screenScale);
                             shape.setSize(sf::Vector2f(710.0f * c.screenScale, 500.0f * c.screenScale));
-                            optionsText.setPosition((c.w.getSize().x / 2.f) - 90.0f * c.screenScale,
-                                                    c.w.getSize().y / 2.f - 230.0f * c.screenScale);
-                            optionsText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
 
                             // Local variables to store the attributes of the buttons
                             string contentButton;
@@ -2516,9 +2471,9 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             // Add the buttons with the new resolution
                             for (i = 0; i <= ((int)c.optionsMenuButtons.size() / 2) - 2; i++){
                                 posX = c.w.getSize().x / 2.f - 270.0f * c.screenScale;
-                                posY = c.w.getSize().y / 2.f - (130.0f - idButton * 70.0f) * c.screenScale;
+                                posY = c.w.getSize().y / 2.f - (100.0f - idButton * 70.0f) * c.screenScale;
                                 widthButton = 200.0f * c.screenScale;
-                                heightButton = 30.0f * c.screenScale;
+                                heightButton = 40.0f * c.screenScale;
 
                                 // Create a new button with the new resolution properties
                                 b = Button(posX, posY, widthButton, heightButton, c.fontMenuPlayerButtons,
@@ -2545,9 +2500,9 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             i++;
 
                             posX = c.w.getSize().x / 2.f - 270.0f * c.screenScale;
-                            posY = c.w.getSize().y / 2.f - (130.0f - idButton * 70.0f) * c.screenScale;
+                            posY = c.w.getSize().y / 2.f - (100.0f - idButton * 70.0f) * c.screenScale;
                             widthButton = 200.0f * c.screenScale;
-                            heightButton = 30.0f * c.screenScale;
+                            heightButton = 40.0f * c.screenScale;
 
                             b = Button(posX, posY, widthButton, heightButton, c.fontMenuPlayerButtons,
                                            c.optionsMenuButtons[i].getTextButton(), c.optionsMenuButtons[i].getIdleColorButton(),
@@ -2559,52 +2514,42 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
                             i++;
                             b = Button(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                       c.w.getSize().y / 2.f - 130.0f * c.screenScale,
+                                       c.w.getSize().y / 2.f - 100.0f * c.screenScale,
                                        200.0f * c.screenScale,
-                                       30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                       difficulty, c.optionsMenuButtons[i - 5].getIdleColorButton(),
-                                       c.optionsMenuButtons[i - 5].getHoverColorButton(),
-                                       c.optionsMenuButtons[i - 5].getFontColorButton(), 0, c.screenScale);
+                                       40.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                       difficulty, c.optionsMenuButtons[i - 4].getIdleColorButton(),
+                                       c.optionsMenuButtons[i - 4].getHoverColorButton(),
+                                       c.optionsMenuButtons[i - 4].getFontColorButton(), 0, c.screenScale);
                             c.optionsMenuButtons[i] = b;
 
                             i++;
                             b = Button(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                       c.w.getSize().y / 2.f - 60.0f * c.screenScale,
+                                       c.w.getSize().y / 2.f - 30.0f * c.screenScale,
                                        200.0f * c.screenScale,
-                                       30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                       c.enableAI ? "Enabled" : "Disabled", c.optionsMenuButtons[i - 5].getIdleColorButton(),
-                                       c.optionsMenuButtons[i - 5].getHoverColorButton(),
-                                       c.optionsMenuButtons[i - 5].getFontColorButton(), 0, c.screenScale);
+                                       40.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                       submenu, c.optionsMenuButtons[i - 4].getIdleColorButton(),
+                                       c.optionsMenuButtons[i - 4].getHoverColorButton(),
+                                       c.optionsMenuButtons[i - 4].getFontColorButton(), 0, c.screenScale);
                             c.optionsMenuButtons[i] = b;
 
                             i++;
                             b = Button(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                       c.w.getSize().y / 2.f + 10.0f * c.screenScale,
+                                       c.w.getSize().y / 2.f + 40.0f * c.screenScale,
                                        200.0f * c.screenScale,
-                                       30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                       submenu, c.optionsMenuButtons[i - 5].getIdleColorButton(),
-                                       c.optionsMenuButtons[i - 5].getHoverColorButton(),
-                                       c.optionsMenuButtons[i - 5].getFontColorButton(), 0, c.screenScale);
+                                       40.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                       submenu, c.optionsMenuButtons[i - 4].getIdleColorButton(),
+                                       c.optionsMenuButtons[i - 4].getHoverColorButton(),
+                                       c.optionsMenuButtons[i - 4].getFontColorButton(), 1, c.screenScale);
                             c.optionsMenuButtons[i] = b;
 
                             i++;
                             b = Button(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                       c.w.getSize().y / 2.f + 80.0f * c.screenScale,
+                                       c.w.getSize().y / 2.f + 110.0f * c.screenScale,
                                        200.0f * c.screenScale,
-                                       30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                       submenu, c.optionsMenuButtons[i - 5].getIdleColorButton(),
-                                       c.optionsMenuButtons[i - 5].getHoverColorButton(),
-                                       c.optionsMenuButtons[i - 5].getFontColorButton(), 1, c.screenScale);
-                            c.optionsMenuButtons[i] = b;
-
-                            i++;
-                            b = Button(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
-                                       c.w.getSize().y / 2.f + 150.0f * c.screenScale,
-                                       200.0f * c.screenScale,
-                                       30.0f * c.screenScale, c.fontMenuPlayerButtons,
-                                       submenu, c.optionsMenuButtons[i - 5].getIdleColorButton(),
-                                       c.optionsMenuButtons[i - 5].getHoverColorButton(),
-                                       c.optionsMenuButtons[i - 5].getFontColorButton(), 0, c.screenScale);
+                                       40.0f * c.screenScale, c.fontMenuPlayerButtons,
+                                       submenu, c.optionsMenuButtons[i - 4].getIdleColorButton(),
+                                       c.optionsMenuButtons[i - 4].getHoverColorButton(),
+                                       c.optionsMenuButtons[i - 4].getFontColorButton(), 0, c.screenScale);
                             c.optionsMenuButtons[i] = b;
 
 
@@ -2694,12 +2639,12 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                         }
                     }
 
-                    c.optionsMenuButtons[optionSelected + 4].setTextButton(submenu);
-                    c.optionsMenuButtons[optionSelected + 6].setTextButton(submenu);
+                    c.optionsMenuButtons[optionSelected + 3].setTextButton(submenu);
+                    c.optionsMenuButtons[optionSelected + 5].setTextButton(submenu);
                     break;
-                case 4:
+                case 3:
                     // Change the controllers of the game
-                    c.optionsMenuButtons[optionSelected + 5].setTextButton(access);
+                    c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
                     if (Keyboard::isKeyPressed(Keyboard::Enter)) {
@@ -2711,11 +2656,11 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             return status;
                         }
                         if (c.modifiedConfig) {
-                            c.optionsMenuButtons[optionSelected + 5].setTextButton(saved);
+                            c.optionsMenuButtons[optionSelected + 4].setTextButton(saved);
                         }
                     }
 
-                    c.optionsMenuButtons[optionSelected + 4].setTextButton(submenu);
+                    c.optionsMenuButtons[optionSelected + 3].setTextButton(submenu);
                     break;
                 default:
                     break;
@@ -2788,7 +2733,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         string controlSoundtrack = kM.mapperIdKeyWord[index];
 
         // Update the file
-        updateGameConfiguration(path, c.level, c.enableAI, r.volumeMusic, r.volumeEffects, c.enablePixelArt, c.resIndex,
+        updateGameConfiguration(path, c.level, r.volumeMusic, r.volumeEffects, c.enablePixelArt, c.resIndex,
                                 c.resolutions[c.resIndex].first, c.resolutions[c.resIndex].second, controlLeft, controlRight,
                                 controlAccelerate, controlBrake, controlSoundtrack);
 
@@ -3817,7 +3762,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
 
 
 // Update the file
-void updateGameConfiguration(const string path, const Difficult difficulty, const bool activeAI, const int volumeSoundtracks,
+void updateGameConfiguration(const string path, const Difficult difficulty, const int volumeSoundtracks,
                              const int volumeEffects, const bool pixelArt, const int fullScreen, const int axis_x, const int axis_y,
                              const string controlLeft, const string controlRight, const string controlAccelerate, const string controlBrake,
                              const string controlSoundtrack)
@@ -3841,31 +3786,16 @@ void updateGameConfiguration(const string path, const Difficult difficulty, cons
     root->append_node(levelDifficulty);
     string level;
     switch(difficulty){
-        case 0:
-            level = "Peaceful";
-            break;
-        case 1:
+        case EASY:
             level = "Easy";
             break;
-        case 2:
+        case NORMAL:
             level = "Normal";
             break;
-        case 3:
+        case HARD:
             level = "Hard";
     }
     levelDifficulty->value(level.c_str());
-
-    // Create the node of the AI level
-    xml_node<>* levelAI = doc.allocate_node(node_element, "AI");
-    root->append_node(levelAI);
-    string active;
-    if (activeAI){
-        active = "Enabled";
-    }
-    else {
-        active = "Disabled";
-    }
-    levelAI->value(active.c_str());
 
     // Create the node with the volume of the soundtracks
     xml_node<>* musicSoundtrack = doc.allocate_node(node_element, "Volume_Soundtracks");

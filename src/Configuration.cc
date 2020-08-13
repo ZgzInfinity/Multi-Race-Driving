@@ -1,7 +1,7 @@
 
 #include "../include/Configuration.h"
 
-Configuration::Configuration(const Difficult difficulty, const bool activeAI, const bool pixelArt, const bool fullScreen, const int axis_x,
+Configuration::Configuration(const Difficult difficulty, const bool pixelArt, const bool fullScreen, const int axis_x,
                              const int axis_y, const string controlLeft,const string controlRight, const string controlAccelerate,
                              const string controlBrake, const string controlSoundtrack)
                              : resolutions({SCREEN_DEFAULT, SCREEN_1, SCREEN_2, SCREEN_3, SCREEN_4, SCREEN_5}), camD(0.87), renderLen(450)
@@ -130,7 +130,7 @@ Configuration::Configuration(const Difficult difficulty, const bool activeAI, co
     changeAnyParameter = false;
 
     maxAggressiveness = 0.0f;
-    enableAI = activeAI;
+    enableAI = true;
     enablePixelArt = pixelArt;
 }
 

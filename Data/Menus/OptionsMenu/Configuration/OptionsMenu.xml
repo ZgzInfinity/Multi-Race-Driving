@@ -47,8 +47,8 @@
 					</C2>
 				</Colors>
 			</B0>
-			<B1>	
-				<Content>Enemies AI</Content>
+			<B1>
+				<Content>Sound</Content>
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
@@ -64,7 +64,7 @@
 				</Colors>
 			</B1>
 			<B2>
-				<Content>Sound</Content>
+				<Content>Graphics</Content>
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>
@@ -80,22 +80,6 @@
 				</Colors>
 			</B2>
 			<B3>
-				<Content>Graphics</Content>
-				<InitialState>0</InitialState>
-				<Colors>
-					<C1>
-						<R>249</R>
-						<G>54</G>
-						<B>46</B>
-					</C1>
-					<C2>
-						<R>255</R>
-						<G>255</G>
-						<B>255</B>
-					</C2>
-				</Colors>
-			</B3>
-			<B4>
 				<Content>Controllers</Content>
 				<InitialState>0</InitialState>
 				<Colors>
@@ -110,7 +94,7 @@
 						<B>255</B>
 					</C2>
 				</Colors>
-			</B4>
+			</B3>
 		</Buttons>
 	</MenuButtons>
 </OptionsMenu>

@@ -1891,9 +1891,6 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
 
         // Control the difficulty of the game
         switch (c.level){
-            case PEACEFUL:
-                path += "Peaceful.xml";
-                break;
             case EASY:
                 path += "Easy.xml";
                 break;
@@ -1923,16 +1920,6 @@ void Game::checkDifficulty(Configuration &c) {
 
     float prevScoreMul = scoreMul;
     switch (c.level) {
-        case PEACEFUL:
-            numCars = 0;
-            timeMul = 1.1f;
-            scoreMul = 0.25f;
-            numCrashesGoalCar = 6;
-            lifeLostPerCrash = int(100 / numCrashesGoalCar);
-            if (c.enableAI){
-                c.maxAggressiveness = 0.0f;
-            }
-            break;
         case EASY:
             numCars = 3;
             timeMul = 1.1f;
@@ -3625,11 +3612,9 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
         if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
             lastY = currentMap->getCameraPosY() + float(c.renderLen);
         }
+
         for (TrafficCar &v : cars) {
-            if (currentMap->inFork(v.getPosY())) {
-                v.setPosition(v.getPosX(), -RECTANGLE * DEL_DISTANCE * 3.0f);
-            }
-            else if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
+            if (v.getPosY() + DEL_DISTANCE < currentMap->getCameraPosY()) {
                 v.update(lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, c.level);
                 lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
             }
@@ -3667,37 +3652,41 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
         // Clear the ranking of the rivals for updating
         rankingVehicles.clear();
 
+        int i = 0;
+
         // Update and prepare racers to draw
         for (RivalCar &v : rivals) {
             float directionCurve = currentMap->getCurveCoefficient(v.getPosY());
 
-            v.updateModeA(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, directionCurve,
-                          c.level, positionX, positionY, speedPlayer, false);
+            if (!v.isCrashing() && !v.inCrash()){
+                v.updateModeA(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, directionCurve,
+                              c.level, positionX, positionY, speedPlayer, false);
+            }
 
-            lastY = v.getPosY() + DISTANCE_TRESHOLD * RECTANGLE;
+            vehicleCrash = false;
+            float crashPos;
+
+            if (!v.isCrashing() && !v.inCrash()){
+                // Check if the current rival car has crashed with a traffic car
+                if (abs(v.getPosY() - positionY) <= c.renderLen){
+                    for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++){
+                        vehicleCrash = cars[i].hasCrashed(v.getPreviousY(), v.getPosY(),
+                                                          v.getMinScreenX(), v.getMaxScreenX(), crashPos);
+                    }
+                }
+            }
+
+            if (vehicleCrash || v.isCrashing()) {
+                // Determine the type of collision
+                v.setPosition(v.getPosX(), v.getPosY());
+                v.hitControl(vehicleCrash, r, positionY);
+                a = Vehicle::CRASH;
+            }
 
             float posY = v.getPosY();
 
-            vehicleCrash = false;
-            bool vehicleDetected = false;
-            float crashPos;
-
             // Store the new position of the vehicle
             rankingVehicles.push_back(posY);
-
-            // Check if the current rival car has crashed with a traffic car
-            for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++){
-                vehicleCrash = cars[i].hasCrashed(v.getPreviousY(), posY,
-                                                  v.getMinScreenX(), v.getMaxScreenX(), crashPos);
-            }
-
-            if (vehicleCrash) {
-                // Determine the type of collision
-                v.setModeCollision();
-                v.setPosition(v.getPosX(), crashPos);
-                v.hitControl(vehicleCrash, r);
-                a = Vehicle::CRASH;
-            }
 
             // Draw the vehicle
             v.draw(a, currentMap->getElevation(posY));
@@ -3797,6 +3786,7 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                         r.soundEffects[87]->play();
                     }
             }
+            i++;
         }
 
         // Order the rivals cars of the race to build a temporary ranking
@@ -6594,7 +6584,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
         Text angle;
         string value = to_string(angleVehicles[0][0]);
-        angle.setString(value.substr(0, value.find(".") + 3) + " RAD/S");
+        angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
         angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                           c.w.getSize().y / 2.f - 5.0f * c.screenScale);
         angle.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
@@ -7786,21 +7776,8 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         path = "Data/Records/Derramage/LevelScore" + to_string(currentStage) + "_";
     }
 
-    // Control if the game has been played with the AI enabled or not
-    if (c.enableAI){
-        // Record with AI active
-        path += "Enabled_";
-    }
-    else {
-        // Record with AI disabled
-        path += "Disabled_";
-    }
-
     // Control the difficulty of the game
     switch (c.level){
-        case PEACEFUL:
-            path += "Peaceful.xml";
-            break;
         case EASY:
             path += "Easy.xml";
             break;
@@ -8164,10 +8141,10 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             c.w.draw(vehicle);
             c.w.draw(startText);
 
-            if ((typeOfGame != 2 || (typeOfGame == 0 && indexLandScape != 3)
-                || ((typeOfGame == 3 || typeOfGame == 4) && currentStage <= totalStages)))
+            if (typeOfGame != 2 || (typeOfGame == 0 && indexLandScape != 3)
+                || ((typeOfGame == 3 || typeOfGame == 4) && currentStage <= totalStages))
             {
-            c.w.draw(levelPromotion);
+                c.w.draw(levelPromotion);
             }
 
             bufferSprite.setTexture(c.w.getTexture(), true);

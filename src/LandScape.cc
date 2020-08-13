@@ -1709,6 +1709,14 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     }
     sort(sortedRivals.begin(), sortedRivals.end(), ascendingSortRivalCars);
 
+
+    // Discard all the vehicles which are behind the player
+    while (!sortedRivals.empty() && (int(sortedRivals.back()->getPosY()) < int(posCameraY) ||
+                                       int(sortedRivals.back()->getPosY()) > int(posCameraY) + c.renderLen - 1))
+    {
+        sortedRivals.pop_back();
+    }
+
     // Sort the traffic cars
     vector<RivalCar *> sortedGoalCars;
     if (drawGoalCar){
@@ -1730,6 +1738,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     float camH = l->position_3d_y + 1500.0f;
     float maxy = c.w.getSize().y;
     float x = 0, dx = 0;
+    bool pushed = false;
     vector<int> visibleLines;
 
     for (int n = startPos; n <= lastPos; n++) {
@@ -1748,7 +1757,14 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         dx += l->directionCurve;
 
         l->clip = maxy;
-        if (l->position_2d_y < maxy) {
+
+        for (RivalCar* r : sortedRivals){
+            if (int(r->getPosY()) == n ){
+                pushed = true;
+            }
+        }
+
+        if (l->position_2d_y < maxy || pushed) {
             // This line is visible and will be drawn
             visibleLines.push_back(n);
             maxy = l->position_2d_y;
@@ -1760,11 +1776,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         l = getStep(n);
         dx -= l->directionCurve;
         x -= dx;
-
-        // Draw road
-        if (visibleLines.back() == n) {
-
-            visibleLines.pop_back();
 
             Color grassRight, grass, roadRight, road, rumbleRight, rumble, dashRight, dash;
             if ((startingLandScape && n < N) || (!startingLandScape && n < N - (RECTANGLES_LIMIT + RECTANGLES_FORK) * RECTANGLE) ||
@@ -1899,7 +1910,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
 
                 drawRoadTracks(c.w, dash, x1, w1, y1, dw1, x2, w2, y2, dw2);
             }
-        }
 
         // Draw the map elements
         // Near left map element
@@ -2004,7 +2014,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         // Draw the car to chase
         if ((typeOfGame == 3 || typeOfGame == 4) && drawGoalCar){
             // Draw rival cars
-            while (!sortedGoalCars.empty() && int(sortedGoalCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
+            while (!sortedGoalCars.empty()) {
 
                 RivalCar *v = sortedGoalCars.back();
                 Sprite sv;

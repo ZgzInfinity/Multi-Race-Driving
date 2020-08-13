@@ -30,7 +30,7 @@ class RivalCar : public Vehicle {
     int vehicleType;
 
     // Number of textures of textures of the vehicle
-    int numTextures, mode;
+    int numTextures;
 
     // Texture thresholds to control the movements of the vehicle
     int minTextureRight, maxTextureRight,
@@ -106,7 +106,7 @@ public:
     float getSmoking() const;
 
 
-    void hitControl(const bool vehicleCrash, SoundPlayer& r);
+    void hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlayerY);
 
 
     bool isCrashing() const;
@@ -239,17 +239,7 @@ public:
     bool getFiringSmoke();
 
 
-
-    void setModeCollision();
-
-
-
-    int getMode();
-
-
-
-    void update(float iniPos, float endPos);
-
+    bool inCrash();
 };
 
 

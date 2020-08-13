@@ -49,7 +49,6 @@ enum State {
 
 
 enum Difficult {
-    PEACEFUL, // Without enemies
     EASY,
     NORMAL,
     HARD
@@ -481,7 +480,7 @@ struct Configuration {
     /**
      * Constructor por defecto.
      */
-    Configuration(const Difficult difficulty, const bool activeAI, const bool pixelArt, const bool fullScreen, const int axis_x,
+    Configuration(const Difficult difficulty, const bool pixelArt, const bool fullScreen, const int axis_x,
                   const int axis_y, const string controlLeft,const string controlRight, const string controlAccelerate,
                   const string controlBrake, const string controlSoundtrack);
 
