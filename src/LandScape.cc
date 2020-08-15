@@ -1,4 +1,9 @@
 
+/*
+ * Module LandScape implementation file
+ */
+
+
 #include "../include/LandScape.h"
 
 
@@ -160,28 +165,46 @@ inline void LandScape::addStepFromFile(float& x, float y, float& z, float prevY,
     // RECTANGLE indicates the steps number will be added
     float yInc = (y - prevY) / float(RECTANGLE);
 
+    // Assign the coordinates in axis x and y
     Step line;
     line.position_3d_x = x;
     line.position_3d_y = prevY;
+
+    // Assign the color
     line.mainColor = mainColor;
+
+    // Assign the curve coefficient
     line.directionCurve = curve;
 
     // For each normal line, extra steps without objects for better visualization
     for (int i = 0; i < 2 * INTIAL_POS; i++) {
+
+        // Increment the depth of the landscape in axis z
         line.position_3d_z = z;
         z += SEGL;
 
+        // Check if a fork is being processed
         if (offsetX > 0.0f) {
-            if (offsetX >= xFork)
+            // Check if the possible fork is to the left or to the right
+            if (offsetX >= xFork){
+                // Possible fork to the left
                 line.yOffsetX = sqrt(FORK_RADIUS * FORK_RADIUS - pow(offsetX - firstRadiusFork, 2.0f)) + secondRadiusFork;
-            else
+            }
+            else {
+                // Possible fork to the right
                 line.yOffsetX = -sqrt(FORK_RADIUS * FORK_RADIUS - offsetX * offsetX) + FORK_RADIUS;
+            }
+            // Assign coordinate in axis x and increment it
             line.offsetX = offsetX;
-            if (offsetX + offsetInc <= 2.0f * xFork)
+            if (offsetX + offsetInc <= 2.0f * xFork){
                 offsetX += offsetInc;
+            }
         }
 
+        // Increment the height in axis y
         line.position_3d_y += yInc;
+
+        // Increment the direction curve
         bgX += line.directionCurve;
         line.bgX = bgX;
 
@@ -205,6 +228,7 @@ inline void LandScape::addStepFromFile(float& x, float y, float& z, float prevY,
             }
             spriteNearLeft.offset = leftOffset;
         }
+
         // Control the near sprite of the right
         if ((startPos + stepsRead) % eachNearRight != 0){
             spriteNearRight.codeMapElement = -1;
@@ -268,7 +292,9 @@ inline void LandScape::addStepFromFile(float& x, float y, float& z, float prevY,
         line.spriteFarLeft = spriteFarLeft;
         line.spriteFarRight = spriteFarRight;
 
+        // Increment the number of steps processed
         stepsRead++;
+        // Store the current step
         newLines.push_back(line);
         totalSteps++;
     }
@@ -294,67 +320,110 @@ inline void LandScape::addStep(float x, float y, float &z, float prevY, float cu
                                const MapElement &spriteNearLeft, const MapElement &spriteNearRight, float &bgX, float &offsetX,
                                const float offsetInc)
 {
-    float yInc = (y - prevY) / float(RECTANGLE); // RECTANGLE is total lines number will be added
-
+    // RECTANGLE is total lines number will be added
+    float yInc = (y - prevY) / float(RECTANGLE);
     Step line, lineAux;
+
+    // Assign the coordinates in axis x and axis y
     line.position_3d_x = x;
     line.position_3d_y = prevY;
+
+    // Assign the color of the step
     line.mainColor = mainColor;
+
+    // Assign the direction curve of the step
     line.directionCurve = curve;
 
-    lineAux = line; // without objects
-
+    // Assign the elements of the landscape
+    lineAux = line;
     line.spriteNearLeft = spriteNearLeft;
     line.spriteNearRight = spriteNearRight;
 
     // For each normal line, extra lines without objects for better visualization
     for (int i = 0; i < INTIAL_POS; i++) {
+
+        // Increment the depth of the landscape in axis z
         lineAux.position_3d_z = z;
         z += SEGL;
+
+        // Check if a fork is being processed
         if (offsetX > 0.0f) {
-            if (offsetX >= xFork)
+            // Check if the possible fork is to the left or to the right
+            if (offsetX >= xFork){
+                // Possible fork to the left
                 lineAux.yOffsetX = sqrt(FORK_RADIUS * FORK_RADIUS - pow(offsetX - firstRadiusFork, 2.0f)) + secondRadiusFork;
-            else
+            }
+            else {
+                // Possible fork to the right
                 lineAux.yOffsetX = -sqrt(FORK_RADIUS * FORK_RADIUS - offsetX * offsetX) + FORK_RADIUS;
+            }
+            // Assign coordinate in axis x and increment it
             lineAux.offsetX = offsetX;
-            if (offsetX + offsetInc <= 2.0f * xFork)
+            if (offsetX + offsetInc <= 2.0f * xFork){
                 offsetX += offsetInc;
+            }
         }
+
+        // Increment the direction curve
         lineAux.position_3d_y += yInc;
         bgX += lineAux.directionCurve;
         lineAux.bgX = bgX;
         newLines.push_back(lineAux);
     }
 
+    // Increment the depth of the landscape in axis z
     line.position_3d_z = z;
     z += SEGL;
+
+    // Check if a fork is being processed
     if (offsetX > 0.0f) {
-        if (offsetX >= xFork)
+        // Check if the possible fork is to the left or to the right
+        if (offsetX >= xFork){
+            // Possible fork to the left
             line.yOffsetX = sqrt(FORK_RADIUS * FORK_RADIUS - pow(offsetX - firstRadiusFork, 2.0f)) + secondRadiusFork;
-        else
+        }
+        else {
+            // Possible fork to the right
             line.yOffsetX = -sqrt(FORK_RADIUS * FORK_RADIUS - offsetX * offsetX) + FORK_RADIUS;
+        }
+        // Assign coordinate in axis x and increment it
         line.offsetX = offsetX;
-        if (offsetX + offsetInc <= 2.0f * xFork)
+        if (offsetX + offsetInc <= 2.0f * xFork){
             offsetX += offsetInc;
+        }
     }
+
+    // Increment the direction curve
     lineAux.position_3d_y += yInc;
     line.position_3d_y = lineAux.position_3d_y;
     bgX += line.directionCurve;
     line.bgX = bgX;
     newLines.push_back(line);
 
+    // For each normal line, extra lines without objects for better visualization
     for (int i = 0; i < INTIAL_POS; i++) {
+        // Increment the depth of the landscape in axis z
         lineAux.position_3d_z = z;
         z += SEGL;
+        // Check if a fork is being processed
         if (offsetX > 0.0f) {
-            if (offsetX >= xFork)
+            // Check if the possible fork is to the left or to the right
+            if (offsetX >= xFork){
+                // Possible fork to the left
                 lineAux.yOffsetX = sqrt(FORK_RADIUS * FORK_RADIUS - pow(offsetX - firstRadiusFork, 2.0f)) + secondRadiusFork;
-            else
+            }
+            else {
+                // Possible fork to the right
                 lineAux.yOffsetX = -sqrt(FORK_RADIUS * FORK_RADIUS - offsetX * offsetX) + FORK_RADIUS;
+            }
+            // Assign coordinate in axis x and increment it
             lineAux.offsetX = offsetX;
-            if (offsetX + offsetInc <= 2.0f * xFork)
+            if (offsetX + offsetInc <= 2.0f * xFork){
                 offsetX += offsetInc;
+            }
         }
+
+        // Increment the direction curve
         lineAux.position_3d_y += yInc;
         bgX += lineAux.directionCurve;
         lineAux.bgX = bgX;
@@ -402,10 +471,12 @@ Step LandScape::getStep(const int n) const {
  * @return
  */
 Step *LandScape::getLastStep(const int n) {
-    if ((n > 0 && n - 1 < (int)newLines.size()) || nextLeft == nullptr)
+    if ((n > 0 && n - 1 < (int)newLines.size()) || nextLeft == nullptr){
         return &newLines[(n - 1) % newLines.size()];
-    else
+    }
+    else {
         return &nextLeft->newLines[(n - 1 - newLines.size()) % nextLeft->newLines.size()];
+    }
 }
 
 
@@ -962,11 +1033,15 @@ void LandScape::loadRoadProperties(const string& pathRoadFile){
 inline void LandScape::drawRoadTracks(RenderTexture& w, Color& dash, const int x1, const int w1, const int y1,
                        const int dw1, const int x2, const int w2, const int y2, const int dw2)
 {
+    // Check it there is two tracks in the road
     if (number_tracks == 2){
+        // Draw a track in the center of the road
         drawQuad(w, dash, x1 + int(float(w1) * 0.5f), y1, dw1, x2 + int(float(w2) * 0.5f), y2, dw2);
     }
     else {
+        // Iterate the tracks of the road
         for (int i = 1; i < number_tracks; i++){
+            // Draw a new track in the road
             drawQuad(w, dash, x1 + int(float(w1) * (0.25f * i)), y1, dw1, x2 + int(float(w2) * (0.25f * i)), y2, dw2);
         }
     }
@@ -986,16 +1061,20 @@ LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
                      const int time, const int typeOfGame, const int numRivals) : posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
                      startingLandScape(false), finalLandScape(false), middleLandScape(false), timeToPlay(time)
 {
-
+    // Check if the game mode selected by the player is World Tour and Pole Position
     if (typeOfGame == 0 || typeOfGame == 2){
+        // Check the number of rivals
         if (numRivals == 0){
+            // Camera in the center in the screen
             posCameraX = 0.f;
         }
         else {
+            // Camera in the left in the screen
             posCameraX = -0.3f;
         }
     }
     else {
+        // Camera in the center in the screen
         posCameraX = 0.f;
     }
 
@@ -1077,7 +1156,12 @@ LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
 
 
 
+/**
+ * Default constructor
+ */
 LandScape::LandScape(){}
+
+
 
 /**
  * Creates a straight flat map which represents the starting point of a landscape
@@ -1089,24 +1173,33 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
                      background(landScape.background), posCameraY(0), nextLeft(nullptr), nextRight(nullptr), startingLandScape(true),
                      finalLandScape(false), middleLandScape(false), timeToPlay(0)
 {
-
+    // Check if the game mode selected by the player is World Tour and Pole Position
     if (typeOfGame == 0 || typeOfGame == 2){
+        // Check the number of rivals
         if (numRivals == 0){
+            // Camera in the center of the screen
             posCameraX = 0.f;
         }
         else {
+            // Camera in the left of the screen
             posCameraX = -0.3f;
         }
     }
     else {
+        // Camera in the center of the screen
         posCameraX = 0.f;
     }
 
     int rectangles = 0, peopleDisplayed, treesDisplayed;
 
+    // Check if the game mode selected by the player is World Tour and Pole Position
     if (typeOfGame == 0 || typeOfGame == 2){
+
+        // Frequency of apparition of the elements of the landscape
         peopleDisplayed = 8;
         treesDisplayed = 6;
+
+        // Establish the length of the landscape depending of the number of rivals
         if (typeOfGame == 2){
             switch(numRivals){
                 case 0:
@@ -1127,9 +1220,12 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
                 }
         }
         else {
+            // Default length of the landscape
             rectangles = 65;
         }
     }
+    // Check if the game mode is Driving Fury or not
+    // Establish the length of the landscape and the frequency of apparition of the elements
     else if (typeOfGame == 3) {
         rectangles = 20;
         treesDisplayed = 0;
@@ -1152,8 +1248,10 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
     rumbleColor = landScape.rumbleColor;
     dashColor = landScape.dashColor;
 
+    // Vector if indexes of the elements of the landscape
     vector<int> objectIndexes;
 
+    // Load the elements of the landscape
     loadMapElements(mapPath, objectIndexes);
 
     // Hardcoded sprites
@@ -1251,16 +1349,18 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
 
     // Line generation
     bool mainColor = true;
-    vector<vector<string>> instructions;
-    instructions.reserve(rectangles);
-    float z = 0; // Line position
-    float bgX = 0; // Background position
+    float z = 0;
+    float bgX = 0;
+
+    // Add the steps of the landscape
     for (int i = 0; i < rectangles; i++) {
         float offset = 0.0f;
+        // Add the step with all its information
         addStep(0, 0, z, 0, 0, mainColor, leftSprites[i], rightSprites[i], bgX, offset);
         mainColor = !mainColor;
     }
 
+    // Position of the flagger and semaphore in the landscape
     flagger = RECTANGLE * (rectangles - 45) + INTIAL_POS;
     semaphore = RECTANGLE * (rectangles - 44) + INTIAL_POS;
 }
@@ -1270,29 +1370,36 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
 /**
  * Creates a straight flat map which represents the starting point of a landscape
  * @param landscape is the landscape to be displayed
- * @param flagger is the flagger position while is announcing the start
- * @param semaphore is the color of the semaphore in the starting
+ * @param typeOfGame is the game selected by the player
+ * @param numRivals is the number of rivals that are going to compete  against the player
  */
 LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals) :
                      background(landScape.background), posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
                      startingLandScape(false), finalLandScape(false), middleLandScape(true), timeToPlay(0)
 {
-
+    // Check if the game selected by the player is World Tour or Pole Position
     if (typeOfGame == 0 || typeOfGame == 2){
+        // Check the number of rivals to establish the camera
         if (numRivals == 0){
+            // Camera in the center of the screen
             posCameraX = 0.f;
         }
         else {
+            // Camera in the left of the screen
             posCameraX = -0.3f;
         }
     }
     else {
+        // Camera in the center of the screen
         posCameraX = 0.f;
     }
 
+    // Length of the landscape
     int rectangles = 0;
 
+    // Check if the mode of game is Pole Position
     if (typeOfGame == 2){
+        // Establish the depth of the landscape depending of the number of rivals
         switch(numRivals){
             case 0:
             case 1:
@@ -1312,11 +1419,13 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int
         }
     }
 
-    // Map size
-    const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // File with all the textures
+    // File with all the textures
+    const string mapPath = "Data/LandScapeCommon/LandScape.xml";
 
+    // Vector with the code of the elements of the landscape
     vector<int> objectIndexes;
 
+    // Load the textures of the landscape
     loadMapElements(mapPath, objectIndexes);
 
     // Hardcoded sprites
@@ -1389,29 +1498,39 @@ LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int
                      nextRight(nullptr), startingLandScape(false), finalLandScape(true), middleLandScape(false),
                      timeToPlay(0)
 {
-
+    // Check if the game selected by the player is World Tour or Pole Position
     if (typeOfGame == 0 || typeOfGame == 2){
+        // Check the number of rivals to establish the camera
         if (numRivals == 0){
+            // Camera in the center of the screen
             posCameraX = 0.f;
         }
         else {
+            // Camera in the left of the screen
             posCameraX = -0.3f;
         }
     }
     else {
+        // Camera in the center of the screen
         posCameraX = 0.f;
     }
 
-    const int rectangles = 180; // Map size
-    const string mapPath = "Data/LandScapeCommon/LandScape.xml"; // Folder with common objects
+    // Landscape size
+    const int rectangles = 180;
+    // Folder with common objects
+    const string mapPath = "Data/LandScapeCommon/LandScape.xml";
 
+    // Vector with the code of the elements of the landscape
     vector<int> objectIndexes;
+
+    // Load the textures of the landscape
     loadMapElements(mapPath, objectIndexes);
 
     // Hardcoded sprites
     vector<MapElement> leftSprites, rightSprites;
     leftSprites.reserve(rectangles);
     rightSprites.reserve(rectangles);
+
     for (int i = 0; i < rectangles; i++) {
         leftSprites.emplace_back();
         rightSprites.emplace_back();
@@ -1447,18 +1566,20 @@ LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int
         }
     }
 
-    // Line generation
+    // Step generation
     bool mainColor = true;
-    vector<vector<string>> instructions;
-    instructions.reserve(rectangles);
-    float z = 0; // Line position
-    float bgX = 0; // Background position
+    float z = 0;
+    float bgX = 0;
+
+    // Fill the landscape with all the steps
     for (int i = 0; i < rectangles; i++) {
         float offset = 0.0f;
+        // Add the steps with all its information
         addStep(0, 0, z, 0, 0, mainColor, leftSprites[i], rightSprites[i], bgX, offset);
         mainColor = !mainColor;
     }
 
+    // Position of the flagger in the landscape
     flagger = RECTANGLE * INTIAL_POS;
     goalEnd = 500;
 }
@@ -1531,11 +1652,13 @@ void LandScape::addFork(LandScape *left, LandScape *right) {
         this->nextLeft = left;
         this->nextRight = right;
         float yOffset = 0.0f;
-        if (!newLines.empty())
+        if (!newLines.empty()){
             yOffset = newLines[newLines.size() - 1].position_3d_y;
+        }
         this->nextLeft->setOffset(yOffset);
-        if (this->nextLeft != this->nextRight)
+        if (this->nextLeft != this->nextRight){
             this->nextRight->setOffset(yOffset);
+        }
 
         // Add fork to current map
         if (!newLines.empty()) {
@@ -1731,6 +1854,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     sbg.setTextureRect(IntRect(0, 0, static_cast<int>(80.0f * sbg.getGlobalBounds().width), background.getSize().y));
     sbg.setPosition(0, 0);
 
+    // Move the background to the left or to the right
     sbg.move(-16.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
     c.w.draw(sbg);
 

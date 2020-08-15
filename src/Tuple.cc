@@ -11,6 +11,10 @@
  */
 
 
+/*
+ * Module Tuple implementation file
+ */
+
 #include <sstream>
 #include "../include/Tuple.h"
 
@@ -22,8 +26,7 @@ using namespace std;
  * Creates a tuple of one element
  * @param p1 is the first component of the tuple
  */
-Tuple::Tuple(string p1)
-{
+Tuple::Tuple(string p1){
     length = 1;
     lindaTuple[0] = p1;
 };
@@ -35,8 +38,7 @@ Tuple::Tuple(string p1)
  * @param p1 is the first component of the tuple
  * @param p2 is the second component of the tuple
  */
-Tuple::Tuple(string p1, string p2)
-{
+Tuple::Tuple(string p1, string p2){
     length = 2;
     lindaTuple[0] = p1;
     lindaTuple[1] = p2;
@@ -50,8 +52,7 @@ Tuple::Tuple(string p1, string p2)
  * @param p2 is the second component of the tuple
  * @param p3 is the third component of the tuple
  */
-Tuple::Tuple(string p1, string p2, string p3)
-{
+Tuple::Tuple(string p1, string p2, string p3){
     length = 3;
     lindaTuple[0] = p1;
     lindaTuple[1] = p2;
@@ -67,8 +68,7 @@ Tuple::Tuple(string p1, string p2, string p3)
  * @param p3 is the third component of the tuple
  * @param p4 is the fourth component of the tuple
  */
-Tuple::Tuple(string p1, string p2, string p3, string p4)
-{
+Tuple::Tuple(string p1, string p2, string p3, string p4){
     length = 4;
     lindaTuple[0] = p1;
     lindaTuple[1] = p2;
@@ -86,8 +86,7 @@ Tuple::Tuple(string p1, string p2, string p3, string p4)
  * @param p4 is the fourth component of the tuple
  * @param p5 is the fifth component of the tuple
  */
-Tuple::Tuple(string p1, string p2, string p3, string p4, string p5)
-{
+Tuple::Tuple(string p1, string p2, string p3, string p4, string p5){
     length = 5;
     lindaTuple[0] = p1;
     lindaTuple[1] = p2;
@@ -107,8 +106,7 @@ Tuple::Tuple(string p1, string p2, string p3, string p4, string p5)
  * @param p5 is the fifth component of the tuple
  * @param p6 is the sixth component of the tuple
  */
-Tuple::Tuple(string p1, string p2, string p3, string p4, string p5, string p6)
-{
+Tuple::Tuple(string p1, string p2, string p3, string p4, string p5, string p6){
     length = 6;
     lindaTuple[0] = p1;
     lindaTuple[1] = p2;
@@ -123,8 +121,7 @@ Tuple::Tuple(string p1, string p2, string p3, string p4, string p5, string p6)
  * Creates a tuple with a concrete dimension
  * @param dimension is the number of components of the tuple
  */
-Tuple::Tuple(int dimension)
-{
+Tuple::Tuple(int dimension){
     length = dimension;
 };
 
@@ -134,8 +131,7 @@ Tuple::Tuple(int dimension)
  * Convert a string formated tuple into a tuple
  * @param t is the string which represents the tuple
  */
-void Tuple::from_string(string t)
-{
+void Tuple::from_string(string t){
     // Creation of a string flux
     stringstream ss(t);
 
@@ -184,8 +180,7 @@ void Tuple::from_string(string t)
  * Convert a tuple into a string representation
  * @return
  */
-string Tuple::to_string()
-{
+string Tuple::to_string(){
     // Representation of the tuple like a string
     string chain = "[";
 
@@ -206,8 +201,7 @@ string Tuple::to_string()
  * Get the component of the tuple stored in a concrete position
  * @param index is the position of the element to get
  */
-string Tuple::get(int index)
-{
+string Tuple::get(int index){
     return lindaTuple[index - 1];
 };
 
@@ -218,8 +212,7 @@ string Tuple::get(int index)
  * @param index is the position of the component to be assigned
  * @param field is the value which is going to be stored
  */
-void Tuple::set(int index, string field)
-{
+void Tuple::set(int index, string field){
     lindaTuple[index - 1] = field;
 };
 
@@ -229,7 +222,6 @@ void Tuple::set(int index, string field)
  * Returns the dimension of the tuple
  * @return
  */
-int Tuple::size()
-{
+int Tuple::size(){
     return length;
 };

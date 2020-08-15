@@ -169,6 +169,34 @@ int main() {
                     state = playerMenu(c, r);
                     break;
                 }
+                case MULTIPLAYER_MENU: {
+                    int multiPlayerMode;
+                    state = multiplayerMenu(c, r, multiPlayerMode);
+                    if (state == MULTIPLAYER_NAME_PLAYER){
+                        engine.setMultiplayerMode(multiPlayerMode);
+                    }
+                    break;
+                }
+                case MULTIPLAYER_NAME_PLAYER: {
+                    // Ask the name of the player in multi player mode
+                    state = engine.introduceNameMultiplayer(c, r);
+                    break;
+                }
+                case MULTIPLAYER_NAME_GROUP: {
+                    // Ask the name of the player in multi player mode
+                    state = engine.introduceGroupMultiplayer(c, r);
+                    break;
+                }
+                case SELECT_MULTIPLAYER_JOIN: {
+                    // Select how to join to a group in multi player mode
+                    state = engine.selectJoiningMode(c, r);
+                    break;
+                }
+                case START_MULTIPLAYER: {
+                    while(1){
+                        cout << "Hola" << endl;
+                    }
+                }
                 case GAME_MODES_MENU: {
                     // Get the type of game selected by the user
                     int typeOfGame = engine.typeGame();

@@ -1,11 +1,30 @@
 
+/*
+ * Module Configuration implementation file
+ */
+
 #include "../include/Configuration.h"
 
+
+
+/**
+ * Assigns to the game the configuration read from the xml configuration file
+ * @param difficulty is the difficulty level of the game
+ * @param pixelArt controls if the graphics of the game have to be drawn with pixel art effect
+ * @param fullScreen controls if the game is in full screen
+ * @param axis_x is the width of the screen
+ * @param axis_y is the height of the screen
+ * @param controlLeft is the code of the key to move the vehicle to the left
+ * @param controlLeft is the code of the key to move the vehicle to the right
+ * @param controlAccelerate is the code of the key to accelerate the vehicle
+ * @param controlSoundtrack is the code of the key to change the soundtrack of the game
+ */
 Configuration::Configuration(const Difficult difficulty, const bool pixelArt, const bool fullScreen, const int axis_x,
                              const int axis_y, const string controlLeft,const string controlRight, const string controlAccelerate,
                              const string controlBrake, const string controlSoundtrack)
                              : resolutions({SCREEN_DEFAULT, SCREEN_1, SCREEN_2, SCREEN_3, SCREEN_4, SCREEN_5}), camD(0.87), renderLen(450)
 {
+    // Check if the screen is in default resolution or not
     if (axis_x == DEFAULT_WIDTH && axis_y == DEFAULT_HEIGHT){
         isDefaultScreen = true;
         resIndex = 0;
@@ -14,6 +33,7 @@ Configuration::Configuration(const Difficult difficulty, const bool pixelArt, co
         isDefaultScreen = false;
     }
 
+    // Establish the index of the resolution currently used in the vector
     if (axis_x == SCREEN_1.first && axis_y == SCREEN_1.second){
         resIndex = 1;
     }
@@ -30,19 +50,26 @@ Configuration::Configuration(const Difficult difficulty, const bool pixelArt, co
         resIndex = 5;
     }
 
+    // Check if it's full screen or not
     if (!fullScreen){
+        // Create the screen with not full screen resolution
         window.create(VideoMode(static_cast<unsigned int>(resolutions[resIndex].first),
                                 static_cast<unsigned int>(resolutions[resIndex].second)), "Multi Race Driving",
                       Style::Titlebar | Style::Close);
     }
     else {
-        window.create(VideoMode::getFullscreenModes()[0], "Out Run", Style::Fullscreen);
+        // Create a screen with full screen resolution
+        window.create(VideoMode::getFullscreenModes()[0], "Multi Race Driving", Style::Fullscreen);
         resIndex = -1;
     }
 
+    // Set the FPS of the game
     window.setFramerateLimit(FPS);
+
+    // Available repeated keys interruptions
     window.setKeyRepeatEnabled(false);
 
+    // Initialize the flags that control the reading of the xml configuration files
     mainMenuRead = false;
     playerMenuRead = false;
     gameModesMenuRead = false;
@@ -56,39 +83,53 @@ Configuration::Configuration(const Difficult difficulty, const bool pixelArt, co
     pauseMenuRead = false;
     vehicleSelectionMenuRead = false;
     circuitMenuRead = false;
+    multiplayerMenuRead = false;
+    multiplayerNameMenuRead = false;
+    multiplayerGroupMenuRead = false;
+    multiplayerJoinGroupMenuRead = false;
 
+    // Creation of the view
     w.create(static_cast<unsigned int>(window.getView().getSize().x),
              static_cast<unsigned int>(window.getView().getSize().y));
 
+    // Create the view to display the elements of the game
     window.setView(View(Vector2f(window.getSize().x / 2.0f, window.getSize().y / 2.0f),
                           Vector2f(window.getSize().x, window.getSize().y)));
     w.create(static_cast<unsigned int>(window.getView().getSize().x),
                static_cast<unsigned int>(window.getView().getSize().y));
 
+    // Calculate the factor of screen
     screenScale = float(w.getSize().x) / float(DEFAULT_WIDTH);
 
+    // Check if it's default screen resolution
     if (isDefaultScreen){
+        // Store the thresholds and image offsets with their default values
         imageOffset = IMAGE_DEFAULT_OFFSET;
         thresholdDescriptionX = SCREEN_HD_HEIGHT;
         thresholdDescriptionY = VERTICAL_OFFSET;
     }
     else {
+        // Store the thresholds and image offsets depending of the current resolution
         thresholdDescriptionX = w.getSize().x * SCREEN_HD_HEIGHT / DEFAULT_WIDTH;
         thresholdDescriptionY = int((w.getSize().y * VERTICAL_OFFSET / DEFAULT_HEIGHT) * 1.2f);
         imageOffset = float(w.getSize().y) * IMAGE_DEFAULT_OFFSET / DEFAULT_HEIGHT;
     }
 
+    // Assign icon to the screen of the game
     Image i;
     i.loadFromFile("Data/Icon/Multi_Race_Driving.png");
     window.setIcon(i.getSize().x, i.getSize().y, i.getPixelsPtr());
 
+    // Calculate the factor of screen
     screenScale = float(w.getSize().x) / float(DEFAULT_WIDTH);
 
+    // Assign the key controllers
     menuKey = Keyboard::Escape;
     menuUpKey = Keyboard::Up;
     menuDownKey = Keyboard::Down;
     menuEnterKey = Keyboard::Enter;
 
+    // Initialize the keyword mapper
     int index;
     KeywordMapper kM = KeywordMapper();
 
@@ -112,25 +153,26 @@ Configuration::Configuration(const Difficult difficulty, const bool pixelArt, co
     index = kM.lookForKeyBoard(controlSoundtrack);
     soundtrackKey = kM.mapperCodeKeyWord[index];
 
+    // Store all the fonts of the text used by the game
     fontElapsedTime = initializeFontElapsedTime();
-
     fontTimeToPlay = initializeFontTimeToPlay();
-
     fontMenus = initializeFontMenus();
-
-    fontScore = initializeFontScore();
-
     speedVehicle = initializeFontElapsedTime();
 
-    options = initializeFontOptions();
-
+    // Store the difficult of the game
     level = difficulty;
 
+    // By default any aspect of the configuration has been modified
     modifiedConfig = false;
     changeAnyParameter = false;
 
+    // Default level of AI aggressiveness
     maxAggressiveness = 0.0f;
+
+    // AI always active
     enableAI = true;
+
+    // Assigns the pixel art flag
     enablePixelArt = pixelArt;
 }
 
@@ -156,7 +198,7 @@ void Configuration::loadGraphicsMenuConfiguration(const string path){
     // Local variable to store temporary the text content and the fonts of the texts
     string content, fontPath, backgroundTexture, colorKind;
 
-    // Iterate to get the information of the player menu
+    // Iterate to get the information of the graphics menu
     for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
         // Check it is the node that contains the information of the background
         if ((string)property->name() == "Background"){
@@ -166,7 +208,7 @@ void Configuration::loadGraphicsMenuConfiguration(const string path){
         }
         // Check it is the node that contains the information of the main panel
         else if ((string)property->name() == "MenuPanel"){
-            // Iterate to get the information of the player menu
+            // Iterate to get the information of the graphics menu
             for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
                 // Check it is the node that contains the information of the background of the panel
                 if ((string)panelProp->name() == "Background"){
@@ -178,7 +220,7 @@ void Configuration::loadGraphicsMenuConfiguration(const string path){
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the graphics menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -252,9 +294,9 @@ void Configuration::loadGraphicsMenuConfiguration(const string path){
                 }
             }
         }
-        // Check if it is the node that the different buttons of the menu
+        // Check if it is the node that the different buttons of the graphics menu
         else if ((string)property->name() == "MenuButtons"){
-            // Iterate to get the information of the buttons of the player menu
+            // Iterate to get the information of the buttons of the graphics menu
             for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
                 // Get the font of the buttons
                 if ((string)buttonProp->name() == "Font"){
@@ -265,7 +307,7 @@ void Configuration::loadGraphicsMenuConfiguration(const string path){
                 // Get the color of the font button
                 else if ((string)buttonProp->name() == "ColorFont"){
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the color font channels
                     for (xml_node<> *colorChannel = buttonProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -308,7 +350,7 @@ void Configuration::loadGraphicsMenuConfiguration(const string path){
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
                                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                                    // Iterate to get the information of the player menu
+                                    // Iterate to get the information of the graphics menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
                                         if ((string)color->name() == "R"){
@@ -342,6 +384,10 @@ void Configuration::loadGraphicsMenuConfiguration(const string path){
 
 
 
+/**
+ * Represents on the screen the graphics menu and returns to options menu
+ * @return
+ */
 State Configuration::graphicsMenu(SoundPlayer& r) {
         // Control if the start key is pressed or not
     bool startPressed = false;
@@ -354,6 +400,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
         loadGraphicsMenuConfiguration(pathFile);
     }
 
+    // While the start button has not been pressed
     while (!startPressed) {
         bool currentResized = false;
 
@@ -371,10 +418,11 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
         window.draw(bufferSprite);
         window.display();
 
-
+        // Set the textures of the graphics menu
         graphicsMenuBackground.setRepeated(true);
         graphicsMenuPanelBack.setRepeated(true);
 
+        // Adapt the graphics menu to the different screen resolutions
         IntRect background(0, 0, w.getSize().x, w.getSize().y);
         Sprite sprite(graphicsMenuBackground, background);
         float axis_x = float(w.getSize().x) / DEFAULT_WIDTH;
@@ -382,6 +430,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
         sprite.setScale(axis_x, axis_y);
         ghMenuBackground = sprite;
 
+        // Create the panel of the menu
         RectangleShape shape;
         shape.setPosition((w.getSize().x / 2.f) - 300.0f * screenScale, w.getSize().y / 2.f - 250.0f * screenScale);
         shape.setSize(sf::Vector2f(610.0f * screenScale, 500.0f * screenScale));
@@ -389,6 +438,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
         shape.setOutlineThickness(5.0f * screenScale);
         shape.setTexture(&graphicsMenuPanelBack, true);
 
+        // Vector with the right buttons of the menu
         vector<Button> menuButtons;
 
         // Main Text of the menu
@@ -403,26 +453,24 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
         optionsText.setPosition(w.getSize().x / 2.f - optionsText.getLocalBounds().width / 2.f,
                                 w.getSize().y / 2.f - 220.0f * screenScale);
 
-
         // Option indicators
-
         menuButtons.emplace_back(w.getSize().x / 2.f - 270.0f * screenScale, w.getSize().y / 2.f - 70.0f * screenScale,
-                                 200.0f * screenScale, 30.0f * screenScale, fontMenuGraphicsButtons,
+                                 200.0f * screenScale, 40.0f * screenScale, fontMenuGraphicsButtons,
                                  contentButtonsGraphics[0], colorButtons[0], colorButtons[1], colorFontMenuGraphicsButtons, 1, screenScale);
 
         menuButtons.emplace_back(w.getSize().x / 2.f - 270.0f * screenScale, w.getSize().y / 2.f, 200.0f * screenScale,
-                                 30.0f * screenScale, fontMenuGraphicsButtons,
+                                 40.0f * screenScale, fontMenuGraphicsButtons,
                                  contentButtonsGraphics[1], colorButtons[2], colorButtons[3], colorFontMenuGraphicsButtons, 0, screenScale);
 
         // Option configurations
         const string res = resIndex > -1 ? to_string(resolutions[resIndex].first) + "x" +
                                            to_string(resolutions[resIndex].second) : "FULLSCREEN";
         menuButtons.emplace_back(w.getSize().x / 2.f + 80.0f * screenScale, w.getSize().y / 2.f - 70.0f * screenScale,
-                                 200.0f * screenScale, 30.0f * screenScale, fontMenuGraphicsButtons,
+                                 200.0f * screenScale, 40.0f * screenScale, fontMenuGraphicsButtons,
                                  res, colorButtons[0], colorButtons[1], colorFontMenuGraphicsButtons, 1, screenScale);
 
         menuButtons.emplace_back(w.getSize().x / 2.f + 80.0f * screenScale, w.getSize().y / 2.f, 200.0f * screenScale,
-                                 30.0f * screenScale, fontMenuGraphicsButtons,
+                                 40.0f * screenScale, fontMenuGraphicsButtons,
                                  enablePixelArt ? "Enabled" : "Disabled", colorButtons[2], colorButtons[3], colorFontMenuGraphicsButtons,
                                  0, screenScale);
 
@@ -440,10 +488,9 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
             }
 
             window.pollEvent(e);
-            if (Keyboard::isKeyPressed(menuDownKey)) {
-                // Up cursor pressed and change the soundtrack selected in the list
+            // Control if the down cursor key has been pressed
+            if (Keyboard::isKeyPressed(Keyboard::Down)) {
                 if (optionSelected != int(menuButtons.size() - 1) / 2) {
-                    // Change the color appearance of both buttons
                     r.soundEffects[0]->play();
                     optionSelected++;
                     menuButtons[optionSelected].setButtonState(BUTTON_HOVER);
@@ -452,8 +499,8 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                     menuButtons[optionSelected + 1].setButtonState(BUTTON_IDLE);
                 }
             }
-            else if (Keyboard::isKeyPressed(menuUpKey)) {
-                // Down cursor pressed and change the soundtrack selected in the list
+            // Control if the up cursor key has been pressed
+            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
                 if (optionSelected != 0) {
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->play();
@@ -468,12 +515,16 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
             window.pollEvent(e);
 
             if (optionSelected == 0) {
-                // Volume music
+                // Screen resolutions
+
                 // Check if left or right cursor keys have been pressed or not
                 if (Keyboard::isKeyPressed(Keyboard::Left)) {
                     if (resized) {
+                        // The screen has not been resized during the game before
                         resized = false;
-                    } else if (resIndex > -1) {
+                    }
+                    else if (resIndex > -1) {
+                        // Modify the resolution of the screen
                         r.soundEffects[0]->stop();
                         r.soundEffects[0]->play();
                         resIndex--;
@@ -481,15 +532,21 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                                                                       to_string(resolutions[resIndex].first) + "x" +
                                                                       to_string(resolutions[resIndex].second)
                                                                                     : "FULLSCREEN");
+
+                        // Control if there are more resolutions on the left
                         if (resIndex > -1) {
                             window.create(VideoMode(static_cast<unsigned int>(resolutions[resIndex].first),
                                                     static_cast<unsigned int>(resolutions[resIndex].second)),
                                           "Multi Race Driving",
                                           Style::Titlebar | Style::Close);
+
+                            // The current screen is on full screen mode
                             fullScreen = true;
                         }
                         else {
+                            // Create a new screen with the new resolution
                             window.create(VideoMode::getFullscreenModes()[0], "Multi Race Driving", Style::Fullscreen);
+                            // The screen is not in full screen mode
                             fullScreen = false;
                         }
                         window.setFramerateLimit(FPS);
@@ -497,22 +554,25 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
 
                         isDefaultScreen = resIndex == 0;
 
-
+                        // Define the screen to represent correctly the interface
                         window.setView(View(Vector2f(window.getSize().x / 2.0f, window.getSize().y / 2.0f),
                                             Vector2f(window.getSize().x, window.getSize().y)));
                         w.create(static_cast<unsigned int>(window.getView().getSize().x),
                                  static_cast<unsigned int>(window.getView().getSize().y));
 
+                        // Calculation of the screen factor between the current resolution and the default resolution
                         screenScale = float(w.getSize().x) / float(DEFAULT_WIDTH);
                         currentResized = true;
                         resized = true;
                     }
+                    // Calculation of threshold to display correctly the description of the buttons
                     thresholdDescriptionX = w.getSize().x * SCREEN_HD_HEIGHT / DEFAULT_WIDTH;
                     thresholdDescriptionY = int((w.getSize().y * VERTICAL_OFFSET / DEFAULT_HEIGHT) * 1.2f);
                     imageOffset = float(w.getSize().y) * IMAGE_DEFAULT_OFFSET / DEFAULT_HEIGHT;
                     changeAnyParameter = true;
                 }
                 else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+                    // The screen has not been resized during the game before
                     if (resized) {
                         resized = false;
                     }
@@ -520,20 +580,20 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                         r.soundEffects[0]->stop();
                         r.soundEffects[0]->play();
                         resIndex++;
+
+                        // Modify the resolution of the screen
                         menuButtons[optionSelected + 2].setTextButton(to_string(resolutions[resIndex].first) + "x" +
                                                                       to_string(resolutions[resIndex].second));
 
+                        // Create a new screen with the new resolution
                         window.create(VideoMode(static_cast<unsigned int>(resolutions[resIndex].first),
                                                 static_cast<unsigned int>(resolutions[resIndex].second)), "Multi Race Driving",
                                       Style::Titlebar | Style::Close);
                         window.setFramerateLimit(FPS);
                         window.setKeyRepeatEnabled(false);
-
-
-
                         isDefaultScreen = resIndex == 0;
 
-
+                        // Adapt the view of the screen to the new resolution
                         window.setView(View(Vector2f(window.getSize().x / 2.0f, window.getSize().y / 2.0f),
                                             Vector2f(window.getSize().x, window.getSize().y)));
                         w.create(static_cast<unsigned int>(window.getView().getSize().x),
@@ -545,12 +605,14 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                     }
                     changeAnyParameter = true;
                 }
+                // Calculation of threshold to display correctly the description of the buttons
                 thresholdDescriptionX = (w.getSize().x * SCREEN_HD_HEIGHT / DEFAULT_WIDTH);
                 thresholdDescriptionY = int((w.getSize().y * VERTICAL_OFFSET / DEFAULT_HEIGHT) * 1.2f);
                 imageOffset = float(w.getSize().y) * IMAGE_DEFAULT_OFFSET / DEFAULT_HEIGHT;
             }
             else {
-                // Volume effects
+                // Pixel Art
+
                 // Check if left or right cursor keys have been pressed or not
                 if (Keyboard::isKeyPressed(Keyboard::Left)) {
                     if (enablePixelArt) {
@@ -571,6 +633,8 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                     }
                 }
             }
+
+            // Draw the elements of the menu
             w.draw(sprite);
             w.draw(shape);
             w.draw(optionsText);
@@ -580,6 +644,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                 menuButton.render(&w);
             }
 
+            // Display the menu in the screen
             bufferSprite.setTexture(w.getTexture(), true);
             w.display();
             window.draw(bufferSprite);
@@ -602,12 +667,22 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
 
 
 
+/**
+ * Returns the font used to write the time in the elapsed time panel
+ * @return
+ */
 Font initializeFontElapsedTime() {
     Font f;
     if (!f.loadFromFile("Data/Fonts/digital.ttf")) exit(1);
     return f;
 }
 
+
+
+/**
+ * Returns the font used to represent the HUD during the game
+ * @return
+ */
 Font initializeFontTimeToPlay() {
     Font f;
     if (!f.loadFromFile("Data/Fonts/DisposableDroid.ttf")) exit(1);
@@ -615,21 +690,14 @@ Font initializeFontTimeToPlay() {
 }
 
 
+
+/**
+ * Returns the font used to represent all the text indicators in
+ * the animations of the game
+ * @return
+ */
 Font initializeFontMenus() {
     Font f;
     if (!f.loadFromFile("Data/Fonts/Hetikademo.otf")) exit(1);
-    return f;
-}
-
-Font initializeFontOptions() {
-    Font f;
-    if (!f.loadFromFile("Data/Fonts/needForSpeed.ttf")) exit(1);
-    return f;
-}
-
-
-Font initializeFontScore(){
-    Font f;
-    if (!f.loadFromFile("Data/Fonts/DisposableDroid.ttf")) exit(1);
     return f;
 }

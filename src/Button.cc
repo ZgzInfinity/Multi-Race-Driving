@@ -9,7 +9,6 @@
 /**
  * Default constructor
  */
-
 Button::Button(){}
 
 
@@ -123,6 +122,11 @@ void Button::setTextButton(const string &newString) {
 
 
 
+/**
+ * Process the description associated to the button presented
+ * in the xml configuration file
+ * @param child is the xml node that points to the description of the button
+ */
 void Button::proccessDescription(xml_node<> *child){
     string descriptionPhrase, wordRead;
     int init, last;
@@ -145,35 +149,60 @@ void Button::proccessDescription(xml_node<> *child){
 
 
 
-vector<string> Button::getDescriptionButton(){
-    return descriptionButton;
-}
-
-
+/**
+ * Assigns an optional description of the purpose of the button
+ * @param description contains the description of the button
+ */
 void Button::setDescriptionButton(vector<string> description){
     descriptionButton = description;
 }
 
 
 
+/**
+ * Returns the optional description of what the button is for
+ * @return
+ */
+vector<string> Button::getDescriptionButton(){
+    return descriptionButton;
+}
+
+
+
+/**
+ * Returns the text of the button
+ * @return
+ */
 string Button::getTextButton(){
     return textButton.getString();
 }
 
 
 
+/**
+ * Returns the RGB color of the button when it's not hovered
+ * @return
+ */
 Color Button::getIdleColorButton(){
     return idleColorButton;
 }
 
 
 
+/**
+ * Returns the RGB color of the button when it's hovered
+ * @return
+ */
 Color Button::getHoverColorButton(){
     return hoverColorButton;
 }
 
 
 
+/**
+ * Returns the font of the button
+ * @return
+ */
 Color Button::getFontColorButton(){
     return fontColorButton;
 }

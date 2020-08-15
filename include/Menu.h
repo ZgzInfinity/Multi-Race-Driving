@@ -195,4 +195,18 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r);
 
 
 
+/**
+ * Load the configuration of the player menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void loadMultiplayerMenuConfiguration(const string path, Configuration& c);
+
+
+
+State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode);
+
+
+
 #endif // MENU_H

@@ -1,3 +1,9 @@
+
+
+/*
+ * Module Configuration interface file
+ */
+
 #pragma once
 
 #ifndef CONFIGURATION_H
@@ -20,7 +26,6 @@ const int SCREEN_HD_WIDTH = 1280;
 const int SCREEN_HD_HEIGHT = 720;
 const int FPS = 60;
 const int VERTICAL_OFFSET = 30;
-
 const float IMAGE_DEFAULT_OFFSET = 1.3f;
 
 const pair<const int ,const int> SCREEN_DEFAULT = make_pair(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -30,12 +35,13 @@ const pair<const int ,const int> SCREEN_3 = make_pair(1920, 1080);
 const pair<const int ,const int> SCREEN_4 = make_pair(2560, 1440);
 const pair<const int ,const int> SCREEN_5 = make_pair(3840, 2160);
 
+// Possible states of the game
 enum State {
     ANIMATION,
     START,
     OPTIONS,
     PLAYER_MENU,
-    MULTIPLYER_MENU,
+    MULTIPLAYER_MENU,
     GAME_MODES_MENU,
     VEHICLE_SELECTION,
     CIRCUIT_SELECTION_MENU,
@@ -44,10 +50,15 @@ enum State {
     PLAY_GAME,
     RANKING,
     CLASIFICATION,
+    MULTIPLAYER_NAME_PLAYER,
+    MULTIPLAYER_NAME_GROUP,
+    SELECT_MULTIPLAYER_JOIN,
+    START_MULTIPLAYER,
     EXIT
 };
 
 
+// Levels of difficulty of the game
 enum Difficult {
     EASY,
     NORMAL,
@@ -56,36 +67,67 @@ enum Difficult {
 
 
 
+/*
+ * Represents the configuration module of the game
+ */
 struct Configuration {
 
+    // Vector of resolutions for the game
     const vector<pair<int, int>> resolutions;
+
+    // Texture displayed in the screen of the game
     RenderTexture w;
+
+    // Screen of the game
     RenderWindow window;
+
+    // Factor of screen resolution
     float screenScale;
+
+    // Control if the game is with the default resolution or not
     bool isDefaultScreen;
+
+    // Index of the resolution used
     int resIndex;
 
+    // Back key
     Keyboard::Key menuKey;
+
+    // Up key
     Keyboard::Key menuUpKey;
+
+    // Down key
     Keyboard::Key menuDownKey;
+
+    // Start key
     Keyboard::Key menuEnterKey;
+
+    // Key to accelerate the vehicle
     Keyboard::Key accelerateKey;
+
+    // Key to brake the vehicle
     Keyboard::Key brakeKey;
+
+    // Key to move to the left the vehicle
     Keyboard::Key leftKey;
+
+    // Key to move to the right the vehicle
     Keyboard::Key rightKey;
+
+    // Key used to change the music soundtrack during the game
     Keyboard::Key soundtrackKey;
 
+    // Font to write the time of the time elapsed panel
     Font fontElapsedTime;
 
+    // Font to write the interface of the game
     Font fontTimeToPlay;
 
+    // Font to write the animations
     Font fontMenus;
 
-    Font fontScore;
-
+    // Font to write the speed of the vehicle driven
     Font speedVehicle;
-
-    Font options;
 
     const float camD; // Camera depth
     int renderLen; // Length rendered
@@ -395,28 +437,28 @@ struct Configuration {
     // Color of the border title vehicle selection menu
     Color colorTitleBorderVehicleSelectionMenu;
 
-    // Font of the title of the vehicle name `panel
+    // Font of the title of the vehicle selection menu name panel
     Font fontVehicleSelectionMenuPanelTitle;
 
-    // Color of the vehicle name title
+    // Color of the vehicle selection menu name title
     Color colorTitleTextVehicleSelectionMenuName;
 
-    // Color of the vehicle border title
+    // Color of the vehicle selection menu border title
     Color colorTitleBorderVehicleSelectionMenuName;
 
-    // Color of the border of the vehicle panel
+    // Color of the border of the vehicle selection menu panel
     Color colorBorderVehiclePanel;
 
-    // Font of the title of the vehicle name `panel
+    // Font of the title of the vehicle name panel
     Font fontVehicleSelectionMenuPanelTitleProp;
 
-    // Color of the vehicle name title
+    // Color of the vehicle selection menu name title
     Color colorTitleTextVehicleSelectionMenuProp;
 
     // Color of the vehicle border title
     Color colorTitleBorderVehicleSelectionMenuNameProp;
 
-    // Color of the border of the properties panel
+    // Color of the border of the properties panel of the vehicle selection menu
     Color colorBorderPropertiesPanel;
 
     // Color of the vehicle selection menu panel properties
@@ -431,7 +473,7 @@ struct Configuration {
     // Color of the inside of the vehicle properties panel
     Color colorInsideVehicleSelectionMenuPanelProp;
 
-    // Color of the buttons of the menu
+    // Color of the buttons of the vehicle selection menu
     vector<Color> vehicleSelectionMenuColorButtons;
 
     // Control if the screen is in full
@@ -449,10 +491,10 @@ struct Configuration {
     // Font of the circuit menu's title
     Font fontTitleCircuitMenu;
 
-    // Color of the title text
+    // Color of the title text of the circuit selection menu
     Color colorTitleTextCircuitMenu;
 
-    // Color of the title border
+    // Color of the title border of the circuit selection menu
     Color colorTitleBorderCircuitMenu;
 
     // Background of the circuit selection menu
@@ -461,24 +503,152 @@ struct Configuration {
     // Font of the circuit menu's title
     Font fontTitleCircuitPanel;
 
-    // Color of the title text
+    // Color of the title text of the circuit selection menu
     Color colorTitleTextCircuitPanel;
 
-    // Color of the title border
+    // Color of the title border of the circuit selection menu
     Color colorTitleBorderCircuitPanel;
 
-    // Color of the panel border
+    // Color of the panel border of the circuit selection menu
     Color colorBorderCircuitPanel;
 
-    // Color of the triangle indicator
+    // Color of the triangle indicator of the circuit selection menu
     Color colorInsideIndicator;
 
-    // Color of the triangle's border indicator
+    // Color of the triangle's border indicator of the circuit selection menu
     Color colorBorderIndicator;
+
+    // Control if the multi player menu has been read
+    bool multiplayerMenuRead;
+
+    // Background of the multi player menu
+    Texture backgroundMultiplayerMenu;
+    Sprite multiPlayerMenuBackground;
+
+    // Title of the multi player menu
+    string contentTitleMultiplayerMenu;
+
+    // Font of the multi player menu's title
+    Font fontTitleMultiplayerMenu;
+
+    // Color of the title text of the multi player menu
+    Color colorTitleTextMultiplayerMenu;
+
+    // Color of the title border of the multi player menu
+    Color colorTitleBorderMultiplayerMenu;
+
+    // Background of the multi player menu
+    Texture backgroundMultiplayerPanel;
+
+    // Color border of the panel of the multi player menu
+    Color colorBorderPanelMultiplayerMenu;
+
+    // Font of the buttons of the multi player menu
+    Font fontMenuMultiplayerButtons;
+
+    // Vector of buttons of the multi player menu
+    vector<Button> multiplayerMenuButtons;
+
+    // Color of the buttons of the multi player menu
+    vector<Color> multiplayerMenuColorButtons;
+
+    // Control if the multi player asking name menu configuration has been read
+    bool multiplayerNameMenuRead;
+
+    // Texture of the multi player asking name menu
+    Texture backgroundMultiplayerNameMenu;
+
+    // Texture of the multi player asking name menu's panel
+    Texture backgroundMultiplayerNamePanel;
+    Sprite multiPlayerNameMenuBackground;
+
+    // Color of the border's panel of the multi player asking menu
+    Color colorBorderPanelMultiplayerNameMenu;
+
+    // Content title of the multi player asking name menu
+    string contentTitleMultiplayerNameMenu;
+
+    // Font title of the multi player asking name menu
+    Font fontTitleMultiplayerNameMenu;
+
+    // Color text of the multi player asking name menu
+    Color colorTitleTextMultiplayerNameMenu;
+
+    // Color border of the multi player asking name menu
+    Color colorTitleBorderMultiplayerNameMenu;
+
+    // Control if the multi player asking name menu configuration has been read
+    bool multiplayerGroupMenuRead;
+
+    // Texture of the multi player asking name menu
+    Texture backgroundMultiplayerGroupMenu;
+
+    // Texture of the multi player asking name menu's panel
+    Texture backgroundMultiplayerGroupPanel;
+    Sprite multiPlayerGroupMenuBackground;
+
+    // Color of the border's panel of the multi player asking menu
+    Color colorBorderPanelMultiplayerGroupMenu;
+
+    // Content title of the multi player asking name menu
+    string contentTitleMultiplayerGroupMenu;
+
+    // Font title of the multi player asking name menu
+    Font fontTitleMultiplayerGroupMenu;
+
+    // Color text of the multi player asking name menu
+    Color colorTitleTextMultiplayerGroupMenu;
+
+    // Color border of the multi player asking name menu
+    Color colorTitleBorderMultiplayerGroupMenu;
+
+    // Control if the multi player join group menu has been read
+    bool multiplayerJoinGroupMenuRead;
+
+    // Background of th  join group menu
+    Texture backgroundMultiplayerJoinGroupMenu;
+    Sprite multiPlayerMenuJoinGroupBackground;
+
+    // Title of the join group menu
+    string contentTitleMultiplayerJoinGroupMenu;
+
+    // Font of the join group menu's title
+    Font fontTitleMultiplayerJoinGroupMenu;
+
+    // Color of the title text of the join group menu
+    Color colorTitleTextMultiplayerJoinGroupMenu;
+
+    // Color of the title border of the join group menu
+    Color colorTitleBorderMultiplayerJoinGroupMenu;
+
+    // Background of the join group menu panel
+    Texture backgroundMultiplayerJoinGroupPanel;
+
+    // Color border of the main panel of the join group menu
+    Color colorBorderPanelMultiplayerJoinGroupMenu;
+
+    // Font of the buttons of the join group menu
+    Font fontMenuMultiplayerJoinGroupButtons;
+
+    // Vector of buttons of the join group menu
+    vector<Button> multiplayerJoinGroupMenuButtons;
+
+    // Color of the buttons of the join group menu
+    vector<Color> multiplayerMenuJoinGroupColorButtons;
+
 
 
     /**
-     * Constructor por defecto.
+     * Assigns to the game the configuration read from the xml configuration file
+     * @param difficulty is the difficulty level of the game
+     * @param pixelArt controls if the graphics of the game have to be drawn with pixel art effect
+     * @param fullScreen controls if the game is in full screen
+     * @param axis_x is the width of the screen
+     * @param axis_y is the height of the screen
+     * @param controlLeft is the code of the key to move the vehicle to the left
+     * @param controlLeft is the code of the key to move the vehicle to the right
+     * @param controlAccelerate is the code of the key to accelerate the vehicle
+     * @param controlSoundtrack is the code of the key to change the soundtrack of the game
      */
     Configuration(const Difficult difficulty, const bool pixelArt, const bool fullScreen, const int axis_x,
                   const int axis_y, const string controlLeft,const string controlRight, const string controlAccelerate,
@@ -497,37 +667,37 @@ struct Configuration {
 
 
     /**
-     * Devuelve true si se ha cambiado la resolución de pantalla.
-     * @param r is the module sound player of he graphics the game
+     * Represents on the screen the graphics menu and returns to options menu
      * @return
      */
     State graphicsMenu(SoundPlayer& r);
 };
 
 
+
 /**
- * Devuelve la fuente para el tiempo.
+ * Returns the font used to write the time in the elapsed time panel
  * @return
  */
 Font initializeFontElapsedTime();
 
+
+
 /**
- * Devuelve la fuente para la velocidad.
+ * Returns the font used to represent the HUD during the game
  * @return
  */
 Font initializeFontTimeToPlay();
 
 
-Font initializeFontMenus();
 
 /**
- * Devuelve la fuente para las opciones.
+ * Returns the font used to represent all the text indicators in
+ * the animations of the game
  * @return
  */
-Font initializeFontOptions();
+Font initializeFontMenus();
 
-
-Font initializeFontScore();
 
 #endif // CONFIGURATION_H
 

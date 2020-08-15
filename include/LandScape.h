@@ -1,3 +1,8 @@
+
+/*
+ * Module LandScape interface file
+ */
+
 #pragma once
 
 #ifndef LANDSCAPE_H
@@ -34,6 +39,10 @@ const int INTIAL_POS = 2;
 const int RECTANGLE = INTIAL_POS * 2 + 1;
 
 
+
+/**
+ * Represents a natural landscape with all its elements
+ */
 class LandScape {
 
     // Radius of the first part of the bifurcation
@@ -323,7 +332,13 @@ class LandScape {
 public:
 
 
+
+    /**
+     * Default constructor
+     */
     LandScape();
+
+
 
     /**
      * Creates a landscape reading its xml configuration file
@@ -347,7 +362,12 @@ public:
 
 
 
-
+    /**
+     * Creates a straight flat map which represents the starting point of a landscape
+     * @param landscape is the landscape to be displayed
+     * @param typeOfGame is the game selected by the player
+     * @param numRivals is the number of rivals that are going to compete  against the player
+     */
     LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals);
 
 

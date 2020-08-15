@@ -6,6 +6,11 @@
  * --------------------------------------------------
  */
 
+
+/*
+ * Module Linda driver interface file
+ */
+
 #ifndef LINDADRIVER_H
 #define LINDADRIVER_H
 

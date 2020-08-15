@@ -1,4 +1,8 @@
 
+/*
+ * Module Tuple interface file
+ */
+
 #ifndef TUPLE_H
 #define TUPLE_H
 
@@ -7,12 +11,24 @@
 
 using namespace std;
 
-class Tuple
-{
-    int length;          // Dimension of the tuple
-    string lindaTuple[6];   // Static vector to store the components of the tuple
+
+
+/**
+ * Represents the mechanism to share the information
+ * in multi player mode
+ */
+class Tuple{
+
+    // Dimension of the tuple
+    int length;
+
+    // Static vector to store the components of the tuple
+    string lindaTuple[6];
+
 
 public:
+
+
 
     /**
      * Creates a tuple of one element

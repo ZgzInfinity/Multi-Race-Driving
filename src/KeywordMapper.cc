@@ -1,9 +1,20 @@
 
+/*
+ * Module KeywordMapper implementation file
+ */
+
+
 #include "../include/KeywordMapper.h"
+
 
 using namespace std;
 using namespace sf;
 
+
+
+/**
+ * Constructor por defecto.
+ */
 KeywordMapper::KeywordMapper() {
 
     // Keyword letters
@@ -173,17 +184,29 @@ KeywordMapper::KeywordMapper() {
 
 
 
+/**
+ * Returns the numeric code of key identified by its name
+ * if it exists. Otherwise returns a negative number
+ * @param key is a key identified by its name
+ */
 int KeywordMapper::lookForKeyBoard(const string key){
+    // Control if the keyword has been found
     bool found = false;
+    // Index of the keyword to be analyzed
     int i = 0;
+    // While the keyword has not been found
     while (!found){
+        // Check if the current key desired
         if (mapperIdKeyWord[i] == key){
+            // Keyword found
             found = true;
         }
         else {
+            // Increment the index
             i++;
         }
     }
+    // Return the numeric code of the key if it exists
     if (found){
         return i;
     }
@@ -194,17 +217,29 @@ int KeywordMapper::lookForKeyBoard(const string key){
 
 
 
+/**
+ * Returns the numeric code of key identified by its name
+ * if it exists. Otherwise returns a negative number
+ * @param key is a key identified by its name
+ */
 int KeywordMapper::lookForKeyBoardId(const Keyboard::Key key){
+    // Control if the keyword has been found
     bool found = false;
+    // Index of the keyword to be analyzed
     int i = 0;
+    // While the keyword has not been found
     while (!found){
+        // Check if the current key desired
         if (mapperCodeKeyWord[i] == key){
+            // Keyword found
             found = true;
         }
         else {
+            // Increment the index
             i++;
         }
     }
+    // Return the numeric code of the key if it exists
     if (found){
         return i;
     }

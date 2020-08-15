@@ -21,9 +21,8 @@ using namespace rapidxml;
 
 
 /*
- * Enum with the possible states of the button
+ * States of the button
  */
-
 enum button_states {
     // Normal state of the button
     BUTTON_IDLE = 0,
@@ -32,6 +31,10 @@ enum button_states {
 };
 
 
+
+/**
+ * Represents the buttons of the game's GUI
+ */
 class Button {
 
     private:
@@ -71,8 +74,8 @@ class Button {
          * @param initialState is the state code of the button
          * @param screenScale is the factor of resolution of the screen
          */
-        Button(float x, float y, float width, float height, sf::Font &f, const string &text,
-               Color idleColor, Color hoverColor, Color fontColor, int initialState, float screenScale);
+        Button(float x, float y, float width, float height, Font &f, const string &text, Color idleColor, Color hoverColor,
+               Color fontColor, int initialState, float screenScale);
 
 
 
@@ -80,7 +83,7 @@ class Button {
          * Updates the state of the button
          * @param buttonState is the new state of the button to change
          */
-        void setButtonState(button_states buttonState);
+        void setButtonState(button_states stateButton);
 
 
 
@@ -100,27 +103,59 @@ class Button {
 
 
 
+        /**
+         * Process the description associated to the button presented
+         * in the xml configuration file
+         * @param child is the xml node that points to the description of the button
+         */
         void proccessDescription(xml_node<> *child);
 
 
 
-        vector<string> getDescriptionButton();
-
-
+        /**
+         * Assigns an optional description of the purpose of the button
+         * @param description contains the description of the button
+         */
         void setDescriptionButton(vector<string> description);
 
 
+
+        /**
+         * Returns the optional description of what the button is for
+         * @return
+         */
+        vector<string> getDescriptionButton();
+
+
+
+        /**
+         * Returns the text of the button
+         * @return
+         */
         string getTextButton();
 
 
 
+        /**
+         * Returns the RGB color of the button when it's not hovered
+         * @return
+         */
         Color getIdleColorButton();
 
 
 
+        /**
+         * Returns the RGB color of the button when it's hovered
+         * @return
+         */
         Color getHoverColorButton();
 
 
+
+        /**
+         * Returns the font of the button
+         * @return
+         */
         Color getFontColorButton();
 
 };

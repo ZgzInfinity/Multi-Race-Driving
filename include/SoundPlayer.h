@@ -44,6 +44,8 @@ struct SoundPlayer {
         // Mutex to control the load of the soundtracks and sound effects
         mutex loaderSounds;
 
+
+
         /**
          * Default constructor
          */

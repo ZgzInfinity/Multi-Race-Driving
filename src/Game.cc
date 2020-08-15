@@ -1475,6 +1475,7 @@ Game::Game(Configuration &c){
 
     // Control if the player is still playing
     finalGame = false;
+    randomMultiplayerJoined = false;
     inGame = false;
     onPause = false;
     blink = false;
@@ -1970,12 +1971,14 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
+                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
+                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), false);
                     cars.push_back(v);
                 }
             }
@@ -1985,12 +1988,14 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
+                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
+                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), false);
                     cars.push_back(v);
                 }
             }
@@ -3667,8 +3672,30 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
             float crashPos;
 
             if (!v.isCrashing() && !v.inCrash()){
-                // Check if the current rival car has crashed with a traffic car
-                if (abs(v.getPosY() - positionY) <= c.renderLen){
+
+                float distX, distY;
+
+                // Check if there a traffic vehicle is near of the rival car
+                bool visible = v.isVisible(c, currentMap->getCameraPosY(), cars[i].getPosX(), cars[i].getPosY(), distX, distY);
+
+                // If the traffic is visible for the player
+                if (visible){
+
+                    // The traffic car is very near
+                    if (distX < 0.3f && distY < 20.f){
+                        const float p = rand_generator_zero_one();
+                        if (p <= 0.5){
+                            // Change the path
+                            if (v.getPosX() < 0.f){
+                                v.setPosition(v.getPosX() + 0.048f, v.getPosY());
+                            }
+                            else {
+                                v.setPosition(v.getPosX() - 0.048f, v.getPosY());
+                            }
+                        }
+                    }
+
+                    // Check if the vehicle crashes or not
                     for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++){
                         vehicleCrash = cars[i].hasCrashed(v.getPreviousY(), v.getPosY(),
                                                           v.getMinScreenX(), v.getMaxScreenX(), crashPos);
@@ -5862,7 +5889,7 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     else {
         // Restart all the buttons to its initial state
         Button b = Button(c.w.getSize().x / 2.f - 95.0f * c.screenScale, c.w.getSize().y / 2.f - 70.0f * c.screenScale,
-                          200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuPauseButtons, c.pauseMenuButtons[0].getTextButton(),
+                          200.0f * c.screenScale, 40.0f * c.screenScale, c.fontMenuPauseButtons, c.pauseMenuButtons[0].getTextButton(),
                           c.pauseMenuButtons[0].getIdleColorButton(), c.pauseMenuButtons[0].getHoverColorButton(),
                           c.pauseMenuButtons[0].getFontColorButton(), 1, c.screenScale);
 
@@ -5871,7 +5898,7 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
         for (int i = 1; i < int(c.pauseMenuButtons.size()); i++){
             // Change the state of the first color
             Button b = Button(c.w.getSize().x / 2.f - 95.0f * c.screenScale, c.w.getSize().y / 2.f - (70.0f - i * 70.f) * c.screenScale,
-                              200.0f * c.screenScale, 30.0f * c.screenScale, c.fontMenuPauseButtons, c.pauseMenuButtons[i].getTextButton(),
+                              200.0f * c.screenScale, 40.0f * c.screenScale, c.fontMenuPauseButtons, c.pauseMenuButtons[i].getTextButton(),
                               c.pauseMenuButtons[i].getIdleColorButton(), c.pauseMenuButtons[i].getHoverColorButton(),
                               c.pauseMenuButtons[i].getFontColorButton(), 0, c.screenScale);
 
@@ -7920,8 +7947,8 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
                         string keyLetter = kM.mapperIdKeyWord[code];
                         if (name == "_") {
                             name = keyLetter + "_";
-                            r.soundEffects[1]->stop();
-                            r.soundEffects[1]->play();
+                            r.soundEffects[116]->stop();
+                            r.soundEffects[116]->play();
                         }
                         else {
                             if (lettersIntroduced == 3) {
@@ -7933,8 +7960,8 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
                             else {
                                 name = name.substr(0, name.size() - 1);
                                 name += keyLetter + "_";
-                                r.soundEffects[1]->stop();
-                                r.soundEffects[1]->play();
+                                r.soundEffects[116]->stop();
+                                r.soundEffects[116]->play();
                             }
                         }
                     }
@@ -8141,8 +8168,8 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             c.w.draw(vehicle);
             c.w.draw(startText);
 
-            if (typeOfGame != 2 || (typeOfGame == 0 && indexLandScape != 3)
-                || ((typeOfGame == 3 || typeOfGame == 4) && currentStage <= totalStages))
+            if ((typeOfGame == 0 && indexLandScape != 3) ||
+               ((typeOfGame == 3 || typeOfGame == 4) && currentStage <= totalStages))
             {
                 c.w.draw(levelPromotion);
             }
@@ -9652,3 +9679,1138 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
         }
     }
 }
+
+
+
+void Game::setMultiplayerMode(const int multiPlayerMode){
+    modeMultiplayer = multiPlayerMode;
+}
+
+
+
+
+/**
+ * Load the configuration of the player menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void Game::loadMultiplayerNameConfiguration(const string path, Configuration& c){
+
+    // Open the xml file of the scenario
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Local variable to store temporary the text content and the fonts of the texts
+    string content, fontPath, backgroundTexture, colorKind;
+
+    // Iterate to get the information of the player menu
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check it is the node that contains the information of the background
+        if ((string)property->name() == "Background"){
+            // Get the background image of the menu
+            backgroundTexture = (string)property->value();
+            c.backgroundMultiplayerNameMenu.loadFromFile(backgroundTexture);
+        }
+        // Check it is the node that contains the information of the main panel
+        else if ((string)property->name() == "MenuPanel"){
+            // Iterate to get the information of the player menu
+            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
+                // Check it is the node that contains the information of the background of the panel
+                if ((string)panelProp->name() == "Background"){
+                    // Get the background image of the menu
+                    backgroundTexture = (string)panelProp->value();
+                    c.backgroundMultiplayerNamePanel.loadFromFile(backgroundTexture);
+                }
+                // Check it is the node that contains the information of the color border of the panel
+                else if ((string)panelProp->name() == "ColorBorder"){
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi((string)colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi((string)colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi((string)colorChannel->value());
+                        }
+                    }
+                    // Store the color border of the panel
+                    c.colorBorderPanelMultiplayerNameMenu = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Title"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                // Get the red color channel
+                if ((string)titleProp->name() == "Content"){
+                    // Get the content of the title
+                    content = (string)titleProp->value();
+                    c.contentTitleMultiplayerNameMenu = content;
+                }
+                // Get the green color channel
+                else if ((string)titleProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)titleProp->value();
+                    c.fontTitleMultiplayerNameMenu.loadFromFile(fontPath);
+                }
+                // Get color text of the title
+                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                    // Get the kind of color to process
+                    colorKind = (string)titleProp->name();
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Check if it is the color of the text
+                    if (colorKind == "ColorText"){
+                        c.colorTitleTextMultiplayerNameMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                    // Check if it is the color of the border
+                    else if (colorKind == "ColorBorder"){
+                        c.colorTitleBorderMultiplayerNameMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                }
+            }
+        }
+    }
+    // The configuration file has been read
+    c.multiplayerNameMenuRead = true;
+}
+
+
+
+State Game::introduceNameMultiplayer(Configuration& c, SoundPlayer& r){
+
+
+    nickNameMultiplayer = "_";
+
+    Event e;
+    while(c.window.pollEvent(e));
+
+     // The xml configuration file of the player menu has been read
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+
+    // Read the player menu if it has not been read
+    if (!c.multiplayerNameMenuRead){
+        // Read the player menu xml configuration file
+        string pathFile = "Data/Menus/MultiplayerNameMenu/Configuration/MultiplayerNameMenu.xml";
+        loadMultiplayerNameConfiguration(pathFile, c);
+    }
+
+    // Control if the start key is pressed or not
+    bool startPressed = false;
+
+    // Control if the backspace key has been pressed
+    bool backSpacePressed = false;
+
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+    // While start and backspace have not been pressed
+    while (!startPressed && !backSpacePressed) {
+
+        // Make the textures repeated
+        c.backgroundMultiplayerNameMenu.setRepeated(true);
+        c.backgroundMultiplayerNamePanel.setRepeated(true);
+
+        // Global rectangle of the background
+        IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+        Sprite sprite(c.backgroundMultiplayerNameMenu, background);
+
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
+        c.multiPlayerNameMenuBackground = sprite;
+
+        // Creation of the panel rectangle of the menu
+        RectangleShape shape;
+        shape.setPosition((c.w.getSize().x / 2.f) - 250.0f * c.screenScale, c.w.getSize().y / 2.f - 170.0f * c.screenScale);
+        shape.setSize(sf::Vector2f(492.0f * c.screenScale, 340.0f * c.screenScale));
+        shape.setOutlineColor(c.colorBorderPanelMultiplayerNameMenu);
+        shape.setOutlineThickness(5.0f * c.screenScale);
+        shape.setTexture(&c.backgroundMultiplayerNamePanel, true);
+
+        // Main Text of the menu
+        Text mainText;
+        mainText.setString(c.contentTitleMultiplayerNameMenu);
+        mainText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+        mainText.setFont(c.fontTitleMultiplayerNameMenu);
+        mainText.setStyle(Text::Bold | Text::Underlined);
+        mainText.setFillColor(c.colorTitleTextMultiplayerNameMenu);
+        mainText.setOutlineColor(c.colorTitleBorderMultiplayerNameMenu);
+        mainText.setOutlineThickness(5.0f * c.screenScale);
+        mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 140.0f * c.screenScale);
+
+        // Informative indjcators about how to change a controller
+        Text info1;
+        info1.setString("ENTER A NICKNAME OF UP TO EIGHT");
+        info1.setFillColor(Color(10, 201, 235));
+        info1.setOutlineColor(Color(3, 39, 8));
+        info1.setOutlineThickness(3.0f * c.screenScale);
+        info1.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        info1.setStyle(Text::Bold);
+        info1.setFont(c.fontTitleMultiplayerNameMenu);
+        info1.setPosition(c.w.getSize().x / 2.f - info1.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 60.0f * c.screenScale);
+        c.w.draw(info1);
+
+        Text info2;
+        info2.setString("CHARACTERS AND PRESS START");
+        info2.setFillColor(Color(10, 201, 235));
+        info2.setOutlineColor(Color(3, 39, 8));
+        info2.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        info2.setOutlineThickness(3.0f * c.screenScale);
+        info2.setStyle(Text::Bold);
+        info2.setFont(c.fontTitleMultiplayerNameMenu);
+        info2.setPosition(c.w.getSize().x / 2.f - info2.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 30.0f * c.screenScale);
+        c.w.draw(info2);
+
+        // Number of letters introduced
+        int lettersIntroduced = 0;
+
+        Text playerName;
+        playerName.setString(nickNameMultiplayer);
+        playerName.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+        playerName.setFont(c.fontTitleMultiplayerNameMenu);
+        playerName.setStyle(Text::Bold);
+        playerName.setFillColor(Color(64, 147, 225));
+        playerName.setOutlineColor(Color::Black);
+        playerName.setOutlineThickness(3.0f * c.screenScale);
+
+        KeywordMapper kM = KeywordMapper();
+
+        // Until the start keyword is not pressed
+        while (!startPressed && !backSpacePressed) {
+
+            // while there are pending events...
+            if (c.window.pollEvent(e)) {
+                // Detect the possible events
+                if (e.type == Event::Closed){
+                    return EXIT;
+                }
+                else if (e.type == Event::KeyPressed) {
+
+                    if (lettersIntroduced < 8){
+                        // Get code of the key
+                        int code = e.key.code;
+                        // Check if the key pressed is a letter or not
+                        if (code >= 0 && code <= 35) {
+                            lettersIntroduced++;
+                            string keyLetter = kM.mapperIdKeyWord[code];
+                            if (nickNameMultiplayer == "_") {
+                                nickNameMultiplayer = keyLetter + "_";
+                                r.soundEffects[116]->stop();
+                                r.soundEffects[116]->play();
+                            }
+                            else {
+                                if (lettersIntroduced == 8) {
+                                    nickNameMultiplayer = nickNameMultiplayer.substr(0, nickNameMultiplayer.size() - 1);
+                                    nickNameMultiplayer += keyLetter;
+                                    r.soundEffects[2]->stop();
+                                    r.soundEffects[2]->play();
+                                }
+                                else {
+                                    nickNameMultiplayer = nickNameMultiplayer.substr(0, nickNameMultiplayer.size() - 1);
+                                    nickNameMultiplayer += keyLetter + "_";
+                                    r.soundEffects[116]->stop();
+                                    r.soundEffects[116]->play();
+                                }
+                            }
+                        }
+                        else {
+                            r.soundEffects[3]->stop();
+                            r.soundEffects[3]->play();
+                        }
+                    }
+                    else {
+                        r.soundEffects[3]->stop();
+                        r.soundEffects[3]->play();
+                    }
+                }
+            }
+
+            playerName.setString(nickNameMultiplayer);
+            playerName.setPosition((c.w.getSize().x / 2.f) - playerName.getLocalBounds().width / 2.f,
+                                    c.w.getSize().y / 2.f + 80.0f * c.screenScale);
+
+            c.w.draw(c.multiPlayerMenuBackground);
+            c.w.draw(shape);
+            c.w.draw(mainText);
+            c.w.draw(info1);
+            c.w.draw(info2);
+            c.w.draw(playerName);
+
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+            sleep(milliseconds(120));
+
+            // Check if start has been pressed
+            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                // Change the controllers of the car
+                startPressed = true;
+                r.soundEffects[2]->stop();
+                r.soundEffects[2]->play();
+            }
+            // Check if backspace has been pressed
+            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                // Change the controllers of the car
+                backSpacePressed = true;
+                r.soundEffects[11]->stop();
+                r.soundEffects[11]->play();
+            }
+        }
+    }
+
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen){
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        }
+        else {
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        }
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+    }
+
+    if(startPressed){
+        // Store how to start the multiplayer game
+        if (modeMultiplayer == 0){
+            // Select create a group
+            return MULTIPLAYER_NAME_GROUP;
+        }
+        else {
+            // Select to join a group
+            return SELECT_MULTIPLAYER_JOIN;
+        }
+    }
+    else if (backSpacePressed) {
+        return MULTIPLAYER_MENU;
+    }
+    return EXIT;
+}
+
+
+
+/**
+ * Load the configuration of the player menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void Game::loadMultiplayerGroupConfiguration(const string path, Configuration& c){
+
+    // Open the xml file of the scenario
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Local variable to store temporary the text content and the fonts of the texts
+    string content, fontPath, backgroundTexture, colorKind;
+
+    // Iterate to get the information of the player menu
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check it is the node that contains the information of the background
+        if ((string)property->name() == "Background"){
+            // Get the background image of the menu
+            backgroundTexture = (string)property->value();
+            c.backgroundMultiplayerGroupMenu.loadFromFile(backgroundTexture);
+        }
+        // Check it is the node that contains the information of the main panel
+        else if ((string)property->name() == "MenuPanel"){
+            // Iterate to get the information of the player menu
+            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
+                // Check it is the node that contains the information of the background of the panel
+                if ((string)panelProp->name() == "Background"){
+                    // Get the background image of the menu
+                    backgroundTexture = (string)panelProp->value();
+                    c.backgroundMultiplayerGroupPanel.loadFromFile(backgroundTexture);
+                }
+                // Check it is the node that contains the information of the color border of the panel
+                else if ((string)panelProp->name() == "ColorBorder"){
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi((string)colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi((string)colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi((string)colorChannel->value());
+                        }
+                    }
+                    // Store the color border of the panel
+                    c.colorBorderPanelMultiplayerGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Title"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                // Get the red color channel
+                if ((string)titleProp->name() == "Content"){
+                    // Get the content of the title
+                    content = (string)titleProp->value();
+                    c.contentTitleMultiplayerGroupMenu = content;
+                }
+                // Get the green color channel
+                else if ((string)titleProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)titleProp->value();
+                    c.fontTitleMultiplayerGroupMenu.loadFromFile(fontPath);
+                }
+                // Get color text of the title
+                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                    // Get the kind of color to process
+                    colorKind = (string)titleProp->name();
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Check if it is the color of the text
+                    if (colorKind == "ColorText"){
+                        c.colorTitleTextMultiplayerGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                    // Check if it is the color of the border
+                    else if (colorKind == "ColorBorder"){
+                        c.colorTitleBorderMultiplayerGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                }
+            }
+        }
+    }
+    // The configuration file has been read
+    c.multiplayerGroupMenuRead = true;
+}
+
+
+
+State Game::introduceGroupMultiplayer(Configuration& c, SoundPlayer& r){
+
+    nickNameGroupMultiplayer = "_";
+
+    Event e;
+    while(c.window.pollEvent(e));
+
+     // The xml configuration file of the player menu has been read
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+
+    // Read the player menu if it has not been read
+    if (!c.multiplayerGroupMenuRead){
+        // Read the player menu xml configuration file
+        string pathFile = "Data/Menus/MultiplayerGroupMenu/Configuration/MultiplayerGroupMenu.xml";
+        loadMultiplayerGroupConfiguration(pathFile, c);
+    }
+
+    // Control if the start key is pressed or not
+    bool startPressed = false;
+
+    // Control if the backspace key has been pressed
+    bool backSpacePressed = false;
+
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+    // While start and backspace have not been pressed
+    while (!startPressed && !backSpacePressed) {
+
+        // Make the textures repeated
+        c.backgroundMultiplayerGroupMenu.setRepeated(true);
+        c.backgroundMultiplayerGroupPanel.setRepeated(true);
+
+        // Global rectangle of the background
+        IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+        Sprite sprite(c.backgroundMultiplayerGroupMenu, background);
+
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
+        c.multiPlayerGroupMenuBackground = sprite;
+
+        // Creation of the panel rectangle of the menu
+        RectangleShape shape;
+        shape.setPosition((c.w.getSize().x / 2.f) - 280.0f * c.screenScale, c.w.getSize().y / 2.f - 170.0f * c.screenScale);
+        shape.setSize(sf::Vector2f(552.0f * c.screenScale, 340.0f * c.screenScale));
+        shape.setOutlineColor(c.colorBorderPanelMultiplayerNameMenu);
+        shape.setOutlineThickness(5.0f * c.screenScale);
+        shape.setTexture(&c.backgroundMultiplayerGroupPanel, true);
+
+        // Main Text of the menu
+        Text mainText;
+        mainText.setString(c.contentTitleMultiplayerGroupMenu);
+        mainText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+        mainText.setFont(c.fontTitleMultiplayerGroupMenu);
+        mainText.setStyle(Text::Bold | Text::Underlined);
+        mainText.setFillColor(c.colorTitleTextMultiplayerGroupMenu);
+        mainText.setOutlineColor(c.colorTitleBorderMultiplayerGroupMenu);
+        mainText.setOutlineThickness(5.0f * c.screenScale);
+        mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 140.0f * c.screenScale);
+
+        // Informative indjcators about how to change a controller
+        Text info1;
+        if (modeMultiplayer == 0){
+            info1.setString("ENTER THE NICKNAME OF THE GROUP TO CREATE");
+        }
+        else {
+            info1.setString("ENTER THE NICKNAME OF THE GROUP");
+        }
+        info1.setFillColor(Color(10, 201, 235));
+        info1.setOutlineColor(Color(3, 39, 8));
+        info1.setOutlineThickness(3.0f * c.screenScale);
+        info1.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        info1.setStyle(Text::Bold);
+        info1.setFont(c.fontTitleMultiplayerGroupMenu);
+        info1.setPosition(c.w.getSize().x / 2.f - info1.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 60.0f * c.screenScale);
+        c.w.draw(info1);
+
+        Text info2;
+        if (modeMultiplayer == 0){
+            info2.setString("OF EIGHT CHARACTERS MAXIMUN AND PRESS START");
+        }
+        else {
+            info2.setString("YOU WANT TO JOIN AND PRESS START");
+        }
+        info2.setFillColor(Color(10, 201, 235));
+        info2.setOutlineColor(Color(3, 39, 8));
+        info2.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+        info2.setOutlineThickness(3.0f * c.screenScale);
+        info2.setStyle(Text::Bold);
+        info2.setFont(c.fontTitleMultiplayerGroupMenu);
+        info2.setPosition(c.w.getSize().x / 2.f - info2.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 30.0f * c.screenScale);
+        c.w.draw(info2);
+
+        // Number of letters introduced
+        int lettersIntroduced = 0;
+
+        Text playerName;
+        playerName.setString(nickNameGroupMultiplayer);
+        playerName.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+        playerName.setFont(c.fontTitleMultiplayerGroupMenu);
+        playerName.setStyle(Text::Bold);
+        playerName.setFillColor(Color(64, 147, 225));
+        playerName.setOutlineColor(Color::Black);
+        playerName.setOutlineThickness(3.0f * c.screenScale);
+
+        KeywordMapper kM = KeywordMapper();
+
+        // Until the start keyword is not pressed
+        while (!startPressed && !backSpacePressed) {
+
+            // while there are pending events...
+            if (c.window.pollEvent(e)) {
+                // Detect the possible events
+                if (e.type == Event::Closed){
+                    return EXIT;
+                }
+                else if (e.type == Event::KeyPressed) {
+
+                    if (lettersIntroduced < 8){
+                        // Get code of the key
+                        int code = e.key.code;
+                        // Check if the key pressed is a letter or not
+                        if (code >= 0 && code <= 35) {
+                            lettersIntroduced++;
+                            string keyLetter = kM.mapperIdKeyWord[code];
+                            if (nickNameGroupMultiplayer == "_") {
+                                nickNameGroupMultiplayer = keyLetter + "_";
+                                r.soundEffects[116]->stop();
+                                r.soundEffects[116]->play();
+                            }
+                            else {
+                                if (lettersIntroduced == 8) {
+                                    nickNameGroupMultiplayer = nickNameGroupMultiplayer.substr(0, nickNameGroupMultiplayer.size() - 1);
+                                    nickNameGroupMultiplayer += keyLetter;
+                                    r.soundEffects[2]->stop();
+                                    r.soundEffects[2]->play();
+                                }
+                                else {
+                                    nickNameGroupMultiplayer = nickNameGroupMultiplayer.substr(0, nickNameGroupMultiplayer.size() - 1);
+                                    nickNameGroupMultiplayer += keyLetter + "_";
+                                    r.soundEffects[116]->stop();
+                                    r.soundEffects[116]->play();
+                                }
+                            }
+                        }
+                        else {
+                            r.soundEffects[3]->stop();
+                            r.soundEffects[3]->play();
+                        }
+                    }
+                    else {
+                        r.soundEffects[3]->stop();
+                        r.soundEffects[3]->play();
+                    }
+                }
+            }
+
+            playerName.setString(nickNameGroupMultiplayer);
+            playerName.setPosition((c.w.getSize().x / 2.f) - playerName.getLocalBounds().width / 2.f,
+                                    c.w.getSize().y / 2.f + 80.0f * c.screenScale);
+
+            c.w.draw(c.multiPlayerMenuBackground);
+            c.w.draw(shape);
+            c.w.draw(mainText);
+            c.w.draw(info1);
+            c.w.draw(info2);
+            c.w.draw(playerName);
+
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+            sleep(milliseconds(120));
+
+            // Check if start has been pressed
+            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                // Change the controllers of the car
+                startPressed = true;
+                r.soundEffects[2]->stop();
+                r.soundEffects[2]->play();
+            }
+            // Check if backspace has been pressed
+            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                // Change the controllers of the car
+                backSpacePressed = true;
+                r.soundEffects[11]->stop();
+                r.soundEffects[11]->play();
+            }
+        }
+    }
+
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen){
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        }
+        else {
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        }
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+    }
+
+    if(startPressed){
+        // Store how to start the multiplayer game
+        return START_MULTIPLAYER;
+    }
+    else if (backSpacePressed) {
+        if (modeMultiplayer == 0){
+            return MULTIPLAYER_NAME_PLAYER;
+        }
+        else {
+            return SELECT_MULTIPLAYER_JOIN;
+        }
+    }
+    return EXIT;
+}
+
+
+
+
+/**
+ * Load the configuration of the player menu stored in its xml
+ * configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void Game::loadMultiplayerJoinGroupMenuConfiguration(const string path, Configuration& c){
+
+    // Open the xml file of the scenario
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Local variable to store temporary the text content and the fonts of the texts
+    string content, fontPath, backgroundTexture, colorKind;
+
+    // Iterate to get the information of the player menu
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check it is the node that contains the information of the background
+        if ((string)property->name() == "Background"){
+            // Get the background image of the menu
+            backgroundTexture = (string)property->value();
+            c.backgroundMultiplayerJoinGroupMenu.loadFromFile(backgroundTexture);
+        }
+        // Check it is the node that contains the information of the main panel
+        else if ((string)property->name() == "MenuPanel"){
+            // Iterate to get the information of the player menu
+            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
+                // Check it is the node that contains the information of the background of the panel
+                if ((string)panelProp->name() == "Background"){
+                    // Get the background image of the menu
+                    backgroundTexture = (string)panelProp->value();
+                    c.backgroundMultiplayerJoinGroupPanel.loadFromFile(backgroundTexture);
+                }
+                // Check it is the node that contains the information of the color border of the panel
+                else if ((string)panelProp->name() == "ColorBorder"){
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi((string)colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi((string)colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi((string)colorChannel->value());
+                        }
+                    }
+                    // Store the color border of the panel
+                    c.colorBorderPanelMultiplayerJoinGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Title"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                // Get the red color channel
+                if ((string)titleProp->name() == "Content"){
+                    // Get the content of the title
+                    content = (string)titleProp->value();
+                    c.contentTitleMultiplayerJoinGroupMenu = content;
+                }
+                // Get the green color channel
+                else if ((string)titleProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)titleProp->value();
+                    c.fontTitleMultiplayerJoinGroupMenu.loadFromFile(fontPath);
+                }
+                // Get color text of the title
+                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                    // Get the kind of color to process
+                    colorKind = (string)titleProp->name();
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Check if it is the color of the text
+                    if (colorKind == "ColorText"){
+                        c.colorTitleTextMultiplayerJoinGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                    // Check if it is the color of the border
+                    else if (colorKind == "ColorBorder"){
+                        c.colorTitleBorderMultiplayerJoinGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                }
+            }
+        }
+        // Check if it is the node that the different buttons of the menu
+        else if ((string)property->name() == "MenuButtons"){
+            Color colorFont;
+            // Iterate to get the information of the buttons of the player menu
+            for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
+                // Get the font of the buttons
+                if ((string)buttonProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)buttonProp->value();
+                    c.fontMenuMultiplayerJoinGroupButtons.loadFromFile(fontPath);
+                }
+                // Get the color font of the buttons
+                else if ((string)buttonProp->name() == "ColorFont"){
+                    // Read the font from the file
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
+                        // Get the red color channel
+                        if ((string)color->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(color->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)color->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(color->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)color->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(color->value());
+                        }
+                    }
+                    // Push the color of the button read
+                    c.colorFontMenuPlayerButtons = Color(colorRed, colorGreen, colorBlue);
+                }
+                // Get the information of the buttons
+                else if ((string)buttonProp->name() == "Buttons"){
+                    // Local variables to store the attributes of the buttons
+                    string contentButton;
+                    int buttonState = 0;
+                    vector<Color> colorButtons;
+                    Texture icon;
+                    Sprite s;
+                    int idButton = 0, posX, posY, widthButton, heightButton;
+                    // Iterate to get the information of the buttons
+                    for (xml_node<> *buttonNode = buttonProp->first_node(); buttonNode; buttonNode = buttonNode->next_sibling()){
+                        // Iterate to get the information of the buttons
+                        for (xml_node<> *button = buttonNode->first_node(); button; button = button->next_sibling()){
+                            // Get the font of the buttons
+                            if ((string)button->name() == "Content"){
+                                // Read the font from the file
+                                contentButton = (string)button->value();
+                            }
+                            // Get the state of the button
+                            else if ((string)button->name() == "InitialState"){
+                                // Read the font from the file
+                                buttonState = stoi(button->value());
+                            }
+                            // Get the colors of the button
+                            else if ((string)button->name() == "Colors"){
+                                // Read the colors of the button
+                                for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
+                                    // Get the border color of the panel
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                                    // Iterate to get the information of the player menu
+                                    for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
+                                        // Get the red color channel
+                                        if ((string)color->name() == "R"){
+                                            // Get the red channel
+                                            colorRed = stoi(color->value());
+                                        }
+                                        // Get the green color channel
+                                        else if ((string)color->name() == "G"){
+                                            // Get the red channel
+                                            colorGreen = stoi(color->value());
+                                        }
+                                        // Get the blue color channel
+                                        else if ((string)color->name() == "B"){
+                                            // Get the red channel
+                                            colorBlue = stoi(color->value());
+                                        }
+                                    }
+                                    // Push the color of the button read
+                                    c.multiplayerMenuJoinGroupColorButtons.push_back(Color(colorRed, colorGreen, colorBlue));
+                                }
+
+                                // Creation of the button and addition to the vector
+                                posX = c.w.getSize().x / 2.f - 110.0f * c.screenScale;
+                                posY = c.w.getSize().y / 2.f - (53.0f - idButton * 123.f) * c.screenScale;
+                                widthButton = 200.0f * c.screenScale;
+                                heightButton = 50.0f * c.screenScale;
+
+                                // Creation of the button
+                                Button b = Button(posX, posY, widthButton, heightButton, c.fontMenuMultiplayerButtons,
+                                                  contentButton, c.multiplayerMenuColorButtons[0], c.multiplayerMenuColorButtons[1],
+                                                  c.colorFontMenuPlayerButtons, buttonState, c.screenScale);
+
+                                c.multiplayerJoinGroupMenuButtons.push_back(b);
+                                idButton++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // The player menu has been read correctly
+    c.multiplayerJoinGroupMenuRead = true;
+}
+
+
+
+State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
+
+        // The xml configuration file of the player menu has been read
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+
+    // Read the player menu if it has not been read
+    if (!c.multiplayerJoinGroupMenuRead){
+        // Read the player menu xml configuration file
+        string pathFile = "Data/Menus/MultiplayerJoinGroupMenu/Configuration/MultiplayerJoinGroupMenu.xml";
+        loadMultiplayerJoinGroupMenuConfiguration(pathFile, c);
+    }
+    else {
+        int numButtons = int(c.multiplayerJoinGroupMenuButtons.size());
+
+        // Change the state of the first color
+        Button b = Button(c.w.getSize().x / 2.f - 110.0f * c.screenScale, c.w.getSize().y / 2.f - 53.0f * c.screenScale,
+                          200.0f * c.screenScale, 50.0f * c.screenScale, c.fontMenuMultiplayerButtons,
+                          c.multiplayerJoinGroupMenuButtons[0].getTextButton(), c.multiplayerJoinGroupMenuButtons[0].getIdleColorButton(),
+                          c.multiplayerJoinGroupMenuButtons[0].getHoverColorButton(), c.multiplayerJoinGroupMenuButtons[0].getFontColorButton(), 1,
+                          c.screenScale);
+
+        c.multiplayerJoinGroupMenuButtons[0] = b;
+
+        // Eliminate the buttons of the right column
+        for (int i = 1; i < numButtons; i++){
+            // Change the state of the first color
+            Button b = Button(c.w.getSize().x / 2.f - 110.0f * c.screenScale, c.w.getSize().y / 2.f - (53.0f - i * 123.f) * c.screenScale,
+                              200.0f * c.screenScale, 50.0f * c.screenScale, c.fontMenuMultiplayerButtons,
+                              c.multiplayerJoinGroupMenuButtons[i].getTextButton(), c.multiplayerJoinGroupMenuButtons[i].getIdleColorButton(),
+                              c.multiplayerJoinGroupMenuButtons[i].getHoverColorButton(), c.multiplayerJoinGroupMenuButtons[i].getFontColorButton(), 0,
+                              c.screenScale);
+
+            c.multiplayerJoinGroupMenuButtons[i] = b;
+        }
+    }
+
+    // Control if the start key is pressed or not
+    bool startPressed = false;
+
+    // Control if the backspace key has been pressed
+    bool backSpacePressed = false;
+
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+    // Control the option selected by the user
+    int optionSelected = 0;
+
+    // While start and backspace have not been pressed
+    while (!startPressed && !backSpacePressed) {
+
+        // Make the textures repeated
+        c.backgroundMultiplayerJoinGroupMenu.setRepeated(true);
+        c.backgroundMultiplayerJoinGroupPanel.setRepeated(true);
+
+        // Global rectangle of the background
+        IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+        Sprite sprite(c.backgroundMultiplayerJoinGroupMenu, background);
+
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
+        c.multiPlayerMenuJoinGroupBackground = sprite;
+
+        // Creation of the panel rectangle of the menu
+        RectangleShape shape;
+        shape.setPosition((c.w.getSize().x / 2.f) - 180.0f * c.screenScale, c.w.getSize().y / 2.f - 170.0f * c.screenScale);
+        shape.setSize(sf::Vector2f(350.0f * c.screenScale, 340.0f * c.screenScale));
+        shape.setOutlineColor(c.colorBorderPanelMultiplayerMenu);
+        shape.setOutlineThickness(5.0f * c.screenScale);
+        shape.setTexture(&c.backgroundMultiplayerJoinGroupPanel, true);
+
+        // Main Text of the menu
+        Text mainText;
+        mainText.setString(c.contentTitleMultiplayerJoinGroupMenu);
+        mainText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+        mainText.setFont(c.fontTitleMultiplayerMenu);
+        mainText.setStyle(Text::Bold | Text::Underlined);
+        mainText.setFillColor(c.colorTitleTextMultiplayerJoinGroupMenu);
+        mainText.setOutlineColor(c.colorTitleBorderMultiplayerJoinGroupMenu);
+        mainText.setOutlineThickness(5.0f * c.screenScale);
+        mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 140.0f * c.screenScale);
+
+        // Until the start keyword is not pressed
+        while (!startPressed && !backSpacePressed) {
+
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)){
+                if (e.type == Event::Closed){
+                    return EXIT;
+                }
+            }
+
+            // Check if the up or down cursor keys have been pressed or not
+            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+                // Up cursor pressed and change the soundtrack selected in the list
+                if (optionSelected != int(c.multiplayerJoinGroupMenuButtons.size() - 1)) {
+                    // Change the color appearance of both buttons
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                    optionSelected++;
+                    c.multiplayerJoinGroupMenuButtons[optionSelected].setButtonState(BUTTON_HOVER);
+                    c.multiplayerJoinGroupMenuButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
+                }
+            }
+            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+                // Down cursor pressed and change the soundtrack selected in the list
+                if (optionSelected != 0) {
+                    r.soundEffects[0]->stop();
+                    r.soundEffects[0]->play();
+                    optionSelected--;
+                    // Change the color appearance of both buttons
+                    c.multiplayerJoinGroupMenuButtons[optionSelected].setButtonState(BUTTON_HOVER);
+                    c.multiplayerJoinGroupMenuButtons[optionSelected + 1].setButtonState(BUTTON_IDLE);
+                }
+            }
+
+            c.w.draw(c.multiPlayerMenuJoinGroupBackground);
+            c.w.draw(shape);
+            c.w.draw(mainText);
+
+             // Show the buttons of the menu
+            for (int i = 0; i < (int)c.multiplayerJoinGroupMenuButtons.size(); i++) {
+                c.multiplayerJoinGroupMenuButtons.at(i).render(&c.w);
+            }
+
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+            sleep(milliseconds(120));
+
+            // Check if start has been pressed
+            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                // Change the controllers of the car
+                startPressed = true;
+                r.soundEffects[2]->stop();
+                r.soundEffects[2]->play();
+            }
+            // Check if backspace has been pressed
+            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                // Change the controllers of the car
+                backSpacePressed = true;
+                r.soundEffects[11]->stop();
+                r.soundEffects[11]->play();
+            }
+        }
+    }
+
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen){
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        }
+        else {
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        }
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+    }
+
+    if(startPressed){
+        // Store how to start the multiplayer game
+        if (optionSelected == 0){
+            // The player joins to a particular group
+            randomMultiplayerJoined = false;
+            return MULTIPLAYER_NAME_GROUP;
+        }
+        else {
+            // The player joins to a random group
+            randomMultiplayerJoined = true;
+            return START_MULTIPLAYER;
+        }
+    }
+    else if (backSpacePressed) {
+        return MULTIPLAYER_NAME_PLAYER;
+    }
+    return EXIT;
+}
+

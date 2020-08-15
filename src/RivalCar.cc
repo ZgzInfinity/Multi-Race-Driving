@@ -142,7 +142,6 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
             xDest = 1000;
             previousY = posY;
             speedCollision = 0.0f;
-            posX = 0.f;
             speed = 0.4f;
         }
     }

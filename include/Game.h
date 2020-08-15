@@ -285,6 +285,18 @@ class Game {
     int distanceAdvanced;
 
 
+    int modeMultiplayer;
+
+
+    string nickNameMultiplayer;
+
+
+    string nickNameGroupMultiplayer;
+
+
+    bool randomMultiplayerJoined;
+
+
     void storingRivalCars(Configuration& c);
 
 
@@ -631,6 +643,29 @@ public:
 
 
     void showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r);
+
+
+    void setMultiplayerMode(const int multiPlayerMode);
+
+
+    void loadMultiplayerNameConfiguration(const string path, Configuration& c);
+
+
+    State introduceNameMultiplayer(Configuration& c, SoundPlayer& r);
+
+
+    void loadMultiplayerGroupConfiguration(const string path, Configuration& c);
+
+
+    State introduceGroupMultiplayer(Configuration& c, SoundPlayer& r);
+
+
+    void loadMultiplayerJoinGroupMenuConfiguration(const string path, Configuration& c);
+
+
+    State selectJoiningMode(Configuration& c, SoundPlayer& r);
+
+
 };
 
 
