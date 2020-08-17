@@ -489,7 +489,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
 
             window.pollEvent(e);
             // Control if the down cursor key has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 if (optionSelected != int(menuButtons.size() - 1) / 2) {
                     r.soundEffects[0]->play();
                     optionSelected++;
@@ -500,7 +500,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                 }
             }
             // Control if the up cursor key has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if (window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 if (optionSelected != 0) {
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->play();
@@ -518,7 +518,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                 // Screen resolutions
 
                 // Check if left or right cursor keys have been pressed or not
-                if (Keyboard::isKeyPressed(Keyboard::Left)) {
+                if (window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
                     if (resized) {
                         // The screen has not been resized during the game before
                         resized = false;
@@ -571,7 +571,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                     imageOffset = float(w.getSize().y) * IMAGE_DEFAULT_OFFSET / DEFAULT_HEIGHT;
                     changeAnyParameter = true;
                 }
-                else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+                else if (window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
                     // The screen has not been resized during the game before
                     if (resized) {
                         resized = false;
@@ -614,7 +614,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                 // Pixel Art
 
                 // Check if left or right cursor keys have been pressed or not
-                if (Keyboard::isKeyPressed(Keyboard::Left)) {
+                if (window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
                     if (enablePixelArt) {
                         r.soundEffects[0]->stop();
                         r.soundEffects[0]->play();
@@ -623,7 +623,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                         changeAnyParameter = true;
                     }
                 }
-                else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+                else if (window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
                     if (!enablePixelArt) {
                         r.soundEffects[0]->stop();
                         r.soundEffects[0]->play();
@@ -653,7 +653,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
             r.soundEffects[0]->stop();
 
             // Check if left or right cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            if (window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 startPressed = true;
                 modifiedConfig = true;

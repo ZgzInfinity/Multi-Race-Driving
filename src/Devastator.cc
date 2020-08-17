@@ -244,12 +244,12 @@ Vehicle::Action Devastator::accelerationControl(Configuration &c, bool hasGotOut
     float previousAcc = acceleration;
 
     // Check if the braking control key has been pressed
-    if (Keyboard::isKeyPressed(c.brakeKey))
+    if (c.window.hasFocus() && Keyboard::isKeyPressed(c.brakeKey))
         // Devastator brakes
         a = BRAKE;
 
     // Check if the accelerating key has been pressed
-    if (a != BRAKE && Keyboard::isKeyPressed(c.accelerateKey)) {
+    if (a != BRAKE && c.window.hasFocus() && Keyboard::isKeyPressed(c.accelerateKey)) {
         // Check if the devastator is outside the road
         if (hasGotOut) {
             outSideRoad = true;
@@ -359,7 +359,7 @@ Vehicle::Direction Devastator::rotationControl(Configuration &c, float curveCoef
                 skidding = true;
 
             // Control if the turning left control key has been pressed
-            if (Keyboard::isKeyPressed(c.leftKey)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(c.leftKey)) {
 
                 // Measure the effect of the inertia force
                 if (inertia > -Devastator_vehicle::FORCE_INERTIA)
@@ -383,7 +383,7 @@ Vehicle::Direction Devastator::rotationControl(Configuration &c, float curveCoef
                 }
             }
             // Control if the turning right control key has been pressed
-            else if (Keyboard::isKeyPressed(c.rightKey)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(c.rightKey)) {
 
                 // Measure the effect of the inertia force
                 if (inertia < Devastator_vehicle::FORCE_INERTIA)

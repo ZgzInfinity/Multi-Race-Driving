@@ -363,7 +363,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
             c.window.display();
 
             // Check if the start keyword has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Pass to the second menu
                 startPressed = true;
                 // Stop the soundtrack of the main menu
@@ -371,7 +371,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
                 r.soundEffects[1]->stop();
                 r.soundEffects[1]->play();
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)){
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)){
                 return EXIT;
             }
             j = (j < (int) nameGames.size() - 1) ? j + 1 : 0;
@@ -820,7 +820,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.menuPlayerButtons.size() - 1)) {
                     // Change the color appearance of both buttons
@@ -831,7 +831,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
                     c.menuPlayerButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
@@ -899,14 +899,14 @@ State playerMenu(Configuration &c, SoundPlayer& r){
             sleep(milliseconds(120));
 
             // Check if start has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -1363,7 +1363,7 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.gameModeMenuButtons.size() - 1)) {
                     // Change the color appearance of both buttons
@@ -1374,7 +1374,7 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
                     c.gameModeMenuButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
@@ -1431,14 +1431,14 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
             sleep(milliseconds(120));
 
             // Check if start key has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace key has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -2059,7 +2059,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
             }
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::Down)) {
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
             // Up cursor pressed and change the soundtrack selected in the list
             if (optionSelected != int(c.soundMenuButtons.size() - 1) / 2) {
                 // Change the color appearance of both buttons
@@ -2071,7 +2071,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                 c.soundMenuButtons[optionSelected + 1].setButtonState(BUTTON_IDLE);
             }
         }
-        else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+        else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
             // Down cursor pressed and change the soundtrack selected in the list
             if (optionSelected != 0) {
                 // Change the color appearance of both buttons
@@ -2087,10 +2087,10 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         if (optionSelected == 0) {
             // Volume music
             // Check if left or right cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Left)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
                 if (r.volumeMusic != 0) {
                     r.volumeMusic--;
-                    for (int i = 0; i <= 16; i++) {
+                    for (int i = 0; i <= 18; i++) {
                         r.soundTracks[i]->setVolume(float(r.volumeMusic));
                         if (i == 14) {
                             r.soundTracks[i]->pause();
@@ -2101,10 +2101,10 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                     c.changeAnyParameter = true;
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
                 if (r.volumeMusic != 100) {
                     r.volumeMusic++;
-                    for (int i = 0; i <= 16; i++) {
+                    for (int i = 0; i <= 18; i++) {
                         r.soundTracks[i]->setVolume(float(r.volumeMusic));
                         if (i == 14) {
                             r.soundTracks[i]->pause();
@@ -2119,10 +2119,10 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         else {
             // Volume effects
             // Check if left or right cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Left)) {
+            if (c.window.hasFocus() && c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
                 if (r.volumeEffects != 0) {
                     r.volumeEffects--;
-                    for (int i = 0; i <= 42; i++) {
+                    for (int i = 0; i <= 116; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
                     r.soundEffects[0]->stop();
@@ -2131,10 +2131,10 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                     c.changeAnyParameter = true;
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
                 if (r.volumeEffects != 100) {
                     r.volumeEffects++;
-                    for (int i = 0; i <= 42; i++) {
+                    for (int i = 0; i <= 116; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
                     r.soundEffects[0]->stop();
@@ -2162,7 +2162,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         r.soundEffects[0]->stop();
 
         // Check if left or right cursor keys have been pressed or not
-        if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
             // Change the controllers of the car
             startPressed = true;
             c.modifiedConfig = true;
@@ -2333,7 +2333,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.optionsMenuButtons.size() - 1) / 2) {
                     // Change the color appearance of both buttons
@@ -2346,7 +2346,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 3].setButtonState(BUTTON_IDLE);
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
@@ -2365,7 +2365,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
             switch (optionSelected) {
                 case 0:
                     // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::Left)) {
+                    if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
                         if (c.level != EASY) {
 
                             r.soundEffects[0]->stop();
@@ -2382,7 +2382,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                             c.changeAnyParameter = true;
                         }
                     }
-                    else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+                    else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
                         if (c.level != HARD) {
 
                             r.soundEffects[0]->stop();
@@ -2407,7 +2407,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                    if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                         r.soundEffects[1]->stop();
                         r.soundEffects[1]->play();
                         State status = soundMenu(c, r, inGame);
@@ -2426,7 +2426,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                    if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                         r.soundEffects[1]->stop();
                         r.soundEffects[1]->play();
                         State status = c.graphicsMenu(r);
@@ -2649,7 +2649,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
-                    if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+                    if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                         // Change the controllers of the car
                         r.soundEffects[1]->stop();
                         r.soundEffects[1]->play();
@@ -2685,7 +2685,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
             r.soundEffects[0]->stop();
 
             // Check if the start key has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
@@ -3164,7 +3164,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                 return EXIT;
             }
         }
-        if (Keyboard::isKeyPressed(Keyboard::Down)) {
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
             // Up cursor pressed and change the soundtrack selected in the list
             if (optionSelected != int(c.vehicleControllersMenuButtons.size() - 1) / 2) {
                 // Change the color appearance of both buttons
@@ -3176,7 +3176,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                 c.vehicleControllersMenuButtons[optionSelected + 4].setButtonState(BUTTON_IDLE);
             }
         }
-        else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+        else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
             // Down cursor pressed and change the soundtrack selected in the list
             if (optionSelected != 0) {
                 // Change the color appearance of both buttons
@@ -3188,7 +3188,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                 c.vehicleControllersMenuButtons[optionSelected + 6].setButtonState(BUTTON_IDLE);
             }
         }
-        while (Keyboard::isKeyPressed(Keyboard::Space) && !Keyboard::isKeyPressed(Keyboard::Enter)) {
+        while (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Space) && !Keyboard::isKeyPressed(Keyboard::Enter)) {
             // Check if any keyword has been pressed or not
             c.window.waitEvent(e);
             if (e.type == Event::KeyPressed && e.key.code != -1 && e.key.code != Keyboard::Enter &&
@@ -3286,7 +3286,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
         }
 
         // Check if left or right cursor keys have been pressed or not
-        if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
             // Change the controllers of the car
             startPressed = true;
             c.modifiedConfig = true;
@@ -3714,7 +3714,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
                 }
             }
         }
-        if (Keyboard::isKeyPressed(c.menuEnterKey)) {
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(c.menuEnterKey)) {
             if (lettersIntroduced == 3){
                 startPressed = true;
             }
@@ -4431,7 +4431,7 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.multiplayerMenuButtons.size() - 1)) {
                     // Change the color appearance of both buttons
@@ -4442,7 +4442,7 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
                     c.multiplayerMenuButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
@@ -4470,14 +4470,14 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
             sleep(milliseconds(120));
 
             // Check if start has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();

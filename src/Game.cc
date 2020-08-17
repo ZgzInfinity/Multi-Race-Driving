@@ -1185,7 +1185,7 @@ void Game::checkSoundtrackChanging(Configuration& c, SoundPlayer& r){
     //Check the time
     if (elapsed14 - elapsed13 >= soundtrack_delay.asSeconds()){
         // Check if the key to change the soundtrack has been pressed
-        if (Keyboard::isKeyPressed(c.soundtrackKey)){
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(c.soundtrackKey)){
             // Inform that the soundtrack has been changed
             r.soundtrackChanged = true;
              // Stop the soundtrack of the game
@@ -2157,7 +2157,7 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
         // Control the final of the game
         if (!finalGame && !arrival) {
             // Check is the game is on pause
-            if (Keyboard::isKeyPressed(c.menuKey) || onPause) {
+            if ((c.window.hasFocus() && Keyboard::isKeyPressed(c.menuKey)) || onPause) {
                 // Pause the game
                 r.soundEffects[1]->stop();
                 r.soundEffects[1]->play();
@@ -2271,7 +2271,7 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
                 }
             }
 
-            startPressed = Keyboard::isKeyPressed(c.menuEnterKey);
+            startPressed = c.window.hasFocus() && Keyboard::isKeyPressed(c.menuEnterKey);
         }
         r.soundTracks[13]->stop();
         r.soundEffects[2]->stop();
@@ -2374,7 +2374,7 @@ State Game::playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r) {
         // Control the final of the game
         if (!finalGame && !arrival) {
             // Check is the game is on pause
-            if (Keyboard::isKeyPressed(c.menuKey) || onPause) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(c.menuKey) || onPause) {
                 // Pause the game
                 r.soundEffects[1]->stop();
                 r.soundEffects[1]->play();
@@ -2609,7 +2609,7 @@ State Game::playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r) {
                 }
             }
 
-            startPressed = Keyboard::isKeyPressed(c.menuEnterKey);
+            startPressed = c.window.hasFocus() && Keyboard::isKeyPressed(c.menuEnterKey);
         }
         r.soundTracks[13]->stop();
         r.soundEffects[2]->stop();
@@ -5929,7 +5929,7 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
         }
 
         // Check if the up or down cursor keys have been pressed or not
-        if (Keyboard::isKeyPressed(Keyboard::Down)) {
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
             // Up cursor pressed and change the soundtrack selected in the list
             if (optionSelected != int(c.pauseMenuButtons.size() - 1)) {
                 // Change the color appearance of both buttons
@@ -5940,7 +5940,7 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
                 c.pauseMenuButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
             }
         }
-        else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+        else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
             // Down cursor pressed and change the soundtrack selected in the list
             if (optionSelected != 0) {
                 r.soundEffects[0]->stop();
@@ -5951,7 +5951,7 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
                 c.pauseMenuButtons[optionSelected + 1].setButtonState(BUTTON_IDLE);
             }
         }
-        else if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+        else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
             if (comeFromOptions) {
                 comeFromOptions = false;
             } else {
@@ -6654,7 +6654,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Right)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 3) {
                     // Change the color appearance of both buttons
@@ -6769,7 +6769,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     }
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Left)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
@@ -6917,7 +6917,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 }
             }
             // Check if the up or down cursor keys have been pressed or not
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if ( c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (colorSelected != 7) {
                     // Change the color appearance of both buttons
@@ -7057,7 +7057,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     }
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (colorSelected != 0) {
                     // Change the color appearance of both buttons
@@ -7225,14 +7225,14 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             sleep(milliseconds(160));
 
             // Check if start has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -7653,7 +7653,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         c.window.display();
 
          // Check if the start keyword has been pressed
-        if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
             // Pass to the second menu
             startPressed = true;
             r.soundEffects[1]->stop();
@@ -8161,7 +8161,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             c.window.display();
 
              // Check if the start keyword has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Pass to the second menu
                 startPressed = true;
                 r.soundEffects[1]->stop();
@@ -8243,7 +8243,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 if (optionSelected != 1){
                     optionSelected++;
                     triangle.setPosition(c.w.getSize().x / 2.f - 37.f * c.screenScale - 15.f,
@@ -8254,7 +8254,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
                 }
             }
             // Check if the up or down cursor keys have been pressed or not
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 if (optionSelected != 0){
                     optionSelected--;
                     triangle.setPosition(c.w.getSize().x / 2.f - 37.f * c.screenScale - 15.f,
@@ -8291,7 +8291,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             sleep(milliseconds(50));
 
             // Check if start has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
@@ -9095,7 +9095,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Down)){
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)){
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 2) {
                     // Change the color appearance of both buttons
@@ -9118,7 +9118,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                     }
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Up)){
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)){
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
@@ -9140,7 +9140,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                     }
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Left)){
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)){
                 // Up cursor pressed and change the soundtrack selected in the list
                 switch(optionSelected){
                     case 0:
@@ -9181,7 +9181,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                         }
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Right)){
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)){
                 switch(optionSelected){
                     case 0:
                         if (landScapeSelected != 3){
@@ -9259,14 +9259,14 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
             sleep(milliseconds(120));
 
             // Check if start key has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)){
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)){
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace key has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)){
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)){
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -9969,14 +9969,14 @@ State Game::introduceNameMultiplayer(Configuration& c, SoundPlayer& r){
             sleep(milliseconds(120));
 
             // Check if start has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -10326,14 +10326,14 @@ State Game::introduceGroupMultiplayer(Configuration& c, SoundPlayer& r){
             sleep(milliseconds(120));
 
             // Check if start has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
@@ -10707,7 +10707,7 @@ State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
             }
 
             // Check if the up or down cursor keys have been pressed or not
-            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
                 // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.multiplayerJoinGroupMenuButtons.size() - 1)) {
                     // Change the color appearance of both buttons
@@ -10718,7 +10718,7 @@ State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
                     c.multiplayerJoinGroupMenuButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
                 }
             }
-            else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
                 // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
@@ -10746,14 +10746,14 @@ State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
             sleep(milliseconds(120));
 
             // Check if start has been pressed
-            if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
                 // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
             // Check if backspace has been pressed
-            else if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();

@@ -243,12 +243,12 @@ Vehicle::Action Minivan::accelerationControl(Configuration &c, bool hasGotOut) {
     float previousAcc = acceleration;
 
     // Check if the braking control key has been pressed
-    if (Keyboard::isKeyPressed(c.brakeKey))
+    if (c.window.hasFocus() && Keyboard::isKeyPressed(c.brakeKey))
         // Minivan brakes
         a = BRAKE;
 
     // Check if the accelerating key has been pressed
-    if (a != BRAKE && Keyboard::isKeyPressed(c.accelerateKey)) {
+    if (a != BRAKE && c.window.hasFocus() && Keyboard::isKeyPressed(c.accelerateKey)) {
         // Check if the minivan is outside the road
         if (hasGotOut) {
             outSideRoad = true;
@@ -356,7 +356,7 @@ Vehicle::Direction Minivan::rotationControl(Configuration &c, float curveCoeffic
                 skidding = true;
 
             // Control if the turning left control key has been pressed
-            if (Keyboard::isKeyPressed(c.leftKey)) {
+            if (c.window.hasFocus() && Keyboard::isKeyPressed(c.leftKey)) {
 
                 // Measure the effect of the inertia force
                 if (inertia > -Minivan_vehicle::FORCE_INERTIA)
@@ -380,7 +380,7 @@ Vehicle::Direction Minivan::rotationControl(Configuration &c, float curveCoeffic
                 }
             }
             // Control if the turning right control key has been pressed
-            else if (Keyboard::isKeyPressed(c.rightKey)) {
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(c.rightKey)) {
 
                 // Measure the effect of the inertia force
                 if (inertia < Minivan_vehicle::FORCE_INERTIA)
