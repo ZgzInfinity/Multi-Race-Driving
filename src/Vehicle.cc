@@ -1,24 +1,57 @@
 
+/*
+ * Module Vehicle implementation file
+ */
 
 #include "../include/Vehicle.h"
 
+
+
+/**
+ * Default constructor
+ */
 Vehicle::Vehicle(){}
 
 
+
+/**
+ * Initialize a vehicle with all its properties
+ * @param maxSpeed is the maximum speed reached by the vehicle in KM/H
+ * @param scale is the scaling factor to draw the vehicle in the screen with different resolutions
+ * @param maxCounterToChange is limit to change the direction of the vehicle
+ * @param speed is the speed of the vehicle in KM/H
+ * @param posX is the position of the vehicle in the axis x
+ * @param posY is the position of the vehicle in the axis y
+ * @param previousY is the last position of the vehicle in the axis y
+ * @param minScreenX is the minimum coefficient to draw the vehicle in the screen
+ * @param maxScreenX is the maximum coefficient to draw the vehicle in the screen
+ * @param vehicle is the type of vehicle selected by the player in the selection vehicle menu
+ * @param numTextures is the number of textures of the vehicle selected
+ * @param currentCodeImage is the code of the sprite to be drawn in the screen
+ * @param counterCodeImage is a counter that change the sprite to be drawn in the screen
+ */
 Vehicle::Vehicle(const float maxSpeed, const float scale, const int maxCounterToChange, float speedVehicle, float posX,
                  float previousX, float posY, float previousY, float minScreenX, float maxScreenX, const string &vehicle,
                  int numTextures,
                  int currentCodeImage, int counterCodeImage) : maxSpeed(maxSpeed), scale(scale),
-                                                               maxCounterToChange(maxCounterToChange), previousX(previousX), posX(posX), posY(posY),
+                                                               maxCounterToChange(maxCounterToChange),
+                                                               previousX(previousX), posX(posX), posY(posY),
                                                                previousY(previousY), minScreenX(minScreenX),
                                                                maxScreenX(maxScreenX),
                                                                current_code_image(currentCodeImage),
                                                                counter_code_image(counterCodeImage)
 {
+    // Assign the maximum speed reached by the vehicle
     speed = speedVehicle;
+    // Calculation of the half sped reached
     halfMaxSpeed = maxSpeed / 2.0f;
+
+    // Reserves memory to store all the textures of the vehicle
     textures.reserve(static_cast<unsigned long>(numTextures));
+
+    // Iterate throughout the textures of the vehicle
     for (int i = 1; i <= numTextures; i++) {
+        // Load the texture and store it in the vector
         Texture t;
         t.loadFromFile(vehicle + "/Images/c" + to_string(i) + ".png");
         t.setSmooth(true);
@@ -27,6 +60,13 @@ Vehicle::Vehicle(const float maxSpeed, const float scale, const int maxCounterTo
     }
 }
 
+
+
+/**
+ * Establish the vehicle in a concrete position in the landscape
+ * @param pX is the position in the axis x when the vehicle must be located
+ * @param pY is the position in the axis y when the vehicle must be located
+ */
 void Vehicle::setPosition(float pX, float pY) {
     posX = pX;
     posY = pY;
@@ -34,45 +74,94 @@ void Vehicle::setPosition(float pX, float pY) {
     previousY = pY;
 }
 
+
+
+/**
+ * Reinitialize all the vehicle properties depending of the game mode
+ * selected by the player
+ * @param typeOfGame is the game mode selected by the player
+ */
 void Vehicle::setVehicle(const int typeOfGame){
+    // Initialize the speed of the vehicle to zero
     speed = 0.0f;
+    // Check if the mode selected by the layer was World Tour or Pole Position
     if (typeOfGame == 0 || typeOfGame == 2){
+        // Camera on the left of the screen
         posX = -0.3f;
     }
     else {
+        // Camera on the center of the screen
         posX = 0.f;
     }
+    // Initialize the vehicle at the beginning of the landscape
     posY = 0.0f;
     previousY = 0.0f;
 }
 
+
+
+/**
+ * Returns the current position of the vehicle in the axis x
+ * @return
+ */
 float Vehicle::getPosX() const {
     return posX;
 }
 
+
+
+/**
+ * Returns the last registered position of the vehicle in the axis x
+ * @return
+ */
 float Vehicle::getPreviousX() const {
     return previousX;
 }
 
+
+
+/**
+ * Returns the current position of the vehicle in the axis y
+ * @return
+ */
 float Vehicle::getPosY() const {
     return posY;
 }
 
+
+
+/**
+ * Returns the minimum coordinate of the screen in axis x used by the vehicle
+ * @return
+ */
 float Vehicle::getMinScreenX() const {
     return minScreenX;
 }
 
+
+
+/**
+ * Returns the maximum coordinate of the screen in axis x used by the vehicle
+ * @return
+ */
 float Vehicle::getMaxScreenX() const {
     return maxScreenX;
 }
 
+
+
+/**
+ * Returns the acceleration of the vehicle
+ * @return
+ */
 float Vehicle::getAcceleration() const {
     return speed * speed;
 }
 
 
+
 /**
- * Devuelve la posición actual X.
+ * Returns the speed of the vehicle in KM/H
  * @return
  */
 float Vehicle::getSpeed() const {
@@ -81,13 +170,24 @@ float Vehicle::getSpeed() const {
 
 
 
+/**
+ * Randomly choose the direction the vehicle must go
+ */
 Vehicle::Direction randomDirection() {
+    // Get a probabilistic number between zero and one
     const float p = rand_generator_zero_one();
-    if (p < 0.6f)
+    // Check the value of the number obtained
+    if (p < 0.6f){
+        // Straight direction
         return Vehicle::Direction::RIGHT;
-    else if (p < 0.8f)
+    }
+    else if (p < 0.8f){
+        // Turn right
         return Vehicle::Direction::TURNRIGHT;
-    else
+    }
+    else {
+        // Turn left
         return Vehicle::Direction::TURNLEFT;
+    }
 }
 

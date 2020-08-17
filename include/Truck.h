@@ -1,4 +1,8 @@
 
+/*
+ * Module Truck interface file
+ */
+
 #ifndef TRUCK_H
 #define TRUCK_H
 
@@ -9,147 +13,248 @@
 using namespace std;
 using namespace sf;
 
+
+
+/*
+ * Properties of the truck
+ */
 namespace Truck_vehicle {
+    // Inertia force of the truck when it is on curves
     const int FORCE_INERTIA = 4;
+    // Number of textures of the truck
     const int PLAYER_TEXTURES = 103;
 }
 
 
+
+/**
+ * Represents a truck as an available vehicle to be
+ * chosen by the player in the vehicle selection menu
+ */
 class Truck : public Vehicle {
-    float speedMul, maxAcc, accInc, scaleY;
-    float acceleration, minCrashAcc, xDest;
+
+    // Factor to multiply the speed of the truck
+    float speedMul;
+
+    // Maximum acceleration reached by the truck
+    float maxAcc;
+
+    // Acceleration increment of the truck
+    float accInc;
+
+    // Scaling factor of the truck in axis y
+    float scaleY;
+
+    // Current acceleration of the truck
+    float acceleration;
+
+    // Minimum acceleration reached when the truck crashes
+    float minCrashAcc;
+
+    // Coordinate in axis x that the truck must reach when it crashes
+    float xDest;
+
+    // Magnitude of the inertia force that the truck experiments in the curves
     int inertia;
 
+    // Sprite to draw the texture of the truck in the screen
     sf::Sprite sprite;
-    bool crashing;      // True if crashing state is on
-    bool smoking;       // True if player generates smoke
-    bool skidding;      // True if player is skidding
-    int mode;           // Type animation collision
 
-    string brand;           // Name of the vehicle
-    string motor;           // Brand of the motor's vehicle
-    float angleTurning;     // Turning angle of the vehicle
-    float topSpeed;         // Top speed of the vehicle
-    float speedCollision;   // Initial speed when starts the collision
-    bool outSideRoad;       // Control if the motorbike is outside the road
+    // Control if the truck is crashing or not
+    bool crashing;
 
+    // Control if the truck generates smoke when it is moving
+    bool smoking;
 
+    // Control if the truck is skidding when it is in a curve
+    bool skidding;
 
-    bool firstCrash, firstTurnLeft, firstTurnRight;
+    // Mode type of collision
+    int mode;
+
+    // Name of the truck's brand
+    string brand;
+
+    // Brand of the truck's motor
+    string motor;
+
+    // Angle of turn of the truck
+    float angleTurning;
+
+    // Maximum speed reached by the truck
+    float topSpeed;
+
+    // Speed of the truck at the moment of a collision
+    float speedCollision;
+
+    // Control if the truck is inside the road or not
+    bool outSideRoad;
+
+    // Control if the truck has crashed more than one time
+    bool firstCrash;
+
+    // Control if the last direction of the truck was turning left
+    bool firstTurnLeft;
+
+    // Control if the last direction of the truck was turning right
+    bool firstTurnRight;
 
 public:
 
 
-    Truck();
 
     /**
-     * Inicializa el vehículo del jugador.
-     * @param maxSpeed
-     * @param speedMul multiplicador de la velocidad que multiplicado por speed obtiene la velocidad real
-     * @param accInc incremento de la aceleración
-     * @param scaleX escalado del sprite del vehículo
-     * @param scaleY escalado del sprite del vehículo
-     * @param maxCounterToChange cuando counter_code_image llega a maxCounterToChange se actualiza el sprite
-     * @param vehicle nombre del vehículo
-     * @param pX
-     * @param pY
+     * Default constructor
+     */
+    Truck();
+
+
+
+    /**
+     * Initialize the truck chosen by the player
+     * @param maxSpeed is the maximum speed that the truck can reach
+     * @param speedMul is factor number that when it is multiplied by speed obtains the real speed
+     * @param accInc is the acceleration increment
+     * @param scaleX is the scaling factor in the axis x
+     * @param scaleY is the scaling factor in the axis y
+     * @param maxCounterToChange lets to update the sprite of the truck that is drawn in the screen
+     * @param vehicle is the type of vehicle selected by the player
+     * @param pX is the position of the player in the axis x
+     * @param pY is the position of the player in the axis y
      */
     Truck(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
            const std::string &vehicle, float pX, float pY, const string brandName, const float angle,
            const string motorName);
 
+
+
     /**
-     * Devuelve la posición previa Y.
+     * Returns the last position of the truck in axis y
      * @return
      */
     float getPreviousY() const;
 
+
+
     /**
-     * Actualiza la lógica del choque y restablece la velocidad y aceleración.
-     * @param vehicleCrash true si es un choque entre vehículos
+     * Updates the crash logic of the truck and restores speed and acceleration
+     * @param vehicleCrash true if it is a crash between vehicles
      */
     void hitControl(bool vehicleCrash);
 
+
+
     /**
-     * Devuelve true si la lógica de choque está en ejecución.
+     * Returns true if the truck is crashing. Otherwise returns false
      * @return
      */
     bool isCrashing() const;
 
+
+
     /**
-     * Devuelve la velocidad real del vehículo.
+     * Returns the real speed of the truck
      * @return
      */
     float getRealSpeed() const;
 
+
+
     /**
-     * Actualiza la lógica de la aceleración y frenado del vehículo.
-     * @param c
-     * @param hasGotOut indica si se ha salido del camino
+     * Updates the logic of the truck's acceleration and braking
+     * @param c is the module configuration of the game
+     * @param hasGotOut indicates if it's gone off track
      * @return
      */
     Action accelerationControl(Configuration &c, bool hasGotOut);
 
+
+
     /**
-     * Actualiza la lógica de giro del vehículo.
-     * @param c
-     * @param curveCoefficient pertenece [-0.9, 0.9]
+     * Updates the logic direction turn of the truck
+     * @param c is the module configuration of the game
+     * @param curveCoefficient is the coefficient curve
+     * @param isFinalMap controls if the truck is circulating in the goal landscape or not
+     * @param limitMap is the size of the landscape
      * @return
      */
     Direction rotationControl(Configuration &c, float curveCoefficient, const bool& isFinalMap, const int& limitMap);
 
+
+
     /**
-     * Actualiza el sprite del vehículo jugador y lo dibuja en la pantalla.
-     * @param c
-     * @param a
-     * @param d
-     * @param e
-     * @param enableSound
+     * Updates the truck's sprite and draws it in the screen
+     * @param c is the module configuration of the game
+     * @param a is the action to be done by the truck
+     * @param d is the direction to be followed by the truck
+     * @param e is the current elevation of the truck in the landscape
+     * @param enableSound indicates if the motor of the truck has to make noise
      */
     void draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d, const Elevation &e, int terrain, bool enableSound = true);
 
-    /**
-     * Dibuja la animación inicial en la pantalla y devuelve si ha acabado.
-     * @param c
-     * @param x
-     * @param end
-     */
-    void drawInitialAnimation(Configuration &c, float x, bool &end);
+
 
     /**
-     * Dibuja la animación final en la pantalla y devuelve si ha acabado.
-     * @param c
-     * @param step
-     * @param end
-     * @param smoke
-     */
-    void drawGoalAnimation(Configuration &c, int &step, bool &end, bool smoke = true);
-
-    /**
-     * Fuerza a que el coche esté echando humo o no.
-     * @param smoke
+     * It forces the truck to be smoking or not
+     * @param smoke indicates if the truck has to make smoke or not
      */
     void setSmoking(bool smoke);
 
 
+
+    /**
+     * Initialize the properties of the truck depending of the game mode
+     * selected by the player
+     * @param typeOfGame is the game mode selected by the player
+     */
     void setVehicle(const int typeOfGame);
 
 
+
+    /**
+     * Sets the type mode of collision
+     * @return
+     */
     void setModeCollision();
 
 
+
+    /**
+     * Returns the half speed that can be reached by the truck
+     * @return
+     */
     float getHalfMaxSpeed();
 
 
+
+    /**
+     * Returns the brand name of the truck
+     * @return
+     */
     string getBrandName();
 
 
+
+    /**
+     * Returns the angle of turning of the truck
+     * @return
+     */
     float getAngle();
 
 
+
+    /**
+     * Returns the motor's name of the truck
+     * @return
+     */
     string getMotorName();
 
 
+
+    /**
+     * Returns the maximum speed reached by the truck
+     * @return
+     */
     float getTopSpeed();
 
 };

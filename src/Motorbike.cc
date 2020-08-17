@@ -1,10 +1,31 @@
 
+/*
+ * Module Motorbike implementation file
+ */
+
 #include "../include/Motorbike.h"
 
 
+
+/**
+ * Default constructor
+ */
 Motorbike::Motorbike(){}
 
 
+
+/**
+ * Initialize the motorbike chosen by the player
+ * @param maxSpeed is the maximum speed that the motorbike can reach
+ * @param speedMul is factor number that when it is multiplied by speed obtains the real speed
+ * @param accInc is the acceleration increment
+ * @param scaleX is the scaling factor in the axis x
+ * @param scaleY is the scaling factor in the axis y
+ * @param maxCounterToChange lets to update the sprite of the motorbike that is drawn in the screen
+ * @param vehicle is the type of vehicle selected by the player
+ * @param pX is the position of the player in the axis x
+ * @param pY is the position of the player in the axis y
+ */
 Motorbike::Motorbike(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
                      const string &vehicle, float pX, float pY, const string brandName, const float angle,
                      const string motorName) : Vehicle(maxSpeed / speedMul, scaleX, maxCounterToChange,
@@ -24,17 +45,38 @@ Motorbike::Motorbike(float maxSpeed, float speedMul, float accInc, float scaleX,
     outSideRoad = false;
 }
 
+
+
+/**
+ * Returns the last position of the motorbike in axis y
+ * @return
+ */
 float Motorbike::getPreviousY() const {
     return previousY;
 }
 
+
+
+/**
+ * Updates the crash logic of the motorbike and restores speed and acceleration
+ * @param vehicleCrash true if it is a crash between vehicles
+ */
 void Motorbike::hitControl(const bool vehicleCrash) {
+
+    // By default the motorbike is crashing
     crashing = true;
+
+    // By default the motorbike is not smoking
     smoking = false;
+
+    // By default the motorbike is not skidding
     skidding = false;
 
+    // Check the speed of the motorbike when it crashes
     if (speedCollision == 0.f){
+        // Get the speed of the motorbike
         speedCollision = getRealSpeed();
+        // Move the motorbike while is crashing
         if (speedCollision < 60.f){
             posY = posY + 10.f;
         }
@@ -43,8 +85,8 @@ void Motorbike::hitControl(const bool vehicleCrash) {
         }
     }
     else {
+        // Decrement the acceleration of the motorbike depending of the speed
         acceleration -= accInc * 2.5f;
-
         if (speed > 1.333f * halfMaxSpeed){
             acceleration -= accInc * 7.5f;
         }
@@ -55,16 +97,19 @@ void Motorbike::hitControl(const bool vehicleCrash) {
             acceleration -= accInc * 2.5f;
         }
 
+        // Control the possible negative accelerations
         if (acceleration < 0.0f){
             acceleration = 0.0f;
         }
 
+        // Calculation of the speed using the acceleration
         mainMutex.lock();
         speed = sqrt(acceleration);
         mainMutex.unlock();
 
         posY = posY + acceleration * 0.20f;
     }
+    // Control the end of the crash animation of the motorbike
     if (current_code_image == 41){
         acceleration = minCrashAcc;
         speed = sqrt(acceleration);
@@ -79,43 +124,77 @@ void Motorbike::hitControl(const bool vehicleCrash) {
     }
 }
 
+
+
+/**
+ * Returns true if the motorbike is crashing. Otherwise returns false
+ * @return
+ */
 bool Motorbike::isCrashing() const {
     return crashing;
 }
 
+
+
+/**
+ * Returns the real speed of the motorbike
+ * @return
+ */
 float Motorbike::getRealSpeed() const {
     return speed * speedMul;
 }
 
 
+
+/**
+ * Updates the logic of the motorbike's acceleration and braking
+ * @param c is the module configuration of the game
+ * @param hasGotOut indicates if it's gone off track
+ * @return
+ */
 Vehicle::Action Motorbike::accelerationControl(Configuration &c, bool hasGotOut) {
+
+    // Default action
     Action a = NONE;
     smoking = false;
+
+    // Store the current acceleration
     float previousAcc = acceleration;
 
+    // Check if the braking control key has been pressed
     if (Keyboard::isKeyPressed(c.brakeKey))
+        // Motorbike brakes
         a = BRAKE;
 
+    // Check if the accelerating key has been pressed
     if (a != BRAKE && Keyboard::isKeyPressed(c.accelerateKey)) {
+        // Check if the motorbike is outside the road
         if (hasGotOut) {
             outSideRoad = true;
+            // The acceleration increases slower
             if (acceleration < maxAcc / 4.5f)
                 acceleration += accInc / 3.0f;
             else
                 acceleration -= accInc * 1.5f;
         }
         else {
+            // The acceleration increases quicker
             outSideRoad = false;
             if (acceleration < maxAcc)
                 acceleration += accInc;
         }
 
+        // Control the limit of the acceleration
         if (acceleration > maxAcc)
             acceleration = maxAcc;
 
+        // Check if the motorbike must start to smoke
         smoking = acceleration < maxAcc * 0.1f;
     } else {
+        // The motorbike is braking
         float mul = 2.0f;
+
+        // Reduces acceleration
         if (a == BRAKE)
             mul *= 2.0f;
         if (hasGotOut)
@@ -128,42 +207,67 @@ Vehicle::Action Motorbike::accelerationControl(Configuration &c, bool hasGotOut)
             acceleration = 0.0f;
     }
 
+    // Control if the motorbike is going to boot the motor
     if (previousAcc == 0.0f && acceleration > 0.0f)
         a = BOOT;
     else if (a == NONE && acceleration > 0.0f)
+        // The motorbike accelerates because the rest of actions has not happened
         a = ACCELERATE;
 
+    // Calculate the new speed of the motorbike
     mainMutex.lock();
     speed = sqrt(acceleration);
     mainMutex.unlock();
 
+    // Control the advance of the motorbike in the landscape
     if (speed > 0.0f) {
+        // Store the last position in axis y
         previousY = posY;
+        // Store the new position using the current speed
         posY += speed;
     }
     return a;
 }
 
+
+
+/**
+ * Updates the logic direction turn of the motorbike
+ * @param c is the module configuration of the game
+ * @param curveCoefficient is the coefficient curve
+ * @param isFinalMap controls if the motorbike is circulating in the goal landscape or not
+ * @param limitMap is the size of the landscape
+ * @return
+ */
 Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoefficient, const bool& isFinalMap, const int& limitMap) {
+
+    // The motorbike is not skidding by default
     skidding = false;
     if (speed > 0.0f) {
+        // Check if it's the final landscape and it is near the goal
         if (isFinalMap && limitMap - posY <= 150.f){
+            // Check if the motorbike is in the right of the road
             if (posX > 0.f){
                 previousX = posX;
                 posX -= 0.02f;
                 if (posX < 0.0f){
+                    // Centered in the middle of the road
                     posX = 0.0f;
                 }
             }
+            // Check if the motorbike is in the left of the road
             else if (posX < 0.0f) {
                 previousX = posX;
                 posX += 0.02f;
                 if (posX > 0.0f){
+                    // Centered in the middle of the road
                     posX = 0.0f;
                 }
             }
         }
         else {
+
+            // Decrement the position in axis x using the maximum speed and the acceleration
             if (speed < 0.66f * maxSpeed){
                 previousX = posX;
                 posX -= angleTurning * curveCoefficient * sqrt(speed / 2.0f) * speed / maxSpeed;
@@ -173,17 +277,23 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
                 posX -= angleTurning * curveCoefficient * sqrt(speed) * speed / maxSpeed;
             }
 
+            // Check if the motorbike has to start to skid
             if (abs(curveCoefficient) >= 0.33f && speed >= 0.66f * maxSpeed)
                 skidding = true;
 
+            // Control if the turning left control key has been pressed
             if (Keyboard::isKeyPressed(c.leftKey)) {
+
+                // Measure the effect of the inertia force
                 if (inertia > -Motorbike_vehicle::FORCE_INERTIA)
                     inertia--;
 
+                // The inertia force makes the motorbike skid
                 if (inertia < 0) {
                     if (curveCoefficient > 0.0f)
                         skidding = false;
 
+                    // Control the position in axis x
                     if (speed < halfMaxSpeed){
                         previousX = posX;
                         posX -= 1.5f * angleTurning * speed / maxSpeed;
@@ -197,16 +307,23 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
                         posX -= angleTurning * speed / maxSpeed;
                     }
 
+                    // Motorbike turns left
                     return TURNLEFT;
                 }
-            } else if (Keyboard::isKeyPressed(c.rightKey)) {
+            }
+            // Control if the turning right control key has been pressed
+            else if (Keyboard::isKeyPressed(c.rightKey)) {
+
+                // Measure the effect of the inertia force
                 if (inertia < Motorbike_vehicle::FORCE_INERTIA)
                     inertia++;
 
+                // The inertia force makes the motorbike skid
                 if (inertia > 0) {
                     if (curveCoefficient < 0.0f)
                         skidding = false;
 
+                    // Control the position in axis x
                     if (speed < halfMaxSpeed){
                         previousX = posX;
                         posX += 1.5f * angleTurning * speed / maxSpeed;
@@ -220,6 +337,7 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
                         posX += angleTurning * speed / maxSpeed;
                     }
 
+                    // Motorbike turns right
                     return TURNRIGHT;
                 }
             } else if (inertia > 0) {
@@ -231,9 +349,20 @@ Vehicle::Direction Motorbike::rotationControl(Configuration &c, float curveCoeff
             skidding = false;
         }
     }
+    // Motorbike goes right
     return RIGHT;
 }
 
+
+
+/**
+ * Updates the motorbike's sprite and draws it in the screen
+ * @param c is the module configuration of the game
+ * @param a is the action to be done by the motorbike
+ * @param d is the direction to be followed by the motorbike
+ * @param e is the current elevation of the motorbike in the landscape
+ * @param enableSound indicates if the motor of the motorbike has to make noise
+ */
 void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d,
                     const Elevation &e, int terrain, bool enableSound)
 {
@@ -241,6 +370,7 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
     if (a != CRASH)
         firstCrash = true;
 
+    // Control the sounds of the motorbike
     if (enableSound) {
         if (speed > 0.0f) {
             if (a == BOOT) {
@@ -303,25 +433,31 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
         firstTurnRight = true;
     }
 
+    // Check the current action of the motorbike to be drawn in the screen
     if (a != NONE) {
         if (counter_code_image >= maxCounterToChange) {
             counter_code_image = 0;
 
+            // Increment the texture counter only if it moves
             if (speed > 0.0f){
                 if (crashing){
+                    // Change the number of textures to display the sprite slower
                     current_code_image++;
                     maxCounterToChange = 5;
                 }
                 else {
+                    // Change the number of textures to display the sprite quicker
                     current_code_image++;
                     maxCounterToChange = COUNTER;
                 }
             }
             else if (crashing){
+                // Change the number of textures to display the sprite slower
                 current_code_image++;
                 maxCounterToChange = 5;
             }
             else {
+                // Change the number of textures to display the sprite quicker
                 maxCounterToChange = COUNTER;
             }
 
@@ -492,19 +628,23 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
                     }
                 }
                 else {
+                    // The motorbike is crashing
                     if (current_code_image < 29 || current_code_image > 41)
                         current_code_image = 29;
                 }
             }
         }
         else {
+            // Increment the code of the motorbike texture to be drawn
             counter_code_image++;
         }
     }
     else {
+        // Default code when the motorbike does not move
         current_code_image = 1;
     }
 
+    // Draw the motorbike in the screen adapted to the current screen resolution and pixel art effect
     sprite.setTexture(textures[current_code_image - 1], true);
     sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
     minScreenX = ((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width / 2.0f;
@@ -523,7 +663,9 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
     c.w.draw(sprite);
 
 
+    // Check if the motorbike is skidding or smoking
     if (smoking || skidding) {
+        // Accelerate the counter of changing the sprite
         maxCounterToChange = COUNTER + 1;
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         sprite.setTexture(textures[41 + current_code_image % 4], true);
@@ -535,8 +677,9 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
         c.w.draw(sprite);
     }
     else if (crashing){
+        // Give it a value depending of the speed of the devastator
         if (getRealSpeed() < 20.f){
-                maxCounterToChange = COUNTER + 6;
+            maxCounterToChange = COUNTER + 6;
         }
         else if (getRealSpeed() >= 20.f && getRealSpeed() < 60.f){
             maxCounterToChange = COUNTER + 5;
@@ -551,17 +694,22 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
             maxCounterToChange = COUNTER + 1;
         }
     }
+    // Draw the smoke effect of the motorbike
     else if (outSideRoad && speed != 0.f){
+        // Must raise land
         maxCounterToChange = COUNTER;
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         switch(terrain){
         case 0:
+            // Grass
             sprite.setTexture(textures[66 + current_code_image % 8], true);
             break;
         case 1:
+            // Land
             sprite.setTexture(textures[60 + current_code_image % 6], true);
             break;
         case 2:
+            // Snow
             sprite.setTexture(textures[74 + current_code_image % 6], true);
         }
         sprite.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
@@ -572,17 +720,28 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
         c.w.draw(sprite);
     }
     else if (!crashing) {
+        // Make the motorbike change the sprite quickly
         maxCounterToChange = COUNTER;
     }
 }
 
 
 
+/**
+ * It forces the motorbike to be smoking or not
+ * @param smoke indicates if the motorbike has to make smoke or not
+ */
 void Motorbike::setSmoking(bool smoke) {
     smoking = smoke;
 }
 
 
+
+/**
+ * Initialize the properties of the motorbike depending of the game mode
+ * selected by the player
+ * @param typeOfGame is the game mode selected by the player
+ */
 void Motorbike::setVehicle(const int typeOfGame){
     Vehicle::setVehicle(typeOfGame);
     acceleration = 0.0f;
@@ -597,26 +756,51 @@ void Motorbike::setVehicle(const int typeOfGame){
 }
 
 
+
+/**
+ * Returns the half speed that can be reached by the motorbike
+ * @return
+ */
 float Motorbike::getHalfMaxSpeed(){
     return halfMaxSpeed;
 }
 
 
+
+/**
+ * Returns the brand name of the motorbike
+ * @return
+ */
 string Motorbike::getBrandName(){
     return brand;
 }
 
 
+
+/**
+ * Returns the angle of turning of the motorbike
+ * @return
+ */
 float Motorbike::getAngle(){
     return angleTurning;
 }
 
 
+
+/**
+ * Returns the motor's name of the motorbike
+ * @return
+ */
 string Motorbike::getMotorName(){
     return motor;
 }
 
 
+
+/**
+ * Returns the maximum speed reached by the motorbike
+ * @return
+ */
 float Motorbike::getTopSpeed(){
     return topSpeed;
 }

@@ -11,6 +11,7 @@
  * Default constructor
  */
 Step::Step() {
+    // Assignment of the attributes
     directionCurve = 0.0f;
     position_3d_x = 0.0f;
     position_3d_y = 0.0f;

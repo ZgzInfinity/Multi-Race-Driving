@@ -1,4 +1,9 @@
 
+/*
+ * Module MapElement implementation file
+ */
+
+
 #include "../include/MapElement.h"
 
 

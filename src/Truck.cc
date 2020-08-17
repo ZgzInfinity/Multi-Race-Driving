@@ -1,10 +1,31 @@
 
+/*
+ * Module Truck implementation file
+ */
+
 #include "../include/Truck.h"
 
 
+
+/**
+ * Default constructor
+ */
 Truck::Truck(){}
 
 
+
+/**
+ * Initialize the truck chosen by the player
+ * @param maxSpeed is the maximum speed that the truck can reach
+ * @param speedMul is factor number that when it is multiplied by speed obtains the real speed
+ * @param accInc is the acceleration increment
+ * @param scaleX is the scaling factor in the axis x
+ * @param scaleY is the scaling factor in the axis y
+ * @param maxCounterToChange lets to update the sprite of the truck that is drawn in the screen
+ * @param vehicle is the type of vehicle selected by the player
+ * @param pX is the position of the player in the axis x
+ * @param pY is the position of the player in the axis y
+ */
 Truck::Truck(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
                        const string &vehicle, float pX, float pY, const string brandName, const float angle,
                        const string motorName) : Vehicle(maxSpeed / speedMul, scaleX, maxCounterToChange,
@@ -25,29 +46,56 @@ Truck::Truck(float maxSpeed, float speedMul, float accInc, float scaleX, float s
     outSideRoad = false;
 }
 
+
+
+/**
+ * Returns the last position of the truck in axis y
+ * @return
+ */
 float Truck::getPreviousY() const {
     return previousY;
 }
 
+
+
+/**
+ * Updates the crash logic of the truck and restores speed and acceleration
+ * @param vehicleCrash true if it is a crash between vehicles
+ */
 void Truck::hitControl(const bool vehicleCrash) {
+
+    // By default the truck is crashing
     crashing = true;
+
+    // By default the truck is not smoking
     smoking = false;
+
+    // By default the truck is not skidding
     skidding = false;
 
+    // Check the speed when starts the crash if has not been stored
     if (speedCollision == 0.f){
+        // Store the speed
         speedCollision = getRealSpeed();
     }
 
-    if (xDest == 1000){
-        if (posX > 0.0f){
+    // Calculation of the position in axis x where finish the crash
+    if (xDest == 1000.f){
+        // Check the side of the track where the crash happens
+        if (posX > 0.f){
+            // The truck goes to the left
             xDest = -(acceleration * 1.7f / maxAcc);
+
         }
         else {
+            // The truck goes to the right
             xDest = acceleration * 1.7f / maxAcc;
         }
     }
 
-    if (xDest > 0.0f){
+    // Check the destination coordinate in axis x of the crash
+    if (xDest > 0.f){
+        // Increment to the right depending if the speed of the truck
         if (speedCollision <= 40.f){
             posX = posX + (acceleration * angleTurning / maxAcc) * 40.f;
         }
@@ -65,6 +113,7 @@ void Truck::hitControl(const bool vehicleCrash) {
         }
     }
     else {
+        // Increment to the left depending if the speed of the truck
         if (speedCollision <= 40.f){
             posX = posX - (acceleration * angleTurning / maxAcc) * 40.f;
         }
@@ -80,18 +129,21 @@ void Truck::hitControl(const bool vehicleCrash) {
         else {
             posX = posX - (acceleration * angleTurning / maxAcc) * 1.5f;
         }
-
     }
 
+    // Check if the crash is against another car
     if (vehicleCrash){
-        if (minCrashAcc <= 0.0f) { // Only first time
+        if (minCrashAcc <= 0.f) {
+            // Only first time reduces the speed and the acceleration
             minCrashAcc = (speed * 0.1555f) * (speed * 0.1555f);
             acceleration = (speed * 0.75f) * (speed * 0.75f);
         }
     }
 
+    // Decrement the acceleration
     acceleration -= accInc * 2.5f;
 
+    // Reduce the acceleration in minor quantities each time
     if (speed > 1.333f * halfMaxSpeed){
         acceleration -= accInc * 7.5f;
     }
@@ -102,31 +154,43 @@ void Truck::hitControl(const bool vehicleCrash) {
         acceleration -= accInc * 2.5f;
     }
 
+    // Avoid negative acceleration
     if (acceleration < 0.0f){
         acceleration = 0.0f;
     }
 
+    // Calculate the speed of the truck using its acceleration
     mainMutex.lock();
     speed = sqrt(acceleration);
     mainMutex.unlock();
 
+    // Control the movement in the axis y
     if (xDest > 0.f && posX < xDest){
+        // Check the crash has been with an element of the map
+        // or with another car
         if (!vehicleCrash){
+            // Crash with element of map and truck moves forward
             posY = posY + acceleration * 7.f / maxAcc;
         }
         else {
+            // Crash with element of map and truck moves backwards
             posY = posY - acceleration * 7.f / maxAcc;
         }
     }
     else if (xDest < 0.f && posX > xDest) {
+        // Check the crash has been with an element of the map
+        // or with another car
         if (!vehicleCrash){
+            // Crash with element of map and truck moves forward
             posY = posY + acceleration * 7.f / maxAcc;
         }
         else {
+            // Crash with element of map and truck moves backwards
             posY = posY - acceleration * 7.f / maxAcc;
         }
     }
 
+    // Control if the crash animation has been finished
     if (acceleration <= minCrashAcc){
         acceleration = minCrashAcc;
         speed = sqrt(acceleration);
@@ -141,41 +205,75 @@ void Truck::hitControl(const bool vehicleCrash) {
     }
 }
 
+
+
+/**
+ * Returns true if the truck is crashing. Otherwise returns false
+ * @return
+ */
 bool Truck::isCrashing() const {
     return crashing;
 }
 
+
+
+/**
+ * Returns the real speed of the truck
+ * @return
+ */
 float Truck::getRealSpeed() const {
     return speed * speedMul;
 }
 
+
+
+/**
+ * Updates the logic of the truck's acceleration and braking
+ * @param c is the module configuration of the game
+ * @param hasGotOut indicates if it's gone off track
+ * @return
+ */
 Vehicle::Action Truck::accelerationControl(Configuration &c, bool hasGotOut) {
+
+    // Default action
     Action a = NONE;
     smoking = false;
+
+    // Store the current acceleration
     float previousAcc = acceleration;
 
+    // Check if the braking control key has been pressed
     if (Keyboard::isKeyPressed(c.brakeKey))
         a = BRAKE;
 
+    // Check if the accelerating key has been pressed
     if (a != BRAKE && Keyboard::isKeyPressed(c.accelerateKey)) {
+        // Check if the truck is outside the road
         if (hasGotOut) {
             outSideRoad = true;
+            // The acceleration increases slower
             if (acceleration < maxAcc / 4.5f)
                 acceleration += accInc / 3.0f;
             else
                 acceleration -= accInc * 1.5f;
         } else {
+            // The acceleration increases quicker
             outSideRoad = false;
             if (acceleration < maxAcc)
                 acceleration += accInc;
         }
 
+        // Control the limit of the acceleration
         if (acceleration > maxAcc)
             acceleration = maxAcc;
 
+        // Check if the truck must start to smoke
         smoking = acceleration < maxAcc * 0.1f;
     } else {
+        // The truck is braking
         float mul = 2.0f;
+
+        // Reduces acceleration
         if (a == BRAKE)
             mul *= 2.0f;
         if (hasGotOut)
@@ -188,57 +286,87 @@ Vehicle::Action Truck::accelerationControl(Configuration &c, bool hasGotOut) {
             acceleration = 0.0f;
     }
 
+    // Control if the truck is going to boot the motor
     if (previousAcc == 0.0f && acceleration > 0.0f)
         a = BOOT;
     else if (a == NONE && acceleration > 0.0f)
+        // The truck accelerates because the rest of actions has not happened
         a = ACCELERATE;
 
+    // Calculate the new speed of the truck
     mainMutex.lock();
     speed = sqrt(acceleration);
     mainMutex.unlock();
 
+    // Control the advance of the truck in the landscape
     if (speed > 0.0f) {
+        // Store the last position in axis y
         previousY = posY;
+        // Store the new position using the current speed
         posY += speed;
     }
     return a;
 }
 
+
+
+/**
+ * Updates the logic direction turn of the truck
+ * @param c is the module configuration of the game
+ * @param curveCoefficient is the coefficient curve
+ * @param isFinalMap controls if the truck is circulating in the goal landscape or not
+ * @param limitMap is the size of the landscape
+ * @return
+ */
 Vehicle::Direction Truck::rotationControl(Configuration &c, float curveCoefficient, const bool& isFinalMap, const int& limitMap) {
+
+    // The truck is not skidding by default
     skidding = false;
 
     if (speed > 0.0f) {
+        // Check if it's the final landscape and it is near the goal
         if (isFinalMap && limitMap - posY <= 130.f){
+            // Check if the truck is in the right of the road
             if (posX > 0.f){
                 posX -= 0.02f;
                 if (posX < 0.0f){
+                    // Centered in the middle of the road
                     posX = 0.0f;
                 }
             }
+            // Check if the devastator is in the left of the road
             else if (posX < 0.0f) {
                 posX += 0.02f;
                 if (posX > 0.0f){
+                    // Centered in the middle of the road
                     posX = 0.0f;
                 }
             }
         }
         else {
+            // Decrement the position in axis x using the maximum speed and the acceleration
             if (speed < 0.66f * maxSpeed)
                 posX -= angleTurning * curveCoefficient * sqrt(speed / 2.0f) * speed / maxSpeed;
             else
                 posX -= angleTurning * curveCoefficient * sqrt(speed) * speed / maxSpeed;
 
+            // Check if the truck has to start to skid
             if (abs(curveCoefficient) >= 0.33f && speed >= 0.66f * maxSpeed)
                 skidding = true;
 
+            // Control if the turning left control key has been pressed
             if (Keyboard::isKeyPressed(c.leftKey)) {
+
+                // Measure the effect of the inertia force
                 if (inertia > -Truck_vehicle::FORCE_INERTIA)
                     inertia--;
 
+                // The inertia force makes the truck skid
                 if (inertia < 0) {
                     if (curveCoefficient > 0.0f)
                         skidding = false;
 
+                    // Control the position in axis x
                     if (speed < halfMaxSpeed)
                         posX -= 1.5f * angleTurning * speed / maxSpeed;
                     else if (curveCoefficient == 0.0f)
@@ -246,16 +374,23 @@ Vehicle::Direction Truck::rotationControl(Configuration &c, float curveCoefficie
                     else
                         posX -= angleTurning * speed / maxSpeed;
 
+                    // Truck turns left
                     return TURNLEFT;
                 }
-            } else if (Keyboard::isKeyPressed(c.rightKey)) {
+            }
+            // Control if the turning right control key has been pressed
+            else if (Keyboard::isKeyPressed(c.rightKey)) {
+
+                // Measure the effect of the inertia force
                 if (inertia < Truck_vehicle::FORCE_INERTIA)
                     inertia++;
 
+                // The inertia force makes the truck skid
                 if (inertia > 0) {
                     if (curveCoefficient < 0.0f)
                         skidding = false;
 
+                    // Control the position in axis x
                     if (speed < halfMaxSpeed)
                         posX += 1.5f * angleTurning * speed / maxSpeed;
                     else if (curveCoefficient == 0.0f)
@@ -263,6 +398,7 @@ Vehicle::Direction Truck::rotationControl(Configuration &c, float curveCoefficie
                     else
                         posX += angleTurning * speed / maxSpeed;
 
+                    // Truck turns right
                     return TURNRIGHT;
                 }
             } else if (inertia > 0) {
@@ -270,14 +406,23 @@ Vehicle::Direction Truck::rotationControl(Configuration &c, float curveCoefficie
             } else if (inertia < 0) {
                 inertia++;
             }
-
             skidding = false;
         }
     }
-
+    // Truck goes right
     return RIGHT;
 }
 
+
+
+/**
+ * Updates the truck's sprite and draws it in the screen
+ * @param c is the module configuration of the game
+ * @param a is the action to be done by the truck
+ * @param d is the direction to be followed by the truck
+ * @param e is the current elevation of the truck in the landscape
+ * @param enableSound indicates if the motor of the truck has to make noise
+ */
 void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d,
                   const Elevation &e, int terrain, bool enableSound)
 {
@@ -285,6 +430,7 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
     if (a != CRASH)
         firstCrash = true;
 
+    // Control the sounds of the truck
     if (enableSound) {
         if (speed > 0.0f) {
             if (a == BOOT) {
@@ -352,10 +498,12 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
         firstTurnRight = true;
     }
 
+    // Check the current action of the truck to be drawn in the screen
     if (a != NONE) {
         if (counter_code_image >= maxCounterToChange) {
             counter_code_image = 0;
 
+            // Increment the texture counter only if it moves
             if (speed > 0.0f)
                 current_code_image++;
 
@@ -529,12 +677,14 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
                     }
                 }
                 else {
-                    // Crash
+                    // The truck is crashing
                     if (mode == 0) {
+                        // First type of animation
                         if (current_code_image < 55 || current_code_image > 62)
                             current_code_image = 55;
                     }
                     else if (mode == 1) {
+                        // Second type of animation
                         if (current_code_image < 63 || current_code_image > 70)
                             current_code_image = 63;
                     }
@@ -542,13 +692,16 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
             }
         }
         else {
+            // Increment the code of the truck texture to be drawn
             counter_code_image++;
         }
     }
     else {
+        // Default code when the truck does not move
         current_code_image = 1;
     }
 
+    // Draw the truck in the screen adapted to the current screen resolution and pixel art effect
     sprite.setTexture(textures[current_code_image - 1], true);
     sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
     minScreenX = ((float) c.w.getSize().x) / 2.0f - sprite.getGlobalBounds().width / 2.0f;
@@ -571,9 +724,10 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
     }
     c.w.draw(sprite);
 
-
+    // Check if the truck is crashing or skidding or smoking
     if (smoking || skidding || crashing) {
         if (!crashing){
+            // Accelerate the counter of changing the sprite
             maxCounterToChange = COUNTER + 1;
         }
         else {
@@ -593,6 +747,7 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
                 maxCounterToChange = COUNTER;
             }
         }
+        // Draw the smoke effect of the truck
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
         sprite.setTexture(textures[70 + current_code_image % 4], true);
         sprite.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
@@ -602,17 +757,23 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
         sprite.setPosition(((float) c.w.getSize().x) / 2.0f, j - sprite.getGlobalBounds().height);
         c.w.draw(sprite);
     }
+    // Check if the truck is outside the road and it is moving
     else if (outSideRoad && speed != 0.f){
+        // Must raise land
         maxCounterToChange = COUNTER;
         const float j = sprite.getPosition().y + sprite.getGlobalBounds().height;
+        // Check the kind of terrain of the landscape and draw it
         switch(terrain){
         case 0:
+            // Grass
             sprite.setTexture(textures[81 + current_code_image % 8], true);
             break;
         case 1:
+            // Land
             sprite.setTexture(textures[75 + current_code_image % 6], true);
             break;
         case 2:
+            // Snow
             sprite.setTexture(textures[89 + current_code_image % 6], true);
         }
         sprite.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
@@ -623,18 +784,30 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
         c.w.draw(sprite);
     }
     else if (!crashing) {
+        // Make the truck change the sprite quickly
         maxCounterToChange = COUNTER;
     }
 }
 
 
 
+/**
+ * It forces the truck to be smoking or not
+ * @param smoke indicates if the truck has to make smoke or not
+ */
 void Truck::setSmoking(bool smoke) {
     smoking = smoke;
 }
 
 
+
+/**
+ * Initialize the properties of the truck depending of the game mode
+ * selected by the player
+ * @param typeOfGame is the game mode selected by the player
+ */
 void Truck::setVehicle(const int typeOfGame){
+    // Reinitialize the properties of the truck
     Vehicle::setVehicle(typeOfGame);
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
@@ -648,33 +821,66 @@ void Truck::setVehicle(const int typeOfGame){
 }
 
 
+
+/**
+ * Sets the type mode of collision
+ * @return
+ */
 void Truck::setModeCollision(){
+    // Check if the type of crash animation has been chosen
     if (mode == -1){
+        // Get randomly the type of crash animation
         mode = rand_generator_int(0, 1);
     }
 }
 
 
+
+
+/**
+ * Returns the half speed that can be reached by the truck
+ * @return
+ */
 float Truck::getHalfMaxSpeed(){
     return halfMaxSpeed;
 }
 
 
+
+/**
+ * Returns the brand name of the truck
+ * @return
+ */
 string Truck::getBrandName(){
     return brand;
 }
 
 
+
+/**
+ * Returns the motor's name of the truck
+ * @return
+ */
 string Truck::getMotorName(){
     return motor;
 }
 
 
+
+/**
+ * Returns the angle of turning of the truck
+ * @return
+ */
 float Truck::getAngle(){
     return angleTurning;
 }
 
 
+
+/**
+ * Returns the maximum speed reached by the truck
+ * @return
+ */
 float Truck::getTopSpeed(){
     return topSpeed;
 }

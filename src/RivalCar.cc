@@ -157,7 +157,7 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
             posX += 0.03f;
         }
 
-        posY = posY - 0.2f;
+        posY = posY - 0.04f;
 
         int maxCode = 0;
 

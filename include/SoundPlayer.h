@@ -1,11 +1,11 @@
 #pragma once
 
 /*
- * Module Reproductor interface file
+ * Module SoundPlayer interface file
  */
 
-#ifndef REPRODUCTOR_H
-#define REPRODUCTOR_H
+#ifndef SOUND_PLAYER_H
+#define SOUND_PLAYER_H
 
 #include <iostream>
 #include <cstring>
@@ -70,4 +70,4 @@ struct SoundPlayer {
 };
 
 
-#endif // BU
+#endif // SOUND_PLAYER_H

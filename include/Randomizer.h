@@ -1,4 +1,7 @@
 
+/*
+ * Module Randomizer implementation file
+ */
 
 #ifndef RANDOMIZER_H
 #define RANDOMIZER_H

@@ -1971,14 +1971,12 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
-                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), true);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0, true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
-                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), false);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
                     cars.push_back(v);
                 }
             }
@@ -1988,14 +1986,12 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
-                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), true);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f,
-                                 rand_generator_float(-RECTANGLE * DEL_DISTANCE * 3.0f, -2.f * DEL_DISTANCE * 3.0f), false);
+                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
                     cars.push_back(v);
                 }
             }
@@ -3672,35 +3668,20 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
             float crashPos;
 
             if (!v.isCrashing() && !v.inCrash()){
-
-                float distX, distY;
-
-                // Check if there a traffic vehicle is near of the rival car
-                bool visible = v.isVisible(c, currentMap->getCameraPosY(), cars[i].getPosX(), cars[i].getPosY(), distX, distY);
-
-                // If the traffic is visible for the player
-                if (visible){
-
-                    // The traffic car is very near
-                    if (distX < 0.3f && distY < 20.f){
-                        const float p = rand_generator_zero_one();
-                        if (p <= 0.5){
-                            // Change the path
-                            if (v.getPosX() < 0.f){
-                                v.setPosition(v.getPosX() + 0.048f, v.getPosY());
-                            }
-                            else {
-                                v.setPosition(v.getPosX() - 0.048f, v.getPosY());
-                            }
-                        }
-                    }
-
-                    // Check if the vehicle crashes or not
+                // Check if the current rival car has crashed with a traffic car
+                if (abs(v.getPosY() - positionY) <= c.renderLen){
                     for (int i = 0; !vehicleCrash && i < (int)cars.size(); i++){
                         vehicleCrash = cars[i].hasCrashed(v.getPreviousY(), v.getPosY(),
                                                           v.getMinScreenX(), v.getMaxScreenX(), crashPos);
                     }
                 }
+            }
+
+            if (vehicleCrash || v.isCrashing()) {
+                // Determine the type of collision
+                v.setPosition(v.getPosX(), v.getPosY());
+                v.hitControl(vehicleCrash, r, positionY);
+                a = Vehicle::CRASH;
             }
 
             if (vehicleCrash || v.isCrashing()) {

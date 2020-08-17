@@ -1,4 +1,8 @@
 
+/*
+ * Module Randomizer implementation file
+ */
+
 #include "../include/Randomizer.h"
 
 

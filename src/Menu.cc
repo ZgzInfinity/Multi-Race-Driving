@@ -3432,7 +3432,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
                         (float) c.w.getSize().y / rankingBackground.getSize().y);
 
     // Get the best seventh out runners
-    vector<Score> scoreRankingPlayer = getGlobalScores(c, typeOfGame);
+    vector<Score> scoreRankingPlayer = getGlobalScores(c);
 
     // Check if there is a new record
     int record = isNewRecord(scoreRankingPlayer, scorePlayerGame);
@@ -3738,7 +3738,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     if (record != -1) {
         // If the was record and the name is uncompleted
         Score s = Score(scorePlayerGame, name, minutes, secs, cents_Second);
-        saveNewRecord(scoreRankingPlayer, s, typeOfGame, c);
+        saveNewRecord(scoreRankingPlayer, s, c);
     }
 
     r.soundEffects[2]->stop();

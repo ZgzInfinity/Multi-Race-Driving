@@ -1832,7 +1832,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     }
     sort(sortedRivals.begin(), sortedRivals.end(), ascendingSortRivalCars);
 
-
     // Discard all the vehicles which are behind the player
     while (!sortedRivals.empty() && (int(sortedRivals.back()->getPosY()) < int(posCameraY) ||
                                        int(sortedRivals.back()->getPosY()) > int(posCameraY) + c.renderLen - 1))
@@ -1854,7 +1853,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     sbg.setTextureRect(IntRect(0, 0, static_cast<int>(80.0f * sbg.getGlobalBounds().width), background.getSize().y));
     sbg.setPosition(0, 0);
 
-    // Move the background to the left or to the right
     sbg.move(-16.0f * c.w.getSize().x - l->bgX - posCameraX, 0);
     c.w.draw(sbg);
 
@@ -1900,6 +1898,11 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         l = getStep(n);
         dx -= l->directionCurve;
         x -= dx;
+
+        // Draw road
+        if (visibleLines.back() == n) {
+
+            visibleLines.pop_back();
 
             Color grassRight, grass, roadRight, road, rumbleRight, rumble, dashRight, dash;
             if ((startingLandScape && n < N) || (!startingLandScape && n < N - (RECTANGLES_LIMIT + RECTANGLES_FORK) * RECTANGLE) ||
@@ -2034,6 +2037,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
 
                 drawRoadTracks(c.w, dash, x1, w1, y1, dw1, x2, w2, y2, dw2);
             }
+        }
 
         // Draw the map elements
         // Near left map element
@@ -2138,7 +2142,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         // Draw the car to chase
         if ((typeOfGame == 3 || typeOfGame == 4) && drawGoalCar){
             // Draw rival cars
-            while (!sortedGoalCars.empty()) {
+            while (!sortedGoalCars.empty() && int(sortedGoalCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
 
                 RivalCar *v = sortedGoalCars.back();
                 Sprite sv;

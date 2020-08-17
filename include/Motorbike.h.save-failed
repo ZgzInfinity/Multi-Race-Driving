@@ -197,7 +197,7 @@ public:
 
 
     /**
-     * It forces the motorbike to be smoking or not
+     * It forces the car to be smoking or not
      * @param smoke indicates if the motorbike has to make smoke or not
      */
     void setSmoking(bool smoke);
@@ -207,7 +207,6 @@ public:
     /**
      * Initialize the properties of the motorbike depending of the game mode
      * selected by the player
-     * @param typeOfGame is the game mode selected by the player
      */
     void setVehicle(const int typeOfGame);
 

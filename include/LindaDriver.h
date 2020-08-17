@@ -8,7 +8,7 @@
 
 
 /*
- * Module Linda driver interface file
+ * Module LindaDriver interface file
  */
 
 #ifndef LINDADRIVER_H

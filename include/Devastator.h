@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ * Module Devastator interface file
+ */
+
 #ifndef DEVASTATOR_H
 #define DEVASTATOR_H
 
@@ -10,149 +14,251 @@
 using namespace std;
 using namespace sf;
 
+
+
+/*
+ * Properties of the devastator
+ */
 namespace Devastator_vehicle {
+    // Inertia force of the devastator when it is on curves
     const int FORCE_INERTIA = 7;
+    // Number of textures of the devastator
     const int PLAYER_TEXTURES = 85;
 }
 
 
+
+/**
+ * Represents a devastator as an available vehicle to be
+ * chosen by the player in the vehicle selection menu
+ */
 class Devastator : public Vehicle {
-    float speedMul, maxAcc, accInc, scaleY;
-    float acceleration, minCrashAcc, xDest;
+
+    // Factor to multiply the speed of the devastator
+    float speedMul;
+
+    // Maximum acceleration reached by the devastator
+    float maxAcc;
+
+    // Acceleration increment of the devastator
+    float accInc;
+
+    // Scaling factor of the devastator in axis y
+    float scaleY;
+
+    // Current acceleration of the devastator
+    float acceleration;
+
+    // Minimum acceleration reached when the devastator crashes
+    float minCrashAcc;
+
+    // Coordinate in axis x that the devastator must reach when it crashes
+    float xDest;
+
+    // Magnitude of the inertia force that the devastator experiments in the curves
     int inertia;
 
+    // Sprite to draw the texture of the devastator in the screen
     sf::Sprite sprite;
-    bool crashing;      // True if crashing state is on
-    bool smoking;       // True if player generates smoke
-    bool skidding;      // True if player is skidding
-    int mode;           // Type animation collision
 
-    string brand;           // Name of the vehicle
-    string motor;           // Brand of the motor's vehicle
-    float angleTurning;     // Turning angle of the vehicle
-    float topSpeed;         // Top speed of the vehicle
-    float speedCollision;   // Initial speed when starts the collision
-    bool outSideRoad;       // Control if the motorbike is outside the road
+    // Control if the devastator is crashing or not
+    bool crashing;
 
+    // Control if the devastator generates smoke when it is moving
+    bool smoking;
 
-    bool firstCrash, firstTurnLeft, firstTurnRight;
+    // Control if the devastator is skidding when it is in a curve
+    bool skidding;
+
+    // Mode type of collision
+    int mode;
+
+    // Name of the devastator's brand
+    string brand;
+
+    // Brand of the devastator's motor
+    string motor;
+
+    // Angle of turn of the devastator
+    float angleTurning;
+
+    // Maximum speed reached by the devastator
+    float topSpeed;
+
+    // Speed of the devastator at the moment of a collision
+    float speedCollision;
+
+    // Control if the devastator is inside the road or not
+    bool outSideRoad;
+
+    // Control if the devastator has crashed more than one time
+    bool firstCrash;
+
+    // Control if the last direction of the devastator was turning left
+    bool firstTurnLeft;
+
+    // Control if the last direction of the devastator was turning right
+    bool firstTurnRight;
 
 public:
 
 
-    Devastator();
 
     /**
-     * Inicializa el vehículo del jugador.
-     * @param maxSpeed
-     * @param speedMul multiplicador de la velocidad que multiplicado por speed obtiene la velocidad real
-     * @param accInc incremento de la aceleración
-     * @param scaleX escalado del sprite del vehículo
-     * @param scaleY escalado del sprite del vehículo
-     * @param maxCounterToChange cuando counter_code_image llega a maxCounterToChange se actualiza el sprite
-     * @param vehicle nombre del vehículo
-     * @param pX
-     * @param pY
+     * Default constructor
+     */
+    Devastator();
+
+
+
+    /**
+     * Initialize the devastator chosen by the player
+     * @param maxSpeed is the maximum speed that the devastator can reach
+     * @param speedMul is factor number that when it is multiplied by speed obtains the real speed
+     * @param accInc is the acceleration increment
+     * @param scaleX is the scaling factor in the axis x
+     * @param scaleY is the scaling factor in the axis y
+     * @param maxCounterToChange lets to update the sprite of the devastator that is drawn in the screen
+     * @param vehicle is the type of vehicle selected by the player
+     * @param pX is the position of the player in the axis x
+     * @param pY is the position of the player in the axis y
      */
     Devastator(float maxSpeed, float speedMul, float accInc, float scaleX, float scaleY, int maxCounterToChange,
            const std::string &vehicle, float pX, float pY, const string brandName, const float angle,
            const string motorName);
 
+
+
     /**
-     * Devuelve la posición previa Y.
+     * Returns the last position of the devastator in axis y
      * @return
      */
     float getPreviousY() const;
 
+
+
     /**
-     * Actualiza la lógica del choque y restablece la velocidad y aceleración.
-     * @param vehicleCrash true si es un choque entre vehículos
+     * Updates the crash logic of the devastator and restores speed and acceleration
+     * @param vehicleCrash true if it is a crash between vehicles
      */
     void hitControl(bool vehicleCrash);
 
+
+
     /**
-     * Devuelve true si la lógica de choque está en ejecución.
+     * Returns true if the devastator is crashing. Otherwise returns false
      * @return
      */
     bool isCrashing() const;
 
+
+
     /**
-     * Devuelve la velocidad real del vehículo.
+     * Returns the real speed of the devastator
      * @return
      */
     float getRealSpeed() const;
 
+
+
     /**
-     * Actualiza la lógica de la aceleración y frenado del vehículo.
-     * @param c
-     * @param hasGotOut indica si se ha salido del camino
+     * Updates the logic of the devastator's acceleration and braking
+     * @param c is the module configuration of the game
+     * @param hasGotOut indicates if it's gone off track
      * @return
      */
     Action accelerationControl(Configuration &c, bool hasGotOut);
 
+
+
     /**
-     * Actualiza la lógica de giro del vehículo.
-     * @param c
-     * @param curveCoefficient pertenece [-0.9, 0.9]
+     * Updates the logic direction turn of the devastator
+     * @param c is the module configuration of the game
+     * @param curveCoefficient is the coefficient curve
+     * @param isFinalMap controls if the devastator is circulating in the goal landscape or not
+     * @param limitMap is the size of the landscape
      * @return
      */
     Direction rotationControl(Configuration &c, float curveCoefficient, const bool& isFinalMap, const int& limitMap);
 
+
+
     /**
-     * Actualiza el sprite del vehículo jugador y lo dibuja en la pantalla.
-     * @param c
-     * @param a
-     * @param d
-     * @param e
-     * @param enableSound
+     * Updates the devastator's sprite and draws it in the screen
+     * @param c is the module configuration of the game
+     * @param a is the action to be done by the devastator
+     * @param d is the direction to be followed by the devastator
+     * @param e is the current elevation of the devastator in the landscape
+     * @param enableSound indicates if the motor of the devastator has to make noise
      */
     void draw(Configuration &c, SoundPlayer &r, const Action &a, const Direction &d, const Elevation &e, int terrain, bool enableSound = true);
 
-    /**
-     * Dibuja la animación inicial en la pantalla y devuelve si ha acabado.
-     * @param c
-     * @param x
-     * @param end
-     */
-    void drawInitialAnimation(Configuration &c, float x, bool &end);
+
 
     /**
-     * Dibuja la animación final en la pantalla y devuelve si ha acabado.
-     * @param c
-     * @param step
-     * @param end
-     * @param smoke
-     */
-    void drawGoalAnimation(Configuration &c, int &step, bool &end, bool smoke = true);
-
-    /**
-     * Fuerza a que el coche esté echando humo o no.
-     * @param smoke
+     * It forces the devastator to be smoking or not
+     * @param smoke indicates if the devastator has to make smoke or not
      */
     void setSmoking(bool smoke);
 
 
+
+    /**
+     * Initialize the properties of the devastator depending of the game mode
+     * selected by the player
+     * @param typeOfGame is the game mode selected by the player
+     */
     void setVehicle(const int typeOfGame);
 
 
+
+    /**
+     * Sets the type mode of collision
+     * @return
+     */
     void setModeCollision();
 
 
+
+    /**
+     * Returns the half speed that can be reached by the devastator
+     * @return
+     */
     float getHalfMaxSpeed();
 
 
+
+    /**
+     * Returns the brand name of the devastator
+     * @return
+     */
     string getBrandName();
 
 
+
+    /**
+     * Returns the angle of turning of the devastator
+     * @return
+     */
     float getAngle();
 
 
+
+    /**
+     * Returns the motor's name of the devastator
+     * @return
+     */
     string getMotorName();
 
 
+
+    /**
+     * Returns the maximum speed reached by the devastator
+     * @return
+     */
     float getTopSpeed();
 
 };
 
 
-#endif // PLAYER_H
+#endif // DEVASTATOR_H

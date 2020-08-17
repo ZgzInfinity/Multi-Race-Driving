@@ -8,7 +8,7 @@
 
 
 /*
- * Module Linda driver implementation file
+ * Module LindaDriver implementation file
  */
 
 #include <iomanip>

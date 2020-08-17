@@ -1,42 +1,44 @@
 
+/*
+ * Module Score implementation file
+ */
 
 #include "../include/Score.h"
 
+
+
+/**
+ * Create a record of a player which is going to be stored
+ * @param score is the score obtained by the player during the game mode
+ * @param name is the nickname introduced by the player to save the record
+ * @param minutes is the quantity of minutes that the game has lasted
+ * @param secs is the quantity of seconds that the game has lasted
+ * @param centsSecond is the quantity of hundredths of second that the game has lasted
+ */
 Score::Score(unsigned long score, const string &name, int minutes, int secs, int centsSecond) : score(score),
                                                                                                 name(name),
                                                                                                 minutes(minutes),
                                                                                                 secs(secs),
                                                                                                 cents_second(
-                                                                                                        centsSecond) {}
+                                                                                                centsSecond) {}
 
-vector<Score> getGlobalScores(Configuration& c, const int typeOfGame) {
 
+
+/**
+ * Returns all score records in order from highest to lowest score, i.e. the best record will be in
+ * The size of the vector is between zero (no records) and seven (there are seven records in the
+ * positions zero to six)
+ * @param c is the module configuration of the game
+ * @param typeOfGame is the game mode selected by the player
+ * @return
+ */
+vector<Score> getGlobalScores(Configuration& c) {
+
+    // Vector that will store the scores of the game mode
     vector<Score> globalScores;
 
-        // xml file which stores the player with the highest score in the level
-    string path = "Data/Records/";
-
-    // Control the game mode selected by the player
-    switch(typeOfGame){
-        case 1:
-            path += "OutRun/Scores_";
-            break;
-        case 3:
-            path += "DrivingFury/Scores_";
-            break;
-        case 4:
-            path += "Derramage/Scores_";
-    }
-
-    // Control if the player has played with the AI enabled or not
-    if (c.enableAI){
-        // Active AI
-        path += "Enabled_";
-    }
-    else {
-        // Disabled AI
-        path += "Disabled_";
-    }
+    // xml file which stores the player with the highest score in the level
+    string path = "Data/Records/OutRun/Scores_";
 
     // Control the difficulty of the game
     switch (c.level){
@@ -102,25 +104,50 @@ vector<Score> getGlobalScores(Configuration& c, const int typeOfGame) {
     return globalScores;
 }
 
+
+
+/**
+ * Given all records in order from highest to lowest score and a score, return the
+ * position of the new record (0 to 6) or -1 if not a new record
+ * @param globalScores is a vector which stores all the records of the game mode
+ * @param score is the score which is going to be test to check if it's a new record or not
+ * @return
+ */
 int isNewRecord(const vector<Score> &globalScores, unsigned long score) {
+    // Index of the current record to be check
     int i = 0;
+    // Iterate all the records until its position in the ranking is found
     for (; i < (int)globalScores.size() && i < 7; i++) {
+        // If the position of the new record has been found
         if (globalScores[i].score < score)
+            // Get the position
             return i;
     }
-
+    // If the score is located in the last position of the ranking
     if (globalScores.size() < 7)
+        // Get the position
         return i;
 
+    // The new score is not between the best scores of the game mode
     return -1;
 }
 
-bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, const int typeOfGame, Configuration & c) {
+
+
+/**
+ * Given all the records of punctuation ordered from highest to lowest punctuation and a new record, add the new record
+ * of score and returns true if it has been stored successfully and false if not.
+ * @param globalScores is a vector which stores all the records of the game mode
+ * @param newRecord is the new record of the game mode which is going to be stored
+ * @param c is the module configuration of the game
+ * @return
+ */
+bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, Configuration & c) {
 
     // xml file which stores the player with the highest score in the level
     string path = "Data/Records/OutRun/Scores_";
 
-    // Control the difficulty of the game
+    // Control the difficulty of the game to store the record
     switch (c.level){
         case EASY:
             path += "Easy.xml";
@@ -132,6 +159,7 @@ bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, co
             path += "Hard.xml";
     }
 
+    // Writing flow to write the information
     ofstream theFile (path);
     xml_document<> doc;
 
@@ -142,19 +170,9 @@ bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, co
     doc.append_node(decl);
 
      // Create the node record
-    string nameNode;
+    string nameNode = "RecordsOutRun";
 
-    switch(typeOfGame){
-        case 1:
-            nameNode = "RecordsOutRun";
-            break;
-        case 3:
-            nameNode = "RecordsDrivingFury";
-            break;
-        case 4:
-            nameNode = "RecordsDerramage";
-    }
-
+    // Add the main node of the xml file
     xml_node<>* root = doc.allocate_node(node_element, nameNode.c_str());
     doc.append_node(root);
 
@@ -168,6 +186,7 @@ bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, co
     // Number of players checked
     int numPlayers = 0;
 
+    // Tags in order to identify the players
     string tags[7] = {"P1", "P2", "P3", "P4", "P5", "P6", "P7"};
 
     // While the position has not been found
@@ -284,5 +303,6 @@ bool saveNewRecord(const vector<Score> &globalScores, const Score &newRecord, co
     theFile.close();
     doc.clear();
 
+    // The record has been stored successfully
     return true;
 }

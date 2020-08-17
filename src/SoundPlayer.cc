@@ -1,4 +1,8 @@
 
+/*
+ * Module SoundPlayer implementation file
+ */
+
 
 #include "../include/SoundPlayer.h"
 
