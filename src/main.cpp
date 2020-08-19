@@ -5,7 +5,6 @@
 #include "../include/Menu.h"
 #include "../include/Game.h"
 #include "../include/SoundPlayer.h"
-#include "../include/LindaDriver.h"
 
 mutex mainMutex;
 
@@ -193,9 +192,9 @@ int main() {
                     break;
                 }
                 case START_MULTIPLAYER: {
-                    while(1){
-                        cout << "Hola" << endl;
-                    }
+                    // Play the multi player mode
+                    state = engine.playMultiplayerMode(c, r);
+                    break;
                 }
                 case GAME_MODES_MENU: {
                     // Get the type of game selected by the user

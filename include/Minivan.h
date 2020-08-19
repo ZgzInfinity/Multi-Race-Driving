@@ -187,6 +187,7 @@ public:
     /**
      * Updates the minivan's sprite and draws it in the screen
      * @param c is the module configuration of the game
+     * @param r is the sound player module of the game
      * @param a is the action to be done by the minivan
      * @param d is the direction to be followed by the minivan
      * @param e is the current elevation of the minivan in the landscape

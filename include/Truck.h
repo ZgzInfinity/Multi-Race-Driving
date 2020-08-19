@@ -185,6 +185,7 @@ public:
     /**
      * Updates the truck's sprite and draws it in the screen
      * @param c is the module configuration of the game
+     * @param r is the sound player module of the game
      * @param a is the action to be done by the truck
      * @param d is the direction to be followed by the truck
      * @param e is the current elevation of the truck in the landscape

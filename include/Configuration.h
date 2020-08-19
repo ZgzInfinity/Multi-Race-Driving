@@ -637,6 +637,38 @@ struct Configuration {
     vector<Color> multiplayerMenuJoinGroupColorButtons;
 
 
+    // Control if the multi player joined members group menu has been read
+    bool multiplayerMembersGroupMenuRead;
+
+    // Background of the joined members group menu
+    Texture backgroundMultiplayerMembersGroupMenu;
+    Sprite multiPlayerMenuMembersGroupBackground;
+
+    // Title of the joined members group menu
+    string contentTitleMultiplayerMembersGroupMenu;
+
+    // Font of the joined members group menu's title
+    Font fontTitleMultiplayerMembersGroupMenu;
+
+    // Color of the title text of the joined members group menu
+    Color colorTitleTextMultiplayerMembersGroupMenu;
+
+    // Color of the title border of the joined members group menu
+    Color colorTitleBorderMultiplayerMembersGroupMenu;
+
+    // Background of the joined members group menu panel
+    Texture backgroundMultiplayerMembersGroupPanel;
+
+    // Color border of the main panel of the joined members group menu
+    Color colorBorderPanelMultiplayerMembersGroupMenu;
+
+    // Color of the inside player joined indicator
+    Color colorIndicatorInsideMultiplayerMembersGroupMenu;
+
+    // Color border of the player joined indicator
+    Color colorIndicatorBorderMultiplayerMembersGroupMenu;
+
+
 
     /**
      * Assigns to the game the configuration read from the xml configuration file

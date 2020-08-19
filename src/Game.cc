@@ -1472,6 +1472,8 @@ Game::Game(Configuration &c){
     scoreMul = 1.0f;
     timeAI = 0.0f;
     time = 0;
+    numberPlayersGroup = 1;
+    codePlayerInGroup = 0;
 
     // Control if the player is still playing
     finalGame = false;
@@ -2374,7 +2376,7 @@ State Game::playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r) {
         // Control the final of the game
         if (!finalGame && !arrival) {
             // Check is the game is on pause
-            if (c.window.hasFocus() && Keyboard::isKeyPressed(c.menuKey) || onPause) {
+            if ((c.window.hasFocus() && Keyboard::isKeyPressed(c.menuKey)) || onPause) {
                 // Pause the game
                 r.soundEffects[1]->stop();
                 r.soundEffects[1]->play();
@@ -10000,6 +10002,11 @@ State Game::introduceNameMultiplayer(Configuration& c, SoundPlayer& r){
     }
 
     if(startPressed){
+
+        if (nickNameMultiplayer.size() < 8){
+            nickNameMultiplayer = nickNameMultiplayer.substr(0, nickNameMultiplayer.size() - 1);
+        }
+
         // Store how to start the multiplayer game
         if (modeMultiplayer == 0){
             // Select create a group
@@ -10358,6 +10365,11 @@ State Game::introduceGroupMultiplayer(Configuration& c, SoundPlayer& r){
 
     if(startPressed){
         // Store how to start the multiplayer game
+
+        if (nickNameGroupMultiplayer.size() < 8){
+            nickNameGroupMultiplayer = nickNameGroupMultiplayer.substr(0, nickNameGroupMultiplayer.size() - 1);
+        }
+
         return START_MULTIPLAYER;
     }
     else if (backSpacePressed) {
@@ -10605,7 +10617,7 @@ void Game::loadMultiplayerJoinGroupMenuConfiguration(const string path, Configur
 
 State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
 
-        // The xml configuration file of the player menu has been read
+    // The xml configuration file of the player menu has been read
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
@@ -10795,3 +10807,800 @@ State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
     return EXIT;
 }
 
+
+
+void Game::capturerOfPlayers(bool& fullGroup){
+
+    // Store locally the number of players of the group created by the player
+    int numPlayers;
+
+    // Store locally the names of the players
+    string namePlayer;
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+
+    // Until the group is full or start key is not pressed
+    while (!fullGroup){
+
+        // Receive possible tuples of the players
+        mtx3.lock();
+        numPlayers = numberPlayersGroup;
+        mtx3.unlock();
+
+        string newNickName;
+
+        // Check if there is any player that wants to be joined to the group
+        Tuple t = Tuple("?X", nickNameGroupMultiplayer, "?B", "?C");
+        Tuple r = winLindadriver.removeNote(t);
+
+        // Check the type of order
+        if (r.get(1) == "JOIN_GROUP"){
+
+            // Increment the number of players in the group
+            mtx3.lock();
+            numberPlayersGroup++;
+            numPlayers = numberPlayersGroup;
+            mtx3.unlock();
+
+            newNickName = r.get(4);
+
+            // Send confirmation to enter in the group
+            t = Tuple("ACCEPTED_PLAYER", nickNameGroupMultiplayer, to_string(numberPlayersGroup), newNickName);
+            winLindadriver.postNote(t);
+
+            // Insert the data of the new player of the group
+            MultiplayerData m = MultiplayerData(numPlayers, newNickName);
+            mtx3.lock();
+            groupDataPlayers.push_back(m);
+            mtx3.unlock();
+
+            // Send to the rest of the players all the members in the group
+            for (int i = 2; i <= numPlayers; i++){
+
+                mtx3.lock();
+                string name = groupDataPlayers[i - 1].getNickNamePlayer();
+                mtx3.unlock();
+
+
+                // Iterate throughout the players
+                for (int j = 1; j <= numPlayers; j++){
+
+                    mtx3.lock();
+                    namePlayer = groupDataPlayers[j - 1].getNickNamePlayer();
+                    mtx3.unlock();
+
+                    // Post note each member of the group
+                    Tuple t = Tuple("PLAYER_GROUP", nickNameGroupMultiplayer, to_string(j), namePlayer, name);
+                    winLindadriver.postNote(t);
+                }
+            }
+
+            // Check if the group is completed or not
+            if (numPlayers < 2){
+                // Create the tuple that represents the creation of a new group
+                t = Tuple("CREATE_GROUP", nickNameGroupMultiplayer, to_string(numPlayers), "TRUE");
+                winLindadriver.postNote(t);
+            }
+            else {
+                // Alert that the group is closed
+                Tuple t = Tuple("CREATE_GROUP", nickNameGroupMultiplayer, to_string(numPlayers), "FALSE");
+                winLindadriver.postNote(t);
+
+                // Alarm to the rest of the members that the group is completed
+                mtx3.lock();
+                for (MultiplayerData m : groupDataPlayers){
+                    int idCode = m.getCodePlayer();
+                    string name = m.getNickNamePlayer();
+
+                    // Inform that the group is cancelled
+                    Tuple t = Tuple("COMPLETED_GROUP", nickNameGroupMultiplayer, to_string(idCode), nickNameMultiplayer, name);
+                    winLindadriver.postNote(t);
+                }
+                fullGroup = true;
+                mtx3.unlock();
+            }
+        }
+        else if (r.get(1) == "QUIT_GROUP"){
+            // Delete the player
+            int code = stoi(r.get(3));
+            string playerName = r.get(4);
+
+            mtx3.lock();
+            // Decrement the numeric code of all the player that where joined after
+            for (int i = code; i <= numberPlayersGroup - 1; i++){
+                groupDataPlayers[i].codePlayer--;
+            }
+            // Delete the player
+            groupDataPlayers.erase(groupDataPlayers.begin() + stoi(r.get(3)));
+
+            // Decrement the number of players in the group
+            numberPlayersGroup--;
+            int players = numberPlayersGroup;
+            mtx3.unlock();
+
+            if (players > 1){
+                // Inform to the rest of the members of the group that one player has quit the group
+                for (MultiplayerData m : groupDataPlayers){
+                    string name = m.getNickNamePlayer();
+
+                    // Inform that the group is cancelled
+                    Tuple t = Tuple("DELETE_PLAYER", nickNameGroupMultiplayer, to_string(code), playerName, name);
+                    winLindadriver.postNote(t);
+                }
+            }
+        }
+    }
+}
+
+
+
+void Game::capturerOfGroups(bool& success, bool& fail){
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+
+    // Control if a player can join to the group that he wants
+    bool canBeJoined;
+
+    // Control if the join process has ended correctly
+    bool joinedWell = false;
+
+    // Control if the escape pressed has been pressed
+    while (!joinedWell && !fail){
+
+        Tuple t;
+
+        if (randomMultiplayerJoined){
+            // Create the tuple that represents an attempt to join to a group
+            t = Tuple("CREATE_GROUP", "?Z", "?X", "TRUE");
+        }
+        else {
+            // Create the tuple that represents an attempt to join to a group
+            t = Tuple("CREATE_GROUP", nickNameGroupMultiplayer, "?X", "?H");
+        }
+
+        // Remove note the tuple that represents the group to be joined
+        Tuple r = winLindadriver.removeNote(t);
+
+        // Check if the players has joined randomly and store the nickname of the group
+        if (randomMultiplayerJoined){
+            nickNameGroupMultiplayer = r.get(2);
+            canBeJoined = true;
+        }
+        else {
+            // Check if the new player can be joined
+            if (r.get(4) == "TRUE"){
+                canBeJoined = true;
+            }
+            else {
+                canBeJoined = false;
+            }
+        }
+
+        if (canBeJoined){
+            // Get the number of players
+            string numPlayers = r.get(3);
+
+            // Receives the tuple to be joined to the group and sends a solicitation
+            t = Tuple("JOIN_GROUP", nickNameGroupMultiplayer, numPlayers, nickNameMultiplayer);
+
+            // Post note the solicitation to join to the group
+            winLindadriver.postNote(t);
+
+            // Wait until the permission is conceded
+            t = Tuple("ACCEPTED_PLAYER", nickNameGroupMultiplayer, "?Y", nickNameMultiplayer);
+            r = winLindadriver.removeNote(t);
+
+            mtx3.lock();
+            numberPlayersGroup = stoi(r.get(3));
+            codePlayerInGroup = numberPlayersGroup;
+            mtx3.unlock();
+
+            // Success join
+            joinedWell = true;
+        }
+        else {
+            // Fail join
+            mtx3.lock();
+            fail = true;
+            mtx3.unlock();
+
+            // Post note the group
+            winLindadriver.postNote(r);
+        }
+    }
+    // Ask to the owner of the group the rest of members until the group in closed
+    if (!fail){
+        while (!success){
+            Tuple t = Tuple("?X", nickNameGroupMultiplayer, "?Z", "?A", nickNameMultiplayer);
+            Tuple r = winLindadriver.removeNote(t);
+
+            if (r.get(1) == "PLAYER_GROUP"){
+                // Get the id code and the nick name of each player
+                int codePlayer = stoi(r.get(3));
+                string namePlayer = r.get(4);
+
+                // Insert the data of the new player of the group
+                MultiplayerData m = MultiplayerData(codePlayer, namePlayer);
+                mtx3.lock();
+                groupDataPlayers.push_back(m);
+                mtx3.unlock();
+            }
+            else if (r.get(1) == "CLOSED_GROUP" || r.get(1) == "COMPLETED_GROUP"){
+                mtx3.lock();
+                success = true;
+                mtx3.unlock();
+            }
+            else if (r.get(1) == "CANCELLED_GROUP"){
+                mtx3.lock();
+                fail = true;
+                mtx3.unlock();
+            }
+            else if (r.get(1) == "DELETE_PLAYER"){
+                 // Delete the player
+                int code = stoi(r.get(3));
+
+                mtx3.lock();
+
+                // Decrement the numeric code of all the player that where joined after
+                for (int i = code; i <= numberPlayersGroup - 1; i++){
+                    groupDataPlayers[i].codePlayer--;
+                }
+                // Delete the player
+                groupDataPlayers.erase(groupDataPlayers.begin() + stoi(r.get(3)));
+
+                // Decrement the number of players in the group
+                numberPlayersGroup--;
+                mtx3.unlock();
+            }
+        }
+    }
+}
+
+
+
+State Game::playMultiplayerMode(Configuration& c, SoundPlayer& r){
+
+    // Load the configuration of the joined members menu
+    // prueba(c);
+
+    cout << "SOY " << nickNameMultiplayer << endl;
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+
+    // Check if the player has selected create or join to a group
+    if (modeMultiplayer == 0){
+
+        codePlayerInGroup = 1;
+
+        // Create the tuple that represents the creation of a new group
+        Tuple t = Tuple("CREATE_GROUP", nickNameGroupMultiplayer, to_string(numberPlayersGroup), "TRUE");
+
+        MultiplayerData m = MultiplayerData(numberPlayersGroup, nickNameMultiplayer);
+        groupDataPlayers.push_back(m);
+
+        cout << t.to_string() << endl;
+
+        // Post note in the Linda server a new group
+        winLindadriver.postNote(t);
+
+        // Control if the owner of the group presses start or not
+        bool startPressed = false;
+
+        // Control if the owner of the group presses escape or not
+        bool escapePressed = false;
+
+        // Control if the group is full of members
+        bool fullGroup = false, checkingFullGroup = false;
+
+        // Throw a thread that controls the incorporation of new players
+        capturerPlayers = thread(capturerOfPlayers, this, ref(fullGroup));
+        capturerPlayers.detach();
+
+        // Permit to the other players join to the group
+        while (!startPressed && !escapePressed && !checkingFullGroup){
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)){
+                if (e.type == Event::Closed){
+                    return EXIT;
+                }
+            }
+
+            mtx3.lock();
+            checkingFullGroup = fullGroup;
+            mtx3.unlock();
+
+            // Check if start has been pressed
+            if ((c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) || checkingFullGroup) {
+
+                startPressed = true;
+
+                r.soundEffects[2]->stop();
+                r.soundEffects[2]->play();
+
+                // Force kill of the thread that captures more players to be joined in the group
+                capturerPlayers.~thread();
+
+                // Create the tuple that represents the creation of a new group
+                Tuple t = Tuple("CREATE_GROUP", nickNameGroupMultiplayer, to_string(numberPlayersGroup), "?X");
+                Tuple r = winLindadriver.removeNote(t);
+
+                // Alert that the group is closed
+                r = Tuple("CREATE_GROUP", nickNameGroupMultiplayer, to_string(numberPlayersGroup), "FALSE");
+                winLindadriver.postNote(r);
+
+
+                if (numberPlayersGroup == 1){
+                    return MULTIPLAYER_NAME_GROUP;
+                }
+
+                if (!checkingFullGroup){
+                    // Alert to the members of the group that the group is completed
+                    for (int i = 2; i <= numberPlayersGroup; i++){
+                        int idCode = groupDataPlayers[i - 1].getCodePlayer();
+                        string name = groupDataPlayers[i - 1].getNickNamePlayer();
+
+                        // Inform that the group is cancelled
+                        Tuple t = Tuple("CLOSED_GROUP", nickNameGroupMultiplayer, to_string(idCode), nickNameMultiplayer, name);
+                        winLindadriver.postNote(t);
+                    }
+                }
+            }
+            // Check if escape has been pressed
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
+
+                escapePressed = true;
+
+                r.soundEffects[2]->stop();
+                r.soundEffects[2]->play();
+
+                // Force kill of the thread that captures more players to be joined in the group
+                capturerPlayers.~thread();
+
+                // Create the tuple that represents the creation of a new group
+                Tuple t = Tuple("CREATE_GROUP", nickNameGroupMultiplayer, to_string(numberPlayersGroup), "?X");
+                Tuple r = winLindadriver.removeNote(t);
+
+                if (numberPlayersGroup > 1){
+                    for (int i = 2; i <= numberPlayersGroup; i++){
+
+                        int idCode = groupDataPlayers[i - 1].getCodePlayer();
+                        string name = groupDataPlayers[i - 1].getNickNamePlayer();
+
+                        // Inform that the group is cancelled
+                        Tuple t = Tuple("CANCELLED_GROUP", nickNameGroupMultiplayer, to_string(idCode), nickNameMultiplayer, name);
+                        winLindadriver.postNote(t);
+                    }
+                }
+            }
+        }
+        if (escapePressed){
+            return MULTIPLAYER_NAME_GROUP;
+        }
+    }
+    else {
+        // Join to a group
+        if (!randomMultiplayerJoined){
+
+            // Throw a thread to capture a group to be joined
+            bool escapePressed = false;
+
+            // Control if the join has ended bad
+            bool fail = false;
+
+            // Control if the join has ended bad
+            bool success = false;
+
+            // Local variables to control the result of join
+            bool checkingFail;
+
+            // Throw a thread that controls the incorporation of new players
+            capturerGroups = thread(capturerOfGroups, this, ref(success), ref(fail));
+            capturerGroups.detach();
+
+            // Permit to the other players join to the group
+            while (!escapePressed && !success){
+                // Detect the possible events
+                Event e{};
+                while (c.window.pollEvent(e)){
+                    if (e.type == Event::Closed){
+                        return EXIT;
+                    }
+                }
+
+                mtx3.lock();
+                checkingFail = fail;
+                mtx3.unlock();
+
+                if (checkingFail){
+                    return MULTIPLAYER_NAME_GROUP;
+                }
+
+                // Check if start has been pressed
+                if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
+
+                    escapePressed = true;
+
+                    r.soundEffects[2]->stop();
+                    r.soundEffects[2]->play();
+
+                    capturerPlayers.~thread();
+                }
+            }
+            // Check the reason of leaving the loop
+            if (escapePressed){
+
+                // Inform to the owner of the group that the join must be canceled
+                Tuple t = Tuple("QUIT_GROUP", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+                winLindadriver.postNote(t);
+
+                return MULTIPLAYER_NAME_GROUP;
+            }
+        }
+        else {
+
+            // Control if the join has ended bad
+            bool fail = false, success = false;
+
+            // Control if the escape key has been pressed
+            bool escapePressed = false;
+
+            // Throw a thread that controls the incorporation of new players
+            capturerGroups = thread(capturerOfGroups, this, ref(success), ref(fail));
+            capturerGroups.detach();
+
+            // Permit to the other players join to the group
+            while (!escapePressed && !success && !fail){
+
+                // Detect the possible events
+                Event e{};
+                while (c.window.pollEvent(e)){
+                    if (e.type == Event::Closed){
+                        return EXIT;
+                    }
+                }
+
+                // Check if start has been pressed
+                if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
+
+                    escapePressed = true;
+
+                    r.soundEffects[2]->stop();
+                    r.soundEffects[2]->play();
+
+                    capturerGroups.~thread();
+
+                }
+            }
+            // Check the reason of leaving the loop
+            if (escapePressed){
+
+                // Inform to the owner of the group that the join must be canceled
+                Tuple t = Tuple("QUIT_GROUP", nickNameGroupMultiplayer, to_string(numberPlayersGroup), nickNameMultiplayer);
+                winLindadriver.postNote(t);
+
+                return SELECT_MULTIPLAYER_JOIN;
+            }
+        }
+    }
+    cout << "ESTAMOS DENTRO YA" << endl;
+    while (1){
+
+    }
+}
+
+
+
+
+void Game::loadMultiplayerMemberGroupMenuConfiguration(const string path, Configuration& c){
+
+    // Open the xml file of the scenario
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Local variable to store temporary the text content and the fonts of the texts
+    string content, fontPath, backgroundTexture, colorKind;
+
+    // Iterate to get the information of the player menu
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check it is the node that contains the information of the background
+        if ((string)property->name() == "Background"){
+            // Get the background image of the menu
+            backgroundTexture = (string)property->value();
+            c.backgroundMultiplayerMembersGroupMenu.loadFromFile(backgroundTexture);
+        }
+        // Check it is the node that contains the information of the main panel
+        else if ((string)property->name() == "MenuPanel"){
+            // Iterate to get the information of the player menu
+            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
+                // Check it is the node that contains the information of the background of the panel
+                if ((string)panelProp->name() == "Background"){
+                    // Get the background image of the menu
+                    backgroundTexture = (string)panelProp->value();
+                    c.backgroundMultiplayerMembersGroupPanel.loadFromFile(backgroundTexture);
+                }
+                // Check it is the node that contains the information of the color border of the panel
+                else if ((string)panelProp->name() == "ColorBorder"){
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi((string)colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi((string)colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi((string)colorChannel->value());
+                        }
+                    }
+                    // Store the color border of the panel
+                    c.colorBorderPanelMultiplayerMembersGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Title"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                // Get the red color channel
+                if ((string)titleProp->name() == "Content"){
+                    // Get the content of the title
+                    content = (string)titleProp->value();
+                    c.contentTitleMultiplayerMembersGroupMenu = content;
+                }
+                // Get the green color channel
+                else if ((string)titleProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)titleProp->value();
+                    c.fontTitleMultiplayerMembersGroupMenu.loadFromFile(fontPath);
+                }
+                // Get color text of the title
+                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                    // Get the kind of color to process
+                    colorKind = (string)titleProp->name();
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the player menu
+                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Check if it is the color of the text
+                    if (colorKind == "ColorText"){
+                        c.colorTitleTextMultiplayerMembersGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                    // Check if it is the color of the border
+                    else if (colorKind == "ColorBorder"){
+                        c.colorTitleBorderMultiplayerMembersGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                }
+            }
+        }
+         // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "MemberIndicator"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                        // Get the kind of color to process
+                        colorKind = (string)titleProp->name();
+                        // Get the border color of the panel
+                        int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                        // Iterate to get the information of the player menu
+                        for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                            // Get the red color channel
+                            if ((string)colorChannel->name() == "R"){
+                                // Get the red channel
+                                colorRed = stoi(colorChannel->value());
+                            }
+                            // Get the green color channel
+                            else if ((string)colorChannel->name() == "G"){
+                                // Get the red channel
+                                colorGreen = stoi(colorChannel->value());
+                            }
+                            // Get the blue color channel
+                            else if ((string)colorChannel->name() == "B"){
+                                // Get the red channel
+                                colorBlue = stoi(colorChannel->value());
+                            }
+                        }
+                        // Check if it is the color of inside
+                        if (colorKind == "ColorText"){
+                            c.colorIndicatorInsideMultiplayerMembersGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                        }
+                        // Check if it is the color of the border
+                        else if (colorKind == "ColorBorder"){
+                            c.colorIndicatorBorderMultiplayerMembersGroupMenu = Color(colorRed, colorGreen, colorBlue);
+                        }
+                }
+            }
+        }
+    }
+    // The player menu has been read correctly
+    c.multiplayerMembersGroupMenuRead = true;
+}
+
+
+
+void Game::prueba(Configuration& c){
+
+    // The xml configuration file of the player menu has been read
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+
+    // Read the player menu if it has not been read
+    if (!c.multiplayerMembersGroupMenuRead){
+        // Read the player menu xml configuration file
+        string pathFile = "Data/Menus/MultiplayerMembersGroupMenu/Configuration/MultiplayerMembersGroupMenu.xml";
+        loadMultiplayerMemberGroupMenuConfiguration(pathFile, c);
+    }
+
+    // Control if the start key is pressed or not
+    bool startPressed = false;
+
+    // Control if the backspace key has been pressed
+    bool backSpacePressed = false;
+
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+
+    string basura[8];
+
+    basura[0] = "REGENTABLE";
+    basura[1] = "DEVIDENCE";
+    basura[2] = "ZGZINFINITY";
+    basura[3] = "PEPINO";
+    basura[4] = "ULINKGA";
+    basura[5] = "OCELOTE";
+    basura[6] = "NAVALGA";
+    basura[7] = "HONTANEDA";
+
+    // While start and backspace have not been pressed
+    while (!startPressed) {
+
+        // Make the textures repeated
+        c.backgroundMultiplayerMembersGroupMenu.setRepeated(true);
+        c.backgroundMultiplayerMembersGroupPanel.setRepeated(true);
+
+        // Global rectangle of the background
+        IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+        Sprite sprite(c.backgroundMultiplayerMembersGroupMenu, background);
+
+        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+        sprite.setScale(axis_x, axis_y);
+        c.multiPlayerMenuMembersGroupBackground = sprite;
+
+        // Creation of the panel rectangle of the menu
+        RectangleShape shape;
+        shape.setPosition((c.w.getSize().x / 2.f) - 250.0f * c.screenScale, c.w.getSize().y / 2.f - 240.0f * c.screenScale);
+        shape.setSize(sf::Vector2f(494.0f * c.screenScale, 480.0f * c.screenScale));
+        shape.setOutlineColor(c.colorBorderPanelMultiplayerMenu);
+        shape.setOutlineThickness(5.0f * c.screenScale);
+        shape.setTexture(&c.backgroundMultiplayerMembersGroupPanel, true);
+
+        // Main Text of the menu
+        Text mainText;
+        mainText.setString(c.contentTitleMultiplayerMembersGroupMenu);
+        mainText.setCharacterSize(static_cast<unsigned int>(int(37.0f * c.screenScale)));
+        mainText.setFont(c.fontTitleMultiplayerMembersGroupMenu);
+        mainText.setStyle(Text::Bold | Text::Underlined);
+        mainText.setFillColor(c.colorTitleTextMultiplayerMembersGroupMenu);
+        mainText.setOutlineColor(c.colorTitleBorderMultiplayerMembersGroupMenu);
+        mainText.setOutlineThickness(5.0f * c.screenScale);
+        mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 225.0f * c.screenScale);
+
+        Text playerName;
+        playerName.setCharacterSize(static_cast<unsigned int>(int(28.0f * c.screenScale)));
+        playerName.setFont(c.fontTitleMultiplayerMembersGroupMenu);
+        playerName.setStyle(Text::Bold);
+        playerName.setFillColor(c.colorTitleTextMultiplayerMembersGroupMenu);
+        playerName.setOutlineColor(c.colorTitleBorderMultiplayerMembersGroupMenu);
+        playerName.setOutlineThickness(5.0f * c.screenScale);
+
+
+        Text info1;
+        info1.setString("PRESS START TO CREATE THE GROUP OR");
+        info1.setFillColor(Color(10, 201, 235));
+        info1.setOutlineColor(Color(3, 39, 8));
+        info1.setOutlineThickness(3.0f * c.screenScale);
+        info1.setCharacterSize(static_cast<unsigned int>(int(27.0f * c.screenScale)));
+        info1.setStyle(Text::Bold);
+        info1.setFont(c.fontTitleMultiplayerGroupMenu);
+        info1.setPosition(c.w.getSize().x / 2.f - info1.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 170.0f * c.screenScale);
+
+        Text info2;
+        info2.setString("PRESS ESC TO CANCEL THE GROUP");
+        info2.setFillColor(Color(10, 201, 235));
+        info2.setOutlineColor(Color(3, 39, 8));
+        info2.setOutlineThickness(3.0f * c.screenScale);
+        info2.setCharacterSize(static_cast<unsigned int>(int(27.0f * c.screenScale)));
+        info2.setStyle(Text::Bold);
+        info2.setFont(c.fontTitleMultiplayerGroupMenu);
+        info2.setPosition(c.w.getSize().x / 2.f - info2.getLocalBounds().width / 2.f, c.w.getSize().y / 2.f - 140.0f * c.screenScale);
+
+        // Draw the rectangle indicator
+        CircleShape square(10 * c.screenScale, 4);
+        square.setFillColor(c.colorIndicatorInsideMultiplayerMembersGroupMenu);
+        square.setOutlineColor(c.colorIndicatorBorderMultiplayerMembersGroupMenu);
+        square.setOutlineThickness(2.0f * c.screenScale);
+        square.setRotation(90);
+
+        // Until the start keyword is not pressed
+        while (!startPressed && !backSpacePressed) {
+
+            c.w.draw(c.multiPlayerMenuMembersGroupBackground);
+            c.w.draw(shape);
+            c.w.draw(mainText);
+            c.w.draw(info1);
+            c.w.draw(info2);
+
+            for (int i = 0; i < 8; i++){
+
+                playerName.setString(basura[i]);
+                playerName.setPosition((c.w.getSize().x / 2.f) - 80.f * c.screenScale,
+                                       (c.w.getSize().y / 2.f - 125.0f) + (40.f * i) * c.screenScale);
+
+                square.setPosition((c.w.getSize().x / 2.f) - 95.f * c.screenScale,
+                                       (c.w.getSize().y / 2.f - 113.0f) + (40.f * i) * c.screenScale);
+
+                c.w.draw(playerName);
+                c.w.draw(square);
+            }
+
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+            sleep(milliseconds(120));
+        }
+    }
+
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen){
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        }
+        else {
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        }
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+    }
+}

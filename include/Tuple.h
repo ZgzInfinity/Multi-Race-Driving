@@ -31,6 +31,13 @@ public:
 
 
     /**
+     * Default constructor
+     */
+    Tuple();
+
+
+
+    /**
      * Creates a tuple of one element
      * @param p1 is the first component of the tuple
      */

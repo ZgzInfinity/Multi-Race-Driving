@@ -17,6 +17,8 @@
 #include "Police.h"
 #include "TrafficCar.h"
 #include "RivalCar.h"
+#include "LindaDriver.h"
+#include "MultiplayerData.h"
 #include <SFML/Graphics.hpp>
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
@@ -65,7 +67,7 @@ class Game {
     Truck player4;
     Police player5;
 
-    mutex mtx, mtx2;
+    mutex mtx, mtx2, mtx3;
 
     vector<TrafficCar> cars;
 
@@ -230,9 +232,7 @@ class Game {
     // Control the new lap animation in Pole Position
     bool shown;
 
-    // Threads of the game
-    thread timer0, timer1, timer2, controllerPosition;
-
+    thread timer0, timer1, timer2, controllerPosition, capturerPlayers, capturerGroups;
 
     int displayLapFactor;
 
@@ -295,6 +295,15 @@ class Game {
 
 
     bool randomMultiplayerJoined;
+
+
+    int numberPlayersGroup;
+
+
+    vector<MultiplayerData> groupDataPlayers;
+
+
+    int codePlayerInGroup;
 
 
     void storingRivalCars(Configuration& c);
@@ -665,6 +674,20 @@ public:
 
     State selectJoiningMode(Configuration& c, SoundPlayer& r);
 
+
+    void capturerOfPlayers(bool& fullGroup);
+
+
+    void capturerOfGroups(bool& success, bool& fail);
+
+
+    State playMultiplayerMode(Configuration& c, SoundPlayer& r);
+
+
+    void loadMultiplayerMemberGroupMenuConfiguration(const string path, Configuration& c);
+
+
+    void prueba(Configuration& c);
 
 };
 

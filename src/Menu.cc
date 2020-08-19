@@ -1,8 +1,19 @@
 
+/*
+ * Module Menu implementation file
+ */
+
 
 #include "../include/Menu.h"
 
 
+
+/**
+ * Shows the initial animation of the game
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ * @return
+ */
 State introAnimation(Configuration &c, SoundPlayer& r) {
 
     r.soundTracks[0]->play();
@@ -18,7 +29,11 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
     icon.setTexture(t, true);
     icon.setScale(c.screenScale, c.screenScale);
 
-    // Iterate throughout all the icons of sega
+    // Locate the icon in the center of the screen
+    icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
+                     (c.w.getSize().y - icon.getGlobalBounds().height) / 2.0f);
+
+    // Wait until the time expires
     for (int i = 1; i < TIME_ANIMATION; i++) {
 
         // Detect the possible events
@@ -29,12 +44,10 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
             }
         }
 
-        icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
-                             (c.w.getSize().y - icon.getGlobalBounds().height) / 2.0f);
-
-
+        // Clear the screen and draw the icon
         c.w.clear();
         c.w.draw(icon);
+
         // Show the logos in the console
         Sprite bufferSprite(c.w.getTexture());
         c.w.display();
@@ -53,7 +66,11 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
     icon.setTexture(t, true);
     icon.setScale(c.screenScale, c.screenScale);
 
-    // Iterate throughout all the icons of sega
+    // Locate the logo in the center of the screen
+    icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
+                             (c.w.getSize().y - icon.getGlobalBounds().height) / 2.0f);
+
+    // Iterate until the time expires
     for (int i = 1; i < TIME_ANIMATION; i++) {
 
         // Detect the possible events
@@ -63,10 +80,6 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
                 return EXIT;
             }
         }
-
-        icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
-                             (c.w.getSize().y - icon.getGlobalBounds().height) / 2.0f);
-
 
         c.w.clear();
         c.w.draw(icon);
@@ -92,7 +105,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
  */
 inline void loadMainMenuConfiguration(const string path, Configuration& c){
 
-    // Open the xml file of the scenario
+    // Open the xml file of the main menu
     char* pFile = const_cast<char*>(path.c_str());
     xml_document<> doc;
     file<> file(pFile);
@@ -239,8 +252,6 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     titleGame2.setPosition((c.w.getSize().x - titleGame2.getGlobalBounds().width) / 2.f,
                             c.w.getSize().y / 2.f - 150.0f * c.screenScale);
 
-
-
     // Fill the vector with the information read in the
     // configuration file of the menu
     textElements[0].setString(c.contents[0]);
@@ -302,9 +313,6 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
 
     // Change the background texture
     c.w.draw(c.sBackground);
-
-    // Code of sprite to display
-    int j = 0;
 
     float elapsed1, elapsed2;
     Clock blinkClcok;
@@ -371,16 +379,17 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
                 r.soundEffects[1]->stop();
                 r.soundEffects[1]->play();
             }
+            // Check if the escape keyword has been pressed
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)){
                 return EXIT;
             }
-            j = (j < (int) nameGames.size() - 1) ? j + 1 : 0;
         }
 
         // Control the second menu
         startPressed = false;
         state = PLAYER_MENU;
 
+        // Control if the pixel art is active and draw the interface with better quality
         if (c.enablePixelArt) {
             if (c.isDefaultScreen)
                 c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -393,6 +402,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
             c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
         }
 
+        // Wait until the sound has finished
         while (r.soundEffects[1]->getStatus() == SoundSource::Playing){
             // Detect the possible events
             Event e{};
@@ -402,7 +412,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
                 }
             }
         }
-
+        // Start the soundtrack of the player menu
         r.soundTracks[1]->play();
         return state;
     }
@@ -420,7 +430,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
  */
 void loadPlayerMenuConfiguration(const string path, Configuration& c){
 
-    // Open the xml file of the scenario
+    // Open the xml file of the player menu
     char* pFile = const_cast<char*>(path.c_str());
     xml_document<> doc;
     file<> file(pFile);
@@ -477,7 +487,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                 }
             }
         }
-        // Check if it is the node that stores the information of the main text of the menu
+        // Check if it is the node that stores the information of the main text of the player menu
         else if ((string)property->name() == "Title"){
             // Iterate to get the information of the title
             for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
@@ -651,6 +661,7 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
                                     colorButtons.push_back(Color(colorRed, colorGreen, colorBlue));
                                 }
                             }
+                            // Control the image to display with the description
                             else if ((string)button->name() == "Image"){
                                 icon.loadFromFile((string)button->value());
                                 c.texturesIconPlayerMenu.push_back(icon);
@@ -687,14 +698,13 @@ void loadPlayerMenuConfiguration(const string path, Configuration& c){
 
 
 /**
- * Load the configuration of the player menu stored in its xml
- * configuration file
+ * Load the configuration of the player menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  */
 State playerMenu(Configuration &c, SoundPlayer& r){
 
-    // The xml configuration file of the player menu has been read
+    // Prepare the screen to display the player menu with high quality
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
@@ -728,6 +738,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
 
         // Eliminate the buttons of the right column
         for (int i = 1; i < numButtons; i++){
+
             // Change the state of the first color
             Button b = Button(c.w.getSize().x / 2.f - 280.0f * c.screenScale, c.w.getSize().y / 2.f - (149.0f - i * 133.f) * c.screenScale,
                               200.0f * c.screenScale, 50.0f * c.screenScale, c.fontMenuPlayerButtons, c.menuPlayerButtons[i].getTextButton(),
@@ -745,8 +756,8 @@ State playerMenu(Configuration &c, SoundPlayer& r){
     // Control if the start key is pressed or not
     bool startPressed = false;
 
-    // Control if the backspace key has been pressed
-    bool backSpacePressed = false;
+    // Control if the escape key has been pressed
+    bool escapePressed = false;
 
     c.w.clear(Color(0, 0, 0));
     Sprite bufferSprite(c.w.getTexture());
@@ -758,7 +769,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
     int optionSelected = 0;
 
     // While start and backspace have not been pressed
-    while (!startPressed && !backSpacePressed) {
+    while (!startPressed && !escapePressed) {
 
         // Make the textures repeated
         c.playerMenuBackground.setRepeated(true);
@@ -808,8 +819,8 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         descriptionText.setCharacterSize(25 * c.screenScale);
         descriptionText.setFont(c.fontMenuPlayerButtons);
 
-        // Until the start keyword is not pressed
-        while (!startPressed && !backSpacePressed) {
+        // Until start and escape are not pressed
+        while (!startPressed && !escapePressed) {
 
             // Detect the possible events
             Event e{};
@@ -821,7 +832,6 @@ State playerMenu(Configuration &c, SoundPlayer& r){
 
             // Check if the up or down cursor keys have been pressed or not
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
-                // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.menuPlayerButtons.size() - 1)) {
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->stop();
@@ -832,7 +842,6 @@ State playerMenu(Configuration &c, SoundPlayer& r){
                 }
             }
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
-                // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
@@ -900,21 +909,20 @@ State playerMenu(Configuration &c, SoundPlayer& r){
 
             // Check if start has been pressed
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
-                // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
-            // Check if backspace has been pressed
+            // Check if escape has been pressed
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
-                // Change the controllers of the car
-                backSpacePressed = true;
+                escapePressed = true;
                 r.soundEffects[11]->stop();
                 r.soundEffects[11]->play();
             }
         }
     }
 
+    // Control the pixel art flag to create the view of the screen
     if (c.enablePixelArt) {
         if (c.isDefaultScreen){
             c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -929,23 +937,28 @@ State playerMenu(Configuration &c, SoundPlayer& r){
         c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
     }
 
+    // Default option
     State status = PLAYER_MENU;
 
+    // Check the option selected
     switch(optionSelected){
         case 0:
+            // Single player modes
             status = GAME_MODES_MENU;
             break;
         case 1:
+            // Multi player mode
             r.soundTracks[1]->stop();
             r.soundTracks[18]->play();
             status = MULTIPLAYER_MENU;
             break;
         case 2:
+            // Options menu
             status = OPTIONS;
     }
 
-    // Control the backspace key
-    if (backSpacePressed){
+    // Control the escape key
+    if (escapePressed){
         r.soundTracks[1]->stop();
         r.soundTracks[0]->play();
         status = START;
@@ -958,14 +971,13 @@ State playerMenu(Configuration &c, SoundPlayer& r){
 
 
 /**
- * Load the configuration of the game modes menu stored in its xml
- * configuration file
+ * Load the configuration of the game modes menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  */
 void loadGameModesMenuConfiguration(const string path, Configuration& c){
 
-    // Open the xml file of the scenario
+    // Open the xml file of the game modes menu
     char* pFile = const_cast<char*>(path.c_str());
     xml_document<> doc;
     file<> file(pFile);
@@ -1044,7 +1056,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the game modes menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -1081,7 +1093,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                 colorKind = (string)descriptionProp->name();
                 // Get the border color of the panel
                 int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                // Iterate to get the information of the player menu
+                // Iterate to get the information of the game modes menu
                 for (xml_node<> *colorChannel = descriptionProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                     // Get the red color channel
                     if ((string)colorChannel->name() == "R"){
@@ -1111,7 +1123,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
         }
          // Check if it is the node that the different buttons of the menu
         else if ((string)property->name() == "MenuButtons"){
-            // Iterate to get the information of the buttons of the player menu
+            // Iterate to get the information of the buttons of the game modes menu
             for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
                 // Get the font of the buttons
                 if ((string)buttonProp->name() == "Font"){
@@ -1173,7 +1185,7 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
                                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                                    // Iterate to get the information of the player menu
+                                    // Iterate to get the information of the game modes menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
                                         if ((string)color->name() == "R"){
@@ -1219,31 +1231,30 @@ void loadGameModesMenuConfiguration(const string path, Configuration& c){
             }
         }
     }
-    // The player menu has been read correctly
+    // The game nodes menu has been read correctly
     c.gameModesMenuRead = true;
 }
 
 
 
 /**
- * Load the configuration of the game modes menu stored in its xml
- * configuration file
+ * Load the configuration of the game modes menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  * @param typeOfGame is the game mode selected by the player
  */
 State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
 
-    // The xml configuration file of the player menu has been read
+    // Prepare the screen to display the game modes menu
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
                static_cast<unsigned int>(c.window.getView().getSize().y));
     c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
 
-    // Read the player menu if it has not been read
+    // Read the game modes menu if it has not been read
     if (!c.gameModesMenuRead){
-        // Read the player menu xml configuration file
+        // Read the game modes menu xml configuration file
         string pathFile = "Data/Menus/GameModesMenu/Configuration/GameModesMenu.xml";
         loadGameModesMenuConfiguration(pathFile, c);
     }
@@ -1284,8 +1295,8 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
     // Control if the start key is pressed or not
     bool startPressed = false;
 
-    // Control if the backspace key is pressed or not
-    bool backSpacePressed = false;
+    // Control if the escape key is pressed or not
+    bool escapePressed = false;
 
     c.w.clear(Color(0, 0, 0));
     Sprite bufferSprite(c.w.getTexture());
@@ -1296,8 +1307,8 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
     // Game selected by the user
     int optionSelected;
 
-    // While start is not been pressed
-    while (!startPressed && !backSpacePressed) {
+    // While start and escape are not been pressed
+    while (!startPressed && !escapePressed) {
 
         // Make the textures repeated
         c.gameModesMenuBackground.setRepeated(true);
@@ -1351,8 +1362,8 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
         // Control the option selected by the user
         optionSelected = 0;
 
-        // Until the start keyword or backspace keyword are not pressed
-        while (!startPressed && !backSpacePressed) {
+        // Until the start keyword or escape keyword are not pressed
+        while (!startPressed && !escapePressed) {
 
             // Detect the possible events
             Event e{};
@@ -1364,7 +1375,6 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
 
             // Check if the up or down cursor keys have been pressed or not
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
-                // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.gameModeMenuButtons.size() - 1)) {
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->stop();
@@ -1375,7 +1385,6 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
                 }
             }
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
-                // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
@@ -1432,28 +1441,27 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
 
             // Check if start key has been pressed
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
-                // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
-            // Check if backspace key has been pressed
+            // Check if escape key has been pressed
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
-                // Change the controllers of the car
-                backSpacePressed = true;
+                escapePressed = true;
                 r.soundEffects[11]->stop();
                 r.soundEffects[11]->play();
             }
         }
     }
 
-    // Control the backspace key has been pressed
-    if (backSpacePressed){
+    // Control the escape key has been pressed
+    if (escapePressed){
         return PLAYER_MENU;
     }
     // Store the game selected by the player
     typeOfGame = optionSelected;
 
+    // Control the pixel art flag to set the view of the screen
     if (c.enablePixelArt) {
         if (c.isDefaultScreen)
             c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -1472,6 +1480,7 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
     }
     else if (typeOfGame != 3){
         r.soundTracks[1]->stop();
+        // Vehicle selection menu
         return VEHICLE_SELECTION;
     }
     else {
@@ -1484,242 +1493,13 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
 
 
 /**
- * Load the configuration of the options menu stored in its xml
- * configuration file
- * @param path contains the path of the xml configuration file
- * @param c is the configuration of the game
- */
-void loadOptionsMenuConfiguration(const string path, Configuration& c){
-
-    // Open the xml file of the scenario
-    char* pFile = const_cast<char*>(path.c_str());
-    xml_document<> doc;
-    file<> file(pFile);
-    // Parsing the content of file
-    doc.parse<0>(file.data());
-    // Get the principal node of the file
-    xml_node<> *menuNode = doc.first_node();
-
-    // Local variable to store temporary the text content and the fonts of the texts
-    string content, fontPath, backgroundTexture, colorKind;
-
-    // Iterate to get the information of the player menu
-    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
-        // Check it is the node that contains the information of the background
-        if ((string)property->name() == "Background"){
-            // Get the background image of the menu
-            backgroundTexture = (string)property->value();
-            c.optionsMenuBackground.loadFromFile(backgroundTexture);
-        }
-        // Check it is the node that contains the information of the main panel
-        else if ((string)property->name() == "MenuPanel"){
-            // Iterate to get the information of the player menu
-            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
-                // Check it is the node that contains the information of the background of the panel
-                if ((string)panelProp->name() == "Background"){
-                    // Get the background image of the menu
-                    backgroundTexture = (string)panelProp->value();
-                    c.optionsMenuPanelBack.loadFromFile(backgroundTexture);
-                }
-                // Check it is the node that contains the information of the color border of the panel
-                else if ((string)panelProp->name() == "ColorBorder"){
-                    // Get the border color of the panel
-                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
-                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
-                        // Get the red color channel
-                        if ((string)colorChannel->name() == "R"){
-                            // Get the red channel
-                            colorRed = stoi((string)colorChannel->value());
-                        }
-                        // Get the green color channel
-                        else if ((string)colorChannel->name() == "G"){
-                            // Get the red channel
-                            colorGreen = stoi((string)colorChannel->value());
-                        }
-                        // Get the blue color channel
-                        else if ((string)colorChannel->name() == "B"){
-                            // Get the red channel
-                            colorBlue = stoi((string)colorChannel->value());
-                        }
-                    }
-                    // Store the color border of the panel
-                    c.colorBorderPanelOptionsMenu = Color(colorRed, colorGreen, colorBlue);
-                }
-            }
-        }
-        // Check if it is the node that stores the information of the main text of the menu
-        else if ((string)property->name() == "Title"){
-            // Iterate to get the information of the title
-            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
-                // Get the red color channel
-                if ((string)titleProp->name() == "Content"){
-                    // Get the content of the title
-                    content = (string)titleProp->value();
-                    c.contentTitleOptionsMenu = content;
-                }
-                // Get the green color channel
-                else if ((string)titleProp->name() == "Font"){
-                    // Read the font from the file
-                    fontPath = (string)titleProp->value();
-                    c.fontOptionsMenu.loadFromFile(fontPath);
-                }
-                // Get color text of the title
-                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
-                    // Get the kind of color to process
-                    colorKind = (string)titleProp->name();
-                    // Get the border color of the panel
-                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
-                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
-                        // Get the red color channel
-                        if ((string)colorChannel->name() == "R"){
-                            // Get the red channel
-                            colorRed = stoi(colorChannel->value());
-                        }
-                        // Get the green color channel
-                        else if ((string)colorChannel->name() == "G"){
-                            // Get the red channel
-                            colorGreen = stoi(colorChannel->value());
-                        }
-                        // Get the blue color channel
-                        else if ((string)colorChannel->name() == "B"){
-                            // Get the red channel
-                            colorBlue = stoi(colorChannel->value());
-                        }
-                    }
-                    // Check if it is the color of the text
-                    if (colorKind == "ColorText"){
-                        c.colorTitleTextOptionsMenu = Color(colorRed, colorGreen, colorBlue);
-                    }
-                    // Check if it is the color of the border
-                    else if (colorKind == "ColorBorder"){
-                        c.colorTitleBorderOptionsMenu = Color(colorRed, colorGreen, colorBlue);
-                    }
-                }
-            }
-        }
-        // Check if it is the node that the different buttons of the menu
-        else if ((string)property->name() == "MenuButtons"){
-            // Iterate to get the information of the buttons of the player menu
-            for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
-                // Get the font of the buttons
-                if ((string)buttonProp->name() == "Font"){
-                    // Read the font from the file
-                    fontPath = (string)buttonProp->value();
-                    c.fontMenuOptionsButtons.loadFromFile(fontPath);
-                }
-                // Get the color font of the buttons
-                else if ((string)buttonProp->name() == "ColorFont"){
-                    // Read the font from the file
-                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
-                    for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
-                        // Get the red color channel
-                        if ((string)color->name() == "R"){
-                            // Get the red channel
-                            colorRed = stoi(color->value());
-                        }
-                        // Get the green color channel
-                        else if ((string)color->name() == "G"){
-                            // Get the red channel
-                            colorGreen = stoi(color->value());
-                        }
-                        // Get the blue color channel
-                        else if ((string)color->name() == "B"){
-                            // Get the red channel
-                            colorBlue = stoi(color->value());
-                        }
-                    }
-                    // Push the color of the button read
-                    c.colorFontMenuOptionsButtons = Color(colorRed, colorGreen, colorBlue);
-                }
-                // Get the information of the buttons
-                else if ((string)buttonProp->name() == "Buttons"){
-                    // Local variables to store the attributes of the buttons
-                    string contentButton;
-                    int buttonState = 0;
-                    vector<Color> colorButtons;
-                    Texture icon;
-                    Sprite s;
-                    int idButton = 0, posX, posY, widthButton, heightButton;
-                    // Iterate to get the information of the buttons
-                    for (xml_node<> *buttonNode = buttonProp->first_node(); buttonNode; buttonNode = buttonNode->next_sibling()){
-                        // Iterate to get the information of the buttons
-                        for (xml_node<> *button = buttonNode->first_node(); button; button = button->next_sibling()){
-                            // Get the font of the buttons
-                            if ((string)button->name() == "Content"){
-                                // Read the font from the file
-                                contentButton = (string)button->value();
-                            }
-                            // Get the state of the button
-                            else if ((string)button->name() == "InitialState"){
-                                // Read the font from the file
-                                buttonState = stoi(button->value());
-                            }
-                            // Get the colors of the button
-                            else if ((string)button->name() == "Colors"){
-                                // Read the colors of the button
-                                for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
-                                    // Get the border color of the panel
-                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                                    // Iterate to get the information of the player menu
-                                    for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
-                                        // Get the red color channel
-                                        if ((string)color->name() == "R"){
-                                            // Get the red channel
-                                            colorRed = stoi(color->value());
-                                        }
-                                        // Get the green color channel
-                                        else if ((string)color->name() == "G"){
-                                            // Get the red channel
-                                            colorGreen = stoi(color->value());
-                                        }
-                                        // Get the blue color channel
-                                        else if ((string)color->name() == "B"){
-                                            // Get the red channel
-                                            colorBlue = stoi(color->value());
-                                        }
-                                    }
-                                    // Push the color of the button read
-                                    colorButtons.push_back(Color(colorRed, colorGreen, colorBlue));
-                                }
-                                // Creation of the button and addition to the vector
-                                posX = c.w.getSize().x / 2.f - 270.0f * c.screenScale;
-                                posY = c.w.getSize().y / 2.f - (100.0f - idButton * 70.0f) * c.screenScale;
-                                widthButton = 200.0f * c.screenScale;
-                                heightButton = 40.0f * c.screenScale;
-
-                                // Creation of the button
-                                Button b = Button(posX, posY, widthButton, heightButton, c.fontMenuOptionsButtons,
-                                                  contentButton, colorButtons[0], colorButtons[1], c.colorFontMenuOptionsButtons,
-                                                  buttonState, c.screenScale);
-
-                                // Process the description text of the button
-                                c.optionsMenuButtons.push_back(b);
-                                idButton++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    // The player menu has been read correctly
-    c.optionsMenuRead = true;
-}
-
-
-
-/**
- * Load the configuration of the sound menu stored in its xml
- * configuration file
+ * Load the configuration of the sound menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  */
 void loadSoundMenuConfiguration(const string path, Configuration& c){
 
-    // Open the xml file of the scenario
+    // Open the xml file of the sound menu
     char* pFile = const_cast<char*>(path.c_str());
     xml_document<> doc;
     file<> file(pFile);
@@ -1731,7 +1511,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
     // Local variable to store temporary the text content and the fonts of the texts
     string content, fontPath, backgroundTexture, colorKind;
 
-    // Iterate to get the information of the player menu
+    // Iterate to get the information of the sound menu
     for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
         // Check it is the node that contains the information of the background
         if ((string)property->name() == "Background"){
@@ -1741,7 +1521,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
         }
         // Check it is the node that contains the information of the main panel
         else if ((string)property->name() == "MenuPanel"){
-            // Iterate to get the information of the player menu
+            // Iterate to get the information of the sound menu
             for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
                 // Check it is the node that contains the information of the background of the panel
                 if ((string)panelProp->name() == "Background"){
@@ -1753,7 +1533,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the sound menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -1798,7 +1578,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the sound menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -1829,7 +1609,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
         }
         // Check if it is the node that the different buttons of the menu
         else if ((string)property->name() == "MenuButtons"){
-            // Iterate to get the information of the buttons of the player menu
+            // Iterate to get the information of the buttons of the sound menu
             for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
                 // Get the font of the buttons
                 if ((string)buttonProp->name() == "Font"){
@@ -1841,7 +1621,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the sound menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
                         if ((string)color->name() == "R"){
@@ -1891,7 +1671,7 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
                                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                                    // Iterate to get the information of the player menu
+                                    // Iterate to get the information of the sound menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
                                         if ((string)color->name() == "R"){
@@ -1933,19 +1713,19 @@ void loadSoundMenuConfiguration(const string path, Configuration& c){
             }
         }
     }
-    // The player menu has been read correctly
+    // The sound menu has been read correctly
     c.soundMenuRead = true;
 }
 
 
 
 /**
- * Load the configuration of the sound menu stored in its xml
- * configuration file
+ * Load the configuration of the sound menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  */
 State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
+
     // Clean the console window
     c.w.clear(Color(0, 0, 0));
     Sprite bufferSprite(c.w.getTexture());
@@ -1960,7 +1740,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
     c.window.draw(bufferSprite);
     c.window.display();
 
-    // The xml configuration file of the options menu has been read
+    // Prepare the window to display the sound menu
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
@@ -1975,6 +1755,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
     }
     else {
         int numButtons = int(c.soundMenuButtons.size()) / 2;
+
         // Eliminate the buttons of the right column
         for (int i = 0; i < numButtons; i++){
             // Delete the last one
@@ -2043,14 +1824,14 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                              to_string(r.volumeEffects), c.soundMenuButtons[1].getIdleColorButton(), c.soundMenuButtons[1].getHoverColorButton(),
                              c.soundMenuButtons[1].getFontColorButton(), 0, c.screenScale);
 
-    // Control if the start key is pressed or not
-    bool startPressed = false;
+    // Control if the escape key is pressed or not
+    bool escapePressed = false;
 
     // Control the option selected by the user
     int optionSelected = 0;
 
-    // Until the start keyword is not pressed
-    while (!startPressed) {
+    // Until the escape keyword is not pressed
+    while (!escapePressed) {
         // Detect the possible events
         Event e{};
         while (c.window.pollEvent(e)) {
@@ -2060,7 +1841,6 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         }
 
         if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
-            // Up cursor pressed and change the soundtrack selected in the list
             if (optionSelected != int(c.soundMenuButtons.size() - 1) / 2) {
                 // Change the color appearance of both buttons
                 r.soundEffects[0]->play();
@@ -2072,7 +1852,6 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
             }
         }
         else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
-            // Down cursor pressed and change the soundtrack selected in the list
             if (optionSelected != 0) {
                 // Change the color appearance of both buttons
                 r.soundEffects[0]->play();
@@ -2086,31 +1865,40 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
 
         if (optionSelected == 0) {
             // Volume music
+
             // Check if left or right cursor keys have been pressed or not
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
+                // Check the volume before descend
                 if (r.volumeMusic != 0) {
                     r.volumeMusic--;
+                    // Iterate the soundtracks and reduce the level volume
                     for (int i = 0; i <= 18; i++) {
                         r.soundTracks[i]->setVolume(float(r.volumeMusic));
                         if (i == 14) {
+                            // Listen the changes in the options soundtrack
                             r.soundTracks[i]->pause();
                             r.soundTracks[i]->play();
                         }
                     }
+                    // Store the changes
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeMusic)));
                     c.changeAnyParameter = true;
                 }
             }
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
+                // Check the volume before ascend
                 if (r.volumeMusic != 100) {
                     r.volumeMusic++;
+                    // Iterate the soundtracks and ascend the level volume
                     for (int i = 0; i <= 18; i++) {
                         r.soundTracks[i]->setVolume(float(r.volumeMusic));
                         if (i == 14) {
+                            // Listen the changes in the options soundtrack
                             r.soundTracks[i]->pause();
                             r.soundTracks[i]->play();
                         }
                     }
+                    // Store the changes
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeMusic)));
                     c.changeAnyParameter = true;
                 }
@@ -2121,10 +1909,13 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
             // Check if left or right cursor keys have been pressed or not
             if (c.window.hasFocus() && c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
                 if (r.volumeEffects != 0) {
+                    // Check the volume before descend
                     r.volumeEffects--;
+                    // Iterate the sound effects and ascend the level volume
                     for (int i = 0; i <= 116; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
+                    // Test the changes and store then
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeEffects)));
@@ -2132,11 +1923,14 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                 }
             }
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Right)) {
+                // Check the volume before ascend
                 if (r.volumeEffects != 100) {
                     r.volumeEffects++;
+                    // Iterate the effects and ascend the level volume
                     for (int i = 0; i <= 116; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
+                    // Test the changes and store then
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
                     c.soundMenuButtons[optionSelected + 2].setTextButton((to_string(r.volumeEffects)));
@@ -2144,7 +1938,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                 }
             }
         }
-
+        // Display the elements in the screen
         c.w.draw(c.sdMenuBackground);
         c.w.draw(shape);
         c.w.draw(soundText);
@@ -2161,10 +1955,10 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
         sleep(milliseconds(120));
         r.soundEffects[0]->stop();
 
-        // Check if left or right cursor keys have been pressed or not
+        // Check if escape key has been pressed
         if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
             // Change the controllers of the car
-            startPressed = true;
+            escapePressed = true;
             c.modifiedConfig = true;
             r.soundEffects[2]->stop();
             r.soundEffects[2]->play();
@@ -2177,17 +1971,245 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
 
 
 /**
- * Load the configuration of the game modes menu stored in its xml
- * configuration file
+ * Load the configuration of the options menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
+ */
+void loadOptionsMenuConfiguration(const string path, Configuration& c){
+
+    // Open the xml file of the options menu
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Local variable to store temporary the text content and the fonts of the texts
+    string content, fontPath, backgroundTexture, colorKind;
+
+    // Iterate to get the information of the options menu
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check it is the node that contains the information of the background
+        if ((string)property->name() == "Background"){
+            // Get the background image of the menu
+            backgroundTexture = (string)property->value();
+            c.optionsMenuBackground.loadFromFile(backgroundTexture);
+        }
+        // Check it is the node that contains the information of the main panel
+        else if ((string)property->name() == "MenuPanel"){
+            // Iterate to get the information of the options menu
+            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
+                // Check it is the node that contains the information of the background of the panel
+                if ((string)panelProp->name() == "Background"){
+                    // Get the background image of the menu
+                    backgroundTexture = (string)panelProp->value();
+                    c.optionsMenuPanelBack.loadFromFile(backgroundTexture);
+                }
+                // Check it is the node that contains the information of the color border of the panel
+                else if ((string)panelProp->name() == "ColorBorder"){
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the options menu
+                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi((string)colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi((string)colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi((string)colorChannel->value());
+                        }
+                    }
+                    // Store the color border of the panel
+                    c.colorBorderPanelOptionsMenu = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Title"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                // Get the red color channel
+                if ((string)titleProp->name() == "Content"){
+                    // Get the content of the title
+                    content = (string)titleProp->value();
+                    c.contentTitleOptionsMenu = content;
+                }
+                // Get the green color channel
+                else if ((string)titleProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)titleProp->value();
+                    c.fontOptionsMenu.loadFromFile(fontPath);
+                }
+                // Get color text of the title
+                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                    // Get the kind of color to process
+                    colorKind = (string)titleProp->name();
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the options menu
+                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Check if it is the color of the text
+                    if (colorKind == "ColorText"){
+                        c.colorTitleTextOptionsMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                    // Check if it is the color of the border
+                    else if (colorKind == "ColorBorder"){
+                        c.colorTitleBorderOptionsMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                }
+            }
+        }
+        // Check if it is the node that the different buttons of the menu
+        else if ((string)property->name() == "MenuButtons"){
+            // Iterate to get the information of the buttons of the options menu
+            for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
+                // Get the font of the buttons
+                if ((string)buttonProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)buttonProp->value();
+                    c.fontMenuOptionsButtons.loadFromFile(fontPath);
+                }
+                // Get the color font of the buttons
+                else if ((string)buttonProp->name() == "ColorFont"){
+                    // Read the font from the file
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the options menu
+                    for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
+                        // Get the red color channel
+                        if ((string)color->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(color->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)color->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(color->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)color->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(color->value());
+                        }
+                    }
+                    // Push the color of the button read
+                    c.colorFontMenuOptionsButtons = Color(colorRed, colorGreen, colorBlue);
+                }
+                // Get the information of the buttons
+                else if ((string)buttonProp->name() == "Buttons"){
+                    // Local variables to store the attributes of the buttons
+                    string contentButton;
+                    int buttonState = 0;
+                    vector<Color> colorButtons;
+                    Texture icon;
+                    Sprite s;
+                    int idButton = 0, posX, posY, widthButton, heightButton;
+                    // Iterate to get the information of the buttons
+                    for (xml_node<> *buttonNode = buttonProp->first_node(); buttonNode; buttonNode = buttonNode->next_sibling()){
+                        // Iterate to get the information of the buttons
+                        for (xml_node<> *button = buttonNode->first_node(); button; button = button->next_sibling()){
+                            // Get the font of the buttons
+                            if ((string)button->name() == "Content"){
+                                // Read the font from the file
+                                contentButton = (string)button->value();
+                            }
+                            // Get the state of the button
+                            else if ((string)button->name() == "InitialState"){
+                                // Read the font from the file
+                                buttonState = stoi(button->value());
+                            }
+                            // Get the colors of the button
+                            else if ((string)button->name() == "Colors"){
+                                // Read the colors of the button
+                                for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
+                                    // Get the border color of the panel
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                                    // Iterate to get the information of the options menu
+                                    for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
+                                        // Get the red color channel
+                                        if ((string)color->name() == "R"){
+                                            // Get the red channel
+                                            colorRed = stoi(color->value());
+                                        }
+                                        // Get the green color channel
+                                        else if ((string)color->name() == "G"){
+                                            // Get the red channel
+                                            colorGreen = stoi(color->value());
+                                        }
+                                        // Get the blue color channel
+                                        else if ((string)color->name() == "B"){
+                                            // Get the red channel
+                                            colorBlue = stoi(color->value());
+                                        }
+                                    }
+                                    // Push the color of the button read
+                                    colorButtons.push_back(Color(colorRed, colorGreen, colorBlue));
+                                }
+                                // Creation of the button and addition to the vector
+                                posX = c.w.getSize().x / 2.f - 270.0f * c.screenScale;
+                                posY = c.w.getSize().y / 2.f - (100.0f - idButton * 70.0f) * c.screenScale;
+                                widthButton = 200.0f * c.screenScale;
+                                heightButton = 40.0f * c.screenScale;
+
+                                // Creation of the button
+                                Button b = Button(posX, posY, widthButton, heightButton, c.fontMenuOptionsButtons,
+                                                  contentButton, colorButtons[0], colorButtons[1], c.colorFontMenuOptionsButtons,
+                                                  buttonState, c.screenScale);
+
+                                // Process the description text of the button
+                                c.optionsMenuButtons.push_back(b);
+                                idButton++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // The options menu has been read correctly
+    c.optionsMenuRead = true;
+}
+
+
+
+/**
+ * Shows the options menu of the game
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ * @param inGame controls if the player was in game before enter in the options menu
+ * @return
  */
 State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
     // Stop the soundtrack of the player menu
     r.soundTracks[1]->stop();
 
-    // The xml configuration file of the options menu has been read
+    // Prepare the window to display the options menu
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
@@ -2228,14 +2250,14 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         }
     }
 
-    // Control if the start key is pressed or not
-    bool startPressed = false;
+    // Control if the escape key is pressed or not
+    bool escapePressed = false;
 
     // Control the option selected by the user
     int optionSelected = 0;
 
-    // While the start key and the backspace key have not been pressed
-    while (!startPressed) {
+    // While the escape key is not pressed
+    while (!escapePressed) {
 
         // Clean the console window
         c.w.clear(Color(0, 0, 0));
@@ -2244,6 +2266,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         c.window.draw(bufferSprite);
         c.window.display();
 
+        // Reproduce the options soundtrack
         r.soundTracks[14]->play();
 
         // Loading the background texture
@@ -2257,6 +2280,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         sprite.setScale(axis_x, axis_y);
         c.optMenuBackground = sprite;
 
+        // Panel of the options menu
         RectangleShape shape;
         shape.setPosition((c.w.getSize().x / 2.f) - 350.0f * c.screenScale, c.w.getSize().y / 2.f - 198.0f * c.screenScale);
         shape.setSize(sf::Vector2f(710.0f * c.screenScale, 400.0f * c.screenScale));
@@ -2277,7 +2301,6 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                                  c.w.getSize().y / 2.f - 180.0f * c.screenScale);
 
         // Option configurations
-
         string difficulty;
         switch (c.level) {
             case EASY:
@@ -2291,7 +2314,10 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                 break;
         }
 
+        // Possible contents of the menu buttons text
         const string submenu = "Menu", access = "Press Enter", saved = "Saved!";
+
+        // Menu buttons located of the right of the menu
 
         c.optionsMenuButtons.emplace_back(c.w.getSize().x / 2.f + 80.0f * c.screenScale,
                                           c.w.getSize().y / 2.f - 100.0f * c.screenScale, 200.0f * c.screenScale,
@@ -2321,9 +2347,9 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                                           c.optionsMenuButtons[4].getHoverColorButton(),
                                           c.optionsMenuButtons[4].getFontColorButton(), 0, c.screenScale);
 
+        // Until the escape keyword is not pressed
+        while (!escapePressed) {
 
-        // Until the start keyword and the backspace keyword have not pressed
-        while (!startPressed) {
             // Detect the possible events
             Event e{};
             while (c.window.pollEvent(e)){
@@ -2334,7 +2360,6 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
             // Check if the up or down cursor keys have been pressed or not
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
-                // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.optionsMenuButtons.size() - 1) / 2) {
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->stop();
@@ -2347,7 +2372,6 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                 }
             }
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
-                // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
@@ -2363,6 +2387,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
             // Modify the option parameter if it's necessary
             switch (optionSelected) {
+                // Change the level of difficulty
                 case 0:
                     // Check if left or right cursor keys have been pressed or not
                     if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Left)) {
@@ -2402,6 +2427,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     }
                     c.optionsMenuButtons[optionSelected + 5].setTextButton(submenu);
                     break;
+                // Change the volume of the soundtracks and the sound effects
                 case 1:
                     // Change the volume of the game
                     c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
@@ -2421,8 +2447,8 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
                     c.optionsMenuButtons[optionSelected + 5].setTextButton(submenu);
                     break;
+                // Change the graphics of the game
                 case 2:
-                    // Change the graphics of the game
                     c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
@@ -2644,8 +2670,8 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     c.optionsMenuButtons[optionSelected + 3].setTextButton(submenu);
                     c.optionsMenuButtons[optionSelected + 5].setTextButton(submenu);
                     break;
+                // Change the game controllers
                 case 3:
-                    // Change the controllers of the game
                     c.optionsMenuButtons[optionSelected + 4].setTextButton(access);
 
                     // Check if left or right cursor keys have been pressed or not
@@ -2663,11 +2689,9 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
                     }
 
                     c.optionsMenuButtons[optionSelected + 3].setTextButton(submenu);
-                    break;
-                default:
-                    break;
             }
 
+            // Draw the elements of the menu
             c.w.draw(sprite);
             c.w.draw(shape);
             c.w.draw(optionsText);
@@ -2684,16 +2708,17 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
             sleep(milliseconds(120));
             r.soundEffects[0]->stop();
 
-            // Check if the start key has been pressed
+            // Check if the escape key has been pressed
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
                 // Change the controllers of the car
-                startPressed = true;
+                escapePressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
         }
         r.soundTracks[14]->stop();
 
+        // Check the pixel art to construct the view of the screen
         if (c.enablePixelArt) {
             if (c.isDefaultScreen)
                 c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -2715,10 +2740,11 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
         KeywordMapper kM = KeywordMapper();
 
+        // Get the keyword to control the turn to the left
         int index = kM.lookForKeyBoardId(c.leftKey);
         string controlLeft = kM.mapperIdKeyWord[index];
 
-        // Get the keyword to control the turn to the left
+        // Get the keyword to control the turn to the right
         index = kM.lookForKeyBoardId(c.rightKey);
         string controlRight = kM.mapperIdKeyWord[index];
 
@@ -2734,15 +2760,17 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         index = kM.lookForKeyBoardId(c.soundtrackKey);
         string controlSoundtrack = kM.mapperIdKeyWord[index];
 
-        // Update the file
+        // Update the file with the new configuration
         updateGameConfiguration(path, c.level, r.volumeMusic, r.volumeEffects, c.enablePixelArt, c.resIndex,
                                 c.resolutions[c.resIndex].first, c.resolutions[c.resIndex].second, controlLeft, controlRight,
                                 controlAccelerate, controlBrake, controlSoundtrack);
 
+        // Make possible more modifications
         c.changeAnyParameter = false;
     }
 
     if (inGame) {
+        // Return to the game
         return PLAY_GAME;
     }
     else {
@@ -2755,13 +2783,13 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
 
 
 /**
- * Load the configuration of the vehicle controllers menu stored in its xml
- * configuration file
+ * Load the configuration of the vehicle controllers menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  */
 void loadVehicleControllersMenuConfiguration(const string path, Configuration& c){
-    // Open the xml file of the scenario
+
+    // Open the xml file of the controllers menu
     char* pFile = const_cast<char*>(path.c_str());
     xml_document<> doc;
     file<> file(pFile);
@@ -2773,7 +2801,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
     // Local variable to store temporary the text content and the fonts of the texts
     string content, fontPath, backgroundTexture, colorKind;
 
-    // Iterate to get the information of the player menu
+    // Iterate to get the information of the controllers menu
     for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
         // Check it is the node that contains the information of the background
         if ((string)property->name() == "Background"){
@@ -2783,7 +2811,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
         }
         // Check it is the node that contains the information of the main panel
         else if ((string)property->name() == "MenuPanel"){
-            // Iterate to get the information of the player menu
+            // Iterate to get the information of the controllers menu
             for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
                 // Check it is the node that contains the information of the background of the panel
                 if ((string)panelProp->name() == "Background"){
@@ -2795,7 +2823,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the controllers menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -2840,7 +2868,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the controllers menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -2871,7 +2899,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
         }
         // Check if it is the node that the different buttons of the menu
         else if ((string)property->name() == "MenuButtons"){
-            // Iterate to get the information of the buttons of the player menu
+            // Iterate to get the information of the buttons of the controllers menu
             for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
                 // Get the font of the buttons
                 if ((string)buttonProp->name() == "Font"){
@@ -2883,7 +2911,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the controllers menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
                         if ((string)color->name() == "R"){
@@ -2933,7 +2961,7 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
                                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                                    // Iterate to get the information of the player menu
+                                    // Iterate to get the information of the controllers menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
                                         if ((string)color->name() == "R"){
@@ -2975,19 +3003,19 @@ void loadVehicleControllersMenuConfiguration(const string path, Configuration& c
             }
         }
     }
-    // The player menu has been read correctly
+    // The controllers menu has been read correctly
     c.vehicleControllersMenuRead = true;
 }
 
 
 
 /**
- * Load the configuration of the vehicle controllers menu stored in its xml
- * configuration file
- * @param path contains the path of the xml configuration file
- * @param c is the configuration of the game
+ * Shows the vehicle controllers menu of the game
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
  */
 State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
+
     // Clean the console window
     c.w.clear(Color(0, 0, 0));
     Sprite bufferSprite(c.w.getTexture());
@@ -3093,6 +3121,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
 
     // Option configurations
 
+    // Buttons with the current controllers
     int code;
     code = kM.mapperCodeKeyWord[c.leftKey];
     c.vehicleControllersMenuButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
@@ -3131,14 +3160,16 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                                                  c.vehicleControllersMenuButtons[4].getFontColorButton(), 0, c.screenScale);
 
 
-    // Control if the start key is pressed or not
-    bool startPressed = false;
+    // Control if the escape key is pressed or not
+    bool escapePressed = false;
 
     // Control the option selected by the user
     int optionSelected = 0;
 
-    // Until the start keyword is not pressed
-    while (!startPressed) {
+    // Until the escape keyword is not pressed
+    while (!escapePressed) {
+
+        // Draw the elements of the menu
         c.w.draw(c.vehControllersMenuBackground);
         c.w.draw(shape);
         c.w.draw(controllersText);
@@ -3164,8 +3195,8 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                 return EXIT;
             }
         }
+        // Check if up or down cursor keys have been pressed
         if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
-            // Up cursor pressed and change the soundtrack selected in the list
             if (optionSelected != int(c.vehicleControllersMenuButtons.size() - 1) / 2) {
                 // Change the color appearance of both buttons
                 r.soundEffects[0]->play();
@@ -3177,7 +3208,6 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
             }
         }
         else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
-            // Down cursor pressed and change the soundtrack selected in the list
             if (optionSelected != 0) {
                 // Change the color appearance of both buttons
                 r.soundEffects[0]->play();
@@ -3188,6 +3218,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                 c.vehicleControllersMenuButtons[optionSelected + 6].setButtonState(BUTTON_IDLE);
             }
         }
+        // Ignore space and enter keywords
         while (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Space) && !Keyboard::isKeyPressed(Keyboard::Enter)) {
             // Check if any keyword has been pressed or not
             c.window.waitEvent(e);
@@ -3196,6 +3227,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                 // Modify the option parameter if it's necessary
                 switch (optionSelected) {
                     case 0:
+                        // Check if the new controller is already selected
                         if (kM.mapperCodeKeyWord[e.key.code] == c.rightKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.accelerateKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.brakeKey ||
@@ -3204,6 +3236,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
+                            // Change the controller
                             c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.leftKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
@@ -3212,7 +3245,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                         }
                         break;
                     case 1:
-                        // Get the code of the keyword if it's not the up pr down cursor keys
+                        // Check if the new controller is already selected
                         if (kM.mapperCodeKeyWord[e.key.code] == c.leftKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.accelerateKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.brakeKey ||
@@ -3221,6 +3254,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
+                            // Change the controller
                             c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.rightKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
@@ -3229,7 +3263,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                         }
                         break;
                     case 2:
-                        // Get the code of the keyword if it's not the up pr down cursor keys
+                        // Check if the new controller is already selected
                         if (kM.mapperCodeKeyWord[e.key.code] == c.leftKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.rightKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.brakeKey ||
@@ -3238,6 +3272,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
+                            // Change the controller
                             c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.accelerateKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
@@ -3246,7 +3281,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                         }
                         break;
                     case 3:
-                        // Get the code of the keyword if it's not the up pr down cursor keys
+                        // Check if the new controller is already selected
                         if (kM.mapperCodeKeyWord[e.key.code] == c.leftKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.rightKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.accelerateKey ||
@@ -3255,6 +3290,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
+                            // Change the controller
                             c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.brakeKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
@@ -3263,7 +3299,7 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                         }
                         break;
                     case 4:
-                        // Get the code of the keyword if it's not the up pr down cursor keys
+                        // Check if the new controller is already selected
                         if (kM.mapperCodeKeyWord[e.key.code] == c.leftKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.rightKey ||
                             kM.mapperCodeKeyWord[e.key.code] == c.accelerateKey ||
@@ -3272,23 +3308,20 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
                             r.soundEffects[3]->play();
                         }
                         else {
+                            // Change the controller
                             c.vehicleControllersMenuButtons[optionSelected + 5].setTextButton(kM.mapperIdKeyWord[e.key.code]);
                             c.soundtrackKey = kM.mapperCodeKeyWord[e.key.code];
                             r.soundEffects[1]->stop();
                             r.soundEffects[1]->play();
                             c.changeAnyParameter = true;
                         }
-                        break;
-                    default:
-                        break;
                 }
             }
         }
-
-        // Check if left or right cursor keys have been pressed or not
+        // Check if the escape key has been pressed
         if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
             // Change the controllers of the car
-            startPressed = true;
+            escapePressed = true;
             c.modifiedConfig = true;
             r.soundEffects[2]->stop();
             r.soundEffects[2]->play();
@@ -3299,10 +3332,20 @@ State vehicleControllersMenu(Configuration &c, SoundPlayer& r){
 
 
 
+/**
+ * Shows the ranking menu with best seven players of the Out Run mode
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ * @param minutes is the number of minutes that the game has lasted
+ * @param decs is the number of seconds that the game has lasted
+ * @param cents_Second is the number of hundredths of second that the game has lasted
+ * @param typeOfGame is the game mode selected by the player
+ * @return
+ */
 State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePlayerGame, const int minutes, const int secs,
                   const int cents_Second, const int typeOfGame)
 {
-
+    // Prepare the screen to display the ranking menu
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
@@ -3310,6 +3353,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
 
     r.soundEffects[6]->stop();
+
     // Clean the console window
     c.w.clear(Color(0, 0, 0));
     Sprite bufferSprite(c.w.getTexture());
@@ -3317,6 +3361,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     c.window.draw(bufferSprite);
     c.window.display();
 
+    // Keyword detector
     KeywordMapper kM = KeywordMapper();
 
     r.soundTracks[r.currentSoundtrack]->stop();
@@ -3328,7 +3373,10 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     int time = 28;
     float elapsed1, elapsed2, elapsed3, elapsed4;
 
+    // Play ranking music
     r.soundTracks[12]->play();
+
+    // Texts of the menu
 
     Text rankingTitle;
     rankingTitle.setFont(c.fontMenus);
@@ -3438,9 +3486,14 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     int record = isNewRecord(scoreRankingPlayer, scorePlayerGame);
     bool startPressed = false;
     bool blink = false;
+
+    // Number of letters introduced
     int lettersIntroduced = 0;
+
+    // Name of the player
     string name = "_";
 
+    // Counter clock to control the time of the menu and the blink texts
     rankingTime.restart();
     elapsed1 = rankingTime.getElapsedTime().asSeconds();
     elapsed3 = blinkStart.getElapsedTime().asSeconds();
@@ -3448,6 +3501,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     r.soundEffects[29]->play();
     Event e{};
 
+    // Until time expires or start key is pressed
     while (time > 0 && !startPressed) {
 
         // Get the actual time
@@ -3746,6 +3800,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
     r.soundEffects[29]->stop();
     r.soundTracks[12]->stop();
 
+    // Control the pixel art to construct the view of the screen
     if (c.enablePixelArt) {
         if (c.isDefaultScreen)
             c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -3763,7 +3818,23 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
 
 
 
-// Update the file
+/**
+ * Updates the current configuration of the game by a new one modifying
+ * the xml configuration file
+ * @param path is the path the xml configuration file
+ * @param difficulty is the level of difficulty selected by the player
+ * @param volumeSoundtracks is the volume of the soundtracks selected by the player
+ * @param volumeEffects is the volume of the sound effects selected by the player
+ * @param pixelArt controls if the graphics must be rendered with pixel art effect or not
+ * @param fullScreen controls if the game must be load in full screen or not
+ * @param axis_x is the width of the window's game
+ * @param axis_y is the height of the window's game
+ * @param controlLeft is the key selected by the player to turn the vehicle to the left
+ * @param controlRight is the key selected by the player to turn the vehicle to the right
+ * @param controlAccelerate is the key selected by the player to accelerate the vehicle
+ * @param controlBrake is the key selected by the player to brake the vehicle
+ * @param controlSoundtrack is the key selected by the player to change the soundtrack of the game
+ */
 void updateGameConfiguration(const string path, const Difficult difficulty, const int volumeSoundtracks,
                              const int volumeEffects, const bool pixelArt, const int fullScreen, const int axis_x, const int axis_y,
                              const string controlLeft, const string controlRight, const string controlAccelerate, const string controlBrake,
@@ -3874,9 +3945,14 @@ void updateGameConfiguration(const string path, const Difficult difficulty, cons
 
 
 
+/**
+ * Shows a loading animation with the current controllers of the game
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State showLoadingAnimation(Configuration& c, SoundPlayer& r){
 
-    // The xml configuration file of the player menu has been read
+    // Prepare the screen to display the loading animation
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
@@ -3916,6 +3992,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
     controllersText.setPosition((c.w.getSize().x / 2.f) - controllersText.getLocalBounds().width / 2.f,
                                  c.w.getSize().y / 2.f - 210.0f * c.screenScale);
 
+    // Number of points to display depending of the resolution
     int totalPoints, offsetText;
     if (c.isDefaultScreen){
         totalPoints = 25;
@@ -3926,7 +4003,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
         offsetText = 205;
     }
 
-
+    // Menu text
     Text loadingText;
     loadingText.setString("NOW LOADING");
     loadingText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
@@ -3938,7 +4015,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
     loadingText.setPosition((c.w.getSize().x / 7.f) - loadingText.getLocalBounds().width / 2.f,
                                  c.w.getSize().y / 2.f + offsetText * c.screenScale);
 
-    // Buttons of the menu
+    // Buttons of the controllers
     vector<Button> controllerButtons;
 
     // Left buttons
@@ -3977,7 +4054,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
     // Right buttons
     KeywordMapper kM = KeywordMapper();
 
-    // Right buttons
+    // Right buttons with the current controllers
     int code;
     code = kM.mapperCodeKeyWord[c.leftKey];
     controllerButtons.emplace_back(c.w.getSize().x / 2.f + 20.0f * c.screenScale,
@@ -4017,6 +4094,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
 
     // Vector of loafing points
     string points[totalPoints];
+
     // Fill the vector with the points
     for (int i = 0; i < totalPoints; i++){
         points[i] = ".";
@@ -4035,6 +4113,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
             }
         }
 
+        // Draw the elements of the menu
         c.w.draw(sprite);
         c.w.draw(shape);
         c.w.draw(controllersText);
@@ -4075,12 +4154,13 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
         c.window.draw(bufferSprite);
         c.window.display();
 
-        sleep(milliseconds(350));
+        sleep(milliseconds(250));
     }
 
     // Reproduce the soundtrack of the game
     r.soundTracks[17]->stop();
 
+    // Control the pixel art flag to construct the view of the screen
     if (c.enablePixelArt) {
         if (c.isDefaultScreen)
             c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -4092,7 +4172,6 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
                    static_cast<unsigned int>(c.window.getView().getSize().y));
         c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
     }
-
     return PLAY_GAME;
 }
 
@@ -4100,14 +4179,13 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
 
 
 /**
- * Load the configuration of the player menu stored in its xml
- * configuration file
+ * Load the configuration of the multi player menu stored in its xml configuration file
  * @param path contains the path of the xml configuration file
  * @param c is the configuration of the game
  */
 void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
 
-    // Open the xml file of the scenario
+    // Open the xml file of the multi player
     char* pFile = const_cast<char*>(path.c_str());
     xml_document<> doc;
     file<> file(pFile);
@@ -4119,7 +4197,7 @@ void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
     // Local variable to store temporary the text content and the fonts of the texts
     string content, fontPath, backgroundTexture, colorKind;
 
-    // Iterate to get the information of the player menu
+    // Iterate to get the information of the multi player menu
     for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
         // Check it is the node that contains the information of the background
         if ((string)property->name() == "Background"){
@@ -4129,7 +4207,7 @@ void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
         }
         // Check it is the node that contains the information of the main panel
         else if ((string)property->name() == "MenuPanel"){
-            // Iterate to get the information of the player menu
+            // Iterate to get the information of the multi player menu
             for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
                 // Check it is the node that contains the information of the background of the panel
                 if ((string)panelProp->name() == "Background"){
@@ -4141,7 +4219,7 @@ void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
                 else if ((string)panelProp->name() == "ColorBorder"){
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the multi player menu
                     for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -4186,7 +4264,7 @@ void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
                     colorKind = (string)titleProp->name();
                     // Get the border color of the panel
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the multi player menu
                     for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
                         // Get the red color channel
                         if ((string)colorChannel->name() == "R"){
@@ -4230,7 +4308,7 @@ void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
                 else if ((string)buttonProp->name() == "ColorFont"){
                     // Read the font from the file
                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                    // Iterate to get the information of the player menu
+                    // Iterate to get the information of the multi player menu
                     for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
                         // Get the red color channel
                         if ((string)color->name() == "R"){
@@ -4280,7 +4358,7 @@ void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
                                 for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
                                     // Get the border color of the panel
                                     int colorRed = 0, colorGreen = 0, colorBlue = 0;
-                                    // Iterate to get the information of the player menu
+                                    // Iterate to get the information of the multi player menu
                                     for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
                                         // Get the red color channel
                                         if ((string)color->name() == "R"){
@@ -4327,9 +4405,17 @@ void loadMultiplayerMenuConfiguration(const string path, Configuration& c){
 }
 
 
+
+
+/**
+ * Shows the main multi player menu
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ * @param multiplayerMode controls how the player has selected to play in multi player mode
+ */
 State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
 
-    // The xml configuration file of the player menu has been read
+    // Prepare the screen to display the main multi player menu
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
                           Vector2f(c.window.getSize().x, c.window.getSize().y)));
     c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
@@ -4337,9 +4423,9 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
 
     c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
 
-    // Read the player menu if it has not been read
+    // Read the multi player menu if it has not been read
     if (!c.multiplayerMenuRead){
-        // Read the player menu xml configuration file
+        // Read the multi player menu xml configuration file
         string pathFile = "Data/Menus/MultiplayerMenu/Configuration/MultiplayerMenu.xml";
         loadMultiplayerMenuConfiguration(pathFile, c);
     }
@@ -4371,8 +4457,8 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
     // Control if the start key is pressed or not
     bool startPressed = false;
 
-    // Control if the backspace key has been pressed
-    bool backSpacePressed = false;
+    // Control if the escape key has been pressed
+    bool escapePressed = false;
 
     c.w.clear(Color(0, 0, 0));
     Sprite bufferSprite(c.w.getTexture());
@@ -4383,8 +4469,8 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
     // Control the option selected by the user
     int optionSelected = 0;
 
-    // While start and backspace have not been pressed
-    while (!startPressed && !backSpacePressed) {
+    // While start and escape have not been pressed
+    while (!startPressed && !escapePressed) {
 
         // Make the textures repeated
         c.backgroundMultiplayerMenu.setRepeated(true);
@@ -4419,8 +4505,8 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
         mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
                               c.w.getSize().y / 2.f - 140.0f * c.screenScale);
 
-        // Until the start keyword is not pressed
-        while (!startPressed && !backSpacePressed) {
+        // Until the start keyword or escape keyword is not pressed
+        while (!startPressed && !escapePressed) {
 
             // Detect the possible events
             Event e{};
@@ -4432,7 +4518,6 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
 
             // Check if the up or down cursor keys have been pressed or not
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
-                // Up cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != int(c.multiplayerMenuButtons.size() - 1)) {
                     // Change the color appearance of both buttons
                     r.soundEffects[0]->stop();
@@ -4443,7 +4528,6 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
                 }
             }
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
-                // Down cursor pressed and change the soundtrack selected in the list
                 if (optionSelected != 0) {
                     r.soundEffects[0]->stop();
                     r.soundEffects[0]->play();
@@ -4454,6 +4538,7 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
                 }
             }
 
+            // Draw the elements of the menu
             c.w.draw(c.multiPlayerMenuBackground);
             c.w.draw(shape);
             c.w.draw(mainText);
@@ -4471,21 +4556,20 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
 
             // Check if start has been pressed
             if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
-                // Change the controllers of the car
                 startPressed = true;
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
             }
-            // Check if backspace has been pressed
+            // Check if escape has been pressed
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
-                // Change the controllers of the car
-                backSpacePressed = true;
+                escapePressed = true;
                 r.soundEffects[11]->stop();
                 r.soundEffects[11]->play();
             }
         }
     }
 
+    // Control the pixel art flag to construct the view of the screen
     if (c.enablePixelArt) {
         if (c.isDefaultScreen){
             c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
@@ -4501,13 +4585,15 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
     }
 
     if(startPressed){
-        // Store how to start the multiplayer game
+        // Store how to start the multi player game
         multiplayerMode = optionSelected;
         return MULTIPLAYER_NAME_PLAYER;
     }
-    else if (backSpacePressed) {
+
+    else if (escapePressed) {
         r.soundTracks[18]->stop();
         r.soundTracks[1]->play();
+        // Return to the player menu
         return PLAYER_MENU;
     }
     return EXIT;
