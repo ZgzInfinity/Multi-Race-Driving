@@ -19,7 +19,7 @@ using namespace std;
 /**
  * Represents the information of a player in the multi player mode
  */
-struct MultiplayerData {
+class MultiplayerData {
 
     // Identifier of a player in the group
     int codePlayer;

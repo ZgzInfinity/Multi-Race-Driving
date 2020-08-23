@@ -12,6 +12,7 @@
 #include "LandScape.h"
 #include "Motorbike.h"
 #include "Devastator.h"
+#include "FormulaOne.h"
 #include "Truck.h"
 #include "Minivan.h"
 #include "Police.h"
@@ -51,7 +52,7 @@ class Game {
     // Vector of landscapes for World tour and pole position modes
     vector<LandScape> tourLandScapes;
 
-    // Matrix of landscapes for Out Run Driving fury and Derramage modes
+    // Matrix of landscapes for Out Run Driving fury and Demarrage modes
     vector<vector<LandScape>> maps;
     vector<vector<LandScape>> referencedMaps;
     pair<int, int> mapId;
@@ -65,7 +66,8 @@ class Game {
     Devastator player2;
     Minivan player3;
     Truck player4;
-    Police player5;
+    FormulaOne player5;
+    Police player6;
 
     mutex mtx, mtx2, mtx3;
 
@@ -587,7 +589,7 @@ public:
      * @param c is the configuration of the game
      * @return
      */
-    State playOutRunDrivingFuryDerramage(Configuration &c, SoundPlayer& r);
+    State playOutRunDrivingFuryDemarrage(Configuration &c, SoundPlayer& r);
 
 
 

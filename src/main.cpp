@@ -238,7 +238,7 @@ int main() {
                             state = engine.loadOutRunDrivingFuryDemarrageConf(c);
                             break;
                         case 4:
-                            // Derramage mode
+                            // Demarrage mode
                             state = engine.loadOutRunDrivingFuryDemarrageConf(c);
                             break;
                         case 5:
@@ -259,7 +259,7 @@ int main() {
                         state = engine.playWorldTourPolePosition(c, r);
                     }
                     else {
-                        state = engine.playOutRunDrivingFuryDerramage(c, r);
+                        state = engine.playOutRunDrivingFuryDemarrage(c, r);
                     }
                     break;
                 }

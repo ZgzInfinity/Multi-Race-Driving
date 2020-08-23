@@ -102,8 +102,8 @@
 					</C2>
 				</Colors>
 				<Description>
-					<D1>Select a scenario to run and win the race investing</D1>
-					<D2>as little time as possible to improve your records.</D2>
+					<D1>Compete in intense F1 races and beat</D1>
+					<D2>all your rivals in the shortest time possible.</D2>
 					<D3>Mode inspired in Pole Position game.</D3>
 				</Description>
 			</B2>
@@ -129,7 +129,7 @@
 				</Description>
 			</B3>
 			<B4>
-				<Content>Derramage</Content>
+				<Content>Demarrage</Content>
 				<InitialState>0</InitialState>
 				<Colors>
 					<C1>

@@ -1912,7 +1912,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                     // Check the volume before descend
                     r.volumeEffects--;
                     // Iterate the sound effects and ascend the level volume
-                    for (int i = 0; i <= 116; i++) {
+                    for (int i = 0; i <= 126; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
                     // Test the changes and store then
@@ -1927,7 +1927,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                 if (r.volumeEffects != 100) {
                     r.volumeEffects++;
                     // Iterate the effects and ascend the level volume
-                    for (int i = 0; i <= 116; i++) {
+                    for (int i = 0; i <= 126; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
                     // Test the changes and store then
@@ -3753,8 +3753,8 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
                             if (lettersIntroduced == 3) {
                                 name = name.substr(0, name.size() - 1);
                                 name += keyLetter;
-                                r.soundEffects[2]->stop();
-                                r.soundEffects[2]->play();
+                                r.soundEffects[116]->stop();
+                                r.soundEffects[116]->play();
                             } else {
                                 name += keyLetter + "_";
                                 r.soundEffects[116]->stop();

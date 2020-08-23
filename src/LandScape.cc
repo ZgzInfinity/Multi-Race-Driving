@@ -1117,11 +1117,7 @@ LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
         break;
     case 4:
         // Demarrage mode
-        pathRoadFile = "Data/GameModes/Derramage/Configuration/Configuration.xml";
-        break;
-    case 5:
-        // Delivery mode
-        pathRoadFile = "Data/GameModes/Delivery/Configuration/Configuration.xml";
+        pathRoadFile = "Data/GameModes/Demarrage/Configuration/Configuration.xml";
     }
 
     // Load properties of the road
