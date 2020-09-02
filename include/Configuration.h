@@ -39,10 +39,12 @@ const pair<const int ,const int> SCREEN_5 = make_pair(3840, 2160);
 enum State {
     ANIMATION,
     START,
+    CREDITS,
     OPTIONS,
     PLAYER_MENU,
     MULTIPLAYER_MENU,
     GAME_MODES_MENU,
+    RIVAL_TYPE_MENU,
     VEHICLE_SELECTION,
     CIRCUIT_SELECTION_MENU,
     LOAD_GAME,
@@ -667,6 +669,43 @@ struct Configuration {
 
     // Color border of the player joined indicator
     Color colorIndicatorBorderMultiplayerMembersGroupMenu;
+
+
+    // Control if the player menu has been read before or not
+    bool rivalTypeMenuRead;
+
+    // Texture of the background
+    Texture rivalTypeMenuBackground;
+    Sprite sRivalTypeMenuBackground;
+
+    // Texture of the background panel
+    Texture rivalTypeMenuPanelBack;
+
+    // Color border of the main panel
+    Color colorBorderPanelRivalTypeMenu;
+
+    // Contents of the player menu title
+    string contentTitleRivalTypeMenu;
+
+    // Font of the title text of the menu
+    Font fontRivalTypeMenu;
+
+    // Colors of the main text of the player menu
+    Color colorTitleTextRivalTypeMenu;
+    Color colorTitleBorderRivalTypeMenu;
+
+    // Colors of the description panel of the player menu
+    Color colorDescriptionPanelInsideRivalTypeMenu;
+    Color colorDescriptionPanelBorderRivalTypeMenu;
+
+    // Font of the buttons of the menu
+    Font fontMenuRivalTypeButtons;
+
+    // Vector of buttons of the player menu
+    vector<Button> menuRivalTypeButtons;
+
+    // Color of the font buttons in the menu player
+    Color colorFontMenuRivalTypeButtons;
 
 
 

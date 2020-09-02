@@ -74,8 +74,9 @@ void SoundPlayer::loadSoundtracksOfGame(const string pathFile){
         auto soundTrack = make_unique<sf::Music>();
         // Open the soundtrack file and store it in the vector of soundtracks
         soundTrack->openFromFile((string)soundtrack->value());
-        // Reproduce the soundtracks in loop
+        // Reproduce the soundtracks in loop and with the level music read in the xml file
         soundTrack->setLoop(true);
+        soundTrack->setVolume(volumeMusic);
         // Check if ir is or nor a soundtrack reproduced during the game
         soundTracks.push_back(move(soundTrack));
         loaderSounds.unlock();
@@ -109,6 +110,8 @@ void SoundPlayer::loadSoundEffectsOfGame(const string pathFile){
         auto soundEffect = make_unique<sf::Music>();
         // Open the sound effect file and store it in the vector of sound effects
         soundEffect->openFromFile((string)effect->value());
+        // Store the level volume of the sound effects
+        soundEffect->setVolume(volumeEffects);
         soundEffects.push_back(move(soundEffect));
         loaderSounds.unlock();
     }

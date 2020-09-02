@@ -86,5 +86,33 @@
 				<B>0</B>
 			</ColorBorder>
 		</T6>
+		<T7>
+			<Content>PRESS SPACE TO</Content>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
+			<ColorText>
+				<R>255</R>
+				<G>255</G>
+				<B>255</B>
+			</ColorText>
+			<ColorBorder>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
+			</ColorBorder>
+		</T7>
+		<T8>
+			<Content>GO TO THE CREDITS</Content>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
+			<ColorText>
+				<R>255</R>
+				<G>255</G>
+				<B>255</B>
+			</ColorText>
+			<ColorBorder>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
+			</ColorBorder>
+		</T8>
 	</Texts>
 </MainMenu>

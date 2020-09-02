@@ -104,20 +104,18 @@ void FormulaOne::hitControl(const bool vehicleCrash) {
         }
         posY -= 20.f;
     }
-    else {
-        // Control the end of the crash animation of the formula one
-        if (current_code_image == 53){
-            acceleration = minCrashAcc;
-            speed = sqrt(acceleration);
-            crashing = false;
-            minCrashAcc = 0.0f;
-            xDest = 1000;
-            inertia = 0;
-            previousY = posY;
-            speedCollision = 0.0f;
-            outSideRoad = false;
-            posX = 0.0f;
-        }
+    // Control the end of the crash animation of the formula one
+    if (current_code_image == 53){
+        acceleration = minCrashAcc;
+        speed = sqrt(acceleration);
+        crashing = false;
+        minCrashAcc = 0.0f;
+        xDest = 1000;
+        inertia = 0;
+        previousY = posY;
+        speedCollision = 0.0f;
+        outSideRoad = false;
+        posX = 0.0f;
     }
 }
 

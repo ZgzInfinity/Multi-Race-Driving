@@ -225,6 +225,12 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode);
 
 
 
+/**
+ * Shows the credits of the platform
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
+State credits(Configuration& c, SoundPlayer& r);
 
 
 

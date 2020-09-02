@@ -26,11 +26,13 @@
 #include "rapidxml_print.hpp"
 #include "Globals.h"
 #include "functional"
-
+#include <condition_variable>
+#include <future>
 
 using namespace sf;
 using namespace std;
 using namespace rapidxml;
+using namespace std::chrono_literals;
 
 const float BONIFICATION = 1000000.0f;
 const float DISTANCE_TRESHOLD = 5.0f;
@@ -234,7 +236,8 @@ class Game {
     // Control the new lap animation in Pole Position
     bool shown;
 
-    thread timer0, timer1, timer2, controllerPosition, capturerPlayers, capturerGroups;
+    thread timer0, timer1, timer2, controllerPosition,
+    capturerPlayers, capturerGroups, guestPulses, controlPulse;
 
     int displayLapFactor;
 
@@ -306,6 +309,15 @@ class Game {
 
 
     int codePlayerInGroup;
+
+
+    bool onMultiplayer;
+
+
+    int kindVehicle;
+
+
+    int rivalTypeMode;
 
 
     void storingRivalCars(Configuration& c);
@@ -632,6 +644,27 @@ public:
     State selectionVehicleMenu(Configuration& c, SoundPlayer& r);
 
 
+
+
+    /**
+     * Load the configuration of the rival type selection menu in its xml file
+     * @param path contains the path of the xml configuration file
+     * @param c is the configuration of the game
+     */
+    void loadRivalTypeSelectionMenuConfiguration(const string path, Configuration& c);
+
+
+
+    /**
+     * Load the configuration of the rival type selection menu in its xml
+     * configuration file
+     * @param path contains the path of the xml configuration file
+     * @param c is the configuration of the game
+     */
+    State selectionRivalTypeMenu(Configuration& c, SoundPlayer& r);
+
+
+
     void writeRecordFromLandScape(const string path, string namePlayer, int minutesLap, int secondsLap, int centsSecondLap);
 
 
@@ -648,6 +681,11 @@ public:
      */
     void loadCircuitMenuConfiguration(const string path, Configuration& c);
 
+
+    void controlGuestPulses(bool& circuitSelected, bool& cancelledGroup);
+
+
+    void sendGuestPulses(bool& circuitSelected, bool& finishedGroup);
 
 
     State selectionCircuitMenu(Configuration& c, SoundPlayer& r);

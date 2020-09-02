@@ -24,7 +24,7 @@ namespace Motorbike_vehicle {
     // Inertia force of the motorbike when it is on curves
     const int FORCE_INERTIA = 8;
     // Number of textures of the motorbike
-    const int PLAYER_TEXTURES = 80;
+    const int PLAYER_TEXTURES = 88;
 }
 
 

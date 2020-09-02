@@ -72,6 +72,7 @@ Configuration::Configuration(const Difficult difficulty, const bool pixelArt, co
     // Initialize the flags that control the reading of the xml configuration files
     mainMenuRead = false;
     playerMenuRead = false;
+    rivalTypeMenuRead = false;
     gameModesMenuRead = false;
     optionsMenuRead = false;
     graphicsMenuRead = false;

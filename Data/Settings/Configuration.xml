@@ -3,10 +3,10 @@
 	<Difficulty>Hard</Difficulty>
 	<Volume_Soundtracks>100</Volume_Soundtracks>
 	<Volume_Effects>100</Volume_Effects>
-	<PixelArt>Enabled</PixelArt>
+	<PixelArt>Disabled</PixelArt>
 	<Full_screen>Disabled</Full_screen>
-	<Resolution_x>1366</Resolution_x>
-	<Resolution_y>768</Resolution_y>
+	<Resolution_x>1280</Resolution_x>
+	<Resolution_y>720</Resolution_y>
 	<Controller_left>LEFT CURSOR</Controller_left>
 	<Controller_right>RIGHT CURSOR</Controller_right>
 	<Controller_accelerate>LCTRL</Controller_accelerate>

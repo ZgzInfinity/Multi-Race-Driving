@@ -24,7 +24,7 @@ namespace FormulaOne_vehicle {
     // Inertia force of the formula one when it is on curves
     const int FORCE_INERTIA = 8;
     // Number of textures of the formula one
-    const int PLAYER_TEXTURES = 78;
+    const int PLAYER_TEXTURES = 86;
 }
 
 

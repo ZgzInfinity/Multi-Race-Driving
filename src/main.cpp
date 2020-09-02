@@ -157,6 +157,10 @@ int main() {
                     state = introAnimation(c, r);
                     break;
                 }
+                case CREDITS: {
+                    state = credits(c, r);
+                    break;
+                }
                 case OPTIONS: {
                     sleep(milliseconds(500));
                     bool inGame = engine.isInGame();
@@ -205,6 +209,11 @@ int main() {
                     engine.setTypeOfGame(typeOfGame);
                     break;
                 }
+                case RIVAL_TYPE_MENU: {
+                    // Select the rival type vehicle
+                    state = engine.selectionRivalTypeMenu(c, r);
+                    break;
+                }
                 case VEHICLE_SELECTION: {
                     // Select the vehicle by the player
                     state = engine.selectionVehicleMenu(c, r);
@@ -240,10 +249,6 @@ int main() {
                         case 4:
                             // Demarrage mode
                             state = engine.loadOutRunDrivingFuryDemarrageConf(c);
-                            break;
-                        case 5:
-                            // Delivery mode
-                            cerr << "Temporary error" << endl;
                     }
                     break;
                 }

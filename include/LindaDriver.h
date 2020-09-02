@@ -1,14 +1,20 @@
 /*
- * --------------------------------------------------
- * -- Authors ---------------------------------------
- * -- aeri ------------------------------------------
- * -- ZgzInfinity -----------------------------------
- * --------------------------------------------------
- */
-
-
-/*
- * Module LindaDriver interface file
+ * Copyright (c) 2020 Naval Alcalá
+ * Copyright (c) 2020 Rubén Rodríguez
+ *
+ * This file is part of Boreas.
+ * Boreas is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Boreas is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Boreas.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef LINDADRIVER_H
@@ -33,6 +39,9 @@ using namespace std;
 #pragma comment(lib, "Mswsock.lib")
 #pragma comment(lib, "AdvApi32.lib")
 #define WIN32_LEAN_AND_MEAN
+
+const string NF = "NOT_FOUND";
+
 
 class LD
 {
@@ -144,6 +153,15 @@ public:
     * @param t is the tuple to be get if it exists in the tuple space
     */
    Tuple readNote(Tuple t);
+
+
+
+    /**
+    * Make a readNoteX not locked operation if the Linda tuple space
+    * @param t is the tuple to be get if it exists in the tuple space
+	* @param found controls if the search has been successfull
+    */
+   Tuple readNoteX(Tuple t, bool& found);
 
 
 

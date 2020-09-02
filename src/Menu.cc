@@ -198,7 +198,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
 
     // Number of elements of the menu
-    const int NUM_TEXTS = 6;
+    const int NUM_TEXTS = 8;
 
     // Clean the console window of the game
     c.w.clear();
@@ -261,7 +261,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[0].setOutlineColor(c.colorBorders[0]);
     textElements[0].setOutlineThickness(3.0f * c.screenScale);
     textElements[0].setPosition((c.w.getSize().x - textElements[0].getGlobalBounds().width) / 2.f,
-                                c.w.getSize().y / 2.f + 100.0f * c.screenScale);
+                                c.w.getSize().y / 2.f + 30.0f * c.screenScale);
 
     textElements[1].setString(c.contents[1]);
     textElements[1].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
@@ -269,9 +269,10 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[1].setFillColor(c.colorTexts[1]);
     textElements[1].setOutlineColor(c.colorBorders[1]);
     textElements[1].setOutlineThickness(3.0f * c.screenScale);
-    float initialX = c.w.getSize().x - 1.2f * textElements[1].getGlobalBounds().width, initialY =
+    float initialX = c.w.getSize().x - 1.1f * textElements[1].getGlobalBounds().width, initialY =
             c.w.getSize().y - 2.0f * float(textElements[1].getCharacterSize());
     textElements[1].setPosition(initialX, initialY);
+    float refY = initialY;
 
     textElements[2].setString(c.contents[2]);
     textElements[2].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
@@ -279,7 +280,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[2].setFillColor(c.colorTexts[2]);
     textElements[2].setOutlineColor(c.colorBorders[2]);
     textElements[2].setOutlineThickness(3.0f * c.screenScale);
-    textElements[2].setPosition(initialX - 1.5f * textElements[2].getGlobalBounds().width, initialY);
+    textElements[2].setPosition(initialX + textElements[2].getGlobalBounds().width, initialY - 40.f * c.screenScale);
 
     initialX = textElements[1].getGlobalBounds().width;
     textElements[3].setString(c.contents[3]);
@@ -288,7 +289,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[3].setFillColor(c.colorTexts[3]);
     textElements[3].setOutlineColor(c.colorBorders[4]);
     textElements[3].setOutlineThickness(3.0f * c.screenScale);
-    textElements[3].setPosition(initialX / 2.5f, initialY);
+    textElements[3].setPosition(initialX / 6.5f, initialY);
 
     initialY -= 2.0f * textElements[3].getGlobalBounds().height;
     textElements[4].setString(c.contents[4]);
@@ -297,7 +298,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[4].setFillColor(c.colorTexts[4]);
     textElements[4].setOutlineColor(c.colorBorders[4]);
     textElements[4].setOutlineThickness(3.0f * c.screenScale);
-    textElements[4].setPosition(initialX / 2.5f, initialY);
+    textElements[4].setPosition(initialX / 6.5f, initialY);
 
     initialY -= 2.0f * textElements[4].getGlobalBounds().height;
     textElements[5].setString(c.contents[5]);
@@ -306,7 +307,25 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[5].setFillColor(c.colorTexts[5]);
     textElements[5].setOutlineColor(c.colorBorders[5]);
     textElements[5].setOutlineThickness(3.0f * c.screenScale);
-    textElements[5].setPosition(initialX / 2.5f, initialY);
+    textElements[5].setPosition(initialX / 6.5f, initialY);
+
+    initialY -= 2.0f * textElements[4].getGlobalBounds().height;
+    textElements[6].setString(c.contents[6]);
+    textElements[6].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    textElements[6].setFont(c.fontsMainMenu[6]);
+    textElements[6].setFillColor(c.colorTexts[6]);
+    textElements[6].setOutlineColor(c.colorBorders[6]);
+    textElements[6].setOutlineThickness(3.0f * c.screenScale);
+    textElements[6].setPosition(c.w.getSize().x / 2.f - textElements[6].getLocalBounds().width / 2.f, initialY + 122.f * c.screenScale);
+
+    initialY -= 2.0f * textElements[4].getGlobalBounds().height;
+    textElements[7].setString(c.contents[7]);
+    textElements[7].setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    textElements[7].setFont(c.fontsMainMenu[7]);
+    textElements[7].setFillColor(c.colorTexts[7]);
+    textElements[7].setOutlineColor(c.colorBorders[7]);
+    textElements[7].setOutlineThickness(3.0f * c.screenScale);
+    textElements[7].setPosition(c.w.getSize().x / 2.f - textElements[7].getLocalBounds().width / 2.f, refY);
 
     // Partial state of the game
     State state = START;
@@ -322,10 +341,13 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     elapsed1 = blinkClcok.restart().asSeconds();
     bool blink = true;
 
+    // Control if the space key has been pressed
+    bool spacePressed = false;
+
     // While the console window is opened
     while (c.window.isOpen()) {
         // While the ENTER keyword is not pressed
-        while (!startPressed) {
+        while (!startPressed && !spacePressed) {
             // Detect the possible events
             Event e{};
             while (c.window.pollEvent(e)) {
@@ -363,6 +385,9 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
             c.w.draw(textElements[3]);
             c.w.draw(textElements[4]);
             c.w.draw(textElements[5]);
+            c.w.draw(textElements[6]);
+            c.w.draw(textElements[7]);
+
 
             bufferSprite.setTexture(c.w.getTexture(), true);
 
@@ -378,16 +403,23 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
                 r.soundTracks[0]->stop();
                 r.soundEffects[1]->stop();
                 r.soundEffects[1]->play();
+                state = PLAYER_MENU;
+            }
+            // Check if the space keyword has been pressed
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Space)) {
+                // Pass to the second menu
+                spacePressed = true;
+                // Stop the soundtrack of the main menu
+                r.soundTracks[0]->stop();
+                r.soundEffects[1]->stop();
+                r.soundEffects[1]->play();
+                state = CREDITS;
             }
             // Check if the escape keyword has been pressed
             else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)){
                 return EXIT;
             }
         }
-
-        // Control the second menu
-        startPressed = false;
-        state = PLAYER_MENU;
 
         // Control if the pixel art is active and draw the interface with better quality
         if (c.enablePixelArt) {
@@ -413,7 +445,9 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
             }
         }
         // Start the soundtrack of the player menu
-        r.soundTracks[1]->play();
+        if (state == PLAYER_MENU){
+            r.soundTracks[1]->play();
+        }
         return state;
     }
     return EXIT;
@@ -1476,17 +1510,15 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
 
     if (typeOfGame == 2){
         // Stop the soundtrack of the menu
-        return LOAD_GAME;
+        return RIVAL_TYPE_MENU;
     }
-    else if (typeOfGame != 3){
+    else if (typeOfGame == 0) {
+        return RIVAL_TYPE_MENU;
+    }
+    else {
         r.soundTracks[1]->stop();
         // Vehicle selection menu
         return VEHICLE_SELECTION;
-    }
-    else {
-        // Stop the soundtrack of the menu
-        r.soundTracks[1]->stop();
-        return LOAD_GAME;
     }
 }
 
@@ -4595,6 +4627,719 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
         r.soundTracks[1]->play();
         // Return to the player menu
         return PLAYER_MENU;
+    }
+    return EXIT;
+}
+
+
+
+/**
+ * Shows the credits of the platform
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
+State credits(Configuration& c, SoundPlayer& r){
+
+    // Set the scale of the console window
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+
+    // Clean the console window of the game
+    c.w.clear();
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+    // Vector of textures and sprites of the main menu
+    vector<Sprite> nameGames;
+
+    // Stop the soundtrack of the main menu and play the credit soundtrack
+    r.soundTracks[0]->stop();
+    r.soundTracks[19]->play();
+
+    // vector with the soundtracks developers
+    string soundtrackDevelopers[9];
+
+    // vector with the enterprise developers
+    string enterpriseDevelopers1[9];
+
+    soundtrackDevelopers[0] = "Super Hang on - 1989 - Sega Megadrive";
+    soundtrackDevelopers[1] = "Alien 3 - 1992 - Sega Megadrive";
+    soundtrackDevelopers[2] = "Mega Turricane - 1994 - Sega Megadrive";
+    soundtrackDevelopers[3] = "Cruis'n USA - 1994 - N64";
+    soundtrackDevelopers[4] = "Cruis'n USA 1994 - Arcade version";
+    soundtrackDevelopers[5] = "Cruis'n World - 1996 - N64";
+    soundtrackDevelopers[6] = "Cruis'n Exotica - 1999 - N64";
+    soundtrackDevelopers[7] = "Mario kart Super Circuit - 2001 - Game Boy Advanced";
+    soundtrackDevelopers[8] = "Mario Kart - 2005 - NDS";
+
+    enterpriseDevelopers1[0] = "Sega AM2 and Sega";
+    enterpriseDevelopers1[1] = "Acclaim Studios London and Bits Studios";
+    enterpriseDevelopers1[2] = "Factor 5";
+    enterpriseDevelopers1[3] = "Midway Games and WMS Industries";
+    enterpriseDevelopers1[4] = "Midway Games and WMS Industries";
+    enterpriseDevelopers1[5] = "Midway Games and Eurocom";
+    enterpriseDevelopers1[6] = "Gratuitous Game, Crawfish Interactive and Midway Games";
+    enterpriseDevelopers1[7] = "Intelligent Systems";
+    enterpriseDevelopers1[8] = "Nintendo and Nintendo Entertainment Analysis and Development";
+
+    // vector with the soundtracks developers
+    string soundEffectskDevelopers[12];
+
+    // vector with the enterprise developers
+    string enterpriseDevelopers2[12];
+
+    soundEffectskDevelopers[0] = "Out Run - 1986 - Arcade version";
+    soundEffectskDevelopers[1] = "Chase HQ - 1988 - Arcade version";
+    soundEffectskDevelopers[2] = "Super Hang on - 1989 - Sega Megadrive";
+    soundEffectskDevelopers[3] = "Golden Axe - 1989 - Sega Megadrive";
+    soundEffectskDevelopers[4] = "Cruis'n USA - N64 - 1994";
+    soundEffectskDevelopers[5] = "Cruis'n World - N64 - 1996";
+    soundEffectskDevelopers[6] = "Road Rash - 1999 - N64";
+    soundEffectskDevelopers[7] = "Le Tour De France - 2002 - Play Station 2";
+    soundEffectskDevelopers[8] = "Mario Kart - 2005 - NDS";
+    soundEffectskDevelopers[9] = "Mario Kart 7 - 2011 - Nintendo 3DS";
+    soundEffectskDevelopers[10] = "Mario Kart Wii - 2008 - Wii";
+    soundEffectskDevelopers[11] = "Mario Kart Tour - 2019 - Android and iOS";
+
+    enterpriseDevelopers2[0] = "Sega, Sega AM2, M2, NEC Corporation, Acclaim Studios London and SEGA Mobile";
+    enterpriseDevelopers2[1] = "Taito Corporation, Ocean Software, The Hit Squad and John O'Brien";
+    enterpriseDevelopers2[2] = "Sega AM2 and Sega";
+    enterpriseDevelopers2[3] = "Sega, Bandai, Virgin Interactive, Sega Wow, Telenet Japan, Acclaim Studios London and SEGA Mobile";
+    enterpriseDevelopers2[4] = "Midway Games and WMS Industries";
+    enterpriseDevelopers2[5] = "Midway Games and Eurocom";
+    enterpriseDevelopers2[6] = "Pacific Coast Power and Light";
+    enterpriseDevelopers2[7] = "Konami";
+    enterpriseDevelopers2[8] = "Nintendo and Entertainment Analysis and Development";
+    enterpriseDevelopers2[9] = "Nintendo, Retro Studios and Nintendo Entertainment Analysis and Development";
+    enterpriseDevelopers2[10] = "Nintendo";
+    enterpriseDevelopers2[11] = "Nintendo, DeNA and Nintendo Entertainment Analysis and Development";
+
+    // Backgrounds
+    string enterpriseDevelopers3[6];
+
+    enterpriseDevelopers3[0] = "Vectezzy";
+    enterpriseDevelopers3[1] = "Pngocean";
+    enterpriseDevelopers3[2] = "SpriteResource";
+    enterpriseDevelopers3[3] = "PgnTree";
+    enterpriseDevelopers3[4] = "VectorStock";
+    enterpriseDevelopers3[5] = "Compfight ";
+
+    // Sprites
+
+    string sprites[6];
+
+    sprites[0] = "Vectezzy";
+    sprites[1] = "PngTree";
+    sprites[2] = "SpriteResource";
+    sprites[3] = "Vexels";
+    sprites[4] = "VectorStock";
+    sprites[5] = "Pngocean";
+
+    string enterpriseDevelopers4[4];
+
+    // Global rectangle of the background
+    IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+    Sprite sprite(c.textureBackground, background);
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
+    c.sBackground = sprite;
+
+    // Partial state of the game
+    State state = START;
+
+    // Change the background texture
+    c.w.draw(c.sBackground);
+
+    // Control if the start key has been pressed
+    bool startPressed = false;
+
+    // Title of te credits animation
+    Text creditTitle;
+    creditTitle.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+    creditTitle.setFont(c.fontsMainMenu[0]);
+    creditTitle.setFillColor(Color::White);
+    creditTitle.setOutlineColor(Color::Black);
+    creditTitle.setOutlineThickness(5.0f * c.screenScale);
+    creditTitle.setStyle(Text::Bold);
+
+    // Information credits
+    Text info;
+    info.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    info.setFont(c.fontsMainMenu[0]);
+    info.setFillColor(Color::White);
+    info.setOutlineColor(Color::Black);
+    info.setOutlineThickness(5.0f * c.screenScale);
+    info.setStyle(Text::Bold);
+
+    // Name of the simulator
+    Text simulatorName;
+    simulatorName.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+    simulatorName.setFont(c.fontsMainMenu[0]);
+    simulatorName.setString("MULTI RACE DRIVING");
+    simulatorName.setFillColor(Color::White);
+    simulatorName.setOutlineColor(Color::Black);
+    simulatorName.setOutlineThickness(5.0f * c.screenScale);
+    simulatorName.setStyle(Text::Bold);
+    simulatorName.setPosition(c.w.getSize().x / 2.f - simulatorName.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 200.f * c.screenScale);
+
+    // Designed text
+    Text desginedBy;
+    desginedBy.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    desginedBy.setFont(c.fontsMainMenu[0]);
+    desginedBy.setString("DESIGNED BY");
+    desginedBy.setFillColor(Color::White);
+    desginedBy.setOutlineColor(Color::Black);
+    desginedBy.setOutlineThickness(5.0f * c.screenScale);
+    desginedBy.setStyle(Text::Bold);
+    desginedBy.setPosition(c.w.getSize().x / 2.f - desginedBy.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 80.f * c.screenScale);
+
+    // Author of the simulator
+    Text author;
+    author.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    author.setFont(c.fontsMainMenu[0]);
+    author.setString("ZGZINFINITY");
+    author.setFillColor(Color::White);
+    author.setOutlineColor(Color::Black);
+    author.setOutlineThickness(5.0f * c.screenScale);
+    author.setStyle(Text::Bold);
+    author.setPosition(c.w.getSize().x / 2.f - author.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 10.f * c.screenScale);
+
+    // Author of the simulator
+    Text year;
+    year.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    year.setFont(c.fontsMainMenu[0]);
+    year.setString("2020");
+    year.setFillColor(Color::White);
+    year.setOutlineColor(Color::Black);
+    year.setOutlineThickness(5.0f * c.screenScale);
+    year.setStyle(Text::Bold);
+    year.setPosition(c.w.getSize().x / 2.f - year.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f + 70.f * c.screenScale);
+
+    // Brand of the distributor company
+    Text brandName;
+    brandName.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    brandName.setFont(c.fontsMainMenu[0]);
+    brandName.setString("INFINITYGAMES ENTERTAINMENT, INC");
+    brandName.setFillColor(Color::White);
+    brandName.setOutlineColor(Color::Black);
+    brandName.setOutlineThickness(5.0f * c.screenScale);
+    brandName.setStyle(Text::Bold);
+    brandName.setPosition(c.w.getSize().x / 2.f - brandName.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f + 150.f * c.screenScale);
+
+    Text license;
+    license.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    license.setFont(c.fontsMainMenu[0]);
+    license.setString("UNDER LICENSE GPL-3.0");
+    license.setFillColor(Color::White);
+    license.setOutlineColor(Color::Black);
+    license.setOutlineThickness(5.0f * c.screenScale);
+    license.setStyle(Text::Bold);
+    license.setPosition(c.w.getSize().x / 2.f - license.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f + 180.f * c.screenScale);
+
+    Text rights1;
+    rights1.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    rights1.setFont(c.fontsMainMenu[0]);
+    rights1.setString("ALL RIGHTS TO THE MUSIC, SFX AND SPRITES USED");
+    rights1.setFillColor(Color::White);
+    rights1.setOutlineColor(Color::Black);
+    rights1.setOutlineThickness(5.0f * c.screenScale);
+    rights1.setStyle(Text::Bold);
+    rights1.setPosition(c.w.getSize().x / 2.f - rights1.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 120.f * c.screenScale);
+
+    Text rights2;
+    rights2.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    rights2.setFont(c.fontsMainMenu[0]);
+    rights2.setString("BELONG TO THE DEVELOPING ENTERPRISES OF THE ");
+    rights2.setFillColor(Color::White);
+    rights2.setOutlineColor(Color::Black);
+    rights2.setOutlineThickness(5.0f * c.screenScale);
+    rights2.setStyle(Text::Bold);
+    rights2.setPosition(c.w.getSize().x / 2.f - rights2.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 30.f * c.screenScale);
+
+    Text rights3;
+    rights3.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    rights3.setFont(c.fontsMainMenu[0]);
+    rights3.setString("VIDEOGAMES IN WHICH MULTI RACE DRIVING HAS BEEN INSPIRED");
+    rights3.setFillColor(Color::White);
+    rights3.setOutlineColor(Color::Black);
+    rights3.setOutlineThickness(5.0f * c.screenScale);
+    rights3.setStyle(Text::Bold);
+    rights3.setPosition(c.w.getSize().x / 2.f - rights3.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f + 70.f * c.screenScale);
+
+    Text multiplayer;
+    multiplayer.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    multiplayer.setFont(c.fontsMainMenu[0]);
+    multiplayer.setString("MULTIPLAYER ENGINE POWERED BY BOREAS");
+    multiplayer.setFillColor(Color::White);
+    multiplayer.setOutlineColor(Color::Black);
+    multiplayer.setOutlineThickness(5.0f * c.screenScale);
+    multiplayer.setStyle(Text::Bold);
+    multiplayer.setPosition(c.w.getSize().x / 2.f - multiplayer.getLocalBounds().width / 2.f,
+                              c.w.getSize().y / 2.f - 30.f * c.screenScale);
+
+    // Current animation to display
+    int numAnimation = 1;
+
+    // While the console window is opened
+    while (c.window.isOpen()) {
+
+        // While the ENTER keyword is not pressed
+
+        while (!startPressed && numAnimation <= 10) {
+
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)) {
+                if (e.type == Event::Closed) {
+                    return EXIT;
+                }
+            }
+
+            // Assign the content of the title
+            switch(numAnimation){
+                case 3:
+                case 4:
+                    creditTitle.setString("SOUNDTRACKS OF THE GAME");
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    creditTitle.setString("SFX OF THE GAME");
+                    break;
+                case 8:
+                    creditTitle.setString("BACKGROUNDS OF THE GAME");
+                    break;
+                case 9:
+                    creditTitle.setString("SPRITES OF THE GAME");
+                    break;
+                case 10:
+                    creditTitle.setString("MULTIPLAYER SUPPORTING");
+            }
+
+            // Wait until the time pass displaying the info
+            for (int i = 0; i <= 1000; i++){
+
+                // Detect the possible events
+                Event e{};
+                while (c.window.pollEvent(e)) {
+                    if (e.type == Event::Closed) {
+                        return EXIT;
+                    }
+                }
+
+                creditTitle.setPosition((c.w.getSize().x - creditTitle.getGlobalBounds().width) / 2.f,
+                                             c.w.getSize().y / 2.f - 250.0f * c.screenScale);
+
+                // Display the animation
+                c.w.clear();
+                c.w.draw(c.sBackground);
+                c.w.draw(creditTitle);
+
+                switch(numAnimation){
+                    case 1:
+                        // General information of the simulator
+                        c.w.draw(simulatorName);
+                        c.w.draw(desginedBy);
+                        c.w.draw(author);
+                        c.w.draw(year);
+                        c.w.draw(brandName);
+                        c.w.draw(license);
+                        break;
+                    case 2:
+                        c.w.draw(rights1);
+                        c.w.draw(rights2);
+                        c.w.draw(rights3);
+                        break;
+                    case 3:
+                        // Information of the first soundtrack
+                        info.setString(soundtrackDevelopers[0]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 165.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[0]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 135.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the second soundtrack
+                        info.setString(soundtrackDevelopers[1]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 80.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[1]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 55.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the third soundtrack
+                        info.setString(soundtrackDevelopers[2]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[2]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 25.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the fourth soundtrack
+                        info.setString(soundtrackDevelopers[3]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 75.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[3]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 105.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the fourth soundtrack
+                        info.setString(soundtrackDevelopers[4]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 155.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[4]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 185.0f * c.screenScale);
+                        c.w.draw(info);
+                        break;
+                    case 4:
+                         // Information of the first soundtrack
+                        info.setString(soundtrackDevelopers[5]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 145.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+
+                        info.setString(enterpriseDevelopers1[5]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 110.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the second soundtrack
+                        info.setString(soundtrackDevelopers[6]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 60.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[6]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 25.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the third soundtrack
+                        info.setString(soundtrackDevelopers[7]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 25.f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[7]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 60.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the fourth soundtrack
+                        info.setString(soundtrackDevelopers[8]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 110.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers1[8]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 145.0f * c.screenScale);
+                        c.w.draw(info);
+                        break;
+                    case 5:
+                        // Sound effects information
+                        info.setString(soundEffectskDevelopers[0]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 165.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[0]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 135.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the second soundtrack
+                        info.setString(soundEffectskDevelopers[1]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 80.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[1]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 55.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the third soundtrack
+                        info.setString(soundEffectskDevelopers[2]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[2]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 25.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the fourth soundtrack
+                        info.setString(soundEffectskDevelopers[3]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 75.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[3]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 105.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the fourth soundtrack
+                        info.setString(soundEffectskDevelopers[4]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 155.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[4]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 185.0f * c.screenScale);
+                        c.w.draw(info);
+                        break;
+                    case 6:
+                        // Sound effects information
+                        info.setString(soundEffectskDevelopers[5]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 165.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[5]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 135.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the second soundtrack
+                        info.setString(soundEffectskDevelopers[6]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 80.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[6]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 55.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the third soundtrack
+                        info.setString(soundEffectskDevelopers[7]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[7]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 25.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the fourth soundtrack
+                        info.setString(soundEffectskDevelopers[8]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 75.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[8]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 105.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the fourth soundtrack
+                        info.setString(soundEffectskDevelopers[9]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 155.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[9]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 185.0f * c.screenScale);
+                        c.w.draw(info);
+                        break;
+                    case 7:
+                        // Sound effects information
+                        info.setString(soundEffectskDevelopers[10]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 80.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[10]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 45.0f * c.screenScale);
+                        c.w.draw(info);
+
+                        // Information of the second soundtrack
+                        info.setString(soundEffectskDevelopers[11]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 5.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(enterpriseDevelopers2[11]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 40.0f * c.screenScale);
+                        c.w.draw(info);
+                        break;
+                    case 8:
+                        // Information of the first font of backgrounds
+                        info.setString(enterpriseDevelopers3[0]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 100.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        // Information of the second font of backgrounds
+                        info.setString(enterpriseDevelopers3[1]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 50.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        // Information of the third font of backgrounds
+                        info.setString(enterpriseDevelopers3[2]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 0.f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        // Information of the fourth font of backgrounds
+                        info.setString(soundtrackDevelopers[3]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 50.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        // Information of the fifth font of backgrounds
+                        info.setString(soundtrackDevelopers[4]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 100.0f * c.screenScale);
+
+                        c.w.draw(info);
+                        break;
+                    case 9:
+                        // Fonts of the sprites of the game
+
+                        info.setString(sprites[0]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 125.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(sprites[1]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(sprites[2]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f - 25.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(sprites[3]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 25.f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(sprites[4]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 75.0f * c.screenScale);
+
+                        c.w.draw(info);
+
+                        info.setString(sprites[5]);
+                        info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
+                                          c.w.getSize().y / 2.f + 125.0f * c.screenScale);
+
+                        c.w.draw(info);
+                        break;
+                    case 10:
+                        c.w.draw(multiplayer);
+                }
+
+
+                bufferSprite.setTexture(c.w.getTexture(), true);
+                c.w.display();
+                c.window.draw(bufferSprite);
+                c.window.display();
+
+                // Check if the start keyword has been pressed
+                if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
+                    // Pass to the second menu
+                    startPressed = true;
+                    // Stop the soundtrack of the main menu
+                    r.soundTracks[0]->stop();
+                    r.soundEffects[1]->stop();
+                    r.soundEffects[1]->play();
+                    state = PLAYER_MENU;
+                }
+            }
+            // Increment the animation to be displayed
+            numAnimation++;
+        }
+
+        // Control if the pixel art is active and draw the interface with better quality
+        if (c.enablePixelArt) {
+            if (c.isDefaultScreen)
+                c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                      Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+            else
+                c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                      Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+            c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                       static_cast<unsigned int>(c.window.getView().getSize().y));
+            c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+        }
+
+        // Stop the soundtrack of the credits menu and start the soundtrack of the player menu
+        r.soundTracks[19]->stop();
+        r.soundTracks[0]->play();
+        return state;
     }
     return EXIT;
 }

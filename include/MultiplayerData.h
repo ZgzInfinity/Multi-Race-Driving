@@ -19,7 +19,7 @@ using namespace std;
 /**
  * Represents the information of a player in the multi player mode
  */
-class MultiplayerData {
+struct MultiplayerData {
 
     // Identifier of a player in the group
     int codePlayer;
@@ -27,7 +27,7 @@ class MultiplayerData {
     // Nickname of the player in the group
     string nickName;
 
-public:
+
 
     /**
      * Create a multiplayer data structure of the new

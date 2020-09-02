@@ -345,7 +345,7 @@
 					<SpriteNearLeft>
 						<Each>97</Each>
 						<Offset>Random</Offset>
-						<Code>38</Code>
+						<Code>36</Code>
 					</SpriteNearLeft>
 					<SpriteNearRight>
 						<Each>93</Each>

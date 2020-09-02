@@ -1,14 +1,20 @@
 /*
- * --------------------------------------------------
- * -- Authors ---------------------------------------
- * -- aeri ------------------------------------------
- * -- ZgzInfinity -----------------------------------
- * --------------------------------------------------
- */
-
-
-/*
- * Module LindaDriver implementation file
+ * Copyright (c) 2020 Naval Alcalá
+ * Copyright (c) 2020 Rubén Rodríguez
+ *
+ * This file is part of Boreas.
+ * Boreas is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Boreas is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Boreas.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <iomanip>
@@ -17,6 +23,7 @@
 
 #include "../include/LindaDriver.h"
 
+using namespace std;
 using namespace std;
 
 
@@ -103,11 +110,20 @@ int LD::solvingAdressingPort(const string ip, const string port){
  * @return
  */
 int LD::connectToServer(){
+
+	BOOL bOptVal = TRUE;
+	int bOptLen = sizeof(BOOL);
+
     // Attempt to connect to an address until one succeeds
     for(ptr = result; ptr != NULL; ptr = ptr->ai_next)
 	{
 	    // Create a SOCKET for connecting to server
 	    ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+
+		if (setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&bOptVal, bOptLen) == SOCKET_ERROR){
+			printf("FAILED IN TCP_NODELAY\n");
+		}
+
 	    if(ConnectSocket == INVALID_SOCKET)
 		{
 		    cerr << "socket failed with error: " << WSAGetLastError() << endl;
@@ -181,9 +197,7 @@ int LD::sending(const string message){
 void LD::receiving(char recvbuf[], const int recvbuflen, int& error){
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
     if (iResult > 0){
-        if (strcmp(recvbuf, "ACK") != 0){
-            cout << recvbuf << endl;
-        }
+        cout << recvbuf << endl;
         error = 0;
     }
     else if (iResult == 0){
@@ -245,31 +259,11 @@ void LD::postNote(Tuple t)
     // Send the tuple to be postnoted
     sending(message);
 
-    // Receive until the peer closes the connection
-    do
-	{
-	    // Empty and clear the buffer
-	    memset(recvbuf, 0, DEFAULT_BUFLEN);
-
-        // Receive the response of the server
-        receiving(recvbuf, recvbuflen, error);
-
-	    if(strcmp(recvbuf, "ACK") == 0)
-		{
-		    break;
-		}
-	}
-    while(iResult > 0);
-
     // Empty and clear the buffer
     memset(recvbuf, 0, DEFAULT_BUFLEN);
 
     // Receive the response of the server
     receiving(recvbuf, recvbuflen, error);
-
-    // Send the ACK
-    const char *ackbuf = "ACK";
-    sending(ackbuf);
 };
 
 
@@ -287,31 +281,12 @@ Tuple LD::removeNote(Tuple t)
 
     sending(message);
 
-    // Receive until the peer closes the connection
-    do
-	{
-	    // Empty and clear the buffer
-	    memset(recvbuf, 0, DEFAULT_BUFLEN);
-
-	    // Receive the response of the server
-        receiving(recvbuf, recvbuflen, error);
-
-	    if(strcmp(recvbuf, "ACK") == 0)
-		{
-		    break;
-		}
-	}
-    while(iResult > 0);
-
     // Empty and clear the buffer
     memset(recvbuf, 0, DEFAULT_BUFLEN);
 
     // Receive the response of the server
     receiving(recvbuf, recvbuflen, error);
 
-    // Send the ACK
-    const char *ackbuf = "ACK";
-    sending(ackbuf);
     Tuple r(tamanyo(recvbuf));
     r.from_string(recvbuf);
     return r;
@@ -325,28 +300,12 @@ Tuple LD::removeNote(Tuple t)
  */
 Tuple LD::readNote(Tuple t)
 {
-    string message = "ReadN:" + t.to_string();
+    string message = "RD:" + t.to_string();
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
     int error;
 
     sending(message);
-
-    // Receive until the peer closes the connection
-    do
-	{
-	    // Empty and clear the buffer
-	    memset(recvbuf, 0, DEFAULT_BUFLEN);
-
-	    // Receive the response of the server
-        receiving(recvbuf, recvbuflen, error);
-
-	    if(strcmp(recvbuf, "ACK") == 0)
-		{
-		    break;
-		}
-	}
-    while(iResult > 0);
 
     // Empty and clear the buffer
     memset(recvbuf, 0, DEFAULT_BUFLEN);
@@ -354,14 +313,47 @@ Tuple LD::readNote(Tuple t)
     // Receive the response of the server
     receiving(recvbuf, recvbuflen, error);
 
-    // Send the ACK
-    const char *ackbuf = "ACK";
-    sending(ackbuf);
     Tuple r(tamanyo(recvbuf));
     r.from_string(recvbuf);
     return r;
 };
 
+
+
+/**
+* Make a readNoteX not locked operation if the Linda tuple space
+* @param t is the tuple to be get if it exists in the tuple space
+* @param found controls if the search has been successfull
+*/
+Tuple LD::readNoteX(Tuple t, bool& found)
+{
+    string message = "RX:" + t.to_string();
+    char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
+    int error;
+
+    sending(message);
+
+    // Empty and clear the buffer
+    memset(recvbuf, 0, DEFAULT_BUFLEN);
+
+    // Receive the response of the server
+    receiving(recvbuf, recvbuflen, error);
+
+	Tuple r(tamanyo(recvbuf));
+
+	if(NF.compare(recvbuf) == 0){
+		found = false;
+		r.set(1,NF);
+	}
+	else{
+		found = true;
+		r.from_string(recvbuf);
+
+	}
+
+    return r;
+};
 
 
 /**
