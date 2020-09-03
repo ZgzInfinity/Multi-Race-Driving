@@ -51,6 +51,9 @@ class Game {
     // Determine the game selected by the player
     int typeOfGame;
 
+    // Determine the game selected by the player in multi player mode
+    int typeOfGameMultiplayer;
+
     // Vector of landscapes for World tour and pole position modes
     vector<LandScape> tourLandScapes;
 
@@ -237,7 +240,8 @@ class Game {
     bool shown;
 
     thread timer0, timer1, timer2, controllerPosition,
-    capturerPlayers, capturerGroups, guestPulses, controlPulse;
+    capturerPlayers, capturerGroups, guestPulses, controlPulse,
+    vehicleOwner, vehicleGuest;
 
     int displayLapFactor;
 
@@ -635,6 +639,13 @@ public:
 
 
 
+    void controlVehicleOwner(bool& cancelledGroup);
+
+
+    void controlVehicleGuest(bool& cancelledVehicle);
+
+
+
     /**
      * Load the configuration of the vehicle selection menu in its xml
      * configuration file
@@ -685,7 +696,7 @@ public:
     void controlGuestPulses(bool& circuitSelected, bool& cancelledGroup);
 
 
-    void sendGuestPulses(bool& circuitSelected, bool& finishedGroup);
+    void sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &cancelledCicruit);
 
 
     State selectionCircuitMenu(Configuration& c, SoundPlayer& r);
@@ -721,13 +732,27 @@ public:
     void capturerOfGroups(bool& success, bool& fail);
 
 
-    State playMultiplayerMode(Configuration& c, SoundPlayer& r);
+    State creationOfGroups(Configuration& c, SoundPlayer& r);
 
 
     void loadMultiplayerMemberGroupMenuConfiguration(const string path, Configuration& c);
 
 
     void prueba(Configuration& c);
+
+
+    /**
+     * Load the configuration of the game modes multi player menu stored in its xml configuration file
+     * @param path contains the path of the xml configuration file
+     * @param c is the configuration of the game
+     */
+    void loadGameModesMultiplayerMenuConfiguration(const string path, Configuration& c);
+
+
+    State selectionModeMultiplayer(Configuration& c, SoundPlayer& r);
+
+
+    State selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r);
 
 };
 

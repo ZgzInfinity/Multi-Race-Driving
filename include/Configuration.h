@@ -55,7 +55,9 @@ enum State {
     MULTIPLAYER_NAME_PLAYER,
     MULTIPLAYER_NAME_GROUP,
     SELECT_MULTIPLAYER_JOIN,
-    START_MULTIPLAYER,
+    CREATION_GROUPS_MULTIPLAYER,
+    SELECTION_MODE_MULTIPLAYER,
+    SELECTION_CIRCUIT_MULTIPLAYER,
     EXIT
 };
 
@@ -216,11 +218,11 @@ struct Configuration {
     // Image offset to display the images in the player menu
     float imageOffset;
 
-    // Control if the game modes menu has been read before or not
-    bool gameModesMenuRead;
-
     // Control if the player has visited the options menu before
     bool fromOptions;
+
+    // Control if the game modes menu has been read before or not
+    bool gameModesMenuRead;
 
     // Texture of the background
     Texture gameModesMenuBackground;
@@ -706,6 +708,42 @@ struct Configuration {
 
     // Color of the font buttons in the menu player
     Color colorFontMenuRivalTypeButtons;
+
+    // Control if the game modes multi player menu has been read before or not
+    bool gameModesMultiplayerMenuRead;
+
+    // Texture of the background
+    Texture gameModesMultiplayerMenuBackground;
+    Sprite sGameModesMultiplayerBackground;
+
+    // Texture of the background panel
+    Texture gameModesMultiplayerMenuPanelBack;
+
+    // Color border of the main panel
+    Color colorBorderPanelGameModeMultiplayerMenu;
+
+    // Contents of the game modes menu title
+    string contentTitleGameModeMultiplayerMenu;
+
+    // Font of the title text of the menu
+    Font fontGameModeMultiplayerMenu;
+
+    // Colors of the main text of the game modes multi player menu
+    Color colorTitleTextGameModeMultiplayerMenu;
+    Color colorTitleBorderGameModeMultiplayerMenu;
+
+    // Colors of the description panel of the game modes multi player  menu
+    Color colorDescriptionPanelInsideGameModeMultiplayerMenu;
+    Color colorDescriptionPanelBorderGameModeMultiplayerMenu;
+
+    // Font of the buttons of the menu
+    Font fontMenuGameModeMultiplayerButtons;
+
+    // Vector of buttons of the game modes multi player menu
+    vector<Button> gameModeMenuMultiplayerButtons;
+
+    // Color of the font buttons in the game modes multi player menu
+    Color colorFontMenuGameModesMultiplayerButtons;
 
 
 

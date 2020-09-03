@@ -1368,8 +1368,8 @@ State gameModesMenu(Configuration &c, SoundPlayer& r, int& typeOfGame){
         RectangleShape panelButton;
         panelButton.setPosition((c.w.getSize().x / 2.f) + 20.0f * c.screenScale, c.w.getSize().y / 2.f - 149.0f * c.screenScale);
         panelButton.setSize(sf::Vector2f(300.0f * c.screenScale, 339.0f * c.screenScale));
-        panelButton.setFillColor(c.colorDescriptionPanelInsidePlayerMenu);
-        panelButton.setOutlineColor(c.colorDescriptionPanelBorderPlayerMenu);
+        panelButton.setFillColor(c.colorDescriptionPanelInsideGameModeMenu);
+        panelButton.setOutlineColor(c.colorDescriptionPanelBorderGameModeMenu);
         panelButton.setOutlineThickness(3.0f * c.screenScale);
 
         // Main Text of the menu
@@ -4186,7 +4186,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
         c.window.draw(bufferSprite);
         c.window.display();
 
-        sleep(milliseconds(250));
+        sleep(milliseconds(150));
     }
 
     // Reproduce the soundtrack of the game
@@ -4914,18 +4914,18 @@ State credits(Configuration& c, SoundPlayer& r){
             switch(numAnimation){
                 case 3:
                 case 4:
-                    creditTitle.setString("SOUNDTRACKS OF THE GAME");
+                    creditTitle.setString("SOUNDTRACKS OF THE SIMULATOR");
                     break;
                 case 5:
                 case 6:
                 case 7:
-                    creditTitle.setString("SFX OF THE GAME");
+                    creditTitle.setString("SFX OF THE SIMULATOR");
                     break;
                 case 8:
-                    creditTitle.setString("BACKGROUNDS OF THE GAME");
+                    creditTitle.setString("BACKGROUNDS OF THE SIMULATOR");
                     break;
                 case 9:
-                    creditTitle.setString("SPRITES OF THE GAME");
+                    creditTitle.setString("SPRITES OF THE SIMULATOR");
                     break;
                 case 10:
                     creditTitle.setString("MULTIPLAYER SUPPORTING");
@@ -5246,14 +5246,14 @@ State credits(Configuration& c, SoundPlayer& r){
                         c.w.draw(info);
 
                         // Information of the fourth font of backgrounds
-                        info.setString(soundtrackDevelopers[3]);
+                        info.setString(enterpriseDevelopers3[3]);
                         info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
                                           c.w.getSize().y / 2.f + 50.0f * c.screenScale);
 
                         c.w.draw(info);
 
                         // Information of the fifth font of backgrounds
-                        info.setString(soundtrackDevelopers[4]);
+                        info.setString(enterpriseDevelopers3[4]);
                         info.setPosition((c.w.getSize().x - info.getGlobalBounds().width) / 2.f,
                                           c.w.getSize().y / 2.f + 100.0f * c.screenScale);
 

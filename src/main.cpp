@@ -195,9 +195,19 @@ int main() {
                     state = engine.selectJoiningMode(c, r);
                     break;
                 }
-                case START_MULTIPLAYER: {
+                case CREATION_GROUPS_MULTIPLAYER: {
                     // Play the multi player mode
-                    state = engine.playMultiplayerMode(c, r);
+                    state = engine.creationOfGroups(c, r);
+                    break;
+                }
+                case SELECTION_MODE_MULTIPLAYER: {
+                    // Selection of the game to play in multi player mode
+                    state = engine.selectionModeMultiplayer(c, r);
+                    break;
+                }
+                case SELECTION_CIRCUIT_MULTIPLAYER: {
+                    // Select the circuit in multi player mode
+                    state = engine.selectionCircuitMultiplayer(c, r);
                     break;
                 }
                 case GAME_MODES_MENU: {

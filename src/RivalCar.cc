@@ -1811,6 +1811,7 @@ void RivalCar::draw(const Action &a, const Elevation &e) {
                         case 4:
                             if (current_code_image < 45 || current_code_image > 53)
                                 current_code_image = 45;
+                            break;
                         case 5:
                             if (current_code_image < 25 || current_code_image > 37)
                                 current_code_image = 25;

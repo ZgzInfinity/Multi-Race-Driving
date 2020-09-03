@@ -7526,7 +7526,7 @@ void Game::controlVehicleGuest(bool& cancelledVehicle){
         Tuple r = winLindadriver.removeNote(t);
 
         if (r.get(1) == "CANCELLED_VEHICLE"){
-            cout << "ME LLEGA CANCELAR EH" << endl;
+            cout << "ME LLEGA CANCELAR EH" <<< endl;
             canceled = true;
         }
         else if (r.get(1) == "DELETE_PLAYER") {
@@ -7543,7 +7543,7 @@ void Game::controlVehicleGuest(bool& cancelledVehicle){
         }
 
         mtx3.lock();
-        cancelledVehicle = canceled;
+        canceled = cancelledVehicle;
         mtx3.unlock();
     }
 }
@@ -7875,7 +7875,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 // Owner
                 vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup));
             }
-            else {
+            else if (modeMultiplayer == 1){
                 // Guest
                 vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle));
             }
@@ -7902,7 +7902,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                         backSpacePressed = true;
                     }
                 }
-                else {
+                else if (modeMultiplayer == 1){
                     mtx3.lock();
                     checkingVehicle = cancelledVehicle;
                     mtx3.unlock();
@@ -8703,14 +8703,14 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             if (modeMultiplayer == 0){
                 // Owner of the group
 
-                if (checkingGroup){
+                vehicleOwner.join();
+
+                if (cancelledGroup){
                     return MULTIPLAYER_NAME_GROUP;
                 }
 
                 // Create a Linda driver compatible with Windows to make communicate with the Linda server
                 LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
-
-                cout << "PLAYERS IN GROUP " << numberPlayersGroup << endl;
 
                 if (numberPlayersGroup > 1){
                     for (int i = 2; i <= numberPlayersGroup; i++){
@@ -8725,9 +8725,6 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     }
                 }
                 winLindadriver.stop();
-
-                vehicleOwner.detach();
-                vehicleOwner.~thread();
 
                 // Control the end point
                 if (typeOfGameMultiplayer == 0){
@@ -15276,7 +15273,7 @@ State Game::selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r){
 
         // Menu text
         Text loadingText;
-        loadingText.setString("WAITING FOR CIRCUIT");
+        loadingText.setString("NOW WAITING FOR CIRCUIT");
         loadingText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
         loadingText.setFont(c.fontMenus);
         loadingText.setStyle(Text::Bold);
