@@ -1406,7 +1406,13 @@ void Game::showCheckpointIndications(Configuration &c, bool visible) {
     s.setScale(1.5f * c.screenScale, 1.5f * c.screenScale);
     textForLap.setPosition(float(c.w.getSize().x / 2.f) - textForLap.getGlobalBounds().width / 2.f,
                            initial + 3.4f * s.getGlobalBounds().height);
-    s.setPosition(float(c.w.getSize().x / 2.f) - s.getLocalBounds().width / 2.0f, initial * 1.3f);
+
+    if (c.enablePixelArt){
+        s.setPosition(float(c.w.getSize().x / 2.f) - s.getLocalBounds().width / 2.0f, initial * 1.3f);
+    }
+    else {
+        s.setPosition(float(c.w.getSize().x / 2.f) - s.getLocalBounds().width / 0.9f, initial * 1.3f);
+    }
 
     if (visible) {
         textForLap.setFillColor(Color(146, 194, 186));
@@ -8861,74 +8867,76 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         typeOfVehicle = optionSelected;
         colorCarSelected = colorSelected;
 
-        // Counter of players registered
-        int numPlayers = 0, localPlayers = 0;
+        if (onMultiplayer){
+            // Counter of players registered
+            int numPlayers = 0, localPlayers = 0;
 
-        // Control that all the players are registered
-        bool finishedRegister = false, checkingRegister = false;
-        int players = groupDataPlayers.size();
+            // Control that all the players are registered
+            bool finishedRegister = false, checkingRegister = false;
+            int players = groupDataPlayers.size();
 
-        Text multiplayerIndicator;
-        multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS 1 / " + to_string(players));
-        multiplayerIndicator.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        multiplayerIndicator.setFont(c.fontVehicleSelectionMenuPanelProp);
-        multiplayerIndicator.setStyle(Text::Bold);
-        multiplayerIndicator.setFillColor(c.colorTextVehicleSelectionProp);
-        multiplayerIndicator.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        multiplayerIndicator.setOutlineThickness(2.0f * c.screenScale);
-        multiplayerIndicator.setPosition(c.w.getSize().x / 2.f - multiplayerIndicator.getLocalBounds().width / 2.f,
-                                         c.w.getSize().y / 2.f + 235.0f * c.screenScale);
-
-        // Control the vehicle selected by the other rivals
-        vehicleRestPlayers = thread(storeRivalPlayers, this, ref(numPlayers), ref(finishedRegister));
-        vehicleRestPlayers.detach();
-
-        // Wait until all players have selected their cars
-        while (!checkingRegister){
-
-            // Detect the possible events
-            Event e{};
-            while (c.window.pollEvent(e)){
-                if (e.type == Event::Closed){
-                    return EXIT;
-                }
-            }
-
-            // Check if all rivals have selected their cars
-            mtx3.lock();
-            localPlayers = numPlayers;
-            checkingRegister = finishedRegister;
-            mtx3.unlock();
-
-             // Display the menu
-            c.w.draw(vehicleShape);
-            c.w.draw(garage);
-            c.w.draw(descriptionShape);
-            c.w.draw(vehiclePropertiesText);
-            c.w.draw(vehicleName);
-            c.w.draw(speedVehicleText);
-            c.w.draw(angleTurnText);
-            c.w.draw(motorText);
-            c.w.draw(accelerationText);
-            c.w.draw(speed);
-            c.w.draw(angle);
-            c.w.draw(motor);
-            c.w.draw(acceleration);
-            c.w.draw(vehicleCar);
-
-            mtx3.lock();
-            players = groupDataPlayers.size();
+            Text multiplayerIndicator;
             multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS 1 / " + to_string(players));
-            mtx3.unlock();
+            multiplayerIndicator.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+            multiplayerIndicator.setFont(c.fontVehicleSelectionMenuPanelProp);
+            multiplayerIndicator.setStyle(Text::Bold);
+            multiplayerIndicator.setFillColor(c.colorTextVehicleSelectionProp);
+            multiplayerIndicator.setOutlineColor(c.colorBorderVehicleSelectionProp);
+            multiplayerIndicator.setOutlineThickness(2.0f * c.screenScale);
             multiplayerIndicator.setPosition(c.w.getSize().x / 2.f - multiplayerIndicator.getLocalBounds().width / 2.f,
                                              c.w.getSize().y / 2.f + 235.0f * c.screenScale);
 
-            // Display the counter
-            bufferSprite.setTexture(c.w.getTexture(), true);
-            c.w.display();
-            c.window.draw(bufferSprite);
-            c.window.display();
-            sleep(milliseconds(160));
+            // Control the vehicle selected by the other rivals
+            vehicleRestPlayers = thread(storeRivalPlayers, this, ref(numPlayers), ref(finishedRegister));
+            vehicleRestPlayers.detach();
+
+            // Wait until all players have selected their cars
+            while (!checkingRegister){
+
+                // Detect the possible events
+                Event e{};
+                while (c.window.pollEvent(e)){
+                    if (e.type == Event::Closed){
+                        return EXIT;
+                    }
+                }
+
+                // Check if all rivals have selected their cars
+                mtx3.lock();
+                localPlayers = numPlayers;
+                checkingRegister = finishedRegister;
+                mtx3.unlock();
+
+                 // Display the menu
+                c.w.draw(vehicleShape);
+                c.w.draw(garage);
+                c.w.draw(descriptionShape);
+                c.w.draw(vehiclePropertiesText);
+                c.w.draw(vehicleName);
+                c.w.draw(speedVehicleText);
+                c.w.draw(angleTurnText);
+                c.w.draw(motorText);
+                c.w.draw(accelerationText);
+                c.w.draw(speed);
+                c.w.draw(angle);
+                c.w.draw(motor);
+                c.w.draw(acceleration);
+                c.w.draw(vehicleCar);
+
+                mtx3.lock();
+                players = groupDataPlayers.size();
+                multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS 1 / " + to_string(players));
+                mtx3.unlock();
+                multiplayerIndicator.setPosition(c.w.getSize().x / 2.f - multiplayerIndicator.getLocalBounds().width / 2.f,
+                                                 c.w.getSize().y / 2.f + 235.0f * c.screenScale);
+
+                // Display the counter
+                bufferSprite.setTexture(c.w.getTexture(), true);
+                c.w.display();
+                c.window.draw(bufferSprite);
+                c.window.display();
+                sleep(milliseconds(160));
+            }
         }
 
         // Stop the threads

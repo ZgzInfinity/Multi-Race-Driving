@@ -279,6 +279,8 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
             previousY = posY;
             speedCollision = 0.0f;
             speed = 0.4f;
+            r.soundEffects[30]->stop();
+            r.soundEffects[30]->play();
         }
     }
     else {
@@ -293,20 +295,20 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
             // Moves the car in axis X
             if (xDest >= 0.f){
                 // The collision take place in the right track and the car goes to the left
-                if (posX -= 0.03f < -0.7f){
+                if (posX -= 0.01f < -0.7f){
                     posX = -0.7f;
                 }
                 else {
-                    posX -= 0.03f;
+                    posX -= 0.01f;
                 }
             }
             else {
                 // The collision take place in the left track and the car goes to the right
-                if (posX += 0.03f < 0.7f){
+                if (posX += 0.01f < 0.7f){
                     posX = 0.7f;
                 }
                 else {
-                    posX += 0.03f;
+                    posX += 0.01f;
                 }
             }
             // The rival car goes back while it is crashing
@@ -349,6 +351,27 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
             speedCollision = 0.0f;
             shoutDone = false;
             speed = 0.4f;
+            switch(vehicleType){
+                case 1:
+                    r.soundEffects[12]->stop();
+                    r.soundEffects[12]->play();
+                    break;
+                case 2:
+                    r.soundEffects[41]->stop();
+                    r.soundEffects[41]->play();
+                    break;
+                case 3:
+                    r.soundEffects[33]->stop();
+                    r.soundEffects[33]->play();
+                    break;
+                case 4:
+                    r.soundEffects[121]->stop();
+                    r.soundEffects[121]->play();
+                    break;
+                case 5:
+                    r.soundEffects[114]->stop();
+                    r.soundEffects[114]->play();
+            }
         }
     }
 }
