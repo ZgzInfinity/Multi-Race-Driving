@@ -241,7 +241,7 @@ class Game {
 
     thread timer0, timer1, timer2, controllerPosition,
     capturerPlayers, capturerGroups, guestPulses, controlPulse,
-    vehicleOwner, vehicleGuest;
+    vehicleOwner, vehicleGuest, vehicleRestPlayers;
 
     int displayLapFactor;
 
@@ -639,10 +639,13 @@ public:
 
 
 
-    void controlVehicleOwner(bool& cancelledGroup);
+    void controlVehicleOwner(bool& cancelledGroup, bool& stop);
 
 
-    void controlVehicleGuest(bool& cancelledVehicle);
+    void controlVehicleGuest(bool& cancelledVehicle, bool& stop);
+
+
+    void storeRivalPlayers(int& numPlayers, bool& finishedRegister);
 
 
 

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CircuitSelectionMenu>
+	<Background>Data/Menus/CircuitSelectionMenu/Images/cover.png</Background>
+	<Title>
+		<Content>CIRCUIT SELECTION</Content>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorText>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorText>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</Title>
+	<CircuitPanel>
+		<Background>Data/Menus/CircuitSelectionMenu/Images/crono.png</Background>
+		<Text>
+			<Font>Data/Fonts/Hetikademo.otf</Font>
+			<ColorText>
+				<R>255</R>
+				<G>255</G>
+				<B>255</B>
+			</ColorText>
+			<ColorBorder>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
+			</ColorBorder>
+		</Text>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</CircuitPanel>
+	<Indicators>
+		<ColorInside>
+			<R>0</R>
+			<G>255</G>
+			<B>0</B>
+		</ColorInside>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</Indicators>
+</CircuitSelectionMenu>

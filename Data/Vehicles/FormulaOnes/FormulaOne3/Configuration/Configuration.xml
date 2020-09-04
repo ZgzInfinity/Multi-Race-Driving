@@ -1,0 +1,6 @@
+<FormulaOne>
+	<Name>Renault Plus</Name>
+	<MaxSpeed>300</MaxSpeed>
+	<Angle>0.049</Angle>
+	<Motor>Hemi V4 TXS</Motor>
+</FormulaOne>

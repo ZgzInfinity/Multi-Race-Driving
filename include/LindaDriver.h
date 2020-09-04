@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2020 Naval Alcalá
- * Copyright (c) 2020 Rubén Rodríguez
+ * Copyright (c) 2020 Naval Alcala
+ * Copyright (c) 2020 Ruben Rodriguez
  *
  * This file is part of Boreas.
  * Boreas is free software: you can redistribute it and/or modify

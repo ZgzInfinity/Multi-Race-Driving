@@ -2050,7 +2050,7 @@ void Game::checkDifficulty(Configuration &c) {
     float prevScoreMul = scoreMul;
     switch (c.level) {
         case EASY:
-            numCars = 3;
+            numCars = 5;
             timeMul = 1.1f;
             scoreMul = 0.5f;
             numCrashesGoalCar = 8;
@@ -2060,7 +2060,7 @@ void Game::checkDifficulty(Configuration &c) {
             }
             break;
         case NORMAL:
-            numCars = 8;
+            numCars = 10;
             timeMul = 1.0f;
             scoreMul = 1.0f;
             numCrashesGoalCar = 10;
@@ -2070,8 +2070,7 @@ void Game::checkDifficulty(Configuration &c) {
             }
             break;
         case HARD:
-            numCars = 10;
-            numCars = 10;
+            numCars = 15;
             timeMul = 0.9f;
             scoreMul = 1.5f;
             numCrashesGoalCar = 15;
@@ -2099,12 +2098,12 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0, true);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0, true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
                     cars.push_back(v);
                 }
             }
@@ -2114,12 +2113,12 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
                     cars.push_back(v);
                 }
             }
@@ -7476,6 +7475,7 @@ void Game::controlVehicleOwner(bool& cancelledGroup){
         Tuple t = Tuple("LEAVE_GROUP", nickNameGroupMultiplayer, "?A", "?B", nickNameMultiplayer);
         Tuple r = winLindadriver.removeNote(t);
 
+        mtx3.lock();
         int i = stoi(r.get(3));
 
         // The petition is received
@@ -7485,6 +7485,7 @@ void Game::controlVehicleOwner(bool& cancelledGroup){
 
         groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
         numberPlayersGroup--;
+        mtx3.unlock();
 
         if (numberPlayersGroup == 1){
             canceled = true;
@@ -7526,11 +7527,11 @@ void Game::controlVehicleGuest(bool& cancelledVehicle){
         Tuple r = winLindadriver.removeNote(t);
 
         if (r.get(1) == "CANCELLED_VEHICLE"){
-            cout << "ME LLEGA CANCELAR EH" <<< endl;
             canceled = true;
         }
         else if (r.get(1) == "DELETE_PLAYER") {
 
+            mtx3.lock();
             int i = stoi(r.get(3));
 
             // The petition is received
@@ -7540,10 +7541,11 @@ void Game::controlVehicleGuest(bool& cancelledVehicle){
 
             groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
             numberPlayersGroup--;
+            mtx3.unlock();
         }
 
         mtx3.lock();
-        canceled = cancelledVehicle;
+        cancelledVehicle = canceled;
         mtx3.unlock();
     }
 }
@@ -7875,7 +7877,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 // Owner
                 vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup));
             }
-            else if (modeMultiplayer == 1){
+            else {
                 // Guest
                 vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle));
             }
@@ -7902,7 +7904,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                         backSpacePressed = true;
                     }
                 }
-                else if (modeMultiplayer == 1){
+                else {
                     mtx3.lock();
                     checkingVehicle = cancelledVehicle;
                     mtx3.unlock();
@@ -8703,14 +8705,14 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             if (modeMultiplayer == 0){
                 // Owner of the group
 
-                vehicleOwner.join();
-
-                if (cancelledGroup){
+                if (checkingGroup){
                     return MULTIPLAYER_NAME_GROUP;
                 }
 
                 // Create a Linda driver compatible with Windows to make communicate with the Linda server
                 LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+                cout << "PLAYERS IN GROUP " << numberPlayersGroup << endl;
 
                 if (numberPlayersGroup > 1){
                     for (int i = 2; i <= numberPlayersGroup; i++){
@@ -8725,6 +8727,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     }
                 }
                 winLindadriver.stop();
+
+                vehicleOwner.detach();
+                vehicleOwner.~thread();
 
                 // Control the end point
                 if (typeOfGameMultiplayer == 0){
@@ -8787,6 +8792,8 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         // Store the car selected by the player
         typeOfVehicle = optionSelected;
         colorCarSelected = colorSelected;
+
+        // Control the vehicle selected by the other rivals
 
         switch(typeOfVehicle){
             case 0:
@@ -15273,7 +15280,7 @@ State Game::selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r){
 
         // Menu text
         Text loadingText;
-        loadingText.setString("NOW WAITING FOR CIRCUIT");
+        loadingText.setString("WAITING FOR CIRCUIT");
         loadingText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
         loadingText.setFont(c.fontMenus);
         loadingText.setStyle(Text::Bold);

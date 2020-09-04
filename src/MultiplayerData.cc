@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020 Rubén Rodríguez
+ *
+ * This file is part of Multi Race Driving.
+ * Multi Race Driving is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Multi Race Driving is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Multi Race Driving.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
  * Module MultiplayerData implementation file
@@ -17,7 +35,29 @@
  MultiplayerData::MultiplayerData(const int idPlayer, const string namePlayer){
     codePlayer = idPlayer;
     nickName = namePlayer;
+    vehicle = -1;
+    color = -1;
  }
+
+
+
+/**
+ * Sets the vehicle type selected by a rival player
+ * @param vehicleType is the kind of vehicle selected by the player
+ */
+void MultiplayerData::setVehicleType(const int vehicleType){
+    vehicle = vehicleType;
+}
+
+
+
+/**
+ * Sets the color of the car selected by a rival player
+ * @param colorCar is the color of vehicle selected by the player
+ */
+void MultiplayerData::setColorVehicle(const int colorCar){
+    color = colorCar;
+}
 
 
 

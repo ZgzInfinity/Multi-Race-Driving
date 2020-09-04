@@ -2050,7 +2050,7 @@ void Game::checkDifficulty(Configuration &c) {
     float prevScoreMul = scoreMul;
     switch (c.level) {
         case EASY:
-            numCars = 3;
+            numCars = 5;
             timeMul = 1.1f;
             scoreMul = 0.5f;
             numCrashesGoalCar = 8;
@@ -2060,7 +2060,7 @@ void Game::checkDifficulty(Configuration &c) {
             }
             break;
         case NORMAL:
-            numCars = 8;
+            numCars = 10;
             timeMul = 1.0f;
             scoreMul = 1.0f;
             numCrashesGoalCar = 10;
@@ -2070,8 +2070,7 @@ void Game::checkDifficulty(Configuration &c) {
             }
             break;
         case HARD:
-            numCars = 10;
-            numCars = 10;
+            numCars = 15;
             timeMul = 0.9f;
             scoreMul = 1.5f;
             numCrashesGoalCar = 15;
@@ -2099,12 +2098,12 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0, true);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0, true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
                     cars.push_back(v);
                 }
             }
@@ -2114,12 +2113,12 @@ void Game::checkDifficulty(Configuration &c) {
             for (int i = static_cast<int>(cars.size()); i < numCars; i++) {
                 if (1 + i % maxSprites == 4){
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, true);
                     cars.push_back(v);
                 }
                 else {
                     TrafficCar v(MAX_SPEED, SPEED_FACTOR, vehicleScales[i % maxSprites], COUNTER,
-                        "Data/Vehicles/TrafficCars/Car" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
+                        "Data/Vehicles/TrafficCars/TrafficCar" + to_string(1 + i % maxSprites), 0.f, -RECTANGLE * DEL_DISTANCE * 3.0f, false);
                     cars.push_back(v);
                 }
             }
@@ -7458,24 +7457,26 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
 
 
 
-void Game::controlVehicleOwner(bool& cancelledGroup){
+void Game::controlVehicleOwner(bool& cancelledGroup, bool& stop){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
     LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
     // Control the group is not canceled
-    bool canceled;
+    bool canceled, stopped;
 
     mtx3.lock();
     canceled = cancelledGroup;
+    stopped = stop;
     mtx3.unlock();
 
     // While not canceled
-    while (!canceled){
+    while (!canceled && !stopped){
         // Wait the tuple of canceled
         Tuple t = Tuple("LEAVE_GROUP", nickNameGroupMultiplayer, "?A", "?B", nickNameMultiplayer);
         Tuple r = winLindadriver.removeNote(t);
 
+        mtx3.lock();
         int i = stoi(r.get(3));
 
         // The petition is received
@@ -7485,6 +7486,7 @@ void Game::controlVehicleOwner(bool& cancelledGroup){
 
         groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
         numberPlayersGroup--;
+        mtx3.unlock();
 
         if (numberPlayersGroup == 1){
             canceled = true;
@@ -7504,33 +7506,35 @@ void Game::controlVehicleOwner(bool& cancelledGroup){
 
         mtx3.lock();
         cancelledGroup = canceled;
+        stopped = stop;
         mtx3.unlock();
     }
 }
 
 
-void Game::controlVehicleGuest(bool& cancelledVehicle){
+void Game::controlVehicleGuest(bool& cancelledVehicle, bool& stop){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
     LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
     // Control the group is not canceled
-    bool canceled;
+    bool canceled, stopped;
 
     mtx3.lock();
     canceled = cancelledVehicle;
+    stopped = stop;
     mtx3.unlock();
 
-    while (!canceled){
+    while (!canceled && !stopped){
         Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", nickNameMultiplayer, "?C");
         Tuple r = winLindadriver.removeNote(t);
 
         if (r.get(1) == "CANCELLED_VEHICLE"){
-            cout << "ME LLEGA CANCELAR EH" << endl;
             canceled = true;
         }
         else if (r.get(1) == "DELETE_PLAYER") {
 
+            mtx3.lock();
             int i = stoi(r.get(3));
 
             // The petition is received
@@ -7540,13 +7544,80 @@ void Game::controlVehicleGuest(bool& cancelledVehicle){
 
             groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
             numberPlayersGroup--;
+            mtx3.unlock();
         }
 
         mtx3.lock();
         cancelledVehicle = canceled;
+        stopped = stop;
         mtx3.unlock();
     }
 }
+
+
+
+void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister){
+
+    // Local variables to store the information
+    bool finished = false;
+    int playersRegistered = 1, totalPlayers;
+
+    // Tuple with the car selection information
+    Tuple t = Tuple("VEHICLE_SELECTED", to_string(codePlayerInGroup), nickNameMultiplayer,
+                        to_string(typeOfVehicle), to_string(colorCarSelected));
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+
+    mtx3.lock();
+    totalPlayers = groupDataPlayers.size();
+    mtx3.unlock();
+
+    // Send to all the rivals the vehicle that i have chosen
+    for (int i = 1; i <= totalPlayers; i++){
+        // Postnote the tuple with the car selected for each player
+        if (i != codePlayerInGroup){
+            winLindadriver.postNote(t);
+        }
+    }
+
+    // Wait until the rest of players have sent their vehicles
+    mtx3.lock();
+    totalPlayers = groupDataPlayers.size();
+    mtx3.unlock();
+
+    bool found;
+
+    while (playersRegistered != totalPlayers){
+        // Check if any of the players has sent his vehicle
+        for (int i = 1; i <= totalPlayers; i++){
+            if (i != codePlayerInGroup){
+                Tuple t = Tuple("VEHICLE_SELECTED", to_string(i), "?A", "?B", "?C");
+                Tuple r = winLindadriver.readNoteX(t, found);
+
+                // Check if the tuple has been found
+                if (found && r.get(1) != NF){
+                    // Increment the number of players registered and store the car with the color
+                    mtx3.lock();
+                    numPlayers++;
+                    groupDataPlayers[i].setVehicleType(stoi(r.get(4)));
+                    groupDataPlayers[i].setColorVehicle(stoi(r.get(5)));
+                    mtx3.unlock();
+                }
+            }
+            // Check the values again if the
+            mtx3.lock();
+            totalPlayers = groupDataPlayers.size();
+            mtx3.unlock();
+        }
+        // All the cars are stored
+        mtx3.lock();
+        finishedRegister = true;
+        mtx3.unlock();
+    }
+}
+
 
 
 
@@ -7622,7 +7693,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
     // Variables to store the vehicle properties
     string brandName, motorName, pathFile;
-    float max_speed, angle;
+    float max_speed, angleVehicle;
 
     for (int i = 0; i < 6; i++){
         if (i == 0){
@@ -7654,20 +7725,20 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 if (j == 0){
                     t.loadFromFile(path + "/Images/" + imageCode);
                     vehicleTextures[i][j] = t;
-                    loadVehicleProperties(path + "/Configuration/Configuration.xml", brandName, max_speed, angle, motorName);
+                    loadVehicleProperties(path + "/Configuration/Configuration.xml", brandName, max_speed, angleVehicle, motorName);
                     vehicleNames[i][j] = brandName;
                     motorNames[i][j] = motorName;
-                    angleVehicles[i][j] = angle;
+                    angleVehicles[i][j] = angleVehicle;
                     speedVehicles[i][j] = max_speed;
                 }
             }
             else {
                 t.loadFromFile(path + to_string(j + 1) + "/Images/" + imageCode);
                 vehicleTextures[i][j] = t;
-                loadVehicleProperties(path + to_string(j + 1) + "/Configuration/Configuration.xml", brandName, max_speed, angle, motorName);
+                loadVehicleProperties(path + to_string(j + 1) + "/Configuration/Configuration.xml", brandName, max_speed, angleVehicle, motorName);
                 vehicleNames[i][j] = brandName;
                 motorNames[i][j] = motorName;
-                angleVehicles[i][j] = angle;
+                angleVehicles[i][j] = angleVehicle;
                 speedVehicles[i][j] = max_speed;
             }
         }
@@ -7686,185 +7757,188 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     // Control if the vehicle selection has been canceled
     bool cancelledVehicle = false, checkingVehicle = false;
 
+    // Control if the threads must be stopped
+    bool stop = false;
+
+    IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+    Sprite sprite(c.backgroundSelectionMenu, background);
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
+
+    Sprite garage;
+    garage.setTexture(carTexture, true);
+
+    if (c.w.getSize().x != DEFAULT_WIDTH && c.w.getSize().y != DEFAULT_HEIGHT){
+        garage.setScale(float(c.w.getSize().x) / DEFAULT_WIDTH, float(c.w.getSize().y) / DEFAULT_HEIGHT * 1.34f);
+    }
+    garage.setPosition((c.w.getSize().x / 2.f) + 80.0f * c.screenScale, c.w.getSize().y / 2.f - 163.0f * c.screenScale);
+
+    RectangleShape vehicleShape;
+    vehicleShape.setPosition((c.w.getSize().x / 2.f) + 80.0f * c.screenScale, c.w.getSize().y / 2.f - 163.0f * c.screenScale);
+    vehicleShape.setSize(sf::Vector2f(318.0f * c.screenScale, 350.0f * c.screenScale));
+    vehicleShape.setOutlineColor(c.colorBorderVehiclePanel);
+    vehicleShape.setOutlineThickness(5.0f * c.screenScale);
+
+    RectangleShape descriptionShape;
+    descriptionShape.setPosition((c.w.getSize().x / 2.f) - 400.0f * c.screenScale, c.w.getSize().y / 2.f - 163.0f * c.screenScale);
+    descriptionShape.setSize(sf::Vector2f(360.0f * c.screenScale, 350.0f * c.screenScale));
+    descriptionShape.setOutlineColor(c.colorBorderPropertiesPanel);
+    descriptionShape.setOutlineThickness(5.0f * c.screenScale);
+    descriptionShape.setFillColor(c.colorInsideVehicleSelectionMenuPanelProp);
+
+    // Main Text of the menu
+    Text selectionVehicleText;
+    selectionVehicleText.setString(c.contentTitleVehicleSelectionMenu);
+    selectionVehicleText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+    selectionVehicleText.setFont(c.fontVehicleSelectionMenu);
+    selectionVehicleText.setStyle(Text::Bold | Text::Underlined);
+    selectionVehicleText.setFillColor(c.colorTitleTextVehicleSelectionMenu);
+    selectionVehicleText.setOutlineColor(c.colorTitleBorderVehicleSelectionMenu);
+    selectionVehicleText.setOutlineThickness(5.0f * c.screenScale);
+    selectionVehicleText.setPosition(c.w.getSize().x / 2.f - selectionVehicleText.getLocalBounds().width / 2.f,
+                                     c.w.getSize().y / 2.f - 260.0f * c.screenScale);
+
+    // Main Text of the menu
+    Text colorDescription;
+    colorDescription.setString("PRESS UP OR DOWN KEYS TO CHANGE THE COLOR OF THE CAR");
+    colorDescription.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+    colorDescription.setFont(c.fontVehicleSelectionMenu);
+    colorDescription.setStyle(Text::Bold | Text::Underlined);
+    colorDescription.setFillColor(c.colorTitleTextVehicleSelectionMenu);
+    colorDescription.setOutlineColor(c.colorTitleBorderVehicleSelectionMenu);
+    colorDescription.setOutlineThickness(5.0f * c.screenScale);
+    colorDescription.setPosition(c.w.getSize().x / 2.f - colorDescription.getLocalBounds().width / 2.f,
+                                 c.w.getSize().y / 2.f - 210.0f * c.screenScale);
+
+    // Main Text of the menu
+    Text vehiclePropertiesText;
+    vehiclePropertiesText.setString("PROPERTIES");
+    vehiclePropertiesText.setPosition(c.w.getSize().x / 2.f - 295.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+    vehiclePropertiesText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    vehiclePropertiesText.setFont(c.fontVehicleSelectionMenuPanelTitleProp);
+    vehiclePropertiesText.setStyle(Text::Bold | Text::Underlined);
+    vehiclePropertiesText.setFillColor(c.colorTitleTextVehicleSelectionMenuProp);
+    vehiclePropertiesText.setOutlineColor(c.colorTitleBorderVehicleSelectionMenuNameProp);
+    vehiclePropertiesText.setOutlineThickness(3.0f * c.screenScale);
+
+    // Vehicle Properties
+    Text speedVehicleText;
+    speedVehicleText.setString("TOP SPEED: ");
+    speedVehicleText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+    speedVehicleText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    speedVehicleText.setFont(c.fontVehicleSelectionMenuPanelProp);
+    speedVehicleText.setStyle(Text::Bold);
+    speedVehicleText.setFillColor(c.colorTextVehicleSelectionProp);
+    speedVehicleText.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    speedVehicleText.setOutlineThickness(2.0f * c.screenScale);
+
+    Text angleTurnText;
+    angleTurnText.setString("ANGLE OF TURN: ");
+    angleTurnText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f  - 5.f * c.screenScale);
+    angleTurnText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    angleTurnText.setFont(c.fontVehicleSelectionMenuPanelProp);
+    angleTurnText.setStyle(Text::Bold);
+    angleTurnText.setFillColor(c.colorTextVehicleSelectionProp);
+    angleTurnText.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    angleTurnText.setOutlineThickness(2.0f * c.screenScale);
+
+    Text motorText;
+    motorText.setString("MOTOR: ");
+    motorText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+    motorText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    motorText.setFont(c.fontVehicleSelectionMenuPanelProp);
+    motorText.setStyle(Text::Bold);
+    motorText.setFillColor(c.colorTextVehicleSelectionProp);
+    motorText.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    motorText.setOutlineThickness(2.0f * c.screenScale);
+
+    Text accelerationText;
+    accelerationText.setString("0 - " + to_string(int(speedVehicles[0][0]) / 2) + " KM/H:");
+    accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+    accelerationText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    accelerationText.setFont(c.fontVehicleSelectionMenuPanelProp);
+    accelerationText.setStyle(Text::Bold);
+    accelerationText.setFillColor(c.colorTextVehicleSelectionProp);
+    accelerationText.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    accelerationText.setOutlineThickness(2.0f * c.screenScale);
+
+    // Main Text of the menu
+    Text vehicleName;
+    vehicleName.setString(vehicleNames[0][0]);
+    vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
+    vehicleName.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    vehicleName.setFont(c.fontVehicleSelectionMenuPanelTitle);
+    vehicleName.setStyle(Text::Bold | Text::Underlined);
+    vehicleName.setFillColor(c.colorTitleTextVehicleSelectionMenuName);
+    vehicleName.setOutlineColor(c.colorTitleBorderVehicleSelectionMenuName);
+    vehicleName.setOutlineThickness(3.0f * c.screenScale);
+
+    Text speed;
+    speed.setString(to_string(int(speedVehicles[0][0])) + " KM/H");
+    speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
+                                 c.w.getSize().y / 2.f - 75.0f * c.screenScale);
+    speed.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    speed.setFont(c.fontVehicleSelectionMenuPanelProp);
+    speed.setStyle(Text::Bold);
+    speed.setFillColor(c.colorTextVehicleSelectionProp);
+    speed.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    speed.setOutlineThickness(2.0f * c.screenScale);
+
+    Text angle;
+    string value = to_string(angleVehicles[0][0]);
+    angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+    angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
+                      c.w.getSize().y / 2.f - 5.0f * c.screenScale);
+    angle.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    angle.setFont(c.fontVehicleSelectionMenuPanelProp);
+    angle.setStyle(Text::Bold);
+    angle.setFillColor(c.colorTextVehicleSelectionProp);
+    angle.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    angle.setOutlineThickness(2.0f * c.screenScale);
+
+    Text motor;
+    motor.setString(motorNames[0][0]);
+    motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
+                      c.w.getSize().y / 2.f + 65.0f * c.screenScale);
+    motor.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    motor.setFont(c.fontVehicleSelectionMenuPanelProp);
+    motor.setStyle(Text::Bold);
+    motor.setFillColor(c.colorTextVehicleSelectionProp);
+    motor.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    motor.setOutlineThickness(2.0f * c.screenScale);
+
+    Text acceleration;
+    value = to_string((speedVehicles[0][0] / 2.f) / TIME_HALF_SPEED);
+    acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
+    acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
+                             c.w.getSize().y / 2.f + 135.0f * c.screenScale);
+    acceleration.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    acceleration.setFont(c.fontVehicleSelectionMenuPanelProp);
+    acceleration.setStyle(Text::Bold);
+    acceleration.setFillColor(c.colorTextVehicleSelectionProp);
+    acceleration.setOutlineColor(c.colorBorderVehicleSelectionProp);
+    acceleration.setOutlineThickness(2.0f * c.screenScale);
+
+    CircleShape triangle(30 * c.screenScale, 3);
+    triangle.setFillColor(c.vehicleSelectionMenuColorButtons[0]);
+    triangle.setOutlineColor(c.vehicleSelectionMenuColorButtons[3]);
+    triangle.setOutlineThickness(2.0f * c.screenScale);
+    triangle.setRotation(30);
+    triangle.setPosition(c.w.getSize().x / 2.f - 20.0f * c.screenScale, c.w.getSize().y / 2.f + 185.0f * c.screenScale);
+
+    CircleShape triangle2(30 * c.screenScale, 3);
+    triangle2.setFillColor(c.vehicleSelectionMenuColorButtons[1]);
+    triangle2.setOutlineColor(c.vehicleSelectionMenuColorButtons[3]);
+    triangle2.setOutlineThickness(2.0f * c.screenScale);
+    triangle2.setRotation(90);
+    triangle2.setPosition(c.w.getSize().x / 2.f + 75.0f * c.screenScale, c.w.getSize().y / 2.f + 196.0f * c.screenScale);
+
     // While start and backspace have not been pressed
     while (!startPressed && !backSpacePressed) {
 
         optionSelected = 0;
         colorSelected = colorCars[optionSelected];
-
-        IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
-        Sprite sprite(c.backgroundSelectionMenu, background);
-        float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
-        float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
-        sprite.setScale(axis_x, axis_y);
-
-        Sprite garage;
-        garage.setTexture(carTexture, true);
-
-        if (c.w.getSize().x != DEFAULT_WIDTH && c.w.getSize().y != DEFAULT_HEIGHT){
-            garage.setScale(float(c.w.getSize().x) / DEFAULT_WIDTH, float(c.w.getSize().y) / DEFAULT_HEIGHT * 1.34f);
-        }
-        garage.setPosition((c.w.getSize().x / 2.f) + 80.0f * c.screenScale, c.w.getSize().y / 2.f - 163.0f * c.screenScale);
-
-        RectangleShape vehicleShape;
-        vehicleShape.setPosition((c.w.getSize().x / 2.f) + 80.0f * c.screenScale, c.w.getSize().y / 2.f - 163.0f * c.screenScale);
-        vehicleShape.setSize(sf::Vector2f(318.0f * c.screenScale, 350.0f * c.screenScale));
-        vehicleShape.setOutlineColor(c.colorBorderVehiclePanel);
-        vehicleShape.setOutlineThickness(5.0f * c.screenScale);
-
-        RectangleShape descriptionShape;
-        descriptionShape.setPosition((c.w.getSize().x / 2.f) - 400.0f * c.screenScale, c.w.getSize().y / 2.f - 163.0f * c.screenScale);
-        descriptionShape.setSize(sf::Vector2f(360.0f * c.screenScale, 350.0f * c.screenScale));
-        descriptionShape.setOutlineColor(c.colorBorderPropertiesPanel);
-        descriptionShape.setOutlineThickness(5.0f * c.screenScale);
-        descriptionShape.setFillColor(c.colorInsideVehicleSelectionMenuPanelProp);
-
-        // Main Text of the menu
-        Text selectionVehicleText;
-        selectionVehicleText.setString(c.contentTitleVehicleSelectionMenu);
-        selectionVehicleText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
-        selectionVehicleText.setFont(c.fontVehicleSelectionMenu);
-        selectionVehicleText.setStyle(Text::Bold | Text::Underlined);
-        selectionVehicleText.setFillColor(c.colorTitleTextVehicleSelectionMenu);
-        selectionVehicleText.setOutlineColor(c.colorTitleBorderVehicleSelectionMenu);
-        selectionVehicleText.setOutlineThickness(5.0f * c.screenScale);
-        selectionVehicleText.setPosition(c.w.getSize().x / 2.f - selectionVehicleText.getLocalBounds().width / 2.f,
-                                         c.w.getSize().y / 2.f - 260.0f * c.screenScale);
-
-        // Main Text of the menu
-        Text colorDescription;
-        colorDescription.setString("PRESS UP OR DOWN KEYS TO CHANGE THE COLOR OF THE CAR");
-        colorDescription.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
-        colorDescription.setFont(c.fontVehicleSelectionMenu);
-        colorDescription.setStyle(Text::Bold | Text::Underlined);
-        colorDescription.setFillColor(c.colorTitleTextVehicleSelectionMenu);
-        colorDescription.setOutlineColor(c.colorTitleBorderVehicleSelectionMenu);
-        colorDescription.setOutlineThickness(5.0f * c.screenScale);
-        colorDescription.setPosition(c.w.getSize().x / 2.f - colorDescription.getLocalBounds().width / 2.f,
-                                     c.w.getSize().y / 2.f - 210.0f * c.screenScale);
-
-        // Main Text of the menu
-        Text vehiclePropertiesText;
-        vehiclePropertiesText.setString("PROPERTIES");
-        vehiclePropertiesText.setPosition(c.w.getSize().x / 2.f - 295.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
-        vehiclePropertiesText.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-        vehiclePropertiesText.setFont(c.fontVehicleSelectionMenuPanelTitleProp);
-        vehiclePropertiesText.setStyle(Text::Bold | Text::Underlined);
-        vehiclePropertiesText.setFillColor(c.colorTitleTextVehicleSelectionMenuProp);
-        vehiclePropertiesText.setOutlineColor(c.colorTitleBorderVehicleSelectionMenuNameProp);
-        vehiclePropertiesText.setOutlineThickness(3.0f * c.screenScale);
-
-        // Vehicle Properties
-        Text speedVehicleText;
-        speedVehicleText.setString("TOP SPEED: ");
-        speedVehicleText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f - 75.0f * c.screenScale);
-        speedVehicleText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        speedVehicleText.setFont(c.fontVehicleSelectionMenuPanelProp);
-        speedVehicleText.setStyle(Text::Bold);
-        speedVehicleText.setFillColor(c.colorTextVehicleSelectionProp);
-        speedVehicleText.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        speedVehicleText.setOutlineThickness(2.0f * c.screenScale);
-
-        Text angleTurnText;
-        angleTurnText.setString("ANGLE OF TURN: ");
-        angleTurnText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f  - 5.f * c.screenScale);
-        angleTurnText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        angleTurnText.setFont(c.fontVehicleSelectionMenuPanelProp);
-        angleTurnText.setStyle(Text::Bold);
-        angleTurnText.setFillColor(c.colorTextVehicleSelectionProp);
-        angleTurnText.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        angleTurnText.setOutlineThickness(2.0f * c.screenScale);
-
-        Text motorText;
-        motorText.setString("MOTOR: ");
-        motorText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f + 65.0f * c.screenScale);
-        motorText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        motorText.setFont(c.fontVehicleSelectionMenuPanelProp);
-        motorText.setStyle(Text::Bold);
-        motorText.setFillColor(c.colorTextVehicleSelectionProp);
-        motorText.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        motorText.setOutlineThickness(2.0f * c.screenScale);
-
-        Text accelerationText;
-        accelerationText.setString("0 - " + to_string(int(speedVehicles[0][0]) / 2) + " KM/H:");
-        accelerationText.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale, c.w.getSize().y / 2.f + 135.0f * c.screenScale);
-        accelerationText.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        accelerationText.setFont(c.fontVehicleSelectionMenuPanelProp);
-        accelerationText.setStyle(Text::Bold);
-        accelerationText.setFillColor(c.colorTextVehicleSelectionProp);
-        accelerationText.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        accelerationText.setOutlineThickness(2.0f * c.screenScale);
-
-        // Main Text of the menu
-        Text vehicleName;
-        vehicleName.setString(vehicleNames[0][0]);
-        vehicleName.setPosition(c.w.getSize().x / 2.f + 143.0f * c.screenScale, c.w.getSize().y / 2.f - 143.0f * c.screenScale);
-        vehicleName.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
-        vehicleName.setFont(c.fontVehicleSelectionMenuPanelTitle);
-        vehicleName.setStyle(Text::Bold | Text::Underlined);
-        vehicleName.setFillColor(c.colorTitleTextVehicleSelectionMenuName);
-        vehicleName.setOutlineColor(c.colorTitleBorderVehicleSelectionMenuName);
-        vehicleName.setOutlineThickness(3.0f * c.screenScale);
-
-        Text speed;
-        speed.setString(to_string(int(speedVehicles[0][0])) + " KM/H");
-        speed.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + speedVehicleText.getLocalBounds().width + 5.f,
-                                     c.w.getSize().y / 2.f - 75.0f * c.screenScale);
-        speed.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        speed.setFont(c.fontVehicleSelectionMenuPanelProp);
-        speed.setStyle(Text::Bold);
-        speed.setFillColor(c.colorTextVehicleSelectionProp);
-        speed.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        speed.setOutlineThickness(2.0f * c.screenScale);
-
-        Text angle;
-        string value = to_string(angleVehicles[0][0]);
-        angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
-        angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
-                          c.w.getSize().y / 2.f - 5.0f * c.screenScale);
-        angle.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        angle.setFont(c.fontVehicleSelectionMenuPanelProp);
-        angle.setStyle(Text::Bold);
-        angle.setFillColor(c.colorTextVehicleSelectionProp);
-        angle.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        angle.setOutlineThickness(2.0f * c.screenScale);
-
-        Text motor;
-        motor.setString(motorNames[0][0]);
-        motor.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + motorText.getLocalBounds().width + 5.f,
-                          c.w.getSize().y / 2.f + 65.0f * c.screenScale);
-        motor.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        motor.setFont(c.fontVehicleSelectionMenuPanelProp);
-        motor.setStyle(Text::Bold);
-        motor.setFillColor(c.colorTextVehicleSelectionProp);
-        motor.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        motor.setOutlineThickness(2.0f * c.screenScale);
-
-        Text acceleration;
-        value = to_string((speedVehicles[0][0] / 2.f) / TIME_HALF_SPEED);
-        acceleration.setString(value.substr(0, value.find(".") + 3) + " SEC");
-        acceleration.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + accelerationText.getLocalBounds().width + 5.f,
-                                 c.w.getSize().y / 2.f + 135.0f * c.screenScale);
-        acceleration.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
-        acceleration.setFont(c.fontVehicleSelectionMenuPanelProp);
-        acceleration.setStyle(Text::Bold);
-        acceleration.setFillColor(c.colorTextVehicleSelectionProp);
-        acceleration.setOutlineColor(c.colorBorderVehicleSelectionProp);
-        acceleration.setOutlineThickness(2.0f * c.screenScale);
-
-        CircleShape triangle(30 * c.screenScale, 3);
-        triangle.setFillColor(c.vehicleSelectionMenuColorButtons[0]);
-        triangle.setOutlineColor(c.vehicleSelectionMenuColorButtons[3]);
-        triangle.setOutlineThickness(2.0f * c.screenScale);
-        triangle.setRotation(30);
-        triangle.setPosition(c.w.getSize().x / 2.f - 20.0f * c.screenScale, c.w.getSize().y / 2.f + 185.0f * c.screenScale);
-
-        CircleShape triangle2(30 * c.screenScale, 3);
-        triangle2.setFillColor(c.vehicleSelectionMenuColorButtons[1]);
-        triangle2.setOutlineColor(c.vehicleSelectionMenuColorButtons[3]);
-        triangle2.setOutlineThickness(2.0f * c.screenScale);
-        triangle2.setRotation(90);
-        triangle2.setPosition(c.w.getSize().x / 2.f + 75.0f * c.screenScale, c.w.getSize().y / 2.f + 196.0f * c.screenScale);
 
         // Reproduce the sound effect
         r.soundEffects[40]->play();
@@ -7873,11 +7947,11 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         if (onMultiplayer){
             if (modeMultiplayer == 0){
                 // Owner
-                vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup));
+                vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup), ref(stop));
             }
             else {
                 // Guest
-                vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle));
+                vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle), ref(stop));
             }
         }
 
@@ -7891,7 +7965,6 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     return EXIT;
                 }
             }
-
 
             if (onMultiplayer){
                 if (modeMultiplayer == 0){
@@ -8710,8 +8783,6 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 // Create a Linda driver compatible with Windows to make communicate with the Linda server
                 LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
-                cout << "PLAYERS IN GROUP " << numberPlayersGroup << endl;
-
                 if (numberPlayersGroup > 1){
                     for (int i = 2; i <= numberPlayersGroup; i++){
 
@@ -8720,7 +8791,6 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
                         // Inform that the group is cancelled
                         Tuple t = Tuple("CANCELLED_VEHICLE", nickNameGroupMultiplayer, to_string(idCode), name, nickNameMultiplayer);
-                        cout << "MANDO " << t.to_string() << endl;
                         winLindadriver.postNote(t);
                     }
                 }
@@ -8790,6 +8860,89 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         // Store the car selected by the player
         typeOfVehicle = optionSelected;
         colorCarSelected = colorSelected;
+
+        // Counter of players registered
+        int numPlayers = 0, localPlayers = 0;
+
+        // Control that all the players are registered
+        bool finishedRegister = false, checkingRegister = false;
+        int players = groupDataPlayers.size();
+
+        Text multiplayerIndicator;
+        multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS 1 / " + to_string(players));
+        multiplayerIndicator.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+        multiplayerIndicator.setFont(c.fontVehicleSelectionMenuPanelProp);
+        multiplayerIndicator.setStyle(Text::Bold);
+        multiplayerIndicator.setFillColor(c.colorTextVehicleSelectionProp);
+        multiplayerIndicator.setOutlineColor(c.colorBorderVehicleSelectionProp);
+        multiplayerIndicator.setOutlineThickness(2.0f * c.screenScale);
+        multiplayerIndicator.setPosition(c.w.getSize().x / 2.f - multiplayerIndicator.getLocalBounds().width / 2.f,
+                                         c.w.getSize().y / 2.f + 235.0f * c.screenScale);
+
+        // Control the vehicle selected by the other rivals
+        vehicleRestPlayers = thread(storeRivalPlayers, this, ref(numPlayers), ref(finishedRegister));
+        vehicleRestPlayers.detach();
+
+        // Wait until all players have selected their cars
+        while (!checkingRegister){
+
+            // Detect the possible events
+            Event e{};
+            while (c.window.pollEvent(e)){
+                if (e.type == Event::Closed){
+                    return EXIT;
+                }
+            }
+
+            // Check if all rivals have selected their cars
+            mtx3.lock();
+            localPlayers = numPlayers;
+            checkingRegister = finishedRegister;
+            mtx3.unlock();
+
+             // Display the menu
+            c.w.draw(vehicleShape);
+            c.w.draw(garage);
+            c.w.draw(descriptionShape);
+            c.w.draw(vehiclePropertiesText);
+            c.w.draw(vehicleName);
+            c.w.draw(speedVehicleText);
+            c.w.draw(angleTurnText);
+            c.w.draw(motorText);
+            c.w.draw(accelerationText);
+            c.w.draw(speed);
+            c.w.draw(angle);
+            c.w.draw(motor);
+            c.w.draw(acceleration);
+            c.w.draw(vehicleCar);
+
+            mtx3.lock();
+            players = groupDataPlayers.size();
+            multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS 1 / " + to_string(players));
+            mtx3.unlock();
+            multiplayerIndicator.setPosition(c.w.getSize().x / 2.f - multiplayerIndicator.getLocalBounds().width / 2.f,
+                                             c.w.getSize().y / 2.f + 235.0f * c.screenScale);
+
+            // Display the counter
+            bufferSprite.setTexture(c.w.getTexture(), true);
+            c.w.display();
+            c.window.draw(bufferSprite);
+            c.window.display();
+            sleep(milliseconds(160));
+        }
+
+        // Stop the threads
+        if (onMultiplayer){
+            mtx3.lock();
+            stop = false;
+            mtx3.unlock();
+            if (modeMultiplayer == 0){
+                vehicleOwner.join();
+            }
+            else {
+                vehicleGuest.join();
+            }
+        }
 
         switch(typeOfVehicle){
             case 0:
