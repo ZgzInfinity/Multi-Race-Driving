@@ -51,7 +51,7 @@ KeywordMapper::KeywordMapper() {
     mapperIdKeyWord[11] = "L";
     mapperIdKeyWord[12] = "M";
     mapperIdKeyWord[13] = "N";
-    mapperIdKeyWord[14] = "0";
+    mapperIdKeyWord[14] = "O";
     mapperIdKeyWord[15] = "P";
     mapperIdKeyWord[16] = "Q";
     mapperIdKeyWord[17] = "R";

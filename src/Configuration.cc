@@ -109,6 +109,7 @@ Configuration::Configuration(const Difficult difficulty, const bool pixelArt, co
     multiplayerJoinGroupMenuRead = false;
     multiplayerMembersGroupMenuRead = false;
     gameModesMultiplayerMenuRead = false;
+    multiplayerTestConnectionMenuRead = false;
 
     // Creation of the view
     w.create(static_cast<unsigned int>(window.getView().getSize().x),

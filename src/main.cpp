@@ -28,6 +28,8 @@ mutex mainMutex;
 #include <SFML/Graphics.hpp>
 
 
+#include <windows.h>
+
 using namespace sf;
 using namespace std;
 
@@ -187,6 +189,10 @@ int main() {
                 }
                 case PLAYER_MENU: {
                     state = playerMenu(c, r);
+                    break;
+                }
+                case TESTTING_NETWORK: {
+                    state = engine.makeConnectionServerTest(c, r);
                     break;
                 }
                 case MULTIPLAYER_MENU: {

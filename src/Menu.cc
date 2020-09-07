@@ -1002,7 +1002,7 @@ State playerMenu(Configuration &c, SoundPlayer& r){
             // Multi player mode
             r.soundTracks[1]->stop();
             r.soundTracks[18]->play();
-            status = MULTIPLAYER_MENU;
+            status = TESTTING_NETWORK;
             break;
         case 2:
             // Options menu
@@ -4561,8 +4561,48 @@ State multiplayerMenu(Configuration& c, SoundPlayer& r, int& multiplayerMode){
             // Detect the possible events
             Event e{};
             while (c.window.pollEvent(e)){
+
                 if (e.type == Event::Closed){
-                    return EXIT;
+
+                    // Complaining text
+                    Text complainText;
+                    complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                    complainText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+                    complainText.setFont(c.fontTitleMultiplayerMenu);
+                    complainText.setStyle(Text::Bold);
+                    complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                    complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                    complainText.setOutlineThickness(5.0f * c.screenScale);
+                    if (c.isDefaultScreen){
+                        complainText.setPosition(c.w.getSize().x / 2.f - complainText.getLocalBounds().width / 2.f,
+                                                         c.w.getSize().y / 2.f + 220.0f * c.screenScale);
+                    }
+                    else {
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+                    }
+
+                    for (int i = 0; i <= 120; i++){
+
+                        Event e;
+                        c.window.pollEvent(e);
+
+                        // Draw the elements of the menu
+                        c.w.draw(c.multiPlayerMenuBackground);
+                        c.w.draw(shape);
+                        c.w.draw(mainText);
+                        c.w.draw(complainText);
+
+                         // Show the buttons of the menu
+                        for (int i = 0; i < (int)c.multiplayerMenuButtons.size(); i++) {
+                            c.multiplayerMenuButtons.at(i).render(&c.w);
+                        }
+
+                        bufferSprite.setTexture(c.w.getTexture(), true);
+                        c.w.display();
+                        c.window.draw(bufferSprite);
+                        c.window.display();
+                    }
                 }
             }
 

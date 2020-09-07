@@ -30,6 +30,7 @@
 #include <memory>
 #include <iostream>
 #include "Button.h"
+#include "windows.h"
 #include "KeywordMapper.h"
 #include "Score.h"
 #include "Configuration.h"

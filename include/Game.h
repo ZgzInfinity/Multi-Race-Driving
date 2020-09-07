@@ -639,13 +639,13 @@ public:
 
 
 
-    void controlVehicleOwner(bool& cancelledGroup, bool& stop);
+    void controlVehicleOwner(bool& cancelledGroup);
 
 
-    void controlVehicleGuest(bool& cancelledVehicle, bool& stop);
+    void controlVehicleGuest(bool& cancelledVehicle);
 
 
-    void storeRivalPlayers(int& numPlayers, bool& finishedRegister);
+    void storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& cancelledGroup);
 
 
 
@@ -696,7 +696,7 @@ public:
     void loadCircuitMenuConfiguration(const string path, Configuration& c);
 
 
-    void controlGuestPulses(bool& circuitSelected, bool& cancelledGroup);
+    void controlGuestPulses(bool& circuitSelected, bool& cancelledGroup, bool& escape);
 
 
     void sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &cancelledCicruit);
@@ -756,6 +756,20 @@ public:
 
 
     State selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r);
+
+
+    void testConnection(bool& testFinished, string& mininumLatency, string& mediumLatency, string& maxLantency);
+
+
+    /**
+     * Load the configuration of the multi player test configuration menu stored in its xml configuration file
+     * @param path contains the path of the xml configuration file
+     * @param c is the configuration of the game
+     */
+    void loadMultiplayerMenuTestingNetworkConfiguration(const string path, Configuration& c);
+
+
+    State makeConnectionServerTest(Configuration& c, SoundPlayer& r);
 
 };
 

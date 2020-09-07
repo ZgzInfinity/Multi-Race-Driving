@@ -77,6 +77,7 @@ enum State {
     CREATION_GROUPS_MULTIPLAYER,
     SELECTION_MODE_MULTIPLAYER,
     SELECTION_CIRCUIT_MULTIPLAYER,
+    TESTTING_NETWORK,
     EXIT
 };
 
@@ -763,6 +764,43 @@ struct Configuration {
 
     // Color of the font buttons in the game modes multi player menu
     Color colorFontMenuGameModesMultiplayerButtons;
+
+    // Control if the multi player test connection menu has been read
+    bool multiplayerTestConnectionMenuRead;
+
+    // Background of the multi player test connection menu
+    Texture backgroundMultiplayerTestConnectionMenu;
+    Sprite multiPlayerTestConnectionMenuBackground;
+
+    // Title of the multi player test connection menu
+    string contentTitleMultiplayerTestConnectionMenu;
+
+    // Font of the multi player test connection menu's title
+    Font fontTitleMultiplayerTestConnectionMenu;
+
+    // Color of the title text of the multi player test connection menu
+    Color colorTitleTextMultiplayerTestConnectionMenu;
+
+    // Color of the title border of the multi player test connection menu
+    Color colorTitleBorderMultiplayerTestConnectionMenu;
+
+    // Color of the font of the buttons
+    Color colorFontMenuPlayerTestConnectionButtons;
+
+    // Background of the multi player test connection menu
+    Texture backgroundMultiplayerTestConnectionPanel;
+
+    // Color border of the panel of the multi player test connection menu
+    Color colorBorderPanelMultiplayerTestConnectionMenu;
+
+    // Font of the buttons of the multi player test connection menu
+    Font fontMenuMultiplayerTestConnectionButtons;
+
+    // Vector of buttons of the multi player test connection menu
+    vector<Button> multiplayerTestConnectionMenuButtons;
+
+    // Color of the buttons of the multi player test connection menu
+    vector<Color> multiplayerTestConnectionMenuColorButtons;
 
 
 

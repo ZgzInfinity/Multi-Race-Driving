@@ -2,6 +2,80 @@
 #include "../include/Game.h"
 
 
+int cmd(char *cmd, char *output, DWORD maxbuffer)
+{
+    HANDLE readHandle;
+    HANDLE writeHandle;
+    HANDLE stdHandle;
+    DWORD bytesRead;
+    DWORD retCode;
+    SECURITY_ATTRIBUTES sa;
+    PROCESS_INFORMATION pi;
+    STARTUPINFO si;
+
+    ZeroMemory(&sa,sizeof(SECURITY_ATTRIBUTES));
+    ZeroMemory(&pi,sizeof(PROCESS_INFORMATION));
+    ZeroMemory(&si,sizeof(STARTUPINFO));
+
+    sa.bInheritHandle=true;
+    sa.lpSecurityDescriptor=NULL;
+    sa.nLength=sizeof(SECURITY_ATTRIBUTES);
+    si.cb=sizeof(STARTUPINFO);
+    si.dwFlags=STARTF_USESHOWWINDOW;
+    si.wShowWindow=SW_HIDE;
+
+    if (!CreatePipe(&readHandle,&writeHandle,&sa,NULL))
+    {
+        OutputDebugString("cmd: CreatePipe failed!\n");
+        return 0;
+    }
+
+    stdHandle=GetStdHandle(STD_OUTPUT_HANDLE);
+
+    if (!SetStdHandle(STD_OUTPUT_HANDLE,writeHandle))
+    {
+        OutputDebugString("cmd: SetStdHandle(writeHandle) failed!\n");
+        return 0;
+    }
+
+    if (!CreateProcess(NULL,cmd,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
+    {
+        OutputDebugString("cmd: CreateProcess failed!\n");
+        return 0;
+    }
+
+    GetExitCodeProcess(pi.hProcess,&retCode);
+    while (retCode==STILL_ACTIVE)
+    {
+        GetExitCodeProcess(pi.hProcess,&retCode);
+    }
+
+    if (!ReadFile(readHandle,output,maxbuffer,&bytesRead,NULL))
+    {
+        OutputDebugString("cmd: ReadFile failed!\n");
+        return 0;
+    }
+    output[bytesRead]='\0';
+
+    if (!SetStdHandle(STD_OUTPUT_HANDLE,stdHandle))
+    {
+        OutputDebugString("cmd: SetStdHandle(stdHandle) failed!\n");
+        return 0;
+    }
+
+    if (!CloseHandle(readHandle))
+    {
+        OutputDebugString("cmd: CloseHandle(readHandle) failed!\n");
+    }
+    if (!CloseHandle(writeHandle))
+    {
+        OutputDebugString("cmd: CloseHandle(writeHandle) failed!\n");
+    }
+
+    return 1;
+}
+
+
 void Game::storingRivalCars(Configuration& c){
 
     // Clear the vector of rival cars
@@ -7463,83 +7537,34 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
 
 
 
-void Game::controlVehicleOwner(bool& cancelledGroup, bool& stop){
+void Game::controlVehicleOwner(bool& cancelledGroup){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
     LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
     // Control the group is not canceled
-    bool canceled, stopped;
+    bool canceled, stopped = false;;
 
     mtx3.lock();
     canceled = cancelledGroup;
-    stopped = stop;
     mtx3.unlock();
 
     // While not canceled
     while (!canceled && !stopped){
         // Wait the tuple of canceled
-        Tuple t = Tuple("LEAVE_GROUP", nickNameGroupMultiplayer, "?A", "?B", nickNameMultiplayer);
+        Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", "?C", nickNameMultiplayer);
         Tuple r = winLindadriver.removeNote(t);
-
-        mtx3.lock();
-        int i = stoi(r.get(3));
-
-        // The petition is received
-        for (int j = i; j < (int)groupDataPlayers.size(); j++){
-            groupDataPlayers[j].codePlayer--;
+        if (r.get(1) == "VEHICLE_CLOSED"){
+            stopped = true;
         }
-
-        groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
-        numberPlayersGroup--;
-        mtx3.unlock();
-
-        if (numberPlayersGroup == 1){
-            canceled = true;
+        else if (r.get(1) == "CANCEL_CAR"){
+            winLindadriver.postNote(r);
+            this_thread::sleep_for(chrono::milliseconds(100));
         }
-        else {
-            // Alert to the rest of the members that this member must be deleted
-            for (int i = 2; i <= numberPlayersGroup; i++){
-
-                int idCode = groupDataPlayers[i - 1].getCodePlayer();
-                string namePlayer = groupDataPlayers[i - 1].getNickNamePlayer();
-
-                // Inform that the group is cancelled
-                Tuple t = Tuple("DELETE_PLAYER", nickNameGroupMultiplayer, to_string(i), namePlayer, nickNameMultiplayer);
-                winLindadriver.postNote(t);
-            }
+        else if (r.get(1) == "VEHICLE_DONE"){
+            stopped = true;
         }
-
-        mtx3.lock();
-        cancelledGroup = canceled;
-        stopped = stop;
-        mtx3.unlock();
-    }
-}
-
-
-void Game::controlVehicleGuest(bool& cancelledVehicle, bool& stop){
-
-    // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
-
-    // Control the group is not canceled
-    bool canceled, stopped;
-
-    mtx3.lock();
-    canceled = cancelledVehicle;
-    stopped = stop;
-    mtx3.unlock();
-
-    while (!canceled && !stopped){
-        Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", nickNameMultiplayer, "?C");
-        Tuple r = winLindadriver.removeNote(t);
-
-        if (r.get(1) == "CANCELLED_VEHICLE"){
-            canceled = true;
-        }
-        else if (r.get(1) == "DELETE_PLAYER") {
-
+        else if (r.get(1) == "LEAVE_GROUP"){
             mtx3.lock();
             int i = stoi(r.get(3));
 
@@ -7551,25 +7576,90 @@ void Game::controlVehicleGuest(bool& cancelledVehicle, bool& stop){
             groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
             numberPlayersGroup--;
             mtx3.unlock();
+
+            if (numberPlayersGroup == 1){
+                canceled = true;
+            }
+            else {
+                // Alert to the rest of the members that this member must be deleted
+                for (int i = 2; i <= numberPlayersGroup; i++){
+
+                    int idCode = groupDataPlayers[i - 1].getCodePlayer();
+                    string namePlayer = groupDataPlayers[i - 1].getNickNamePlayer();
+
+                    // Inform that the group is cancelled
+                    Tuple t = Tuple("DELETE_PLAYER", nickNameGroupMultiplayer, to_string(i), namePlayer, nickNameMultiplayer);
+                    winLindadriver.postNote(t);
+                }
+            }
+        }
+        mtx3.lock();
+        cancelledGroup = canceled;
+        mtx3.unlock();
+    }
+}
+
+
+void Game::controlVehicleGuest(bool& cancelledVehicle){
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+    // Control the group is not canceled
+    bool canceled, stopped = false;;
+
+    mtx3.lock();
+    canceled = cancelledVehicle;
+    mtx3.unlock();
+
+    while (!canceled && !stopped){
+        Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", nickNameMultiplayer, "?C");
+        Tuple r = winLindadriver.removeNote(t);
+        if (r.get(1) == "PLAYER_CLOSED"){
+            canceled = true;
+        }
+        else if (r.get(1) == "CANCEL_CAR"){
+            canceled = true;
+        }
+        else if (r.get(1) == "VEHICLE_DONE"){
+            stopped = true;
+        }
+        else if (r.get(1) == "DELETE_PLAYER") {
+
+            mtx3.lock();
+            int i = stoi(r.get(3));
+
+            // The petition is received
+            for (int j = i; j < (int)groupDataPlayers.size(); j++){
+                groupDataPlayers[j].codePlayer--;
+            }
+
+            // Decrement our id
+            if (i < codePlayerInGroup){
+                codePlayerInGroup--;
+            }
+
+            groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
+            numberPlayersGroup--;
+            mtx3.unlock();
         }
 
         mtx3.lock();
         cancelledVehicle = canceled;
-        stopped = stop;
         mtx3.unlock();
     }
 }
 
 
 
-void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister){
+void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& cancelledGroup){
 
     // Local variables to store the information
-    bool finished = false;
+    bool finished = false, cancelled = false;
     int playersRegistered = 1, totalPlayers;
 
     // Tuple with the car selection information
-    Tuple t = Tuple("VEHICLE_SELECTED", to_string(codePlayerInGroup), nickNameMultiplayer,
+    Tuple t = Tuple("VEHICLE_SELECTED", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer,
                         to_string(typeOfVehicle), to_string(colorCarSelected));
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
@@ -7591,15 +7681,16 @@ void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister){
     // Wait until the rest of players have sent their vehicles
     mtx3.lock();
     totalPlayers = groupDataPlayers.size();
+    cancelled = cancelledGroup;
     mtx3.unlock();
 
     bool found;
 
-    while (playersRegistered != totalPlayers){
+    while (!cancelled && playersRegistered != totalPlayers){
         // Check if any of the players has sent his vehicle
         for (int i = 1; i <= totalPlayers; i++){
             if (i != codePlayerInGroup){
-                Tuple t = Tuple("VEHICLE_SELECTED", to_string(i), "?A", "?B", "?C");
+                Tuple t = Tuple("VEHICLE_SELECTED", nickNameGroupMultiplayer, to_string(i), "?A", "?B", "?C");
                 Tuple r = winLindadriver.readNoteX(t, found);
 
                 // Check if the tuple has been found
@@ -7607,21 +7698,25 @@ void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister){
                     // Increment the number of players registered and store the car with the color
                     mtx3.lock();
                     numPlayers++;
-                    groupDataPlayers[i].setVehicleType(stoi(r.get(4)));
-                    groupDataPlayers[i].setColorVehicle(stoi(r.get(5)));
+                    groupDataPlayers[i].setVehicleType(stoi(r.get(5)));
+                    groupDataPlayers[i].setColorVehicle(stoi(r.get(6)));
+                    playersRegistered = numPlayers;
                     mtx3.unlock();
                 }
             }
             // Check the values again if the
             mtx3.lock();
             totalPlayers = groupDataPlayers.size();
+            cancelled = cancelledGroup;
             mtx3.unlock();
         }
         // All the cars are stored
-        mtx3.lock();
-        finishedRegister = true;
-        mtx3.unlock();
     }
+    winLindadriver.stop();
+    mtx3.lock();
+    finishedRegister = true;
+    cancelled = cancelledGroup;
+    mtx3.unlock();
 }
 
 
@@ -7634,6 +7729,10 @@ void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister){
  * @param c is the configuration of the game
  */
 State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
+
+    if (onMultiplayer){
+        r.soundTracks[18]->stop();
+    }
 
     c.w.clear();
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
@@ -7762,9 +7861,6 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
     // Control if the vehicle selection has been canceled
     bool cancelledVehicle = false, checkingVehicle = false;
-
-    // Control if the threads must be stopped
-    bool stop = false;
 
     IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
     Sprite sprite(c.backgroundSelectionMenu, background);
@@ -7953,11 +8049,11 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         if (onMultiplayer){
             if (modeMultiplayer == 0){
                 // Owner
-                vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup), ref(stop));
+                vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup));
             }
             else {
                 // Guest
-                vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle), ref(stop));
+                vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle));
             }
         }
 
@@ -7968,7 +8064,56 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             Event e{};
             while (c.window.pollEvent(e)){
                 if (e.type == Event::Closed){
-                    return EXIT;
+                    if (onMultiplayer){
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f + 190.f * c.screenScale);
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            c.w.clear();
+                            c.w.draw(sprite);
+                            c.w.draw(selectionVehicleText);
+
+                            if (optionSelected != 5){
+                                c.w.draw(colorDescription);
+                            }
+
+                            c.w.draw(vehicleShape);
+                            c.w.draw(garage);
+                            c.w.draw(descriptionShape);
+                            c.w.draw(vehiclePropertiesText);
+                            c.w.draw(vehicleName);
+                            c.w.draw(speedVehicleText);
+                            c.w.draw(angleTurnText);
+                            c.w.draw(motorText);
+                            c.w.draw(accelerationText);
+                            c.w.draw(speed);
+                            c.w.draw(angle);
+                            c.w.draw(motor);
+                            c.w.draw(acceleration);
+                            c.w.draw(vehicleCar);
+                            c.w.draw(complainText);
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
+                    }
+                    else {
+                        return EXIT;
+                    }
                 }
             }
 
@@ -8783,27 +8928,43 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 // Owner of the group
 
                 if (checkingGroup){
+                    r.soundTracks[16]->stop();
+                    r.soundTracks[18]->play();
+                    vehicleOwner.join();
                     return MULTIPLAYER_NAME_GROUP;
                 }
 
                 // Create a Linda driver compatible with Windows to make communicate with the Linda server
                 LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
-                if (numberPlayersGroup > 1){
-                    for (int i = 2; i <= numberPlayersGroup; i++){
+                mtx3.lock();
+                int numPlayers = groupDataPlayers.size();
+                mtx3.unlock();
 
+                if (numPlayers > 1){
+                    for (int i = 2; i <= numPlayers; i++){
+
+                        mtx3.lock();
                         int idCode = groupDataPlayers[i - 1].getCodePlayer();
                         string name = groupDataPlayers[i - 1].getNickNamePlayer();
+                        mtx3.unlock();
 
                         // Inform that the group is cancelled
-                        Tuple t = Tuple("CANCELLED_VEHICLE", nickNameGroupMultiplayer, to_string(idCode), name, nickNameMultiplayer);
+                        Tuple t = Tuple("CANCEL_CAR", nickNameGroupMultiplayer, to_string(idCode), name, nickNameMultiplayer);
+
                         winLindadriver.postNote(t);
                     }
                 }
-                winLindadriver.stop();
 
-                vehicleOwner.detach();
-                vehicleOwner.~thread();
+                r.soundTracks[16]->stop();
+                r.soundTracks[18]->play();
+
+                 // Inform that the group is cancelled
+                Tuple t = Tuple("VEHICLE_CLOSED", nickNameGroupMultiplayer, "?A", "?B", nickNameMultiplayer);
+                winLindadriver.postNote(t);
+                vehicleOwner.join();
+
+                winLindadriver.stop();
 
                 // Control the end point
                 if (typeOfGameMultiplayer == 0){
@@ -8818,6 +8979,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 if (cancelledVehicle){
 
                     vehicleGuest.join();
+
+                    r.soundTracks[16]->stop();
+                    r.soundTracks[18]->play();
 
                     // Control the end point
                     if (typeOfGameMultiplayer == 0){
@@ -8837,8 +9001,15 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 Tuple t = Tuple("LEAVE_GROUP", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer, name);
                 winLindadriver.postNote(t);
 
+                t = Tuple("PLAYER_CLOSED", nickNameGroupMultiplayer, "?A", nickNameMultiplayer, "?B");
+                winLindadriver.postNote(t);
+                vehicleGuest.join();
+
                 // Close connection
                 winLindadriver.stop();
+
+                r.soundTracks[16]->stop();
+                r.soundTracks[18]->play();
 
                 if (randomMultiplayerJoined){
                     return SELECT_MULTIPLAYER_JOIN;
@@ -8868,36 +9039,86 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         colorCarSelected = colorSelected;
 
         if (onMultiplayer){
+
             // Counter of players registered
-            int numPlayers = 0, localPlayers = 0;
+            int numPlayers = 1, localPlayers = 1;
 
             // Control that all the players are registered
             bool finishedRegister = false, checkingRegister = false;
             int players = groupDataPlayers.size();
 
+            mtx3.lock();
+            groupDataPlayers[codePlayerInGroup].setVehicleType(typeOfVehicle);
+            groupDataPlayers[codePlayerInGroup].setColorVehicle(colorCarSelected);
+            mtx3.unlock();
+
             Text multiplayerIndicator;
             multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS 1 / " + to_string(players));
-            multiplayerIndicator.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+            multiplayerIndicator.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
             multiplayerIndicator.setFont(c.fontVehicleSelectionMenuPanelProp);
             multiplayerIndicator.setStyle(Text::Bold);
             multiplayerIndicator.setFillColor(c.colorTextVehicleSelectionProp);
             multiplayerIndicator.setOutlineColor(c.colorBorderVehicleSelectionProp);
             multiplayerIndicator.setOutlineThickness(2.0f * c.screenScale);
             multiplayerIndicator.setPosition(c.w.getSize().x / 2.f - multiplayerIndicator.getLocalBounds().width / 2.f,
-                                             c.w.getSize().y / 2.f + 235.0f * c.screenScale);
+                                             c.w.getSize().y / 2.f + 190.0f * c.screenScale);
+
 
             // Control the vehicle selected by the other rivals
-            vehicleRestPlayers = thread(storeRivalPlayers, this, ref(numPlayers), ref(finishedRegister));
-            vehicleRestPlayers.detach();
+            vehicleRestPlayers = thread(storeRivalPlayers, this, ref(numPlayers), ref(finishedRegister), ref(cancelledGroup));
 
             // Wait until all players have selected their cars
-            while (!checkingRegister){
+            while (!checkingRegister && !checkingGroup){
 
                 // Detect the possible events
                 Event e{};
                 while (c.window.pollEvent(e)){
                     if (e.type == Event::Closed){
-                        return EXIT;
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f + 190.f * c.screenScale);
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            c.w.clear();
+                            c.w.draw(sprite);
+                            c.w.draw(selectionVehicleText);
+
+                            if (optionSelected != 5){
+                                c.w.draw(colorDescription);
+                            }
+
+                            c.w.draw(vehicleShape);
+                            c.w.draw(garage);
+                            c.w.draw(descriptionShape);
+                            c.w.draw(vehiclePropertiesText);
+                            c.w.draw(vehicleName);
+                            c.w.draw(speedVehicleText);
+                            c.w.draw(angleTurnText);
+                            c.w.draw(motorText);
+                            c.w.draw(accelerationText);
+                            c.w.draw(speed);
+                            c.w.draw(angle);
+                            c.w.draw(motor);
+                            c.w.draw(acceleration);
+                            c.w.draw(vehicleCar);
+                            c.w.draw(complainText);
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                 }
 
@@ -8905,9 +9126,19 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 mtx3.lock();
                 localPlayers = numPlayers;
                 checkingRegister = finishedRegister;
+                checkingGroup = cancelledGroup;
                 mtx3.unlock();
 
-                 // Display the menu
+                // Display the menu
+                c.w.clear();
+
+                c.w.draw(sprite);
+                c.w.draw(selectionVehicleText);
+
+                if (optionSelected != 5){
+                    c.w.draw(colorDescription);
+                }
+
                 c.w.draw(vehicleShape);
                 c.w.draw(garage);
                 c.w.draw(descriptionShape);
@@ -8923,27 +9154,43 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 c.w.draw(acceleration);
                 c.w.draw(vehicleCar);
 
-                mtx3.lock();
                 players = groupDataPlayers.size();
-                multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS 1 / " + to_string(players));
-                mtx3.unlock();
+                multiplayerIndicator.setString("WAITING FOR THE REST OF PLAYERS " + to_string(localPlayers) + " / " + to_string(players));
                 multiplayerIndicator.setPosition(c.w.getSize().x / 2.f - multiplayerIndicator.getLocalBounds().width / 2.f,
-                                                 c.w.getSize().y / 2.f + 235.0f * c.screenScale);
+                                                 c.w.getSize().y / 2.f + 190.0f * c.screenScale);
+
+
+                c.w.draw(multiplayerIndicator);
 
                 // Display the counter
                 bufferSprite.setTexture(c.w.getTexture(), true);
                 c.w.display();
                 c.window.draw(bufferSprite);
                 c.window.display();
-                sleep(milliseconds(160));
             }
-        }
 
-        // Stop the threads
-        if (onMultiplayer){
-            mtx3.lock();
-            stop = false;
-            mtx3.unlock();
+            if (checkingGroup){
+                vehicleOwner.join();
+                vehicleRestPlayers.join();
+                return MULTIPLAYER_NAME_GROUP;
+            }
+
+
+            // Create the connection with the Linda server
+            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+            if (modeMultiplayer == 0){
+                // Inform that the group is cancelled
+                Tuple t = Tuple("VEHICLE_DONE", nickNameGroupMultiplayer, "?A", "?B", nickNameMultiplayer);
+                winLindadriver.postNote(t);
+            }
+            else {
+                Tuple t = Tuple("VEHICLE_DONE", nickNameGroupMultiplayer, "?A", nickNameMultiplayer, "?B");
+                winLindadriver.postNote(t);
+            }
+
+            winLindadriver.stop();
+
             if (modeMultiplayer == 0){
                 vehicleOwner.join();
             }
@@ -9001,36 +9248,42 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                  angleVehicles[optionSelected][colorSelected], motorNames[optionSelected][colorSelected]);
         }
 
-        // Store the rival cars
-        if (typeOfGame == 0 || typeOfGame == 2){
-            // Store the rival cars in the vector
-            storingRivalCars(c);
-        }
-
-        if (typeOfGame == 2){
-            switch(typeOfVehicle){
-                case 0:
-                    player.setVehicle(typeOfGame);
-                    break;
-                case 1:
-                    player2.setVehicle(typeOfGame);
-                    break;
-                case 2:
-                    player3.setVehicle(typeOfGame);
-                    break;
-                case 3:
-                    player4.setVehicle(typeOfGame);
-                    break;
-                case 4:
-                    player5.setVehicle(typeOfGame);
-                    break;
-                case 5:
-                    player6.setVehicle(typeOfGame);
+        if (onMultiplayer){
+            while (1){
+                cout << "AQUI ESTAMOS" << endl;
             }
-            return LOADING;
         }
         else {
-            return LOAD_GAME;
+            // Store the rival cars
+            if (typeOfGame == 0 || typeOfGame == 2){
+                // Store the rival cars in the vector
+                storingRivalCars(c);
+            }
+            if (typeOfGame == 2){
+                switch(typeOfVehicle){
+                    case 0:
+                        player.setVehicle(typeOfGame);
+                        break;
+                    case 1:
+                        player2.setVehicle(typeOfGame);
+                        break;
+                    case 2:
+                        player3.setVehicle(typeOfGame);
+                        break;
+                    case 3:
+                        player4.setVehicle(typeOfGame);
+                        break;
+                    case 4:
+                        player5.setVehicle(typeOfGame);
+                        break;
+                    case 5:
+                        player6.setVehicle(typeOfGame);
+                }
+                return LOADING;
+            }
+            else {
+                return LOAD_GAME;
+            }
         }
     }
     return EXIT;
@@ -11157,9 +11410,9 @@ void Game::loadCircuitMenuConfiguration(const string path, Configuration& c){
 
 
 
-void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup){
+void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup, bool& escape){
 
-    bool pathSelected, cancelled;
+    bool pathSelected, cancelled, escaped;
 
     // Check if the pulses have been received
     bool found;
@@ -11168,10 +11421,11 @@ void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup){
     mtx3.lock();
     pathSelected = circuitSelected;
     cancelled = cancelledGroup;
+    escaped = escape;
     mtx3.unlock();
 
     // Max attempts to delete a member of the group
-    const int MAX_ATTEMPTS = 40;
+    const int MAX_ATTEMPTS = 100;
 
     // Vector with the number of attempts of contacting to each member of the group
     vector<int> attemptsPerMember(numberPlayersGroup);
@@ -11186,7 +11440,7 @@ void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup){
     LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
     // Until the circuit has been selected
-    while (!pathSelected && !cancelled){
+    while (!pathSelected && !cancelled && !escaped){
 
         // Iterate the members
         for (int i = 2; i <= groupDataPlayers.size(); i++){
@@ -11249,6 +11503,7 @@ void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup){
         mtx3.lock();
         pathSelected = circuitSelected;
         cancelled = cancelledGroup;
+        escaped = escape;
         mtx3.unlock();
     }
     // Close connection with Linda server
@@ -11540,6 +11795,8 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
     // Canceled group
     bool cancelledGroup = false;
 
+    bool escape = false;
+
     // Show the vehicle selected
     Sprite circuitRoute;
     circuitRoute.setTexture(circuits[0], true);
@@ -11550,8 +11807,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
 
     if (onMultiplayer){
         // Throw the thread that control the pulses of the group guests
-        guestPulses = thread(controlGuestPulses, this, ref(circuitSelected), ref(cancelledGroup));
-        guestPulses.detach();
+        guestPulses = thread(controlGuestPulses, this, ref(circuitSelected), ref(cancelledGroup), ref(escape));
     }
 
     // While start and backspace have not been pressed
@@ -11641,7 +11897,45 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
             Event e{};
             while (c.window.pollEvent(e)){
                 if (e.type == Event::Closed){
-                    return EXIT;
+                    if (onMultiplayer){
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(35.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f + 180.f * c.screenScale);
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            // Draw the elements of the menu
+                            c.w.draw(sprite);
+                            c.w.draw(shape);
+                            c.w.draw(mainText);
+                            c.w.draw(circuitName);
+                            c.w.draw(circuitRoute);
+                            c.w.draw(circuitIndicatorText);
+                            c.w.draw(lapsIndicatorText);
+                            c.w.draw(lapsText);
+                            c.w.draw(circuitText);
+                            c.w.draw(triangle2);
+                            c.w.draw(complainText);
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
+                    }
+                    else {
+                        return EXIT;
+                    }
                 }
             }
 
@@ -11822,15 +12116,27 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                 r.soundEffects[2]->stop();
                 r.soundEffects[2]->play();
 
-                // Check if multi player mode is active
-                guestPulses.~thread();
+                mtx3.lock();
+                circuitSelected = true;
+                mtx3.unlock();
+                guestPulses.join();
             }
             // Check if backspace key has been pressed
-            else if ((c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) || cancelledGroup){
+            else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)){
                 // Change the controllers of the car
                 backSpacePressed = true;
                 r.soundEffects[11]->stop();
                 r.soundEffects[11]->play();
+                mtx3.lock();
+                escape = true;
+                mtx3.unlock();
+                guestPulses.join();
+            }
+            else if (cancelledGroup){
+                backSpacePressed = true;
+                r.soundEffects[11]->stop();
+                r.soundEffects[11]->play();
+                guestPulses.join();
             }
         }
     }
@@ -11864,6 +12170,9 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                 // Inform that the group is cancelled
                 Tuple t = Tuple("CIRCUIT_SELECTED", nickNameGroupMultiplayer, name, to_string(landScapeSelected));
                 winLindadriver.postNote(t);
+
+                t = Tuple("PULSE_RECEIVED", nickNameGroupMultiplayer, name, to_string(idCode));
+                winLindadriver.postNote(t);
             }
 
             mtx3.lock();
@@ -11876,14 +12185,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
     }
     else if (backSpacePressed){
 
-        mtx3.lock();
-        cancelledGroup = true;
-        mtx3.unlock();
-
-
         if (onMultiplayer){
-            // Check if multi player mode is active
-            guestPulses.~thread();
 
             // Create a Linda driver compatible with Windows to make communicate with the Linda server
             LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
@@ -11896,7 +12198,10 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
 
                     // Inform that the group is cancelled
                     Tuple t = Tuple("CANCELLED_CIRCUIT", nickNameGroupMultiplayer, to_string(idCode), nickNameMultiplayer, name);
-                    cout << "PROPIETARIO MANDA " << t.to_string() << endl;
+                    winLindadriver.postNote(t);
+
+                    // The to the member that the pulse has been received
+                    t = Tuple("PULSE_RECEIVED", nickNameGroupMultiplayer, name, to_string(idCode));
                     winLindadriver.postNote(t);
                 }
             }
@@ -12733,7 +13038,48 @@ State Game::introduceNameMultiplayer(Configuration& c, SoundPlayer& r){
                 if (c.window.pollEvent(e)) {
                     // Detect the possible events
                     if (e.type == Event::Closed){
-                        return EXIT;
+                        // Complaining text
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        if (c.isDefaultScreen){
+                            complainText.setPosition(c.w.getSize().x / 2.f - complainText.getLocalBounds().width / 2.f,
+                                                             c.w.getSize().y / 2.f + 220.0f * c.screenScale);
+                        }
+                        else {
+                            complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                      c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+                        }
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            // Draw the elements of the menu
+                            c.w.draw(c.multiPlayerMenuBackground);
+                            c.w.draw(shape);
+                            c.w.draw(mainText);
+                            c.w.draw(info1);
+                            c.w.draw(info2);
+
+                            playerName.setString(nickNameMultiplayer);
+                            playerName.setPosition((c.w.getSize().x / 2.f) - playerName.getLocalBounds().width / 2.f,
+                                                    c.w.getSize().y / 2.f + 80.0f * c.screenScale);
+
+                            c.w.draw(playerName);
+                            c.w.draw(complainText);
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                     else if (e.type == Event::KeyPressed) {
 
@@ -13172,7 +13518,49 @@ State Game::introduceGroupMultiplayer(Configuration& c, SoundPlayer& r){
                 if (c.window.pollEvent(e)) {
                     // Detect the possible events
                     if (e.type == Event::Closed){
-                        return EXIT;
+                        // Complaining text
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        if (c.isDefaultScreen){
+                            complainText.setPosition(c.w.getSize().x / 2.f - complainText.getLocalBounds().width / 2.f,
+                                                             c.w.getSize().y / 2.f + 220.0f * c.screenScale);
+                        }
+                        else {
+                            complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                      c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+                        }
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            // Draw the elements of the menu
+                            c.w.draw(c.multiPlayerMenuBackground);
+                            c.w.draw(shape);
+                            c.w.draw(mainText);
+                            c.w.draw(info1);
+                            c.w.draw(info2);
+                            c.w.draw(playerName);
+
+                            playerName.setString(nickNameGroupMultiplayer);
+                            playerName.setPosition((c.w.getSize().x / 2.f) - playerName.getLocalBounds().width / 2.f,
+                                                    c.w.getSize().y / 2.f + 80.0f * c.screenScale);
+
+                            c.w.draw(playerName);
+                            c.w.draw(complainText);
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                     else if (e.type == Event::KeyPressed) {
 
@@ -13697,7 +14085,45 @@ State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
             Event e{};
             while (c.window.pollEvent(e)){
                 if (e.type == Event::Closed){
-                    return EXIT;
+                    // Complaining text
+                    Text complainText;
+                    complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                    complainText.setCharacterSize(static_cast<unsigned int>(int(50.0f * c.screenScale)));
+                    complainText.setFont(c.fontTitleMultiplayerMenu);
+                    complainText.setStyle(Text::Bold);
+                    complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                    complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                    complainText.setOutlineThickness(5.0f * c.screenScale);
+                    if (c.isDefaultScreen){
+                            complainText.setPosition(c.w.getSize().x / 2.f - complainText.getLocalBounds().width / 2.f,
+                                                             c.w.getSize().y / 2.f + 220.0f * c.screenScale);
+                        }
+                        else {
+                            complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                      c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+                        }
+
+                    for (int i = 0; i <= 120; i++){
+
+                        Event e;
+                        c.window.pollEvent(e);
+
+                        // Draw the elements of the menu
+                        c.w.draw(c.multiPlayerMenuJoinGroupBackground);
+                        c.w.draw(shape);
+                        c.w.draw(mainText);
+                        c.w.draw(complainText);
+
+                         // Show the buttons of the menu
+                        for (int i = 0; i < (int)c.multiplayerJoinGroupMenuButtons.size(); i++) {
+                            c.multiplayerJoinGroupMenuButtons.at(i).render(&c.w);
+                        }
+
+                        bufferSprite.setTexture(c.w.getTexture(), true);
+                        c.w.display();
+                        c.window.draw(bufferSprite);
+                        c.window.display();
+                    }
                 }
             }
 
@@ -14156,7 +14582,62 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
             Event e{};
             while (c.window.pollEvent(e)){
                 if (e.type == Event::Closed){
-                    return EXIT;
+                    // Complaining text
+                    Text complainText;
+                    complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                    complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                    complainText.setFont(c.fontTitleMultiplayerMenu);
+                    complainText.setStyle(Text::Bold);
+                    complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                    complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                    complainText.setOutlineThickness(5.0f * c.screenScale);
+                    if (c.isDefaultScreen){
+                        complainText.setPosition(c.w.getSize().x / 2.f - complainText.getLocalBounds().width / 2.f,
+                                                         c.w.getSize().y / 2.f + 220.0f * c.screenScale);
+                    }
+                    else {
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+                    }
+
+                    mtx3.lock();
+                    vector<MultiplayerData> players(groupDataPlayers);
+                    mtx3.unlock();
+
+                    int numPlayers = players.size();
+
+                    for (int i = 0; i <= 120; i++){
+
+                        Event e;
+                        c.window.pollEvent(e);
+
+                        c.w.draw(c.multiPlayerMenuMembersGroupBackground);
+                        c.w.draw(shape);
+                        c.w.draw(mainText);
+                        c.w.draw(info1);
+                        c.w.draw(info2);
+                        c.w.draw(complainText);
+
+                        if (numPlayers > 0){
+                            for (int i = 1; i <= numPlayers; i++){
+
+                                playerName.setString(players[i - 1].getNickNamePlayer());
+                                playerName.setPosition((c.w.getSize().x / 2.f) - 80.f * c.screenScale,
+                                                       (c.w.getSize().y / 2.f - 125.0f) + (40.f * i) * c.screenScale);
+
+                                square.setPosition((c.w.getSize().x / 2.f) - 95.f * c.screenScale,
+                                                       (c.w.getSize().y / 2.f - 113.0f) + (40.f * i) * c.screenScale);
+
+                                c.w.draw(playerName);
+                                c.w.draw(square);
+                            }
+                        }
+
+                        bufferSprite.setTexture(c.w.getTexture(), true);
+                        c.w.display();
+                        c.window.draw(bufferSprite);
+                        c.window.display();
+                    }
                 }
             }
 
@@ -14395,7 +14876,61 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
                 Event e{};
                 while (c.window.pollEvent(e)){
                     if (e.type == Event::Closed){
-                        return EXIT;
+                                                // Complaining text
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        if (c.isDefaultScreen){
+                            complainText.setPosition(c.w.getSize().x / 2.f - complainText.getLocalBounds().width / 2.f,
+                                                             c.w.getSize().y / 2.f + 220.0f * c.screenScale);
+                        }
+                        else {
+                            complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                      c.w.getSize().y / 2.f + 180.0f * c.screenScale);
+                        }
+
+                        mtx3.lock();
+                        vector<MultiplayerData> players(groupDataPlayers);
+                        mtx3.unlock();
+
+                        int numPlayers = players.size();
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            c.w.draw(c.multiPlayerMenuMembersGroupBackground);
+                            c.w.draw(shape);
+                            c.w.draw(mainText);
+                            c.w.draw(info);
+                            c.w.draw(complainText);
+
+                            if (numPlayers > 0){
+                                for (int i = 1; i <= numPlayers; i++){
+
+                                    playerName.setString(players[i - 1].getNickNamePlayer());
+                                    playerName.setPosition((c.w.getSize().x / 2.f) - 80.f * c.screenScale,
+                                                           (c.w.getSize().y / 2.f - 125.0f) + (40.f * i) * c.screenScale);
+
+                                    square.setPosition((c.w.getSize().x / 2.f) - 95.f * c.screenScale,
+                                                           (c.w.getSize().y / 2.f - 113.0f) + (40.f * i) * c.screenScale);
+
+                                    c.w.draw(playerName);
+                                    c.w.draw(square);
+                                }
+                            }
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                 }
 
@@ -14567,7 +15102,55 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
                 Event e{};
                 while (c.window.pollEvent(e)){
                     if (e.type == Event::Closed){
-                        return EXIT;
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f + 260.f * c.screenScale);
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            // Draw the elements of the menu
+                            c.w.draw(c.multiPlayerMenuMembersGroupBackground);
+                            c.w.draw(shape);
+                            c.w.draw(mainText);
+                            c.w.draw(info);
+                            c.w.draw(complainText);
+
+                            mtx3.lock();
+                            vector<MultiplayerData> players(groupDataPlayers);
+                            mtx3.unlock();
+
+                            int numPlayers = players.size();
+
+                            if (numPlayers > 0){
+                                for (int i = 1; i <= numPlayers; i++){
+
+                                    playerName.setString(players[i - 1].getNickNamePlayer());
+                                    playerName.setPosition((c.w.getSize().x / 2.f) - 80.f * c.screenScale,
+                                                           (c.w.getSize().y / 2.f - 125.0f) + (40.f * i) * c.screenScale);
+
+                                    square.setPosition((c.w.getSize().x / 2.f) - 95.f * c.screenScale,
+                                                           (c.w.getSize().y / 2.f - 113.0f) + (40.f * i) * c.screenScale);
+
+                                    c.w.draw(playerName);
+                                    c.w.draw(square);
+                                }
+                            }
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                 }
 
@@ -14607,8 +15190,8 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
                     r.soundEffects[119]->play();
                 }
 
-                if (players.size() > 0){
-                    for (int i = 1; i <= (int)players.size(); i++){
+                if (numPlayers > 0){
+                    for (int i = 1; i <= numPlayers; i++){
 
                         playerName.setString(players[i - 1].getNickNamePlayer());
                         playerName.setPosition((c.w.getSize().x / 2.f) - 80.f * c.screenScale,
@@ -14627,7 +15210,6 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
                 c.window.draw(bufferSprite);
                 c.window.display();
                 sleep(milliseconds(120));
-
             }
             // Check the reason of leaving the loop
             if (escapePressed){
@@ -14982,10 +15564,10 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
         // Canceled group
         bool cancelledGroup = false;
 
+        bool escape = false;
 
         // Throw the thread that control the pulses of the group guests
-        guestPulses = thread(controlGuestPulses, this, ref(gameModeSelected), ref(cancelledGroup));
-        guestPulses.detach();
+        guestPulses = thread(controlGuestPulses, this, ref(gameModeSelected), ref(cancelledGroup), ref(escape));
 
         // Control if the start key is pressed or not
         bool startPressed = false;
@@ -15064,7 +15646,68 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
                 Event e{};
                 while (c.window.pollEvent(e)){
                     if (e.type == Event::Closed){
-                        return EXIT;
+                        // Complaining text
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f + 260.0f * c.screenScale);
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            // Draw the elements of the menu
+                            c.w.draw(c.sGameModesMultiplayerBackground);
+                            c.w.draw(shape);
+                            c.w.draw(panelButton);
+                            c.w.draw(mainText);
+                            c.w.draw(complainText);
+
+                            // Show the buttons of the menu
+                            for (int i = 0; i < (int)c.gameModeMenuMultiplayerButtons.size(); i++) {
+
+                                c.gameModeMenuMultiplayerButtons.at(i).render(&c.w);
+
+                                // Draw the button description in the panel
+                                if (i == optionSelected){
+
+                                    int posXDescriptionOffset = panelButton.getPosition().x + 10;
+                                    int posYDescriptionOffset = panelButton.getPosition().y + 10;
+
+                                    // Draw the button description
+                                    // Display the description of the button
+                                    vector<string> wordsButton =  c.gameModeMenuMultiplayerButtons.at(i).getDescriptionButton();
+
+                                    for (string s : wordsButton){
+                                        descriptionText.setString(s);
+                                        if (posXDescriptionOffset + descriptionText.getLocalBounds().width <= c.thresholdDescriptionX){
+                                            descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                                            c.w.draw(descriptionText);
+                                            posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                                        }
+                                        else {
+                                            posXDescriptionOffset = panelButton.getPosition().x + 10;
+                                            posYDescriptionOffset += c.thresholdDescriptionY * 1.15f;
+                                            descriptionText.setPosition(posXDescriptionOffset, posYDescriptionOffset);
+                                            c.w.draw(descriptionText);
+                                            posXDescriptionOffset += descriptionText.getLocalBounds().width + 10;
+                                        }
+                                    }
+                                }
+                            }
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                 }
 
@@ -15140,14 +15783,26 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
                     r.soundEffects[2]->stop();
                     r.soundEffects[2]->play();
 
-                    // Check if multi player mode is active
-                    guestPulses.~thread();
+                    mtx3.lock();
+                    gameModeSelected = true;
+                    mtx3.unlock();
+                    guestPulses.join();
                 }
                 // Check if escape key has been pressed
-                else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape) || cancelledGroup) {
+                else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)){
                     escapePressed = true;
                     r.soundEffects[11]->stop();
                     r.soundEffects[11]->play();
+                    mtx3.lock();
+                    escape = escapePressed;
+                    mtx3.unlock();
+                    guestPulses.join();
+                }
+                else if (cancelledGroup){
+                    escapePressed = true;
+                    r.soundEffects[11]->stop();
+                    r.soundEffects[11]->play();
+                    guestPulses.join();
                 }
             }
         }
@@ -15167,9 +15822,6 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
 
         if (escapePressed){
 
-            // Check if multi player mode is active
-            guestPulses.~thread();
-
             // Create a Linda driver compatible with Windows to make communicate with the Linda server
             LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
@@ -15183,7 +15835,9 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
                     Tuple t = Tuple("CANCELLED_GROUP", nickNameGroupMultiplayer, to_string(idCode), nickNameMultiplayer, name);
                     winLindadriver.postNote(t);
 
-                    cout << "CANCELANDO EQUIPO " << t.to_string() << endl;
+                    // The to the member that the pulse has been received
+                    t = Tuple("PULSE_RECEIVED", nickNameGroupMultiplayer, name, to_string(idCode));
+                    winLindadriver.postNote(t);
                 }
             }
             Tuple t = Tuple("NAME_GROUP", nickNameGroupMultiplayer);
@@ -15205,6 +15859,10 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
 
             // Inform that the group is cancelled
             Tuple t = Tuple("GAME_MODE_SELECTED", nickNameGroupMultiplayer, name, to_string(optionSelected));
+            winLindadriver.postNote(t);
+
+            // The to the member that the pulse has been received
+            t = Tuple("PULSE_RECEIVED", nickNameGroupMultiplayer, name, to_string(idCode));
             winLindadriver.postNote(t);
         }
 
@@ -15296,7 +15954,32 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
             Event e{};
             while (c.window.pollEvent(e)){
                 if (e.type == Event::Closed){
-                    return EXIT;
+
+                    Text complainText;
+                    complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                    complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                    complainText.setFont(c.fontTitleMultiplayerMenu);
+                    complainText.setStyle(Text::Bold);
+                    complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                    complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                    complainText.setOutlineThickness(5.0f * c.screenScale);
+                    complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                              c.w.getSize().y / 2.f - complainText.getLocalBounds().height / 2.f);
+
+                    for (int i = 0; i <= 120; i++){
+
+                        Event e;
+                        c.window.pollEvent(e);
+
+                        // Draw the elements of the menu
+                        c.w.draw(sprite);
+                        c.w.draw(complainText);
+
+                        bufferSprite.setTexture(c.w.getTexture(), true);
+                        c.w.display();
+                        c.window.draw(bufferSprite);
+                        c.window.display();
+                    }
                 }
             }
 
@@ -15309,8 +15992,6 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
                 mtx3.lock();
                 fail = true;
                 mtx3.unlock();
-
-                controlPulse.join();
             }
 
             c.w.clear(Color(0, 0, 0));
@@ -15326,7 +16007,31 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
                 Event e{};
                 while (c.window.pollEvent(e)){
                     if (e.type == Event::Closed){
-                        return EXIT;
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f - complainText.getLocalBounds().height / 2.f);
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            // Draw the elements of the menu
+                            c.w.draw(sprite);
+                            c.w.draw(complainText);
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                 }
 
@@ -15469,7 +16174,32 @@ State Game::selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r){
             Event e{};
             while (c.window.pollEvent(e)){
                 if (e.type == Event::Closed){
-                    return EXIT;
+
+                    Text complainText;
+                    complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                    complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                    complainText.setFont(c.fontTitleMultiplayerMenu);
+                    complainText.setStyle(Text::Bold);
+                    complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                    complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                    complainText.setOutlineThickness(5.0f * c.screenScale);
+                    complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                              c.w.getSize().y / 2.f - complainText.getLocalBounds().height / 2.f);
+
+                    for (int i = 0; i <= 120; i++){
+
+                        Event e;
+                        c.window.pollEvent(e);
+
+                        // Draw the elements of the menu
+                        c.w.draw(sprite);
+                        c.w.draw(complainText);
+
+                        bufferSprite.setTexture(c.w.getTexture(), true);
+                        c.w.display();
+                        c.window.draw(bufferSprite);
+                        c.window.display();
+                    }
                 }
             }
 
@@ -15499,7 +16229,31 @@ State Game::selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r){
                 Event e{};
                 while (c.window.pollEvent(e)){
                     if (e.type == Event::Closed){
-                        return EXIT;
+                        Text complainText;
+                        complainText.setString("THIS BUTTON CANT'T BE USED NOW ");
+                        complainText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+                        complainText.setFont(c.fontTitleMultiplayerMenu);
+                        complainText.setStyle(Text::Bold);
+                        complainText.setFillColor(c.colorTitleTextMultiplayerMenu);
+                        complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
+                        complainText.setOutlineThickness(5.0f * c.screenScale);
+                        complainText.setPosition((c.w.getSize().x / 2.f) - complainText.getLocalBounds().width / 2.f,
+                                                  c.w.getSize().y / 2.f - complainText.getLocalBounds().height / 2.f);
+
+                        for (int i = 0; i <= 120; i++){
+
+                            Event e;
+                            c.window.pollEvent(e);
+
+                            // Draw the elements of the menu
+                            c.w.draw(sprite);
+                            c.w.draw(complainText);
+
+                            bufferSprite.setTexture(c.w.getTexture(), true);
+                            c.w.display();
+                            c.window.draw(bufferSprite);
+                            c.window.display();
+                        }
                     }
                 }
 
@@ -15707,4 +16461,625 @@ void Game::loadMultiplayerMemberGroupMenuConfiguration(const string path, Config
     }
     // The player menu has been read correctly
     c.multiplayerMembersGroupMenuRead = true;
+}
+
+
+
+
+void Game::testConnection(bool& testFinished, string& mininumLatency, string& mediumLatency, string& maxLantency){
+    // Make connection test using ping command
+    char pingCommandOutput[2048];
+    cmd("ping onlinda.zgzinfinity.tech", pingCommandOutput, 2048);
+
+    // Index of the buffer character
+    int i = 0;
+
+    // Counter of new line characters found
+    int counter = 0;
+
+    // Number of latencies processed
+    int latenciesProccessed = 0;
+
+    // Iterate the output of ping command until the last line is reached
+    while (counter != 11 && pingCommandOutput[i] != '\0'){
+        // Check if is a new line
+        if (pingCommandOutput[i] == '\n'){
+            // Last line obtained
+            counter++;
+        }
+        // Increment the index
+        i++;
+    }
+
+    // Check the final buffer
+    while (pingCommandOutput[i] != '\0'){
+        // Check if the character is a number
+        if (isdigit(pingCommandOutput[i])){
+            // Select in which latency the number must be stored
+            switch(latenciesProccessed){
+                case 0:
+                    // Minimum latency of the ping command
+                    mininumLatency += pingCommandOutput[i];
+                    break;
+                case 1:
+                    // Medium latency of the ping command
+                    maxLantency += pingCommandOutput[i];
+                    break;
+                case 2:
+                    // Maximum latency of the ping command
+                    mediumLatency += pingCommandOutput[i];
+            }
+        }
+        // Check if the character is a comma
+        else if (pingCommandOutput[i] == ','){
+            // A new latency has been processed
+            latenciesProccessed++;
+        }
+        // Increment the index
+        i++;
+    }
+    // Alert that the test has been finished
+    mtx3.lock();
+    testFinished = true;
+    mtx3.unlock();
+}
+
+
+
+/**
+ * Load the configuration of the multi player test configuration menu stored in its xml configuration file
+ * @param path contains the path of the xml configuration file
+ * @param c is the configuration of the game
+ */
+void Game::loadMultiplayerMenuTestingNetworkConfiguration(const string path, Configuration& c){
+
+    // Open the xml file of the multi player
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Local variable to store temporary the text content and the fonts of the texts
+    string content, fontPath, backgroundTexture, colorKind;
+
+    // Iterate to get the information of the multi player menu
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check it is the node that contains the information of the background
+        if ((string)property->name() == "Background"){
+            // Get the background image of the menu
+            backgroundTexture = (string)property->value();
+            c.backgroundMultiplayerTestConnectionMenu.loadFromFile(backgroundTexture);
+        }
+        // Check it is the node that contains the information of the main panel
+        else if ((string)property->name() == "MenuPanel"){
+            // Iterate to get the information of the multi player menu
+            for (xml_node<> *panelProp = property->first_node(); panelProp; panelProp = panelProp->next_sibling()){
+                // Check it is the node that contains the information of the background of the panel
+                if ((string)panelProp->name() == "Background"){
+                    // Get the background image of the menu
+                    backgroundTexture = (string)panelProp->value();
+                    c.backgroundMultiplayerTestConnectionPanel.loadFromFile(backgroundTexture);
+                }
+                // Check it is the node that contains the information of the color border of the panel
+                else if ((string)panelProp->name() == "ColorBorder"){
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the multi player menu
+                    for (xml_node<> *colorChannel = panelProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi((string)colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi((string)colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi((string)colorChannel->value());
+                        }
+                    }
+                    // Store the color border of the panel
+                    c.colorBorderPanelMultiplayerTestConnectionMenu = Color(colorRed, colorGreen, colorBlue);
+                }
+            }
+        }
+        // Check if it is the node that stores the information of the main text of the menu
+        else if ((string)property->name() == "Title"){
+            // Iterate to get the information of the title
+            for (xml_node<> *titleProp = property->first_node(); titleProp; titleProp = titleProp->next_sibling()){
+                // Get the red color channel
+                if ((string)titleProp->name() == "Content"){
+                    // Get the content of the title
+                    content = (string)titleProp->value();
+                    c.contentTitleMultiplayerTestConnectionMenu = content;
+                }
+                // Get the green color channel
+                else if ((string)titleProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)titleProp->value();
+                    c.fontTitleMultiplayerTestConnectionMenu.loadFromFile(fontPath);
+                }
+                // Get color text of the title
+                else if ((string)titleProp->name() == "ColorText" || (string)titleProp->name() == "ColorBorder"){
+                    // Get the kind of color to process
+                    colorKind = (string)titleProp->name();
+                    // Get the border color of the panel
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the multi player menu
+                    for (xml_node<> *colorChannel = titleProp->first_node(); colorChannel; colorChannel = colorChannel->next_sibling()){
+                        // Get the red color channel
+                        if ((string)colorChannel->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(colorChannel->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)colorChannel->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(colorChannel->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)colorChannel->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(colorChannel->value());
+                        }
+                    }
+                    // Check if it is the color of the text
+                    if (colorKind == "ColorText"){
+                        c.colorTitleTextMultiplayerTestConnectionMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                    // Check if it is the color of the border
+                    else if (colorKind == "ColorBorder"){
+                        c.colorTitleBorderMultiplayerTestConnectionMenu = Color(colorRed, colorGreen, colorBlue);
+                    }
+                }
+            }
+        }
+        // Check if it is the node that the different buttons of the menu
+        else if ((string)property->name() == "MenuButtons"){
+            Color colorFont;
+            // Iterate to get the information of the buttons of the player menu
+            for (xml_node<> *buttonProp = property->first_node(); buttonProp; buttonProp = buttonProp->next_sibling()){
+                // Get the font of the buttons
+                if ((string)buttonProp->name() == "Font"){
+                    // Read the font from the file
+                    fontPath = (string)buttonProp->value();
+                    c.fontMenuMultiplayerTestConnectionButtons.loadFromFile(fontPath);
+                }
+                // Get the color font of the buttons
+                else if ((string)buttonProp->name() == "ColorFont"){
+                    // Read the font from the file
+                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                    // Iterate to get the information of the multi player menu
+                    for (xml_node<> *color = buttonProp->first_node(); color; color = color->next_sibling()){
+                        // Get the red color channel
+                        if ((string)color->name() == "R"){
+                            // Get the red channel
+                            colorRed = stoi(color->value());
+                        }
+                        // Get the green color channel
+                        else if ((string)color->name() == "G"){
+                            // Get the red channel
+                            colorGreen = stoi(color->value());
+                        }
+                        // Get the blue color channel
+                        else if ((string)color->name() == "B"){
+                            // Get the red channel
+                            colorBlue = stoi(color->value());
+                        }
+                    }
+                    // Push the color of the button read
+                    c.colorFontMenuPlayerTestConnectionButtons = Color(colorRed, colorGreen, colorBlue);
+                }
+                // Get the information of the buttons
+                else if ((string)buttonProp->name() == "Buttons"){
+                    // Local variables to store the attributes of the buttons
+                    string contentButton;
+                    int buttonState = 0;
+                    vector<Color> colorButtons;
+                    Texture icon;
+                    Sprite s;
+                    int idButton = 0, posX, posY, widthButton, heightButton;
+                    // Iterate to get the information of the buttons
+                    for (xml_node<> *buttonNode = buttonProp->first_node(); buttonNode; buttonNode = buttonNode->next_sibling()){
+                        // Iterate to get the information of the buttons
+                        for (xml_node<> *button = buttonNode->first_node(); button; button = button->next_sibling()){
+                            // Get the font of the buttons
+                            if ((string)button->name() == "Content"){
+                                // Read the font from the file
+                                contentButton = (string)button->value();
+                            }
+                            // Get the state of the button
+                            else if ((string)button->name() == "InitialState"){
+                                // Read the font from the file
+                                buttonState = stoi(button->value());
+                            }
+                            // Get the colors of the button
+                            else if ((string)button->name() == "Colors"){
+                                // Read the colors of the button
+                                for (xml_node<> *colorButton = button->first_node(); colorButton; colorButton = colorButton->next_sibling()){
+                                    // Get the border color of the panel
+                                    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+                                    // Iterate to get the information of the multi player menu
+                                    for (xml_node<> *color = colorButton->first_node(); color; color = color->next_sibling()){
+                                        // Get the red color channel
+                                        if ((string)color->name() == "R"){
+                                            // Get the red channel
+                                            colorRed = stoi(color->value());
+                                        }
+                                        // Get the green color channel
+                                        else if ((string)color->name() == "G"){
+                                            // Get the red channel
+                                            colorGreen = stoi(color->value());
+                                        }
+                                        // Get the blue color channel
+                                        else if ((string)color->name() == "B"){
+                                            // Get the red channel
+                                            colorBlue = stoi(color->value());
+                                        }
+                                    }
+                                    // Push the color of the button read
+                                    c.multiplayerTestConnectionMenuColorButtons.push_back(Color(colorRed, colorGreen, colorBlue));
+                                }
+
+                                // Creation of the button and addition to the vector
+                                posX = c.w.getSize().x / 2.f - 110.0f * c.screenScale;
+                                posY = c.w.getSize().y / 2.f - (-93.0f - idButton * 103.f) * c.screenScale;
+                                widthButton = 200.0f * c.screenScale;
+                                heightButton = 50.0f * c.screenScale;
+
+                                // Creation of the button
+                                Button b = Button(posX, posY, widthButton, heightButton, c.fontMenuMultiplayerTestConnectionButtons,
+                                                  contentButton, c.multiplayerTestConnectionMenuColorButtons[0],
+                                                  c.multiplayerTestConnectionMenuColorButtons[1],
+                                                  c.colorFontMenuPlayerTestConnectionButtons, buttonState, c.screenScale);
+
+                                c.multiplayerTestConnectionMenuButtons.push_back(b);
+                                idButton++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // The player menu has been read correctly
+    c.multiplayerTestConnectionMenuRead = true;
+}
+
+
+
+
+State Game::makeConnectionServerTest(Configuration& c, SoundPlayer& r){
+
+    // Variables to store the latencies of the test
+    string mininumLatency = "", mediumLatency = "", maxLantency = "";
+
+    // Control locally if the test has been finished or not
+    bool testFinished = false, testCompleted = false;
+
+    // Throw a thread with that process the speed connection test
+    thread testerServerConnection(testConnection, this, ref(testFinished), ref(mininumLatency), ref(mediumLatency), ref(maxLantency));
+    testerServerConnection.detach();
+
+    mtx3.lock();
+    testCompleted = testFinished;
+    mtx3.unlock();
+
+    // Check if the xml configuration file has been read or not
+    if (!c.multiplayerTestConnectionMenuRead){
+        string pathFile = "Data/Menus/TestingNetworkMenu/Configuration/TestingNetworkMenu.xml";
+        loadMultiplayerMenuTestingNetworkConfiguration(pathFile, c);
+    }
+    else {
+        int numButtons = int(c.multiplayerTestConnectionMenuButtons.size());
+
+        // Change the state of the first color
+        Button b = Button(c.w.getSize().x / 2.f - 110.0f * c.screenScale, c.w.getSize().y / 2.f + 93.0f * c.screenScale,
+                          200.0f * c.screenScale, 50.0f * c.screenScale, c.fontMenuMultiplayerTestConnectionButtons,
+                          c.multiplayerTestConnectionMenuButtons[0].getTextButton(), c.multiplayerTestConnectionMenuButtons[0].getIdleColorButton(),
+                          c.multiplayerTestConnectionMenuButtons[0].getHoverColorButton(), c.multiplayerTestConnectionMenuButtons[0].getFontColorButton(), 1,
+                          c.screenScale);
+
+        c.multiplayerTestConnectionMenuButtons[0] = b;
+
+        // Eliminate the buttons of the right column
+        for (int i = 1; i < numButtons; i++){
+            // Change the state of the first color
+            Button b = Button(c.w.getSize().x / 2.f - 110.0f * c.screenScale, c.w.getSize().y / 2.f - (-93.0f - i * 103.f) * c.screenScale,
+                              200.0f * c.screenScale, 50.0f * c.screenScale, c.fontMenuMultiplayerTestConnectionButtons,
+                              c.multiplayerTestConnectionMenuButtons[i].getTextButton(), c.multiplayerTestConnectionMenuButtons[i].getIdleColorButton(),
+                              c.multiplayerTestConnectionMenuButtons[i].getHoverColorButton(), c.multiplayerTestConnectionMenuButtons[i].getFontColorButton(), 0,
+                              c.screenScale);
+
+            c.multiplayerTestConnectionMenuButtons[i] = b;
+        }
+    }
+
+    c.w.clear(Color(0, 0, 0));
+    Sprite bufferSprite(c.w.getTexture());
+    c.w.display();
+    c.window.draw(bufferSprite);
+    c.window.display();
+
+    // Make the textures repeated
+    c.backgroundMultiplayerTestConnectionMenu.setRepeated(true);
+    c.backgroundMultiplayerTestConnectionPanel.setRepeated(true);
+
+    // Global rectangle of the background
+    IntRect background(0, 0, c.w.getSize().x, c.w.getSize().y);
+    Sprite sprite(c.backgroundMultiplayerTestConnectionMenu, background);
+
+    float axis_x = float(c.w.getSize().x) / DEFAULT_WIDTH;
+    float axis_y = float(c.w.getSize().y) / DEFAULT_HEIGHT;
+    sprite.setScale(axis_x, axis_y);
+
+    // Creation of the panel rectangle of the menu
+    RectangleShape shape;
+    shape.setPosition((c.w.getSize().x / 2.f) - 350.0f * c.screenScale, c.w.getSize().y / 2.f - 230.0f * c.screenScale);
+    shape.setSize(sf::Vector2f(710.0f * c.screenScale, 520.0f * c.screenScale));
+    shape.setOutlineColor(c.colorBorderPanelMultiplayerTestConnectionMenu);
+    shape.setOutlineThickness(5.0f * c.screenScale);
+    shape.setTexture(&c.backgroundMultiplayerTestConnectionPanel, true);
+
+    // Main Text of the menu
+    Text mainText;
+    mainText.setString(c.contentTitleMultiplayerTestConnectionMenu);
+    mainText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
+    mainText.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    mainText.setStyle(Text::Bold | Text::Underlined);
+    mainText.setFillColor(c.colorTitleTextMultiplayerTestConnectionMenu);
+    mainText.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    mainText.setOutlineThickness(5.0f * c.screenScale);
+    mainText.setPosition((c.w.getSize().x / 2.f) - mainText.getLocalBounds().width / 2.f,
+                          c.w.getSize().y / 2.f - 215.0f * c.screenScale);
+
+    Text testingText;
+    testingText.setString("TESTING CONNECTION SPEED, WAIT");
+    testingText.setCharacterSize(static_cast<unsigned int>(int(45.0f * c.screenScale)));
+    testingText.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    testingText.setStyle(Text::Bold);
+    testingText.setFillColor(c.colorTitleTextMultiplayerTestConnectionMenu);
+    testingText.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    testingText.setOutlineThickness(5.0f * c.screenScale);
+    testingText.setPosition((c.w.getSize().x / 2.f) - testingText.getLocalBounds().width / 2.f,
+                             c.w.getSize().y / 2.f - testingText.getLocalBounds().height / 2.f);
+
+    Text minLatency;
+    minLatency.setString("MINIMUN LATENCY: ");
+    minLatency.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    minLatency.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    minLatency.setStyle(Text::Bold);
+    minLatency.setFillColor(c.colorTitleTextMultiplayerTestConnectionMenu);
+    minLatency.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    minLatency.setOutlineThickness(5.0f * c.screenScale);
+    minLatency.setPosition((c.w.getSize().x / 2.f) - minLatency.getLocalBounds().width / 1.6f,
+                                c.w.getSize().y / 2.f - 150.f * c.screenScale);
+
+    Text medLatency;
+    medLatency.setString("MEDIUM LATENCY: ");
+    medLatency.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    medLatency.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    medLatency.setStyle(Text::Bold);
+    medLatency.setFillColor(c.colorTitleTextMultiplayerTestConnectionMenu);
+    medLatency.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    medLatency.setOutlineThickness(5.0f * c.screenScale);
+    medLatency.setPosition((c.w.getSize().x / 2.f) - medLatency.getLocalBounds().width / 1.52f,
+                                c.w.getSize().y / 2.f - 90.f * c.screenScale);
+
+    Text maxLatency;
+    maxLatency.setString("MAXIMUM LATENCY: ");
+    maxLatency.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    maxLatency.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    maxLatency.setStyle(Text::Bold);
+    maxLatency.setFillColor(c.colorTitleTextMultiplayerTestConnectionMenu);
+    maxLatency.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    maxLatency.setOutlineThickness(5.0f * c.screenScale);
+    maxLatency.setPosition((c.w.getSize().x / 2.f) - maxLatency.getLocalBounds().width / 1.61f,
+                                c.w.getSize().y / 2.f - 30.f * c.screenScale);
+
+    // Check if the testing network has finished or not
+    mtx3.lock();
+    testCompleted = testFinished;
+    mtx3.unlock();
+
+    while (!testCompleted){
+        // Detect the possible events
+        Event e;
+        c.window.pollEvent(e);
+
+        // Draw the elements of the menu
+        c.w.draw(sprite);
+        c.w.draw(testingText);
+
+        bufferSprite.setTexture(c.w.getTexture(), true);
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+
+         // Check if the testing network has finished or not
+        mtx3.lock();
+        testCompleted = testFinished;
+        mtx3.unlock();
+    }
+
+    Text minLatencyValue;
+    minLatencyValue.setString(mininumLatency + " MS");
+    minLatencyValue.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    minLatencyValue.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    minLatencyValue.setStyle(Text::Bold);
+    minLatencyValue.setFillColor(Color::Green);
+    minLatencyValue.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    minLatencyValue.setOutlineThickness(5.0f * c.screenScale);
+    minLatencyValue.setPosition((c.w.getSize().x / 2.f) + 80.f * c.screenScale,
+                                c.w.getSize().y / 2.f - 150.f * c.screenScale);
+
+    Text medLatencyValue;
+    medLatencyValue.setString(mediumLatency + " MS");
+    medLatencyValue.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    medLatencyValue.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    medLatencyValue.setStyle(Text::Bold);
+    medLatencyValue.setFillColor(Color::Yellow);
+    medLatencyValue.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    medLatencyValue.setOutlineThickness(5.0f * c.screenScale);
+    medLatencyValue.setPosition((c.w.getSize().x / 2.f) + 80.f * c.screenScale,
+                                c.w.getSize().y / 2.f - 90.f * c.screenScale);
+
+    Text maxLatencyValue;
+    maxLatencyValue.setString(maxLantency + " MS");
+    maxLatencyValue.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    maxLatencyValue.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    maxLatencyValue.setStyle(Text::Bold);
+    maxLatencyValue.setFillColor(Color::Red);
+    maxLatencyValue.setOutlineColor(c.colorTitleBorderMultiplayerTestConnectionMenu);
+    maxLatencyValue.setOutlineThickness(5.0f * c.screenScale);
+    maxLatencyValue.setPosition((c.w.getSize().x / 2.f) + 90.f * c.screenScale,
+                                c.w.getSize().y / 2.f - 30.f * c.screenScale);
+
+    string indicator;
+    int latency = stoi(mediumLatency);
+
+    Text playerAlarm;
+    playerAlarm.setCharacterSize(static_cast<unsigned int>(int(30.0f * c.screenScale)));
+    playerAlarm.setFont(c.fontTitleMultiplayerTestConnectionMenu);
+    playerAlarm.setStyle(Text::Bold);
+    playerAlarm.setFillColor(Color(10, 201, 235));
+    playerAlarm.setOutlineColor(Color(3, 39, 8));
+    playerAlarm.setOutlineThickness(5.0f * c.screenScale);
+
+    if (latency <= 40){
+        indicator = "YOUR CLIENT WILL GO LIKE A ROCKET";
+    }
+    else if (latency <= 70) {
+        indicator = "YOUR CLIENTE WILL GO DECENTLY";
+    }
+    else if (latency <= 100){
+        indicator = "YOUR CLIENTE WILL GO A LITTLE LAGGED";
+    }
+    else {
+        indicator = "YOUR CLIENTE WILL GO VERY LAGGED";
+    }
+
+    playerAlarm.setString(indicator);
+    playerAlarm.setPosition((c.w.getSize().x / 2.f) - playerAlarm.getLocalBounds().width / 2.f,
+                             c.w.getSize().y / 2.f + 25.f * c.screenScale);
+
+    // Control if the start key is pressed or not
+    bool startPressed = false;
+
+    // Control if the escape key has been pressed
+    bool escapePressed = false;
+
+    // Control the option selected by the user
+    int optionSelected = 0;
+
+    // While start and escape have not been pressed
+    while (!startPressed && !escapePressed) {
+
+        // Detect the possible events
+        Event e;
+        while (c.window.pollEvent(e)){
+            if (e.type == Event::Closed){
+                return EXIT;
+            }
+        }
+
+        // Check if the up or down cursor keys have been pressed or not
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Down)) {
+            if (optionSelected != int(c.multiplayerTestConnectionMenuButtons.size() - 1)) {
+                // Change the color appearance of both buttons
+                r.soundEffects[0]->stop();
+                r.soundEffects[0]->play();
+                optionSelected++;
+                c.multiplayerTestConnectionMenuButtons[optionSelected].setButtonState(BUTTON_HOVER);
+                c.multiplayerTestConnectionMenuButtons[optionSelected - 1].setButtonState(BUTTON_IDLE);
+            }
+        }
+        else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Up)) {
+            if (optionSelected != 0) {
+                r.soundEffects[0]->stop();
+                r.soundEffects[0]->play();
+                optionSelected--;
+                // Change the color appearance of both buttons
+                c.multiplayerTestConnectionMenuButtons[optionSelected].setButtonState(BUTTON_HOVER);
+                c.multiplayerTestConnectionMenuButtons[optionSelected + 1].setButtonState(BUTTON_IDLE);
+            }
+        }
+
+        // Draw the elements of the menu
+        c.w.clear(Color(0, 0, 0));
+        c.w.draw(sprite);
+        c.w.draw(shape);
+        c.w.draw(mainText);
+        c.w.draw(minLatency);
+        c.w.draw(medLatency);
+        c.w.draw(maxLatency);
+        c.w.draw(minLatencyValue);
+        c.w.draw(medLatencyValue);
+        c.w.draw(maxLatencyValue);
+        c.w.draw(playerAlarm);
+
+        // Show the buttons of the menu
+        for (int i = 0; i < (int)c.multiplayerTestConnectionMenuButtons.size(); i++) {
+            c.multiplayerTestConnectionMenuButtons.at(i).render(&c.w);
+        }
+
+        bufferSprite.setTexture(c.w.getTexture(), true);
+        c.w.display();
+        c.window.draw(bufferSprite);
+        c.window.display();
+        sleep(milliseconds(120));
+
+        // Check if start has been pressed
+        if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Enter)) {
+            startPressed = true;
+            r.soundEffects[2]->stop();
+            r.soundEffects[2]->play();
+        }
+        // Check if escape has been pressed
+        else if (c.window.hasFocus() && Keyboard::isKeyPressed(Keyboard::Escape)) {
+            escapePressed = true;
+            r.soundEffects[11]->stop();
+            r.soundEffects[11]->play();
+        }
+    }
+
+    // Control the pixel art flag to construct the view of the screen
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen){
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        }
+        else {
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        }
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+    }
+
+
+    if(startPressed){
+        switch (optionSelected){
+            case 0:
+                return MULTIPLAYER_MENU;
+            case 1:
+                r.soundTracks[18]->stop();
+                r.soundTracks[1]->play();
+                return PLAYER_MENU;
+        }
+    }
+    else if (escapePressed) {
+        r.soundTracks[18]->stop();
+        r.soundTracks[1]->play();
+        return PLAYER_MENU;
+    }
+    return EXIT;
 }
