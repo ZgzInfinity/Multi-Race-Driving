@@ -235,7 +235,7 @@ public:
      * Initialize the properties of the police depending of the game mode
      * selected by the player
      */
-    void setVehicle(const int typeOfGame);
+    void setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup);
 
 
 

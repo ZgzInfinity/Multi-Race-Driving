@@ -5,8 +5,6 @@
 
 #include <vector>
 #include <random>
-#include <fstream>
-#include <sstream>
 #include "Randomizer.h"
 #include "Menu.h"
 #include "LandScape.h"
@@ -18,6 +16,7 @@
 #include "Police.h"
 #include "TrafficCar.h"
 #include "RivalCar.h"
+#include "MultiplayerCar.h"
 #include "LindaDriver.h"
 #include "MultiplayerData.h"
 #include <SFML/Graphics.hpp>
@@ -25,9 +24,8 @@
 #include "rapidxml_utils.hpp"
 #include "rapidxml_print.hpp"
 #include "Globals.h"
-#include "functional"
-#include <condition_variable>
-#include <future>
+
+
 
 using namespace sf;
 using namespace std;
@@ -79,6 +77,8 @@ class Game {
     vector<TrafficCar> cars;
 
     vector<RivalCar> rivals;
+
+    vector<MultiplayerCar> multiplayerCars;
 
     RivalCar goalCar;
 
@@ -460,8 +460,28 @@ class Game {
      * with the vehicles on the screen.
      * @param c is the configuration of the game
      */
+    void updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                              Vehicle::Direction &direction, int& terrain);
+
+
+
+    /**
+     * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+     * with the vehicles on the screen.
+     * @param c is the configuration of the game
+     */
     void updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
                                       Vehicle::Direction &direction, int& terrain);
+
+
+
+    /**
+     * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+     * with the vehicles on the screen.
+     * @param c is the configuration of the game
+     */
+    void updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
+                                                 Vehicle::Direction &direction, int& terrain);
 
 
 
@@ -597,6 +617,15 @@ public:
      * @return
      */
     State playWorldTourPolePosition(Configuration &c, SoundPlayer& r);
+
+
+
+    /**
+     * Updates the logic of the game and refreshes the screen until you leave the game.
+     * @param c is the configuration of the game
+     * @return
+     */
+    State playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& r);
 
 
 
@@ -741,8 +770,6 @@ public:
     void loadMultiplayerMemberGroupMenuConfiguration(const string path, Configuration& c);
 
 
-    void prueba(Configuration& c);
-
 
     /**
      * Load the configuration of the game modes multi player menu stored in its xml configuration file
@@ -770,6 +797,15 @@ public:
 
 
     State makeConnectionServerTest(Configuration& c, SoundPlayer& r);
+
+
+    void storingMultiplayerCars();
+
+
+    bool getOnMultiplayerMode();
+
+
+    void setMultiplayer();
 
 };
 

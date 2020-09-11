@@ -761,8 +761,8 @@ void FormulaOne::setSmoking(bool smoke) {
  * selected by the player
  * @param typeOfGame is the game mode selected by the player
  */
-void FormulaOne::setVehicle(const int typeOfGame){
-    Vehicle::setVehicle(typeOfGame);
+void FormulaOne::setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup){
+    Vehicle::setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;

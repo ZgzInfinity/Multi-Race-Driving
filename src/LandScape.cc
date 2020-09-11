@@ -1075,10 +1075,13 @@ inline void LandScape::drawRoadTracks(RenderTexture& w, Color& dash, const int x
  * @param bgName is the path of the image that represents the background of the landscape
  * @param time is the time available to complete the landscape
  * @param typeOfGame represents the game mode selected by the player
+ * @param onMultiplayer controls if the game is been played in multi player mode or not
+ * @param typeOfGameMultiplayer represents the game selected to play in multi player mode
  */
 LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
-                     const int time, const int typeOfGame, const int numRivals) : posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
-                     startingLandScape(false), finalLandScape(false), middleLandScape(false), timeToPlay(time)
+                     const int time, const int typeOfGame, const int numRivals,
+                     const bool onMultiplayer, const int typeOfGameMultiplayer) : posCameraY(0), nextLeft(nullptr),
+                     nextRight(nullptr), startingLandScape(false), finalLandScape(false), middleLandScape(false), timeToPlay(time)
 {
     // Check if the game mode selected by the player is World Tour and Pole Position
     if (typeOfGame == 0 || typeOfGame == 2){
@@ -1117,55 +1120,69 @@ LandScape::LandScape(Configuration &c, const string &path, const string &bgName,
 
     string pathRoadFile;
 
-    switch(typeOfGame){
-    case 0:
-        // World tour mode
-        pathRoadFile = "Data/GameModes/WorldTour/Configuration/Configuration.xml";
-        break;
-    case 1:
-        // Out Run mode
-        pathRoadFile = "Data/GameModes/OutRun/Configuration/Configuration.xml";
-        break;
-    case 2:
-        // Pole Position mode
-        pathRoadFile = "Data/GameModes/PolePosition/Configuration/Configuration.xml";
-        break;
-    case 3:
-        // Driving fury mode
-        pathRoadFile = "Data/GameModes/DrivingFury/Configuration/Configuration.xml";
-        break;
-    case 4:
-        // Demarrage mode
-        pathRoadFile = "Data/GameModes/Demarrage/Configuration/Configuration.xml";
+    if (onMultiplayer){
+        if (typeOfGameMultiplayer == 0){
+            // World tour mode
+            pathRoadFile = "Data/GameModes/WorldTour/Configuration/Configuration.xml";
+        }
+        else {
+            // Pole Position mode
+            pathRoadFile = "Data/GameModes/PolePosition/Configuration/Configuration.xml";
+        }
+    }
+    else {
+        switch(typeOfGame){
+        case 0:
+            // World tour mode
+            pathRoadFile = "Data/GameModes/WorldTour/Configuration/Configuration.xml";
+            break;
+        case 1:
+            // Out Run mode
+            pathRoadFile = "Data/GameModes/OutRun/Configuration/Configuration.xml";
+            break;
+        case 2:
+            // Pole Position mode
+            pathRoadFile = "Data/GameModes/PolePosition/Configuration/Configuration.xml";
+            break;
+        case 3:
+            // Driving fury mode
+            pathRoadFile = "Data/GameModes/DrivingFury/Configuration/Configuration.xml";
+            break;
+        case 4:
+            // Demarrage mode
+            pathRoadFile = "Data/GameModes/Demarrage/Configuration/Configuration.xml";
+        }
     }
 
     // Load properties of the road
     loadRoadProperties(pathRoadFile);
 
-    // Load the texture indicator of the possible goal car
-    if (typeOfGame == 3){
-        // Load the texture
-        rowGoalCarIndicator.loadFromFile("Data/Hud/28.png");
+    if (!onMultiplayer){
+        // Load the texture indicator of the possible goal car
+        if (typeOfGame == 3){
+            // Load the texture
+            rowGoalCarIndicator.loadFromFile("Data/Hud/28.png");
 
-        // Establish the indicator text
-        goalCarIndicatorText.setFont(c.fontTimeToPlay);
-        goalCarIndicatorText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
-        goalCarIndicatorText.setFillColor(Color::Yellow);
-        goalCarIndicatorText.setOutlineColor(Color::Black);
-        goalCarIndicatorText.setOutlineThickness(3.0f * c.screenScale);
-        goalCarIndicatorText.setString("CRIMINAL IS HERE!");
-    }
-    else if (typeOfGame == 4){
-        // Load the texture
-        rowGoalCarIndicator.loadFromFile("Data/Hud/28.png");
+            // Establish the indicator text
+            goalCarIndicatorText.setFont(c.fontTimeToPlay);
+            goalCarIndicatorText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+            goalCarIndicatorText.setFillColor(Color::Yellow);
+            goalCarIndicatorText.setOutlineColor(Color::Black);
+            goalCarIndicatorText.setOutlineThickness(3.0f * c.screenScale);
+            goalCarIndicatorText.setString("CRIMINAL IS HERE!");
+        }
+        else if (typeOfGame == 4){
+            // Load the texture
+            rowGoalCarIndicator.loadFromFile("Data/Hud/28.png");
 
-        // Establish the indicator text
-        goalCarIndicatorText.setFont(c.fontTimeToPlay);
-        goalCarIndicatorText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
-        goalCarIndicatorText.setFillColor(Color::Yellow);
-        goalCarIndicatorText.setOutlineColor(Color::Black);
-        goalCarIndicatorText.setOutlineThickness(3.0f * c.screenScale);
-        goalCarIndicatorText.setString("VEHICLE TO BE PASSED!");
+            // Establish the indicator text
+            goalCarIndicatorText.setFont(c.fontTimeToPlay);
+            goalCarIndicatorText.setCharacterSize(static_cast<unsigned int>(int(25.0f * c.screenScale)));
+            goalCarIndicatorText.setFillColor(Color::Yellow);
+            goalCarIndicatorText.setOutlineColor(Color::Black);
+            goalCarIndicatorText.setOutlineThickness(3.0f * c.screenScale);
+            goalCarIndicatorText.setString("VEHICLE TO BE PASSED!");
+        }
     }
 }
 
@@ -1184,12 +1201,21 @@ LandScape::LandScape(){}
  * @param flagger is the flagger position while is announcing the start
  * @param semaphore is the color of the semaphore in the starting
  */
-LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals) :
+LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals,
+                     const bool onMultiplayer, const int codePlayerInGroup) :
                      background(landScape.background), posCameraY(0), nextLeft(nullptr), nextRight(nullptr), startingLandScape(true),
                      finalLandScape(false), middleLandScape(false), timeToPlay(0)
 {
+    if (onMultiplayer){
+        if (codePlayerInGroup % 2 != 0){
+            posCameraX = -0.3f;
+        }
+        else {
+            posCameraX = 0.3f;
+        }
+    }
     // Check if the game mode selected by the player is World Tour and Pole Position
-    if (typeOfGame == 0 || typeOfGame == 2){
+    else if (typeOfGame == 0 || typeOfGame == 2){
         // Check the number of rivals
         if (numRivals == 0){
             // Camera in the center of the screen
@@ -1208,16 +1234,15 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
     int rectangles = 0, peopleDisplayed, treesDisplayed;
 
     // Check if the game mode selected by the player is World Tour and Pole Position
-    if (typeOfGame == 0 || typeOfGame == 2){
+    if (onMultiplayer || typeOfGame == 0 || typeOfGame == 2){
 
         // Frequency of apparition of the elements of the landscape
         peopleDisplayed = 8;
         treesDisplayed = 6;
 
         // Establish the length of the landscape depending of the number of rivals
-        if (typeOfGame == 2){
+        if (onMultiplayer){
             switch(numRivals){
-                case 0:
                 case 1:
                     rectangles = 50;
                     break;
@@ -1232,11 +1257,32 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
                 case 6:
                 case 7:
                     rectangles = 65;
-                }
+            }
         }
         else {
-            // Default length of the landscape
-            rectangles = 65;
+            if (typeOfGame == 2){
+                switch(numRivals){
+                    case 0:
+                    case 1:
+                        rectangles = 50;
+                        break;
+                    case 2:
+                    case 3:
+                        rectangles = 55;
+                        break;
+                    case 4:
+                    case 5:
+                        rectangles = 60;
+                        break;
+                    case 6:
+                    case 7:
+                        rectangles = 65;
+                }
+            }
+            else {
+                // Default length of the landscape
+                rectangles = 65;
+            }
         }
     }
     // Check if the game mode is Driving Fury or not
@@ -1278,7 +1324,7 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
         rightSprites.emplace_back();
     }
 
-    if (typeOfGame == 1){
+    if (!onMultiplayer && typeOfGame == 1){
         // People
         leftSprites[1].codeMapElement = 12; // 29 - 1
         leftSprites[1].offset = -1.75f;
@@ -1287,7 +1333,7 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
     }
 
     // Signals
-    if (typeOfGame != 3){
+    if (onMultiplayer || typeOfGame != 3){
         leftSprites[rectangles - 44].codeMapElement = 6;
         leftSprites[rectangles - 44].offset = -1;
         rightSprites[rectangles - 44].codeMapElement = 11;
@@ -1295,7 +1341,7 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
 
         // Flagger
         leftSprites[rectangles - 45].codeMapElement = 1;
-        if (typeOfGame == 0 || typeOfGame == 2){
+        if (onMultiplayer || typeOfGame == 0 || typeOfGame == 2){
             leftSprites[rectangles - 45].offset = -2;
         }
         else {
@@ -1312,7 +1358,7 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
         rightSprites[rectangles - 47].offset = -1.15f;
 
         // Fill
-        if (typeOfGame == 0 || typeOfGame == 2){
+        if (onMultiplayer || typeOfGame == 0 || typeOfGame == 2){
             for (int i = 0; i <= rectangles; i++) {
                 if (i >= 0 && i <= rectangles - 47){
                     if (i % treesDisplayed == 4) {
@@ -1388,13 +1434,22 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
  * @param typeOfGame is the game selected by the player
  * @param numRivals is the number of rivals that are going to compete  against the player
  */
-LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals) :
+LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals,
+                     const bool onMultiplayer, const int codePlayerInGroup) :
                      background(landScape.background), posCameraY(0), nextLeft(nullptr), nextRight(nullptr),
                      startingLandScape(false), finalLandScape(false), middleLandScape(true), timeToPlay(0)
 {
-    // Check if the game selected by the player is World Tour or Pole Position
-    if (typeOfGame == 0 || typeOfGame == 2){
-        // Check the number of rivals to establish the camera
+    if (onMultiplayer){
+        if (codePlayerInGroup % 2 != 0){
+            posCameraX = -0.3f;
+        }
+        else {
+            posCameraX = 0.3f;
+        }
+    }
+    // Check if the game mode selected by the player is World Tour and Pole Position
+    else if (typeOfGame == 0 || typeOfGame == 2){
+        // Check the number of rivals
         if (numRivals == 0){
             // Camera in the center of the screen
             posCameraX = 0.f;
@@ -1412,8 +1467,27 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int
     // Length of the landscape
     int rectangles = 0;
 
+    // Establish the length of the landscape depending of the number of rivals
+    if (onMultiplayer){
+        switch(numRivals){
+            case 1:
+                rectangles = 50;
+                break;
+            case 2:
+            case 3:
+                rectangles = 55;
+                break;
+            case 4:
+            case 5:
+                rectangles = 60;
+                break;
+            case 6:
+            case 7:
+                rectangles = 65;
+        }
+    }
     // Check if the mode of game is Pole Position
-    if (typeOfGame == 2){
+    else if (typeOfGame == 2){
         // Establish the depth of the landscape depending of the number of rivals
         switch(numRivals){
             case 0:
@@ -1509,12 +1583,21 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int
  * @param flagger is the flagger position while is announcing the goal
  * @param semaphore is the color of the semaphore in the goal
  */
-LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals) : posCameraY(0), nextLeft(nullptr),
+LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals,
+                     const bool onMultiplayer, const int codePlayerInGroup) : posCameraY(0), nextLeft(nullptr),
                      nextRight(nullptr), startingLandScape(false), finalLandScape(true), middleLandScape(false),
                      timeToPlay(0)
 {
+    if (onMultiplayer){
+        if (codePlayerInGroup % 2 != 0){
+            posCameraX = -0.3f;
+        }
+        else {
+            posCameraX = 0.3f;
+        }
+    }
     // Check if the game selected by the player is World Tour or Pole Position
-    if (typeOfGame == 0 || typeOfGame == 2){
+    else if (typeOfGame == 0 || typeOfGame == 2){
         // Check the number of rivals to establish the camera
         if (numRivals == 0){
             // Camera in the center of the screen
@@ -1810,8 +1893,9 @@ float LandScape::getCameraPosY() const {
  * @param vehicles is the vector with all the traffic cars
  */
 void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame,
-                              RivalCar& goalCar, const bool displayGoalIndicator, const bool drawGoalCar) {
-
+                              RivalCar& goalCar, vector<MultiplayerCar> &multiplayerCars, const bool displayGoalIndicator,
+                              const bool drawGoalCar, const bool playingMultiplayer)
+{
     const int N = static_cast<const int>(newLines.size());
     const int startPos = int(posCameraY) % N;
     const int lastPos = startPos + c.renderLen - 1;
@@ -1847,12 +1931,30 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     }
     sort(sortedRivals.begin(), sortedRivals.end(), ascendingSortRivalCars);
 
+
     // Discard all the vehicles which are behind the player
     while (!sortedRivals.empty() && (int(sortedRivals.back()->getPosY()) < int(posCameraY) ||
                                        int(sortedRivals.back()->getPosY()) > int(posCameraY) + c.renderLen - 1))
     {
         sortedRivals.pop_back();
     }
+
+
+    // Sort the multi player cars
+    vector<MultiplayerCar*> sortedMultiplayerCars;
+    sortedMultiplayerCars.reserve(multiplayerCars.size());
+    for (MultiplayerCar &v : multiplayerCars){
+        sortedMultiplayerCars.push_back(&v);
+    }
+    sort(sortedMultiplayerCars.begin(), sortedMultiplayerCars.end(), ascendingSortMultiplayerCars);
+
+    // Discard all the vehicles which are behind the player
+    while (!sortedMultiplayerCars.empty() && (int(sortedMultiplayerCars.back()->getPosY()) < int(posCameraY) ||
+                                       int(sortedMultiplayerCars.back()->getPosY()) > int(posCameraY) + c.renderLen - 1))
+    {
+        sortedMultiplayerCars.pop_back();
+    }
+
 
     // Sort the traffic cars
     vector<RivalCar *> sortedGoalCars;
@@ -2100,13 +2202,14 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
             }
         }
 
-        if (typeOfGame == 0 || typeOfGame == 2){
-            // Draw rival cars
-            while (!sortedRivals.empty() && int(sortedRivals.back()->getPosY()) == n - startPos + int(posCameraY)) {
+        // Draw the multi player cars
+        if (playingMultiplayer){
+            // Draw multi player cars
+            while (!sortedMultiplayerCars.empty() && int(sortedMultiplayerCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
 
-                RivalCar *v = sortedRivals.back();
+                MultiplayerCar *v = sortedMultiplayerCars.back();
                 Sprite sv;
-                sv.setTexture(*v->getCurrentTexture(), true);
+                sv.setTexture(*v->getCurrentTexture(1), true);
                 const float width = v->getScalingFactor() * sv.getTextureRect().width;
                 const float widthOri = sv.getTextureRect().width;
                 const float height = v->getScalingFactor() * sv.getTextureRect().height;
@@ -2120,92 +2223,117 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
                 sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
                 c.w.draw(sv);
 
-                // Check if the rival is smoking or not
-                if (v->getSmoking()){
-                    // Draw the smoking of the rival car
-                    v->drawSmokingPlayer(c, destW, destH, widthOri, heightOri, sv.getPosition().y + sv.getGlobalBounds().height * 0.8f);
-                }
-
-                sortedRivals.pop_back();
+                sortedMultiplayerCars.pop_back();
             }
         }
+        else {
+            if (typeOfGame == 0 || typeOfGame == 2){
+                // Draw rival cars
+                while (!sortedRivals.empty() && int(sortedRivals.back()->getPosY()) == n - startPos + int(posCameraY)) {
 
-        if (typeOfGame != 2){
-            // Draw vehicles
-            while (!sortedVehicles.empty() && int(sortedVehicles.back()->getPosY()) == n - startPos + int(posCameraY)) {
-                TrafficCar *v = sortedVehicles.back();
+                    RivalCar *v = sortedRivals.back();
+                    Sprite sv;
+                    sv.setTexture(*v->getCurrentTexture(), true);
+                    const float width = v->getScalingFactor() * sv.getTextureRect().width;
+                    const float widthOri = sv.getTextureRect().width;
+                    const float height = v->getScalingFactor() * sv.getTextureRect().height;
+                    const float heightOri = sv.getTextureRect().height;
+                    float destW = width * l->position_2d_w / SCALE_RESOLUTION;
+                    float destH = height * l->position_2d_w / SCALE_RESOLUTION;
 
-                Sprite sv;
-                sv.setTexture(*v->getCurrentTexture(), true);
-                const float width = v->getScale() * sv.getTextureRect().width;
-                const float widthOri = sv.getTextureRect().width;
-                const float height = v->getScale() * sv.getTextureRect().height;
-                const float heightOri = sv.getTextureRect().height;
-                float destW = width * l->position_2d_w / SCALE_RESOLUTION;
-                float destH = height * l->position_2d_w / SCALE_RESOLUTION;
+                    sv.setScale(destW / widthOri, destH / heightOri);
+                    v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
+                    v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
+                    sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
+                    c.w.draw(sv);
 
-                sv.setScale(destW / widthOri, destH / heightOri);
-                v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
-                v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
-                sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
-                c.w.draw(sv);
+                    // Check if the rival is smoking or not
+                    if (v->getSmoking()){
+                        // Draw the smoking of the rival car
+                        v->drawSmokingPlayer(c, destW, destH, widthOri, heightOri, sv.getPosition().y + sv.getGlobalBounds().height * 0.8f);
+                    }
 
-                sortedVehicles.pop_back();
+                    sortedRivals.pop_back();
+                }
             }
-        }
 
-        // Draw the car to chase
-        if ((typeOfGame == 3 || typeOfGame == 4) && drawGoalCar){
-            // Draw rival cars
-            while (!sortedGoalCars.empty() && int(sortedGoalCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
+            if (typeOfGame != 2){
+                // Draw vehicles
+                while (!sortedVehicles.empty() && int(sortedVehicles.back()->getPosY()) == n - startPos + int(posCameraY)) {
+                    TrafficCar *v = sortedVehicles.back();
 
-                RivalCar *v = sortedGoalCars.back();
-                Sprite sv;
-                sv.setTexture(*v->getCurrentTexture(), true);
-                const float width = v->getScalingFactor() * sv.getTextureRect().width;
-                const float widthOri = sv.getTextureRect().width;
-                const float height = v->getScalingFactor() * sv.getTextureRect().height;
-                const float heightOri = sv.getTextureRect().height;
-                float destW = width * l->position_2d_w / SCALE_RESOLUTION;
-                float destH = height * l->position_2d_w / SCALE_RESOLUTION;
+                    Sprite sv;
+                    sv.setTexture(*v->getCurrentTexture(), true);
+                    const float width = v->getScale() * sv.getTextureRect().width;
+                    const float widthOri = sv.getTextureRect().width;
+                    const float height = v->getScale() * sv.getTextureRect().height;
+                    const float heightOri = sv.getTextureRect().height;
+                    float destW = width * l->position_2d_w / SCALE_RESOLUTION;
+                    float destH = height * l->position_2d_w / SCALE_RESOLUTION;
 
-                sv.setScale(destW / widthOri, destH / heightOri);
-                v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
-                v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
-                sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
-                c.w.draw(sv);
+                    sv.setScale(destW / widthOri, destH / heightOri);
+                    v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
+                    v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
+                    sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
+                    c.w.draw(sv);
 
-                // Check the drawing of the goal car indicator
-                if (displayGoalIndicator){
-                    Sprite sv2;
-                    sv2.setTexture(rowGoalCarIndicator, true);
-                    sv2.setScale(destW / widthOri, destH / heightOri);
-                    sv2.setPosition(v->getMinScreenX(), sv.getPosition().y - sv.getGlobalBounds().height - 8.f);
-                    c.w.draw(sv2);
-
-                    goalCarIndicatorText.setScale(destW / widthOri, destH / heightOri);
-                    goalCarIndicatorText.setPosition(v->getMinScreenX() - 10.f,
-                                                     sv2.getPosition().y - goalCarIndicatorText.getLocalBounds().height);
-                    c.w.draw(goalCarIndicatorText);
+                    sortedVehicles.pop_back();
                 }
+            }
 
-                // Check if the rival is smoking or not
-                if (v->getSmoking()){
-                    // Draw the smoking of the rival car
-                    v->drawSmokingPlayer(c, destW, destH, widthOri, heightOri, sv.getPosition().y + sv.getGlobalBounds().height * 0.8f);
+            // Draw the car to chase
+            if ((typeOfGame == 3 || typeOfGame == 4) && drawGoalCar){
+                // Draw rival cars
+                while (!sortedGoalCars.empty() && int(sortedGoalCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
+
+                    RivalCar *v = sortedGoalCars.back();
+                    Sprite sv;
+                    sv.setTexture(*v->getCurrentTexture(), true);
+                    const float width = v->getScalingFactor() * sv.getTextureRect().width;
+                    const float widthOri = sv.getTextureRect().width;
+                    const float height = v->getScalingFactor() * sv.getTextureRect().height;
+                    const float heightOri = sv.getTextureRect().height;
+                    float destW = width * l->position_2d_w / SCALE_RESOLUTION;
+                    float destH = height * l->position_2d_w / SCALE_RESOLUTION;
+
+                    sv.setScale(destW / widthOri, destH / heightOri);
+                    v->setMinScreenX(l->position_2d_x + l->position_2d_w * v->getPosX() - sv.getGlobalBounds().width / 2.0f);
+                    v->setMaxScreenX(v->getMinScreenX() + sv.getGlobalBounds().width);
+                    sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
+                    c.w.draw(sv);
+
+                    // Check the drawing of the goal car indicator
+                    if (displayGoalIndicator){
+                        Sprite sv2;
+                        sv2.setTexture(rowGoalCarIndicator, true);
+                        sv2.setScale(destW / widthOri, destH / heightOri);
+                        sv2.setPosition(v->getMinScreenX(), sv.getPosition().y - sv.getGlobalBounds().height - 8.f);
+                        c.w.draw(sv2);
+
+                        goalCarIndicatorText.setScale(destW / widthOri, destH / heightOri);
+                        goalCarIndicatorText.setPosition(v->getMinScreenX() - 10.f,
+                                                         sv2.getPosition().y - goalCarIndicatorText.getLocalBounds().height);
+                        c.w.draw(goalCarIndicatorText);
+                    }
+
+                    // Check if the rival is smoking or not
+                    if (v->getSmoking()){
+                        // Draw the smoking of the rival car
+                        v->drawSmokingPlayer(c, destW, destH, widthOri, heightOri, sv.getPosition().y + sv.getGlobalBounds().height * 0.8f);
+                    }
+                    // Check if the rival is smoking or not
+                    else if (v->getFiringSmoke()){
+                        // Draw the smoking of the rival car
+                        v->drawSmokingFirePlayer(c, destW, destH, widthOri, heightOri,
+                                                 sv.getPosition().y + sv.getGlobalBounds().height * 0.7f);
+                    }
+                    else if (v->getFiring()){
+                        // Draw the smoking of the rival car
+                        v->drawFirePlayer(c, destW, destH, widthOri, heightOri,
+                                          sv.getPosition().y + sv.getGlobalBounds().height * 0.7f);
+                    }
+                    sortedGoalCars.pop_back();
                 }
-                // Check if the rival is smoking or not
-                else if (v->getFiringSmoke()){
-                    // Draw the smoking of the rival car
-                    v->drawSmokingFirePlayer(c, destW, destH, widthOri, heightOri,
-                                             sv.getPosition().y + sv.getGlobalBounds().height * 0.7f);
-                }
-                else if (v->getFiring()){
-                    // Draw the smoking of the rival car
-                    v->drawFirePlayer(c, destW, destH, widthOri, heightOri,
-                                      sv.getPosition().y + sv.getGlobalBounds().height * 0.7f);
-                }
-                sortedGoalCars.pop_back();
             }
         }
     }
@@ -2499,6 +2627,15 @@ bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2) {
     return v1->getPosY() < v2->getPosY();
 }
 
+
+
+/**
+ * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * Otherwise returns false
+ */
+bool ascendingSortMultiplayerCars(const MultiplayerCar *v1, const MultiplayerCar *v2){
+    return v1->getPosY() < v2->getPosY();
+}
 
 
 /*

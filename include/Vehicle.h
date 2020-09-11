@@ -148,7 +148,7 @@ public:
      * @param counterCodeImage is a counter that change the sprite to be drawn in the screen
      */
     Vehicle(float maxSpeed, float scale, int maxCounterToChange, float speedVehicle, float posX, float previousX, float posY, float previousY,
-            float minScreenX, float maxScreenX, const std::string &vehicle, int numTextures, int currentCodeImage,
+            float minScreenX, float maxScreenX, const string &vehicle, int numTextures, int currentCodeImage,
             int counterCodeImage);
 
 
@@ -166,8 +166,10 @@ public:
      * Reinitialize all the vehicle properties depending of the game mode
      * selected by the player
      * @param typeOfGame is the game mode selected by the player
+     * @param onMultiplayer control if the game is in multi player mode or not
+     * @param codePlayerInGroup is the identifier code of the player in the multi player group
      */
-    void setVehicle(const int typeOfGame);
+    void setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup);
 
 
 

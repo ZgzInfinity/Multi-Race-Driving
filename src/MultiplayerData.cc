@@ -78,3 +78,23 @@ void MultiplayerData::setColorVehicle(const int colorCar){
  string MultiplayerData::getNickNamePlayer(){
     return nickName;
  }
+
+
+
+/**
+  * Returns the numeric code identifier of a player in a group
+  * @return
+  */
+ int MultiplayerData::getVehicle(){
+    return vehicle;
+ }
+
+
+
+/**
+  * Returns the nickname of a player in a group
+  * @return
+  */
+ int MultiplayerData::getColor(){
+    return color;
+ }

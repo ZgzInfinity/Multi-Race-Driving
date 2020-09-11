@@ -229,7 +229,7 @@ public:
      * selected by the player
      * @param typeOfGame is the game mode selected by the player
      */
-    void setVehicle(const int typeOfGame);
+    void setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup);
 
 
 

@@ -37,6 +37,7 @@
 #include "Menu.h"
 #include "TrafficCar.h"
 #include "RivalCar.h"
+#include "MultiplayerCar.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include <SFML/Graphics.hpp>
@@ -366,8 +367,11 @@ public:
      * @param bgName is the path of the image that represents the background of the landscape
      * @param time is the time available to complete the landscape
      * @param typeOfGame represents the game mode selected by the player
+     * @param onMultiplayer controls if the game is been played in multi player mode or not
+     * @param typeOfGameMultiplayer represents the game selected to play in multi player mode
      */
-    LandScape(Configuration &c, const string &path, const string &bgName, int time, const int typeOfGame, const int numRivals);
+    LandScape(Configuration &c, const string &path, const string &bgName, int time, const int typeOfGame, const int numRivals,
+              const bool onMultiplayer, const int typeOfGameMultiplayer);
 
 
 
@@ -377,7 +381,8 @@ public:
      * @param flagger is the flagger position while is announcing the start
      * @param semaphore is the color of the semaphore in the starting
      */
-    LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals);
+    LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals,
+              const bool onMultiplayer, const int codePlayerInGroup);
 
 
 
@@ -387,7 +392,7 @@ public:
      * @param typeOfGame is the game selected by the player
      * @param numRivals is the number of rivals that are going to compete  against the player
      */
-    LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals);
+    LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals, const bool onMultiplayer, const int codePlayerInGroup);
 
 
 
@@ -397,7 +402,7 @@ public:
      * @param flagger is the flagger position while is announcing the goal
      * @param semaphore is the color of the semaphore in the goal
      */
-    LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals);
+    LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals, const bool onMultiplayer, const int codePlayerInGroup);
 
 
 
@@ -490,8 +495,9 @@ public:
      * @param c is the configuration of the player
      * @param vehicles is the vector with all the traffic cars
      */
-    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame,
-                       RivalCar& goalCar, const bool displayGoalIndicator, const bool drawGoalCar);
+    void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals,
+                       const int typeOfGame, RivalCar& goalCar, vector<MultiplayerCar> &multiplayerCars,
+                       const bool displayGoalIndicator, const bool drawGoalCar, const bool playingMultiplayer);
 
 
 
@@ -650,6 +656,15 @@ bool ascendingSortTrafficCars(const TrafficCar *v1, const TrafficCar *v2);
  * Otherwise returns false
  */
 bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2);
+
+
+
+/**
+ * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * Otherwise returns false
+ */
+bool ascendingSortMultiplayerCars(const MultiplayerCar *v1, const MultiplayerCar *v2);
+
 
 
 /*

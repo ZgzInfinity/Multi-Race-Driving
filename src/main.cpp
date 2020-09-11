@@ -188,6 +188,7 @@ int main() {
                     break;
                 }
                 case PLAYER_MENU: {
+                    engine.setMultiplayer();
                     state = playerMenu(c, r);
                     break;
                 }
@@ -292,12 +293,18 @@ int main() {
                 }
                 case PLAY_GAME: {
                     // Start the corresponding game selected by the player
-                    int typeOfGame = engine.typeGame();
-                    if (typeOfGame == 0 || typeOfGame == 2){
-                        state = engine.playWorldTourPolePosition(c, r);
+                    bool onMultiplayer = engine.getOnMultiplayerMode();
+                    if (onMultiplayer){
+                        state = engine.playWorldTourPolePositionMultiplayer(c, r);
                     }
                     else {
-                        state = engine.playOutRunDrivingFuryDemarrage(c, r);
+                        int typeOfGame = engine.typeGame();
+                        if (typeOfGame == 0 || typeOfGame == 2){
+                            state = engine.playWorldTourPolePosition(c, r);
+                        }
+                        else {
+                            state = engine.playOutRunDrivingFuryDemarrage(c, r);
+                        }
                     }
                     break;
                 }

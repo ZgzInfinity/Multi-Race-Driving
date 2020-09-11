@@ -826,9 +826,9 @@ void Devastator::setSmoking(bool smoke) {
  * selected by the player
  * @param typeOfGame is the game mode selected by the player
  */
-void Devastator::setVehicle(const int typeOfGame){
+void Devastator::setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup){
     // Reinitialize the properties of the devastator
-    Vehicle::setVehicle(typeOfGame);
+    Vehicle::setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
     acceleration = 0.0f;
     minCrashAcc = 0.0f;
     inertia = 0.0f;

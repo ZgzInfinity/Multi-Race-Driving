@@ -93,6 +93,23 @@ struct MultiplayerData {
       */
      string getNickNamePlayer();
 
+
+
+     /**
+      * Returns the numeric code identifier of a player in a group
+      * @return
+      */
+     int getVehicle();
+
+
+
+    /**
+      * Returns the nickname of a player in a group
+      * @return
+      */
+     int getColor();
+
+
 };
 
 #endif // MULTIPLAYER_DATA_H

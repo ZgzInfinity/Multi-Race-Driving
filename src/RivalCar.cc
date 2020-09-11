@@ -1605,7 +1605,7 @@ void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty, const
         // Check the difficulty and choose a type or AI
         switch(difficulty){
         case EASY:
-            if (p < 0.4f) {
+            if (p <= 0.4f) {
                 typeAI = OBSTACLE;
             }
             else {
@@ -1613,7 +1613,7 @@ void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty, const
             }
             break;
         case NORMAL:
-            if (p < 0.5f) {
+            if (p <= 0.5f) {
                 typeAI = OBSTACLE;
             }
             else {
@@ -1621,7 +1621,7 @@ void RivalCar::setAI(float maxAggressiveness, const Difficult& difficulty, const
             }
             break;
         case HARD:
-            if (p < 0.7f) {
+            if (p <= 0.7f) {
                 typeAI = OBSTACLE;
                 probAI *= 2.0f;
             }
