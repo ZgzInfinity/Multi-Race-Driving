@@ -367,6 +367,7 @@ public:
      * @param bgName is the path of the image that represents the background of the landscape
      * @param time is the time available to complete the landscape
      * @param typeOfGame represents the game mode selected by the player
+     * @param numRivals is the number of rivals in the multi player mode
      * @param onMultiplayer controls if the game is been played in multi player mode or not
      * @param typeOfGameMultiplayer represents the game selected to play in multi player mode
      */
@@ -380,6 +381,9 @@ public:
      * @param landscape is the landscape to be displayed
      * @param flagger is the flagger position while is announcing the start
      * @param semaphore is the color of the semaphore in the starting
+     * @param numRivals is the number of rivals in the multi player mode
+     * @param onMultiplayer control if the game is in multi player mode or not
+     * @param codePlayerInGroup is the identifier code of the player in the multi player group
      */
     LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals,
               const bool onMultiplayer, const int codePlayerInGroup);
@@ -391,6 +395,8 @@ public:
      * @param landscape is the landscape to be displayed
      * @param typeOfGame is the game selected by the player
      * @param numRivals is the number of rivals that are going to compete  against the player
+     * @param onMultiplayer control if the game is in multi player mode or not
+     * @param codePlayerInGroup is the identifier code of the player in the multi player group
      */
     LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals, const bool onMultiplayer, const int codePlayerInGroup);
 
@@ -401,6 +407,9 @@ public:
      * @param landscape is the landscape to be displayed
      * @param flagger is the flagger position while is announcing the goal
      * @param semaphore is the color of the semaphore in the goal
+     * @param numRivals is the number of rivals in the multi player mode
+     * @param onMultiplayer control if the game is in multi player mode or not
+     * @param codePlayerInGroup is the identifier code of the player in the multi player group
      */
     LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals, const bool onMultiplayer, const int codePlayerInGroup);
 

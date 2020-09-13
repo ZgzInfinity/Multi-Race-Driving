@@ -168,8 +168,9 @@ public:
      * @param typeOfGame is the game mode selected by the player
      * @param onMultiplayer control if the game is in multi player mode or not
      * @param codePlayerInGroup is the identifier code of the player in the multi player group
+     * @param numRivals is the number of rivals in the multi player mode
      */
-    void setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup);
+    void setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup, const int numRivals);
 
 
 

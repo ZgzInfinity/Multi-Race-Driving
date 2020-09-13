@@ -1200,10 +1200,13 @@ LandScape::LandScape(){}
  * @param landscape is the landscape to be displayed
  * @param flagger is the flagger position while is announcing the start
  * @param semaphore is the color of the semaphore in the starting
+ * @param numRivals is the number of rivals in the multi player mode
+ * @param onMultiplayer control if the game is in multi player mode or not
+ * @param codePlayerInGroup is the identifier code of the player in the multi player group
  */
 LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, const int typeOfGame, const int numRivals,
                      const bool onMultiplayer, const int codePlayerInGroup) :
-                     background(landScape.background), posCameraY(0), nextLeft(nullptr), nextRight(nullptr), startingLandScape(true),
+                     background(landScape.background), nextLeft(nullptr), nextRight(nullptr), startingLandScape(true),
                      finalLandScape(false), middleLandScape(false), timeToPlay(0)
 {
     if (onMultiplayer){
@@ -1212,6 +1215,17 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
         }
         else {
             posCameraX = 0.3f;
+        }
+        if (numRivals == 1){
+            posCameraY = 0.f;
+        }
+        else {
+            if (codePlayerInGroup <= 2){
+                posCameraY = 20.f;
+            }
+            else {
+                posCameraY = 0.f;
+            }
         }
     }
     // Check if the game mode selected by the player is World Tour and Pole Position
@@ -1249,14 +1263,6 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
                 case 2:
                 case 3:
                     rectangles = 55;
-                    break;
-                case 4:
-                case 5:
-                    rectangles = 60;
-                    break;
-                case 6:
-                case 7:
-                    rectangles = 65;
             }
         }
         else {
@@ -1433,6 +1439,8 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
  * @param landscape is the landscape to be displayed
  * @param typeOfGame is the game selected by the player
  * @param numRivals is the number of rivals that are going to compete  against the player
+ * @param onMultiplayer control if the game is in multi player mode or not
+ * @param codePlayerInGroup is the identifier code of the player in the multi player group
  */
 LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int numRivals,
                      const bool onMultiplayer, const int codePlayerInGroup) :
@@ -1476,14 +1484,6 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int
             case 2:
             case 3:
                 rectangles = 55;
-                break;
-            case 4:
-            case 5:
-                rectangles = 60;
-                break;
-            case 6:
-            case 7:
-                rectangles = 65;
         }
     }
     // Check if the mode of game is Pole Position
@@ -1577,11 +1577,15 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int
 
 
 
+
 /**
  * Creates a straight flat map which represents the goal point of a landscape
  * @param landscape is the landscape to be displayed
  * @param flagger is the flagger position while is announcing the goal
  * @param semaphore is the color of the semaphore in the goal
+ * @param numRivals is the number of rivals in the multi player mode
+ * @param onMultiplayer control if the game is in multi player mode or not
+ * @param codePlayerInGroup is the identifier code of the player in the multi player group
  */
 LandScape::LandScape(int &flagger, int &goalEnd, const int typeOfGame, const int numRivals,
                      const bool onMultiplayer, const int codePlayerInGroup) : posCameraY(0), nextLeft(nullptr),
@@ -1997,11 +2001,22 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
 
         l->clip = maxy;
 
-        for (RivalCar* r : sortedRivals){
-            if (int(r->getPosY()) == n ){
-                pushed = true;
+        if (playingMultiplayer){
+            for (MultiplayerCar* r : sortedMultiplayerCars){
+                if (int(r->getPosY()) == n ){
+                    pushed = true;
+                }
             }
         }
+        else {
+            for (RivalCar* r : sortedRivals){
+                if (int(r->getPosY()) == n ){
+                    pushed = true;
+                }
+            }
+        }
+
+
 
         if (l->position_2d_y < maxy || pushed) {
             // This line is visible and will be drawn

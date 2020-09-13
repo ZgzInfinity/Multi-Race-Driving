@@ -137,6 +137,9 @@ class Game {
     // Count the time to reproduce a police car sound
     Clock policeDriverClock;
 
+    // Count the time to display the player fallen
+    Clock playerFallenClock;
+
     // Time to update the clock counter lap
     Time woman_delay;
 
@@ -239,9 +242,11 @@ class Game {
     // Control the new lap animation in Pole Position
     bool shown;
 
+    // Internal threads of the game
     thread timer0, timer1, timer2, controllerPosition,
     capturerPlayers, capturerGroups, guestPulses, controlPulse,
-    vehicleOwner, vehicleGuest, vehicleRestPlayers;
+    vehicleOwner, vehicleGuest, vehicleRestPlayers,
+    controlRaceOwner, controlRaceGuest;
 
     int displayLapFactor;
 
@@ -620,6 +625,14 @@ public:
 
 
 
+    void monitorizeRaceOwner(bool& canceledRace, string& playerFallen);
+
+
+
+    void monitorizeRaceGuest(bool& canceledRace, string& playerFallen);
+
+
+
     /**
      * Updates the logic of the game and refreshes the screen until you leave the game.
      * @param c is the configuration of the game
@@ -668,13 +681,13 @@ public:
 
 
 
-    void controlVehicleOwner(bool& cancelledGroup);
+    void controlVehicleOwner(bool& cancelledGroup, vector<int>& vehiclesRead);
 
 
-    void controlVehicleGuest(bool& cancelledVehicle);
+    void controlVehicleGuest(bool& cancelledVehicle, vector<int>& vehiclesRead);
 
 
-    void storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& cancelledGroup);
+    void storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& cancelledGroup, vector<int>& vehiclesRead);
 
 
 

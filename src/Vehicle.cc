@@ -101,8 +101,9 @@ void Vehicle::setPosition(float pX, float pY) {
  * @param typeOfGame is the game mode selected by the player
  * @param onMultiplayer control if the game is in multi player mode or not
  * @param codePlayerInGroup is the identifier code of the player in the multi player group
+ * @param numRivals is the number of rivals in the multi player mode
  */
-void Vehicle::setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup){
+void Vehicle::setVehicle(const int typeOfGame, const bool onMultiplayer, const int codePlayerInGroup, const int numRivals){
     // Initialize the speed of the vehicle to zero
     speed = 0.0f;
     // Check if the mode selected by the layer was World Tour or Pole Position
@@ -112,6 +113,18 @@ void Vehicle::setVehicle(const int typeOfGame, const bool onMultiplayer, const i
         }
         else {
             posX = 0.3f;
+        }
+        // Initialize the vehicle at the beginning of the landscape
+        if (numRivals <= 2){
+            posY = 0.f;
+        }
+        else {
+            if (codePlayerInGroup <= 2){
+                posY = 25.f;
+            }
+            else {
+                posY = 0.f;
+            }
         }
     }
     else {
@@ -123,10 +136,9 @@ void Vehicle::setVehicle(const int typeOfGame, const bool onMultiplayer, const i
             // Camera on the center of the screen
             posX = 0.f;
         }
+        posY = 0.f;
+        previousY = 0.f;
     }
-    // Initialize the vehicle at the beginning of the landscape
-    posY = 0.f;
-    previousY = 0.f;
 }
 
 

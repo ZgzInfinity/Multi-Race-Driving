@@ -1678,7 +1678,7 @@ void Game::showBonusIndications(Configuration &c, int seconds, int decs_second) 
  */
 Game::Game(Configuration &c){
 
-    typeOfVehicle = 0;
+    typeOfVehicle = -1;
     lastY = 0;
     vehicleCrash = false;
     timeMul = 1.0f;
@@ -1751,22 +1751,22 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
 
     switch(typeOfVehicle){
         case 0:
-            player.setVehicle(typeOfGame);
+            player.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 1:
-            player2.setVehicle(typeOfGame);
+            player2.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 2:
-            player3.setVehicle(typeOfGame);
+            player3.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 3:
-            player4.setVehicle(typeOfGame);
+            player4.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
          case 4:
-            player5.setVehicle(typeOfGame);
+            player5.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 5:
-            player6.setVehicle(typeOfGame);
+            player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
     }
 
     // Times of each scenario
@@ -1777,6 +1777,10 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
         if (typeOfGameMultiplayer == 0){
             times = {50, 53, 51, 52};
             path = "Data/Gamemodes/WorldTour/LandScapes/LandScape";
+        }
+        else {
+            times = {58, 58, 59, 57};
+            path = "Data/Gamemodes/PolePosition/LandScapes/LandScape";
         }
     }
     else {
@@ -1831,7 +1835,7 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
         checkPointPositions = tourLandScapes[indexLandScape].getCheckPointPositions();
     }
     else if (onMultiplayer && typeOfGameMultiplayer != 0){
-        currentMap = &tourLandScapes[indexLandScape];
+        currentMap = &tourLandScapes[landScapeSelected];
 
         // Back door
         time = int(float(currentMap->getTimeToPlay()) * timeMul);
@@ -1840,7 +1844,7 @@ State Game::loadWorldTourPolePositionConf(Configuration& c){
 
         // Initialize the checkpoint index
         indexCheckPoint = 1;
-        checkPointPositions = tourLandScapes[indexLandScape].getCheckPointPositions();
+        checkPointPositions = tourLandScapes[landScapeSelected].getCheckPointPositions();
     }
 
     // Load the game mode hud
@@ -1890,22 +1894,22 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
 
     switch(typeOfVehicle){
         case 0:
-            player.setVehicle(typeOfGame);
+            player.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 1:
-            player2.setVehicle(typeOfGame);
+            player2.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 2:
-            player3.setVehicle(typeOfGame);
+            player3.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 3:
-            player4.setVehicle(typeOfGame);
+            player4.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 4:
-            player5.setVehicle(typeOfGame);
+            player5.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 5:
-            player6.setVehicle(typeOfGame);
+            player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
     }
 
     // Control the loading of the landscapes
@@ -2006,7 +2010,7 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     if (mapId.first < 4)
         currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
     else {
-        goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+        goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
         goalMap.setColorsLandScape(*currentMap);
         currentMap->addNewLandScape(&goalMap);
     }
@@ -2523,6 +2527,121 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
 
 
 
+void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen){
+    // Local variable to finish the process
+    bool finished = false;
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+    // Until the work has not finished
+    while (!finished){
+        Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", "?C");
+        Tuple r = winLindadriver.removeNote(t);
+
+        // Check the tuple response
+        if (r.get(1) == "RACE_COMPLETED_OWNER" ||
+            r.get(1) == "RACE_CANCELED_OWNER")
+        {
+            finished = true;
+        }
+        else if (r.get(1) == "PLAYER_ABORT"){
+            // End if the work
+            finished = true;
+
+            int i = stoi(r.get(3));
+
+            mtx3.lock();
+
+            // The petition is received
+            for (int j = i; j < (int)groupDataPlayers.size(); j++){
+                groupDataPlayers[j].codePlayer--;
+            }
+
+            groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
+            numberPlayersGroup--;
+
+            if (numberPlayersGroup > 1){
+                // Store the name of the fallen player
+                playerFallen = groupDataPlayers[i - 1].getNickNamePlayer();
+            }
+
+            mtx3.unlock();
+
+            if (numberPlayersGroup > 1){
+                // Alert to the rest of the members that this member must be deleted
+                for (int i = 2; i <= numberPlayersGroup; i++){
+
+                    int idCode = groupDataPlayers[i - 1].getCodePlayer();
+                    string namePlayer = groupDataPlayers[i - 1].getNickNamePlayer();
+
+                    // Inform that the group is cancelled
+                    Tuple t = Tuple("REMOVE_PLAYER", nickNameGroupMultiplayer, to_string(i), namePlayer);
+                    winLindadriver.postNote(t);
+                }
+            }
+            else {
+                canceledRace = true;
+            }
+        }
+    }
+    // Close the connection
+    winLindadriver.stop();
+}
+
+
+
+void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen){
+    // Local variable to finish the process
+    bool finished = false;
+    bool abortedRace = false;
+
+     // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+    // Until the work has not finished
+    while (!finished && !abortedRace){
+        Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", nickNameMultiplayer);
+        Tuple r = winLindadriver.removeNote(t);
+
+        // Check the tuple response
+        if (r.get(1) == "RACE_COMPLETED_GUEST" ||
+            r.get(1) == "RACE_CANCELED_GUEST")
+        {
+            finished = true;
+        }
+        else if (r.get(1) == "RACE_ABORT"){
+            abortedRace = true;
+            canceledRace = abortedRace;
+        }
+        else if (r.get(1) == "REMOVE_PLAYER"){
+            mtx3.lock();
+            int i = stoi(r.get(3));
+
+            // Store the name of the fallen player
+            playerFallen = groupDataPlayers[i - 1].getNickNamePlayer();
+
+            // The petition is received
+            for (int j = i; j < (int)groupDataPlayers.size(); j++){
+                groupDataPlayers[j].codePlayer--;
+            }
+
+            // Decrement our id
+            if (i < codePlayerInGroup){
+                codePlayerInGroup--;
+            }
+
+            groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
+            numberPlayersGroup--;
+            mtx3.unlock();
+        }
+    }
+     // Close the connection
+    winLindadriver.stop();
+}
+
+
+
 /**
  * Updates the logic of the game and refreshes the screen until you leave the game.
  * @param c is the configuration of the game
@@ -2546,6 +2665,9 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
     // Time to change again the soundtrack
     soundtrack_delay = seconds(3.0);
 
+    // Display the name of the player fallen
+    playerFallen_delay = seconds(2.0);
+
     womanShot.restart();
     elapsed5 = womanShot.getElapsedTime().asSeconds();
 
@@ -2560,24 +2682,44 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
     State status = PLAY_GAME;
 
+    // Text for represent the different fallen players
+    Text namePlayerFallen;
+    namePlayerFallen.setFont(c.fontTimeToPlay);
+    namePlayerFallen.setString("");
+    namePlayerFallen.setCharacterSize(static_cast<unsigned int>(int(38.0f * c.screenScale)));
+    namePlayerFallen.setFillColor(Color::Red);
+    namePlayerFallen.setOutlineColor(Color::Black);
+    namePlayerFallen.setOutlineThickness(3.0f * c.screenScale);
+    namePlayerFallen.setPosition((float(c.w.getSize().x) - namePlayerFallen.getGlobalBounds().width) / 2.0f,
+                         (float(c.w.getSize().y) - float(namePlayerFallen.getCharacterSize())) / 4.0f);
+
     // Thread to control the elapsed time
     timer0 = thread(updateTimeElapsed, this);
 
-    // Thread to control the time of the landscape
-    timer1 = thread(updateTimeLandScape, this);
+    // Control if the race has been canceled by the owner
+    bool cancelledRaceGuest = false, cancelledRaceOwner = false;
 
-    while (!finalGame && !arrival && c.window.isOpen()) {
+    // Variable that stores the name of a player fallen
+    string playerFallen = "", namePlayer = "";
+
+    if (modeMultiplayer == 0){
+        // Owner of the group
+        controlRaceOwner = thread(monitorizeRaceOwner, this, ref(cancelledRaceOwner), ref(playerFallen));
+    }
+    else {
+        // Guest if the group
+        controlRaceGuest = thread(monitorizeRaceGuest, this, ref(cancelledRaceGuest), ref(playerFallen));
+    }
+
+    while (!finalGame && !arrival && !cancelledRaceGuest && !cancelledRaceOwner && c.window.isOpen()){
 
         // Detect the possible events
-        Event e;
-        c.window.pollEvent(e);
-        if (e.type == Event::Closed){
+        Event ev;
+        if (c.window.pollEvent(ev) && ev.type == Event::Closed){
             mtx.lock();
             finalGame = true;
             mtx.unlock();
             timer0.join();
-            timer1.join();
-            return EXIT;
         }
 
         // Update the status of the game
@@ -2585,11 +2727,11 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
             updateGameWorldTourStatusMultiplayer(c, r, action, direction, terrain);
         }
         else {
-            updateGamePolePositionStatus(c, r, action, direction, terrain);
+            updateGamePolePositionStatusMultiplayer(c, r, action, direction, terrain);
         }
 
         // Control the final of the game
-        if (!finalGame && !arrival) {
+        if (!finalGame && !arrival && !cancelledRaceGuest && !cancelledRaceOwner) {
 
             // Update the indicators
             mtx.lock();
@@ -2605,6 +2747,36 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
             // Control if the music has been change by the player
             checkSoundtrackChanging(c, r);
 
+            // Store the possible fallen player
+            mtx3.lock();
+            namePlayer = playerFallen;
+            mtx3.unlock();
+
+            if (namePlayer != ""){
+                namePlayerFallen.setString("PLAYER " + namePlayer + " DISCONNECTED");
+
+                // Start the count of time
+                playerFallenClock.restart();
+                elapsed19 = playerFallenClock.getElapsedTime().asSeconds();
+            }
+            else {
+                // Measure the time elapsed
+                elapsed20 = playerFallenClock.getElapsedTime().asSeconds();
+
+                // Check if the time has passed or not
+                if (elapsed20 - elapsed19 >= playerFallen_delay.asSeconds()) {
+                    mtx3.lock();
+                    playerFallen = "";
+                    namePlayerFallen.setString(playerFallen);
+                    mtx3.unlock();
+                    playerFallenClock.restart();
+                }
+            }
+
+            namePlayerFallen.setPosition((float(c.w.getSize().x) - namePlayerFallen.getGlobalBounds().width) / 2.0f,
+                                         (float(c.w.getSize().y) - float(namePlayerFallen.getCharacterSize())) / 4.0f);
+
+            c.w.draw(namePlayerFallen);
 
             Sprite bufferSprite(c.w.getTexture());
             c.w.display();
@@ -2612,22 +2784,214 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
             c.window.display();
         }
     }
+
+    // The guest gets informed of the race cancellation
+    if (modeMultiplayer != 0 && cancelledRaceGuest){
+        mtx.lock();
+        finalGame = true;
+        mtx.unlock();
+        timer0.join();
+        controlRaceGuest.join();
+        finalGame = false;
+        r.soundTracks[r.currentSoundtrack]->stop();
+        inGame = false;
+        if (typeOfGameMultiplayer == 0){
+            return SELECTION_MODE_MULTIPLAYER;
+        }
+        else {
+            return SELECTION_CIRCUIT_MULTIPLAYER;
+        }
+    }
+
     mtx.lock();
     finalGame = false;
     if (arrival) {
         arrival = false;
         mtx.unlock();
-        while (1){
-            cout << "HOLA" << endl;
+        // Arrival
+
+        if (typeOfGameMultiplayer == 0){
+
+            // Create a Linda driver compatible with Windows to make communicate with the Linda server
+            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+            // Canceled the local process that control the race
+            Tuple t = Tuple("RACE_COMPLETED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
+
+            // Close connection with server
+            winLindadriver.stop();
+
+            // Stop the thread
+            controlRaceOwner.join();
+
+            // World Tour is the game mode selected
+            if (indexLandScape == 3){
+                r.soundTracks[r.currentSoundtrack]->stop();
+                r.soundTracks[18]->play();
+                return SELECTION_MODE_MULTIPLAYER;
+            }
+            else {
+                indexLandScape++;
+            }
+            currentMap = &tourLandScapes[indexLandScape];
+            time = int(float(tourLandScapes[indexLandScape].getTimeToPlay()) * timeMul);
+
+            finalGame = false;
+            lastY = 0;
+            vehicleCrash = false;
+            onPause = false;
+            comeFromOptions = false;
+            blink = false;
+            arrival = false;
+            updatedTimeCheck = false;
+            checkPoint = false;
+            minutes = 0;
+            secs = 0;
+            cents_second = 0;
+            minutesTrip = 0;
+            secsTrip = 0;
+            cents_secondTrip = 0;
+            timeCheck = 0;
+            lap = "00:00:00";
+            indexCheckPoint = 1;
+
+            switch(typeOfVehicle){
+                case 0:
+                    player.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
+                    break;
+                case 1:
+                    player2.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
+                    break;
+                case 2:
+                    player3.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
+                    break;
+                case 4:
+                    player4.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
+                    break;
+                case 5:
+                    player5.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
+                    break;
+                case 6:
+                    player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
+            }
+
+            storingMultiplayerCars();
+            inGame = false;
+            return PLAY_GAME;
+        }
+        else {
+
+            // Create a Linda driver compatible with Windows to make communicate with the Linda server
+            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+            // Canceled the local process that control the race
+            Tuple t = Tuple("RACE_COMPLETED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
+
+            // Close connection with server
+            winLindadriver.stop();
+
+            // Stop the thread
+            controlRaceGuest.join();
+
+            // Pole Position is the game mode selected
+            r.soundTracks[18]->play();
+            inGame = false;
+            return SELECTION_CIRCUIT_MULTIPLAYER;
         }
     }
     mtx.unlock();
 
-    while(1){
-        cout << "HOLA" << endl;
+    if (modeMultiplayer == 0){
+        // Create a Linda driver compatible with Windows to make communicate with the Linda server
+        LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+        // Inform that the group is cancelled
+        Tuple t = Tuple("RACE_CANCELED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
+        // Stop the thread
+        controlRaceOwner.join();
+
+        if (!cancelledRaceOwner){
+            // The owner has leave the race
+            mtx3.lock();
+            // Iterate the members of the group
+            for (int i = 2; i <= numberPlayersGroup; i++){
+                int idCode = groupDataPlayers[i - 1].getCodePlayer();
+                string name = groupDataPlayers[i - 1].getNickNamePlayer();
+
+                // Inform that the group is cancelled
+                Tuple t = Tuple("RACE_ABORT", nickNameGroupMultiplayer, to_string(idCode), name);
+                winLindadriver.postNote(t);
+            }
+            mtx3.unlock();
+        }
+        else {
+            mtx.lock();
+            finalGame = true;
+            mtx.unlock();
+            timer0.join();
+        }
+        winLindadriver.stop();
+    }
+    else {
+        // The guest has leave the race
+        int idCode = groupDataPlayers[0].getCodePlayer();
+        string name = groupDataPlayers[0].getNickNamePlayer();
+
+        // Create a Linda driver compatible with Windows to make communicate with the Linda server
+        LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+        // Alert to the owner that leaves the group
+        Tuple t = Tuple("PLAYER_ABORT", nickNameGroupMultiplayer, to_string(codePlayerInGroup), name);
+        winLindadriver.postNote(t);
+
+        // Canceled the local process that control the race
+        t = Tuple("RACE_CANCELED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
+        // Close connection with server
+        winLindadriver.stop();
+
+        // Stop the thread
+        controlRaceGuest.join();
     }
 
-    return status;
+    r.soundTracks[r.currentSoundtrack]->stop();
+    r.soundTracks[18]->play();
+    inGame = false;
+
+    if (modeMultiplayer == 0){
+        if (cancelledRaceOwner){
+            return MULTIPLAYER_NAME_GROUP;
+        }
+        else if (typeOfGameMultiplayer == 0){
+            return SELECTION_MODE_MULTIPLAYER;
+        }
+        else {
+            return SELECTION_CIRCUIT_MULTIPLAYER;
+        }
+    }
+    else {
+        if (!cancelledRaceGuest){
+            if (randomMultiplayerJoined){
+                return SELECT_MULTIPLAYER_JOIN;
+            }
+            else {
+                return MULTIPLAYER_NAME_GROUP;
+            }
+        }
+        else {
+            if (typeOfGameMultiplayer == 0){
+                return SELECTION_MODE_MULTIPLAYER;
+            }
+            else {
+                return SELECTION_CIRCUIT_MULTIPLAYER;
+            }
+        }
+    }
 }
 
 
@@ -2996,18 +3360,18 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         if ((!onMultiplayer && typeOfGame == 0) || (onMultiplayer && typeOfGameMultiplayer == 0)) {
             int bdTime = 0;
             time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
-            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
         else if ((!onMultiplayer && typeOfGame == 2) || (onMultiplayer && typeOfGameMultiplayer != 0)){
             if (numberLaps == 1){
-                goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                 goalMap.setColorsLandScape(*currentMap);
                 currentMap->addNewLandScape(&goalMap);
             }
             else {
-                middleMap = LandScape(*currentMap, typeOfGame, numberRacers);
+                middleMap = LandScape(*currentMap, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                 middleMap.setColorsLandScape(*currentMap);
                 currentMap->addNewLandScape(&middleMap);
             }
@@ -3023,7 +3387,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         initMap->setColorsLandScape(*currentMap);
 
         if ((!onMultiplayer && typeOfGame == 0) || (onMultiplayer && typeOfGameMultiplayer == 0)){
-            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+            goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
@@ -3237,11 +3601,11 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     }
 
     // Draw the semaphore
-    if (onMultiplayer || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+    if ((onMultiplayer && codePlayerInGroup > 2) || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
         Sprite s;
         s.setTexture(textures[4], true);
         s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
-        s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+        s.setPosition((float)c.w.getSize().x / 2.f - (s.getTexture()->getSize().x * s.getScale().x / 2.f),
                              c.w.getSize().y / 2.f - 180.0f * c.screenScale);
         c.w.draw(s);
 
@@ -3321,11 +3685,11 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
             }
 
             // Draw the semaphore
-            if (onMultiplayer || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+            if ((onMultiplayer && codePlayerInGroup > 2) || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
                 Sprite s;
                 s.setTexture(textures[4 + i], true);
                 s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
-                s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                s.setPosition((float)c.w.getSize().x / 2.f - (s.getTexture()->getSize().x * s.getScale().x / 2.f),
                                      c.w.getSize().y / 2.f - 180.0f * c.screenScale);
                 c.w.draw(s);
             }
@@ -3382,11 +3746,11 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                     }
 
                     // Draw the semaphore
-                    if (onMultiplayer || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+                    if ((onMultiplayer && codePlayerInGroup > 2) || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
                         Sprite s;
                         s.setTexture(textures[4 + i], true);
                         s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
-                        s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+                        s.setPosition((float)c.w.getSize().x / 2.f - (s.getTexture()->getSize().x * s.getScale().x / 2.f),
                                              c.w.getSize().y / 2.f - 180.0f * c.screenScale);
                         c.w.draw(s);
                     }
@@ -3491,11 +3855,11 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     }
 
     // Draw the semaphore
-    if (onMultiplayer || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
+    if ((onMultiplayer && codePlayerInGroup > 2) || typeOfGame == 0 || (typeOfGame == 2 && numberRacers >= 1)){
         Sprite s;
         s.setTexture(textures[7], true);
         s.setScale(2.5f * c.screenScale, 2.5f * c.screenScale);
-        s.setPosition((float)c.w.getSize().x / 2.f - s.getLocalBounds().width / 2.f,
+        s.setPosition((float)c.w.getSize().x / 2.f - (s.getTexture()->getSize().x * s.getScale().x / 2.f),
                              c.w.getSize().y / 2.f - 180.0f * c.screenScale);
         c.w.draw(s);
 
@@ -3510,7 +3874,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     r.soundTracks[r.currentSoundtrack]->play();
 
     // Reproduce the cars running
-    if ((typeOfGame == 0 || typeOfGame == 2) && numberRacers > 0){
+    if (onMultiplayer || ((typeOfGame == 0 || typeOfGame == 2) && numberRacers > 0)){
         switch(typeOfVehicle){
             case 0:
                 r.soundEffects[30]->stop();
@@ -3598,7 +3962,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
     elapsed1 = blinkClcok.restart().asSeconds();
     bool blink = true;
 
-    if (typeOfGame == 0 || typeOfGame == 2){
+    if (onMultiplayer || typeOfGame == 0 || typeOfGame == 2){
         // Get the position of the player in the race
         switch(posArrival){
             case 1:
@@ -3657,11 +4021,11 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 r.soundEffects[45]->play();
         }
     }
-    else if (typeOfGame == 1){
+    else if (!onMultiplayer && typeOfGame == 1){
         r.soundEffects[54]->stop();
         r.soundEffects[54]->play();
     }
-    else if (typeOfGame == 3 || typeOfGame == 4){
+    else if (!onMultiplayer && (typeOfGame == 3 || typeOfGame == 4)){
         r.soundEffects[45]->stop();
         r.soundEffects[45]->play();
 
@@ -3720,7 +4084,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
     }
 
     // claps
-    if (posArrival <= 3 && (typeOfGame == 0 || typeOfGame == 2)){
+    if (posArrival <= 3 && (onMultiplayer || typeOfGame == 0 || typeOfGame == 2)){
         r.soundEffects[29]->stop();
         r.soundEffects[29]->play();
     }
@@ -3738,7 +4102,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 mtx.unlock();
                 timer0.join();
                 timer1.join();
-                if (typeOfGame == 1){
+                if (!onMultiplayer && typeOfGame == 1){
                     timer2.join();
                 }
                 return EXIT;
@@ -3811,7 +4175,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                         currentMap->getElevation(player6.getPosY()), currentMap->getTerrain(), false);
         }
 
-        if (typeOfGame != 1){
+        if (onMultiplayer || typeOfGame != 1){
 
             elapsed2 = blinkClcok.getElapsedTime().asSeconds();
             // Change the color of the main text
@@ -3831,9 +4195,11 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
             c.w.draw(positionText);
 
             // Move all the rivals
-            for (RivalCar& r :rivals){
-                r.setPosition(r.getPosX(), r.getPosY() + 1);
-                r.draw(Vehicle::ACCELERATE, currentMap->getElevation(r.getPosY()));
+            if (!onMultiplayer){
+                for (RivalCar& r :rivals){
+                    r.setPosition(r.getPosX(), r.getPosY() + 1);
+                    r.draw(Vehicle::ACCELERATE, currentMap->getElevation(r.getPosY()));
+                }
             }
         }
 
@@ -3850,7 +4216,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
             currentTime = gameClockTime.getElapsedTime().asMilliseconds();
         }
 
-        if (typeOfGame == 1){
+        if (!onMultiplayer && typeOfGame == 1){
 
             elapsed12 = bonus.getElapsedTime().asSeconds();
 
@@ -3902,7 +4268,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
     }
 
     // Reproduce the music soundtrack
-    if (typeOfGame == 0 || typeOfGame == 2){
+    if (!onMultiplayer && (typeOfGame == 0 || typeOfGame == 2)){
         r.soundTracks[15]->play();
     }
 
@@ -3924,16 +4290,17 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
         sleep(milliseconds(20));
     }
-
-    if (typeOfGame == 0 || typeOfGame == 2){
-        return CLASIFICATION;
-    }
-    else if (typeOfGame == 1){
-        return RANKING;
-    }
-    else {
-        r.soundTracks[0]->play();
-        return START;
+    if (!onMultiplayer){
+        if (typeOfGame == 0 || typeOfGame == 2){
+            return CLASIFICATION;
+        }
+        else if (typeOfGame == 1){
+            return RANKING;
+        }
+        else {
+            r.soundTracks[0]->play();
+            return START;
+        }
     }
 }
 
@@ -5137,12 +5504,12 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
                         }
                         else {
                             if (lapsDone == numberLaps){
-                                 goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                                 goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                                  goalMap.setColorsLandScape(*currentMap);
                                  currentMap->addNewLandScape(&goalMap);
                             }
                             else {
-                                middleMap = LandScape(*currentMap, typeOfGame, numberRacers);
+                                middleMap = LandScape(*currentMap, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                                 middleMap.setColorsLandScape(*currentMap);
                                 currentMap->addNewLandScape(&middleMap);
                                 checkPointPositions = currentMap->getCheckPointPositions();
@@ -5753,7 +6120,7 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
                 if (currentMap->isMiddleMap()){
                     lapsDone++;
                 }
-                if (typeOfGame == 2){
+                if (onMultiplayer && typeOfGameMultiplayer != 0){
                     if (lapsDone <= numberLaps){
                         if (currentMap->isMiddleMap()){
                             currentMap->addNewLandScape(&tourLandScapes[landScapeSelected]);
@@ -5776,12 +6143,12 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
                         }
                         else {
                             if (lapsDone == numberLaps){
-                                 goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                                 goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                                  goalMap.setColorsLandScape(*currentMap);
                                  currentMap->addNewLandScape(&goalMap);
                             }
                             else {
-                                middleMap = LandScape(*currentMap, typeOfGame, numberRacers);
+                                middleMap = LandScape(*currentMap, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                                 middleMap.setColorsLandScape(*currentMap);
                                 currentMap->addNewLandScape(&middleMap);
                                 checkPointPositions = currentMap->getCheckPointPositions();
@@ -5833,16 +6200,6 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
                 checkPoint = true;
                 // Initialize the clock again
                 updatedTimeCheck = true;
-
-                // Add the time to complete the landscape
-                if (indexCheckPoint != 4){
-                    time += ((checkPointPositions[indexCheckPoint - 1] - pos) / (halfspeed * 65.f)) ;
-                }
-                else {
-                    time += ((currentMap->getMaxY() - pos) / (halfspeed * 60.f));
-                }
-                // Update the checkpoint time
-                timeCheck = time;
             }
         }
 
@@ -5921,8 +6278,7 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
         // Draw map with cars
         c.w.clear();
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, false);
-
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, true);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -6256,7 +6612,7 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
                 if (mapId.first < 4)
                     currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
                 else {
-                    goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                    goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                     goalMap.setColorsLandScape(*currentMap);
                     currentMap->addNewLandScape(&goalMap);
                 }
@@ -7042,7 +7398,7 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
                 if (mapId.first < 4)
                     currentMap->addFork(&maps[mapId.first + 1][mapId.second], &maps[mapId.first + 1][mapId.second + 1]);
                 else {
-                    goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers);
+                    goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                     goalMap.setColorsLandScape(*currentMap);
                     currentMap->addNewLandScape(&goalMap);
                 }
@@ -8565,7 +8921,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
 
 
 
-void Game::controlVehicleOwner(bool& cancelledGroup){
+void Game::controlVehicleOwner(bool& cancelledGroup, vector<int>& vehiclesRead){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
     LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
@@ -8601,6 +8957,9 @@ void Game::controlVehicleOwner(bool& cancelledGroup){
                 groupDataPlayers[j].codePlayer--;
             }
 
+            // Deleted his possible option
+            vehiclesRead.erase(vehiclesRead.begin() + i - 1);
+
             groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
             numberPlayersGroup--;
             mtx3.unlock();
@@ -8628,7 +8987,7 @@ void Game::controlVehicleOwner(bool& cancelledGroup){
 }
 
 
-void Game::controlVehicleGuest(bool& cancelledVehicle){
+void Game::controlVehicleGuest(bool& cancelledVehicle, vector<int>& vehiclesRead){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
     LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
@@ -8662,6 +9021,9 @@ void Game::controlVehicleGuest(bool& cancelledVehicle){
                 groupDataPlayers[j].codePlayer--;
             }
 
+            // Deleted his possible option
+            vehiclesRead.erase(vehiclesRead.begin() + i - 1);
+
             // Decrement our id
             if (i < codePlayerInGroup){
                 codePlayerInGroup--;
@@ -8680,11 +9042,17 @@ void Game::controlVehicleGuest(bool& cancelledVehicle){
 
 
 
-void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& cancelledGroup){
+void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& cancelledGroup, vector<int>& vehiclesRead){
 
     // Local variables to store the information
     bool finished = false, cancelled = false;
     int playersRegistered = 1, totalPlayers;
+
+    mtx3.lock();
+    for (int a : vehiclesRead){
+        cout << a << endl;
+    }
+    mtx3.unlock();
 
     // Tuple with the car selection information
     Tuple t = Tuple("VEHICLE_SELECTED", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer,
@@ -8718,18 +9086,30 @@ void Game::storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& canc
         // Check if any of the players has sent his vehicle
         for (int i = 1; i <= totalPlayers; i++){
             if (i != codePlayerInGroup){
-                Tuple t = Tuple("VEHICLE_SELECTED", nickNameGroupMultiplayer, to_string(i), "?A", "?B", "?C");
-                Tuple r = winLindadriver.readNoteX(t, found);
+                mtx3.lock();
+                string namePlayer = groupDataPlayers[i - 1].getNickNamePlayer();
+                int registered = vehiclesRead[i - 1];
+                mtx3.unlock();
+                if (registered == 0){
+                    Tuple t = Tuple("VEHICLE_SELECTED", nickNameGroupMultiplayer, to_string(i), namePlayer, "?B", "?C");
+                    Tuple r = winLindadriver.readNoteX(t, found);
 
-                // Check if the tuple has been found
-                if (found && r.get(1) != NF){
-                    // Increment the number of players registered and store the car with the color
-                    mtx3.lock();
-                    numPlayers++;
-                    groupDataPlayers[i].setVehicleType(stoi(r.get(5)));
-                    groupDataPlayers[i].setColorVehicle(stoi(r.get(6)));
-                    playersRegistered = numPlayers;
-                    mtx3.unlock();
+                    // Check if the tuple has been found
+                    if (found && r.get(1) != NF){
+                        // Increment the number of players registered and store the car with the color
+                        cout << "JUGADOR " << codePlayerInGroup << " LEIDO COCHE Y COLOR DEL JUGADOR " << i << endl;
+                        mtx3.lock();
+                        numPlayers++;
+                        groupDataPlayers[i - 1].setVehicleType(stoi(r.get(5)));
+                        groupDataPlayers[i - 1].setColorVehicle(stoi(r.get(6)));
+                        playersRegistered = numPlayers;
+                        vehiclesRead[i - 1] = 1;
+
+                        for (int a : vehiclesRead){
+                            cout << a << endl;
+                        }
+                        mtx3.unlock();
+                    }
                 }
             }
             // Check the values again if the
@@ -9064,6 +9444,15 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
     triangle2.setRotation(90);
     triangle2.setPosition(c.w.getSize().x / 2.f + 75.0f * c.screenScale, c.w.getSize().y / 2.f + 196.0f * c.screenScale);
 
+    // Create the vector if vehicles read
+    vector<int> vehiclesRead;
+    for (int i = 1; i <= numberPlayersGroup; i++){
+        vehiclesRead.push_back(0);
+    }
+    for (int i = 0; i < vehiclesRead.size(); i++){
+        cout << vehiclesRead[i] << endl;
+    }
+
     // While start and backspace have not been pressed
     while (!startPressed && !backSpacePressed) {
 
@@ -9077,11 +9466,11 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
         if (onMultiplayer){
             if (modeMultiplayer == 0){
                 // Owner
-                vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup));
+                vehicleOwner = thread(controlVehicleOwner, this, ref(cancelledGroup), ref(vehiclesRead));
             }
             else {
                 // Guest
-                vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle));
+                vehicleGuest = thread(controlVehicleGuest, this, ref(cancelledVehicle), ref(vehiclesRead));
             }
         }
 
@@ -10076,8 +10465,8 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             int players = groupDataPlayers.size();
 
             mtx3.lock();
-            groupDataPlayers[codePlayerInGroup].setVehicleType(typeOfVehicle);
-            groupDataPlayers[codePlayerInGroup].setColorVehicle(colorCarSelected);
+            groupDataPlayers[codePlayerInGroup - 1].setVehicleType(typeOfVehicle);
+            groupDataPlayers[codePlayerInGroup - 1].setColorVehicle(colorCarSelected);
             mtx3.unlock();
 
             Text multiplayerIndicator;
@@ -10093,7 +10482,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
 
             // Control the vehicle selected by the other rivals
-            vehicleRestPlayers = thread(storeRivalPlayers, this, ref(numPlayers), ref(finishedRegister), ref(cancelledGroup));
+            vehicleRestPlayers = thread(storeRivalPlayers, this, ref(numPlayers), ref(finishedRegister), ref(cancelledGroup), ref(vehiclesRead));
 
             // Wait until all players have selected their cars
             while (!checkingRegister && !checkingGroup){
@@ -10202,6 +10591,9 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 vehicleRestPlayers.join();
                 return MULTIPLAYER_NAME_GROUP;
             }
+            else {
+                vehicleRestPlayers.join();
+            }
 
 
             // Create the connection with the Linda server
@@ -10233,27 +10625,63 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             positX = 0.f;
         }
         else {
-            switch(codePlayerInGroup){
+            switch(numberPlayersGroup){
                 case 1:
                 case 2:
-                    positY = 73.f;
+                    positY = 13.f;
                     break;
                 case 3:
                 case 4:
-                    positY = 53.f;
+                    switch (codePlayerInGroup){
+                        case 1:
+                        case 2:
+                            positY = 33.f;
+                            break;
+                        case 3:
+                        case 4:
+                            positY = 13.f;
+                    }
                     break;
                 case 5:
                 case 6:
-                    positY = 33.f;
+                    switch (codePlayerInGroup){
+                        case 1:
+                        case 2:
+                            positY = 53.f;
+                            break;
+                        case 3:
+                        case 4:
+                            positY = 33.f;
+                            break;
+                        case 5:
+                        case 6:
+                            positY = 13.f;
+                    }
                     break;
                 case 7:
                 case 8:
-                    positY = 13.f;
+                    switch (codePlayerInGroup){
+                        case 1:
+                        case 2:
+                            positY = 73.f;
+                            break;
+                        case 3:
+                        case 4:
+                            positY = 53.f;
+                            break;
+                        case 5:
+                        case 6:
+                            positY = 3.f;
+                        case 7:
+                        case 8:
+                            positY = 13.f;
+                    }
                     break;
                 default:
                     positY = 0.f;
             }
-            if (codePlayerInGroup % 2 != 1){
+
+            if (codePlayerInGroup % 2 != 0){
                 positX = -0.3f;
             }
             else {
@@ -10335,22 +10763,22 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             if (typeOfGame == 2){
                 switch(typeOfVehicle){
                     case 0:
-                        player.setVehicle(typeOfGame);
+                        player.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
                         break;
                     case 1:
-                        player2.setVehicle(typeOfGame);
+                        player2.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
                         break;
                     case 2:
-                        player3.setVehicle(typeOfGame);
+                        player3.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
                         break;
                     case 3:
-                        player4.setVehicle(typeOfGame);
+                        player4.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
                         break;
                     case 4:
-                        player5.setVehicle(typeOfGame);
+                        player5.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
                         break;
                     case 5:
-                        player6.setVehicle(typeOfGame);
+                        player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
                 }
                 return LOADING;
             }
@@ -12093,22 +12521,22 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     switch(typeOfVehicle){
         case 0:
-            player.setVehicle(typeOfGame);
+            player.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 1:
-            player2.setVehicle(typeOfGame);
+            player2.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 2:
-            player3.setVehicle(typeOfGame);
+            player3.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 4:
-            player4.setVehicle(typeOfGame);
+            player4.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 5:
-            player5.setVehicle(typeOfGame);
+            player5.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
             break;
         case 6:
-            player6.setVehicle(typeOfGame);
+            player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
     }
 
     r.soundTracks[15]->stop();
@@ -12627,7 +13055,7 @@ void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &can
         pulseReceived = false;
 
         // Tuple that represents the pulse received
-        t = Tuple("CIRCUIT_SELECTED", nickNameGroupMultiplayer, nickNameMultiplayer, "?X");
+        t = Tuple("CIRCUIT_SELECTED", nickNameGroupMultiplayer, nickNameMultiplayer, "?X", "?Y");
 
         // Check if the pulse has been received
         Tuple r = winLindadriver.readNoteX(t, found);
@@ -12639,6 +13067,7 @@ void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &can
             mtx3.lock();
             circuitSelected = pathSelected;
             landScapeSelected = stoi(r.get(4));
+            numberLaps = stoi(r.get(5));
             mtx3.unlock();
         }
 
@@ -13243,7 +13672,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                 string name = groupDataPlayers[i - 1].getNickNamePlayer();
 
                 // Inform that the group is cancelled
-                Tuple t = Tuple("CIRCUIT_SELECTED", nickNameGroupMultiplayer, name, to_string(landScapeSelected));
+                Tuple t = Tuple("CIRCUIT_SELECTED", nickNameGroupMultiplayer, name, to_string(landScapeSelected), to_string(numberLaps));
                 winLindadriver.postNote(t);
 
                 t = Tuple("PULSE_RECEIVED", nickNameGroupMultiplayer, name, to_string(idCode));
@@ -13659,7 +14088,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
         }
 
         // Reset the police car
-        player6.setVehicle(typeOfGame);
+        player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup);
 
         r.soundEffects[codeSound]->play();
 
@@ -15500,6 +15929,7 @@ void Game::capturerOfGroups(bool& success, bool& fail){
                 MultiplayerData m = MultiplayerData(codePlayer, namePlayer);
                 mtx3.lock();
                 groupDataPlayers.push_back(m);
+                numberPlayersGroup++;
                 mtx3.unlock();
             }
             else if (r.get(1) == "CLOSED_GROUP" || r.get(1) == "COMPLETED_GROUP"){
@@ -15515,6 +15945,7 @@ void Game::capturerOfGroups(bool& success, bool& fail){
             else if (r.get(1) == "CLEAR_PLAYERS"){
                 mtx3.lock();
                 groupDataPlayers.clear();
+                numberPlayersGroup = 0;
                 mtx3.unlock();
             }
         }
@@ -17386,6 +17817,7 @@ State Game::selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r){
             return SELECTION_MODE_MULTIPLAYER;
         }
         // All goes ok
+        controlPulse.join();
         return VEHICLE_SELECTION;
     }
 }
@@ -18181,8 +18613,14 @@ void Game::storingMultiplayerCars(){
     // Get the number of participants of the race
     int numberRacers = groupDataPlayers.size();
 
-    cout << "EN TOTAL HAY " << numberRacers << " CORREDORES" << endl;
-    cout << codePlayerInGroup << endl;
+
+    for (MultiplayerData m : groupDataPlayers){
+        cout << m.getCodePlayer() << endl;
+        cout << m.getNickNamePlayer() << endl;
+        cout << m.getVehicle() << endl;
+        cout << m.getColor() << endl;
+        cout << "===========================" << endl;
+    }
 
     // Control the initial position of the vehicle in the starting point
     switch(numberRacers){
@@ -18212,13 +18650,14 @@ void Game::storingMultiplayerCars(){
 
     // Store the rival cars in the vector
     for (int i = 1; i <= numberRacers; i++) {
+
         if (i != codePlayerInGroup){
             // Set the position of the car in the axis X
             if (i % 2 != 0){
-                positX = 0.3f;
+                positX = -0.3f;
             }
             else {
-                positX = -0.3f;
+                positX = 0.3f;
             }
 
             // Get the type and color of the vehicle selected by the player
@@ -18267,7 +18706,6 @@ void Game::storingMultiplayerCars(){
             }
         }
     }
-    cout << " SALIS LOS DOS" << endl;
 }
 
 
