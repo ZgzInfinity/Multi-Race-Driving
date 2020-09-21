@@ -125,6 +125,16 @@ RivalCar::RivalCar(int typeOfVehicle,float maxSpeed, float speedMul, float scale
  * Returns true if the rival car is crashing.Otherwise returns false.
  * @return
  */
+void RivalCar::setCrash(){
+    crashing = false;
+}
+
+
+
+/**
+ * Returns true if the rival car is crashing.Otherwise returns false.
+ * @return
+ */
 bool RivalCar::isCrashing() const {
     return crashing;
 }
@@ -228,8 +238,8 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
 
                 // Reproduce the sound with a level volume low when the car that crashes is far
                 // and reproduces the sound with high volume when the car is near
-                r.soundEffects[soundCode]->setVolume(int(posY / posPlayerY * 100.f));
-                r.soundEffects[17]->setVolume(int(posY / posPlayerY * 100.f));
+                r.soundEffects[soundCode]->setVolume(int(posY / posPlayerY * 60.f));
+                r.soundEffects[17]->setVolume(int(posY / posPlayerY * 60.f));
 
                 r.soundEffects[soundCode]->play();
                 r.soundEffects[17]->play();
@@ -241,8 +251,8 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
 
                 // Reproduce the sound with a level volume low when the car that crashes is far
                 // and reproduces the sound with high volume when the car is near
-                r.soundEffects[soundCode]->setVolume(int(posPlayerY / posY * 100.f));
-                r.soundEffects[17]->setVolume(int(posPlayerY / posY * 100.f));
+                r.soundEffects[soundCode]->setVolume(int(posPlayerY / posY * 60.f));
+                r.soundEffects[17]->setVolume(int(posPlayerY / posY * 60.f));
 
                 r.soundEffects[soundCode]->play();
                 r.soundEffects[17]->play();
@@ -281,6 +291,7 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
             speed = 0.4f;
             r.soundEffects[30]->stop();
             r.soundEffects[30]->play();
+            current_code_image = 1;
         }
     }
     else {
@@ -351,6 +362,7 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
             speedCollision = 0.0f;
             shoutDone = false;
             speed = 0.4f;
+            current_code_image = 1;
             switch(vehicleType){
                 case 1:
                     r.soundEffects[12]->stop();
@@ -1660,7 +1672,7 @@ void RivalCar::draw(const Action &a, const Elevation &e) {
         if (counter_code_image >= maxCounterToChange) {
             counter_code_image = 0;
 
-            if (speed > 0.0f)
+            if (speed > 0.0f || crashing)
                 current_code_image++;
 
             if ((int)textures.size() == numTextures) {
@@ -1943,8 +1955,8 @@ float RivalCar::getScalingFactor() const {
  */
 bool RivalCar::hasCrashed(float prevY, float currentY, float minX, float maxX, float &crashPos) const {
     // Check if the path of the rival car is approximately the same path of the player's vehicle
-    if (minScreenX != maxScreenX && ((prevY <= posY + 2.5f && currentY >= posY - 2.5f) ||
-                                     (currentY <= posY + 2.5f && prevY >= posY - 2.5f)) && // y matches
+    if (minScreenX != maxScreenX && ((prevY <= posY + 10.f && currentY >= posY - 10.f) ||
+                                     (currentY <= posY + 10.f && prevY >= posY - 10.f)) && // y matches
         ((minX >= minScreenX && minX <= maxScreenX) ||
          (maxX >= minScreenX && maxX <= maxScreenX) ||
          (minScreenX >= minX && minScreenX <= maxX) ||

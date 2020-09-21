@@ -6135,7 +6135,7 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
             v.draw(currentMap->getElevation(posY), currentMap->getCameraPosX());
         }
 
-        Vehicle::Action a = Vehicle::CRASH;
+        Vehicle::Action a = Vehicle::CRASH, a2;
 
         float positionX = 0.f, positionY = 0.f, speedPlayer = 0.f;
 
@@ -6181,7 +6181,7 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
             float directionCurve = currentMap->getCurveCoefficient(v.getPosY());
 
             if (!v.isCrashing() && !v.inCrash()){
-                v.updateModeA(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a, directionCurve,
+                v.updateModeA(c, lastY, lastY + float(c.renderLen) / DENSITY_SPACE, c.maxAggressiveness, a2, directionCurve,
                               c.level, positionX, positionY, speedPlayer, false);
             }
 
@@ -6196,20 +6196,16 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
                                                           v.getMinScreenX(), v.getMaxScreenX(), crashPos);
                     }
                 }
+                else {
+                    v.setCrash();
+                }
             }
 
             if (vehicleCrash || v.isCrashing()) {
                 // Determine the type of collision
-                v.setPosition(v.getPosX(), v.getPosY());
                 v.hitControl(vehicleCrash, r, positionY);
-                a = Vehicle::CRASH;
-            }
-
-            if (vehicleCrash || v.isCrashing()) {
-                // Determine the type of collision
                 v.setPosition(v.getPosX(), v.getPosY());
-                v.hitControl(vehicleCrash, r, positionY);
-                a = Vehicle::CRASH;
+                a2 = Vehicle::CRASH;
             }
 
             float posY = v.getPosY();
@@ -6218,7 +6214,7 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
             rankingVehicles.push_back(posY);
 
             // Draw the vehicle
-            v.draw(a, currentMap->getElevation(posY));
+            v.draw(a2, currentMap->getElevation(posY));
 
             vehicleCrash = false;
 

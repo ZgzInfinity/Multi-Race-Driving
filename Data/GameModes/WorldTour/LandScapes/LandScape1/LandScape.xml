@@ -853,7 +853,7 @@
 							<Offset>-0.95</Offset>
 							<Position>1920</Position>
 							<Code>33</Code>
-						</CheckPoint>
+					</CheckPoint>
 					<SpriteNearLeft>
 						<Each>67</Each>
 						<Offset>0.3</Offset>
@@ -878,7 +878,7 @@
 			</Straight>
 		</P27>
 		<P28>
-			<Dropping elevation="2500">
+			<Dropping elevation="1500">
 				<P1>
 					<Direction>0.0</Direction>
 					<Road startPosGE="1892" finalPosLE="1920">
@@ -1127,7 +1127,7 @@
 			</Climbing>
 		</P36>
 		<P37>
-			<Dropping elevation="9000">
+			<Dropping elevation="6000">
 				<P1>
 					<Direction>1.5</Direction>
 					<Road startPosGE="2321" finalPosLE="2391">

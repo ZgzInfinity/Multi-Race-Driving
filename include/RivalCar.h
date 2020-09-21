@@ -226,6 +226,14 @@ public:
      * Returns true if the rival car is crashing.Otherwise returns false.
      * @return
      */
+    void setCrash();
+
+
+
+    /**
+     * Returns true if the rival car is crashing.Otherwise returns false.
+     * @return
+     */
     bool isCrashing() const;
 
 

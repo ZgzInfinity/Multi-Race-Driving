@@ -426,8 +426,8 @@ float TrafficCar::getScale() const {
  */
 bool TrafficCar::hasCrashed(float prevY, float currentY, float minX, float maxX, float &crashPos) const {
     // Check if the path of the traffic car is approximately the same path of the player's vehicle
-    if (minScreenX != maxScreenX && ((prevY <= posY + 2.5f && currentY >= posY - 2.5f) ||
-                                     (currentY <= posY + 2.5f && prevY >= posY - 2.5f)) && // y matches
+    if (minScreenX != maxScreenX && ((prevY <= posY + 10.f && currentY >= posY - 10.f) ||
+                                     (currentY <= posY + 10.f && prevY >= posY - 10.f)) && // y matches
         ((minX >= minScreenX && minX <= maxScreenX) ||
          (maxX >= minScreenX && maxX <= maxScreenX) ||
          (minScreenX >= minX && minScreenX <= maxX) ||

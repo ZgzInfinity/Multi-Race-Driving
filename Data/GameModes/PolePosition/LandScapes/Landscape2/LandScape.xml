@@ -69,14 +69,14 @@
 			<Curve direction="1.4">
 				<Road startPosGT="149" finalPosLE="250">
 					<SpriteNearLeft>
-						<Each>84</Each>
-						<Offset>0.2</Offset>
-						<Code>5</Code>
-					</SpriteNearLeft>
-					<SpriteNearRight>
 						<Each>90</Each>
 						<Offset>0.2</Offset>
 						<Code>15</Code>
+					</SpriteNearLeft>
+					<SpriteNearRight>
+						<Each>84</Each>
+						<Offset>0.2</Offset>
+						<Code>5</Code>
 					</SpriteNearRight>
 					<SpriteFarLeft>
 						<Each>36</Each>

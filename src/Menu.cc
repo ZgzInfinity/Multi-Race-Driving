@@ -45,7 +45,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
 
     // Load the texture in the sprite reseting the last texture
     icon.setTexture(t, true);
-    icon.setScale(c.screenScale, c.screenScale);
+    icon.setScale(0.5f, 0.5f);
 
     // Locate the icon in the center of the screen
     icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
@@ -73,7 +73,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
         c.window.display();
 
         // Sleep the process to see the menu icons correctly
-        sleep(milliseconds(40));
+        sleep(milliseconds(60));
     }
 
 
@@ -82,7 +82,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
 
     // Load the texture in the sprite reseting the last texture
     icon.setTexture(t, true);
-    icon.setScale(c.screenScale, c.screenScale);
+    icon.setScale(0.5f, 0.5f);
 
     // Locate the logo in the center of the screen
     icon.setPosition((c.w.getSize().x - icon.getGlobalBounds().width) / 2.0f,
@@ -108,7 +108,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
         c.window.display();
 
         // Sleep the process to see the menu icons correctly
-        sleep(milliseconds(40));
+        sleep(milliseconds(60));
     }
     return START;
 }
