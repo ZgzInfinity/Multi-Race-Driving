@@ -1230,6 +1230,8 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
     }
     // Check if the game mode selected by the player is World Tour and Pole Position
     else if (typeOfGame == 0 || typeOfGame == 2){
+        // Install the camera
+        posCameraY = 0.f;
         // Check the number of rivals
         if (numRivals == 0){
             // Camera in the center of the screen
@@ -1243,6 +1245,7 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
     else {
         // Camera in the center of the screen
         posCameraX = 0.f;
+        posCameraY = 0.f;
     }
 
     int rectangles = 0, peopleDisplayed, treesDisplayed;

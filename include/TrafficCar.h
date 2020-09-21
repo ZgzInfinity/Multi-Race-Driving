@@ -145,7 +145,7 @@ public:
      * @param maxAggressiveness is the AI aggressiveness of the traffic cars
      * @param difficulty is the difficulty level of the game selected by the player
      */
-    void update(float iniPos, float endPos, float maxAggressiveness, const Difficult& difficulty);
+    void update(float iniPos, float endPos, float maxAggressiveness, const Difficult& difficulty, const int typeOfGame);
 
 
 
@@ -153,8 +153,9 @@ public:
      * Updates the aggressiveness of the vehicle AI with a random value between 0 and maxAggressiveness
      * @param maxAggressiveness is the AI aggressiveness of the traffic cars
      * @param difficulty is the difficulty level of the game selected by the player
+     * @param typeOfGame is the game selected by the player
      */
-    void setAI(float maxAggressiveness, const Difficult& difficulty);
+    void setAI(float maxAggressiveness, const Difficult& difficulty, const int typeOfGame);
 
 
 

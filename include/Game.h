@@ -72,7 +72,7 @@ class Game {
     FormulaOne player5;
     Police player6;
 
-    mutex mtx, mtx2, mtx3;
+    mutex mtx, mtx2, mtx3, mtx4;
 
     vector<TrafficCar> cars;
 
@@ -80,11 +80,14 @@ class Game {
 
     vector<MultiplayerCar> multiplayerCars;
 
+    vector<MultiplayerData> multiplayerCarsRanking;
+
     RivalCar goalCar;
 
     float lastY;
     bool vehicleCrash;
     bool drawingGoalCar;
+    bool firstRace;
 
     // Time to play
     int time;
@@ -246,7 +249,7 @@ class Game {
     thread timer0, timer1, timer2, controllerPosition,
     capturerPlayers, capturerGroups, guestPulses, controlPulse,
     vehicleOwner, vehicleGuest, vehicleRestPlayers,
-    controlRaceOwner, controlRaceGuest;
+    controlRaceOwner, controlRaceGuest, controlRacerGoal;
 
     int displayLapFactor;
 
@@ -327,6 +330,12 @@ class Game {
 
 
     int rivalTypeMode;
+
+
+    State drawHudAnimationWorldTourPolePosition(Configuration& c, SoundPlayer& r);
+
+
+    State drawHudAnimationOutRunDrivingFuryDemarrage(Configuration& c, SoundPlayer& r);
 
 
     void storingRivalCars(Configuration& c);
@@ -687,7 +696,11 @@ public:
     void controlVehicleGuest(bool& cancelledVehicle, vector<int>& vehiclesRead);
 
 
-    void storeRivalPlayers(int& numPlayers, bool& finishedRegister, bool& cancelledGroup, vector<int>& vehiclesRead);
+    void storeRivalPlayers1(int& numPlayers, bool& finishedRegister, bool& cancelledGroup, vector<int>& vehiclesRead);
+
+
+    void storeRivalPlayers2(int& numPlayers, bool& finishedRegister, bool& cancelledGroup, bool& cancelledOwner, vector<int>& vehiclesRead,
+                            bool& written);
 
 
 
@@ -774,7 +787,7 @@ public:
     void capturerOfPlayers(bool& fullGroup);
 
 
-    void capturerOfGroups(bool& success, bool& fail);
+    void capturerOfGroups(bool& success, bool& fail, bool& partialSuccess);
 
 
     State creationOfGroups(Configuration& c, SoundPlayer& r);

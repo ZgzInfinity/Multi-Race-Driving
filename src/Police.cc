@@ -851,6 +851,15 @@ void Police::setModeCollision(){
 
 
 /**
+ * Set the speed of the vehicle to zero
+ */
+void Police::setSpeed(){
+    Vehicle::setSpeed();
+}
+
+
+
+/**
  * Initialize the properties of the devastator depending of the game mode
  * selected by the player
  * @param typeOfGame is the game mode selected by the player

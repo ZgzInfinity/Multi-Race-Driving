@@ -221,8 +221,9 @@ void updateGameConfiguration(const string path, const Difficult difficulty, cons
  * Shows a loading animation with the current controllers of the game
  * @param c is the module configuration of the game
  * @param r is the sound player module of the game
+ * @param onMultiplayer controls if the multi player mode is been played or not
  */
-State showLoadingAnimation(Configuration& c, SoundPlayer& r);
+State showLoadingAnimation(Configuration& c, SoundPlayer& r, const bool onMultiplayer);
 
 
 

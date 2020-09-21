@@ -1922,7 +1922,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                 if (r.volumeMusic != 0) {
                     r.volumeMusic--;
                     // Iterate the soundtracks and reduce the level volume
-                    for (int i = 0; i <= 18; i++) {
+                    for (int i = 0; i <= 22; i++) {
                         r.soundTracks[i]->setVolume(float(r.volumeMusic));
                         if (i == 14) {
                             // Listen the changes in the options soundtrack
@@ -1940,7 +1940,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                 if (r.volumeMusic != 100) {
                     r.volumeMusic++;
                     // Iterate the soundtracks and ascend the level volume
-                    for (int i = 0; i <= 18; i++) {
+                    for (int i = 0; i <= 22; i++) {
                         r.soundTracks[i]->setVolume(float(r.volumeMusic));
                         if (i == 14) {
                             // Listen the changes in the options soundtrack
@@ -1962,7 +1962,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                     // Check the volume before descend
                     r.volumeEffects--;
                     // Iterate the sound effects and ascend the level volume
-                    for (int i = 0; i <= 126; i++) {
+                    for (int i = 0; i <= 127; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
                     // Test the changes and store then
@@ -1977,7 +1977,7 @@ State soundMenu(Configuration &c, SoundPlayer& r, const bool &inGame) {
                 if (r.volumeEffects != 100) {
                     r.volumeEffects++;
                     // Iterate the effects and ascend the level volume
-                    for (int i = 0; i <= 126; i++) {
+                    for (int i = 0; i <= 127; i++) {
                         r.soundEffects[i]->setVolume(float(r.volumeEffects));
                     }
                     // Test the changes and store then
@@ -3999,8 +3999,9 @@ void updateGameConfiguration(const string path, const Difficult difficulty, cons
  * Shows a loading animation with the current controllers of the game
  * @param c is the module configuration of the game
  * @param r is the sound player module of the game
+ * @param onMultiplayer controls if the multi player mode is been played or not
  */
-State showLoadingAnimation(Configuration& c, SoundPlayer& r){
+State showLoadingAnimation(Configuration& c, SoundPlayer& r, const bool onMultiplayer){
 
     // Prepare the screen to display the loading animation
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
@@ -4158,7 +4159,7 @@ State showLoadingAnimation(Configuration& c, SoundPlayer& r){
         // Detect the possible events
         Event e{};
         while (c.window.pollEvent(e)){
-            if (e.type == Event::Closed){
+            if (e.type == Event::Closed && !onMultiplayer){
                 return EXIT;
             }
         }

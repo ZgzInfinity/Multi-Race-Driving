@@ -144,6 +144,15 @@ void Vehicle::setVehicle(const int typeOfGame, const bool onMultiplayer, const i
 
 
 /**
+ * Set the speed of the vehicle to zero
+ */
+void Vehicle::setSpeed(){
+    speed = 0.f;
+}
+
+
+
+/**
  * Returns the current position of the vehicle in the axis x
  * @return
  */

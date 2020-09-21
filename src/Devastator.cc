@@ -859,6 +859,15 @@ void Devastator::setModeCollision(){
 
 
 /**
+ * Set the speed of the vehicle to zero
+ */
+void Devastator::setSpeed(){
+    Vehicle::setSpeed();
+}
+
+
+
+/**
  * Returns the half speed that can be reached by the devastator
  * @return
  */

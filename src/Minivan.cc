@@ -855,6 +855,14 @@ void Minivan::setModeCollision(){
 
 
 /**
+ * Set the speed of the vehicle to zero
+ */
+void Minivan::setSpeed(){
+    Vehicle::setSpeed();
+}
+
+
+/**
  * Returns the half speed that can be reached by the minivan
  * @return
  */

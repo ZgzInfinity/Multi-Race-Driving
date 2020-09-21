@@ -859,6 +859,15 @@ void Truck::setModeCollision(){
 
 
 
+/**
+ * Set the speed of the vehicle to zero
+ */
+void Truck::setSpeed(){
+    Vehicle::setSpeed();
+}
+
+
+
 
 /**
  * Returns the half speed that can be reached by the truck

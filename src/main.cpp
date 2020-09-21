@@ -288,7 +288,8 @@ int main() {
                 }
                 case LOADING: {
                     // Show the loading animation
-                    state = showLoadingAnimation(c, r);
+                    bool multiplayer = engine.getOnMultiplayerMode();
+                    state = showLoadingAnimation(c, r, multiplayer);
                     break;
                 }
                 case PLAY_GAME: {

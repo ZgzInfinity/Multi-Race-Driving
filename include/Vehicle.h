@@ -175,6 +175,12 @@ public:
 
 
     /**
+     * Set the speed of the vehicle to zero
+     */
+    void setSpeed();
+
+
+    /**
      * Returns the current position of the vehicle in the axis x
      * @return
      */

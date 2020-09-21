@@ -757,6 +757,14 @@ void FormulaOne::setSmoking(bool smoke) {
 
 
 /**
+ * Set the speed of the vehicle to zero
+ */
+void FormulaOne::setSpeed(){
+    Vehicle::setSpeed();
+}
+
+
+/**
  * Initialize the properties of the devastator depending of the game mode
  * selected by the player
  * @param typeOfGame is the game mode selected by the player

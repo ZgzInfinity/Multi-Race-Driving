@@ -206,7 +206,7 @@ void TrafficCar::autoControl(const Configuration &c, float playerPosX, float pla
  * @param maxAggressiveness is the AI aggressiveness of the traffic cars
  * @param difficulty is the difficulty level of the game selected by the player
  */
-void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness, const Difficult& difficulty) {
+void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness, const Difficult& difficulty, const int typeOfGame) {
 
     // Updating the speed of the traffic car between two thresholds
     speed = maxSpeed * rand_generator_float(0.25f, 0.75f);
@@ -222,7 +222,7 @@ void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness, con
     maxScreenX = 0;
 
     // Assign a type of AI to the traffic car
-    setAI(maxAggressiveness, difficulty);
+    setAI(maxAggressiveness, difficulty, typeOfGame);
 }
 
 
@@ -231,51 +231,74 @@ void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness, con
  * Updates the aggressiveness of the vehicle AI with a random value between 0 and maxAggressiveness
  * @param maxAggressiveness is the AI aggressiveness of the traffic cars
  * @param difficulty is the difficulty level of the game selected by the player
+ * @param typeOfGame is the game selected by the player
  */
-void TrafficCar::setAI(float maxAggressiveness, const Difficult& difficulty) {
-    // Get a random number to select the type of AI for the traffic car
-    const float p = rand_generator_zero_one();
+void TrafficCar::setAI(float maxAggressiveness, const Difficult& difficulty, const int typeOfGame) {
 
-    // Check the difficulty and depending of it a kind of AI is more common than the other ones
-    switch(difficulty){
-        case EASY:
-            // More common type is EVASIVE
-            if (p <= 0.25) {
-                typeAI = OBSTACLE;
-            }
-            else if (p <= 0.75) {
-                typeAI = EVASIVE;
-            }
-            else {
-                typeAI = INCONSTANT;
-                probAI *= 2.0f;
-            }
-            break;
-        case NORMAL:
-            // OBSTACLE is more common
-            if (p <= 0.5f) {
-                typeAI = OBSTACLE;
-            }
-            else if (p <= 0.75f) {
-                typeAI = EVASIVE;
-            }
-            else {
-                typeAI = INCONSTANT;
-                probAI *= 2.0f;
-            }
-            break;
-        case HARD:
-            // OBSTACLE is more common
-            if (p <= 0.65f) {
-                typeAI = OBSTACLE;
-            }
-            else if (p <= 0.75f) {
-                typeAI = EVASIVE;
-            }
-            else {
-                typeAI = INCONSTANT;
-                probAI *= 2.0f;
-            }
+    if (typeOfGame != 1){
+        // Get a random number to select the type of AI for the traffic car
+        const float p = rand_generator_zero_one();
+
+        // Check the difficulty and depending of it a kind of AI is more common than the other ones
+        switch(difficulty){
+            case EASY:
+                // More common type is EVASIVE
+                if (p <= 0.25) {
+                    typeAI = OBSTACLE;
+                }
+                else if (p <= 0.75) {
+                    typeAI = EVASIVE;
+                }
+                else {
+                    typeAI = INCONSTANT;
+                    probAI *= 2.0f;
+                }
+                break;
+            case NORMAL:
+                // OBSTACLE is more common
+                if (p <= 0.5f) {
+                    typeAI = OBSTACLE;
+                }
+                else if (p <= 0.75f) {
+                    typeAI = EVASIVE;
+                }
+                else {
+                    typeAI = INCONSTANT;
+                    probAI *= 2.0f;
+                }
+                break;
+            case HARD:
+                // OBSTACLE is more common
+                if (p <= 0.65f) {
+                    typeAI = OBSTACLE;
+                }
+                else if (p <= 0.75f) {
+                    typeAI = EVASIVE;
+                }
+                else {
+                    typeAI = INCONSTANT;
+                    probAI *= 2.0f;
+                }
+        }
+    }
+    else {
+        if (maxAggressiveness == 0.0f){
+            probAI = 0.0f;
+        }
+        else {
+            probAI = rand_generator_float(maxAggressiveness / 2.0f, maxAggressiveness);
+        }
+        const float p = rand_generator_zero_one();
+        if (p < 0.333f) {
+            typeAI = OBSTACLE;
+        }
+        else if (p < 0.666f) {
+            typeAI = EVASIVE;
+        }
+        else {
+            typeAI = INCONSTANT;
+            probAI *= 2.0f;
+        }
     }
 }
 

@@ -245,6 +245,13 @@ public:
 
 
     /**
+     * Set the speed of the vehicle to zero
+     */
+    void setSpeed();
+
+
+
+    /**
      * Returns the half speed that can be reached by the devastator
      * @return
      */
