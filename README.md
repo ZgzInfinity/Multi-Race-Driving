@@ -18,7 +18,7 @@
 
 &nbsp;
 
-# Welcome to the Multi Race Driving!
+# General description
 
 _**Multi Race Driving**_ is a general and customized platform for racing games with 2.5D graphics. This platform has been designed using **C++** as a high-level programming language, and **SFML**, a simple interface for various components of your PC, to ease the development of games and multimedia applications. 
 
@@ -112,3 +112,7 @@ These are the default controllers of the simulator, but you can change them when
 Code is released under the GNU General Public License v3.0.
 
 &nbsp;
+
+## 6. Documentation
+
+Please, go to the [Wiki](https://github.com/ZgzInfinity/Multi-Race-Driving/wiki) in order to be able to see the more details about what _**Multi Race Driving**_ can offer to you.
