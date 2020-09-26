@@ -115,4 +115,4 @@ Code is released under the GNU General Public License v3.0.
 
 ## 6. Documentation
 
-Please, go to the [Wiki](https://github.com/ZgzInfinity/Multi-Race-Driving/wiki) in order to be able to see the more details about what _**Multi Race Driving**_ can offer to you.
+Please, go to the [Wiki](https://github.com/ZgzInfinity/Multi-Race-Driving/wiki/World-Tour) in order to be able to see the more details about what _**Multi Race Driving**_ can offer to you.
