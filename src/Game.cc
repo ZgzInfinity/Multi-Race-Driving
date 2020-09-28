@@ -3227,10 +3227,13 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
 
     State status;
 
+    // Check if the player has returned from pause menu
     if (!inGame) {
+        // Continue the game
         inGame = true;
         status = showsInitialAnimation(c, r);
     }
+    // First time to play
     else if ((typeOfGame == 0 || typeOfGame == 2) && !comeFromOptions){
         status = showsInitialAnimation(c, r);
     }
@@ -5477,10 +5480,13 @@ State Game::playOutRunDrivingFuryDemarrage(Configuration &c, SoundPlayer& r) {
 
     State status;
 
+    // Check if the player has returned from pause menu
     if (!inGame) {
+        // Continue the game
         inGame = true;
         status = showsInitialAnimation(c, r);
     }
+    // First time to play
     else if ((typeOfGame == 0 || typeOfGame == 2) && !comeFromOptions){
         status = showsInitialAnimation(c, r);
     }
@@ -5823,15 +5829,21 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
     int flagger, semaphore;
 
+    // Check the landscape to raw
     if (indexLandScape == 0){
+        // Stop the current soundtrack
         r.soundTracks[r.currentSoundtrack]->stop();
+        // Check if the player is on multi player mode
         if (onMultiplayer){
+            // Get the number of racers
             numberRacers = multiplayerCars.size();
         }
+        // Create the initial landscape
         startMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
         startMap->addNewLandScape(currentMap);
         startMap->setColorsLandScape(*currentMap);
 
+        // Control if the goal landscape has to be drawn on World Tour mode
         if ((!onMultiplayer && typeOfGame == 0) || (onMultiplayer && typeOfGameMultiplayer == 0)) {
             int bdTime = 0;
             time = int(float(currentMap->getTimeToPlay()) * timeMul) + bdTime;
@@ -5839,6 +5851,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
+        // Control if the goal landscape has to be drawn on Pole Position mode
         else if ((!onMultiplayer && typeOfGame == 2) || (onMultiplayer && typeOfGameMultiplayer != 0)){
             if (numberLaps == 1){
                 goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
@@ -5846,6 +5859,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                 currentMap->addNewLandScape(&goalMap);
             }
             else {
+                // Draw the middle landscape between landscapes
                 middleMap = LandScape(*currentMap, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
                 middleMap.setColorsLandScape(*currentMap);
                 currentMap->addNewLandScape(&middleMap);
@@ -5854,21 +5868,26 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         currentMap = startMap;
     }
     else {
+        // Get the number of racers
         if (onMultiplayer){
             numberRacers = multiplayerCars.size();
         }
+        // Starting landscape
         LandScape *initMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
         initMap->addNewLandScape(currentMap);
         initMap->setColorsLandScape(*currentMap);
 
+        // Check if the goal landscape has to be drawn in World Tour mode
         if ((!onMultiplayer && typeOfGame == 0) || (onMultiplayer && typeOfGameMultiplayer == 0)){
             goalMap = LandScape(goalFlagger, goalEnd, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
             goalMap.setColorsLandScape(*currentMap);
             currentMap->addNewLandScape(&goalMap);
         }
+        // Establish the starting landscape
         currentMap = initMap;
     }
 
+    // Control the difficulty
     checkDifficulty(c);
 
     // Semaphore and flagger
@@ -5925,29 +5944,36 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
     State status;
 
+    // Display the HUD animation
     if (onMultiplayer || typeOfGame == 0 || typeOfGame == 2){
+        // World Tour and Pole Position animation
         status = drawHudAnimationWorldTourPolePosition(c, r);
     }
     else {
+        // Out Run, Driving Fury and Demarrage animation
         status = drawHudAnimationOutRunDrivingFuryDemarrage(c, r);
     }
     if (!onMultiplayer && status == EXIT){
         return EXIT;
     }
 
+    // Check if the animation has to be drawn also in multi player modes
     if (onMultiplayer){
         showHudInterfaceWorldTourPolePosition(c);
     }
     else {
         // Draw the HUD of the game
         if (typeOfGame == 0 || typeOfGame == 2){
+            // Show HUD of World Tour or Pole Position
             showHudInterfaceWorldTourPolePosition(c);
         }
         else {
+            // Show HUD of Out Run, Driving Fury or Demarrage
             showHudInterfaceOutRunDrivingFuryDerramage(c);
         }
     }
 
+    // Draw the title of the landscape circuit
     if ((onMultiplayer && typeOfGameMultiplayer == 0) || (!onMultiplayer && typeOfGame == 0)){
         Text titleLandScape;
         titleLandScape.setFont(c.fontTimeToPlay);
@@ -5959,6 +5985,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         titleLandScape.setPosition((float(c.w.getSize().x) - titleLandScape.getGlobalBounds().width) / 2.0f,
                                    (float(c.w.getSize().y) + float(titleLandScape.getCharacterSize())) / 1.4f);
 
+        // Display in the screen of the game
         c.w.draw(titleLandScape);
     }
 
