@@ -143,14 +143,14 @@
 					<Direction>1.4</Direction>
 					<Road startPosGT="269" finalPosLT="330">
 						<SpriteNearLeft>
+							<Each>87</Each>
+							<Offset>0.2</Offset>
+							<Code>3</Code>
+						</SpriteNearLeft>
+						<SpriteNearRight>
 							<Each>83</Each>
 							<Offset>0.3</Offset>
 							<Code>27</Code>
-						</SpriteNearLeft>
-						<SpriteNearRight>
-							<Each>87</Each>
-							<Offset>0.2</Offset>
-							<Code>2</Code>
 						</SpriteNearRight>
 						<SpriteFarLeft>
 							<Each>58</Each>

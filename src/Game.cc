@@ -14904,7 +14904,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
         record = (minutesLap < 10) ? "0" + to_string(int(minutesLap)) + ":" : to_string(int(minutesLap)) + ":";
         record += (secondsLap < 10) ? "0" + to_string(int(secondsLap)) + ":" : to_string(int(secondsLap)) + ":";
-        record += (cent_sec < 10) ? "0" + to_string(centsSecondLap) : to_string(centsSecondLap);
+        record += (centsSecondLap < 10) ? "0" + to_string(centsSecondLap) : to_string(centsSecondLap);
 
         recordText.setString("CURRENT RECORD: " + record);
         recordText.setCharacterSize(static_cast<unsigned int>(int(40.0f * c.screenScale)));
@@ -15423,6 +15423,7 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
     arrival = false;
     updatedTimeCheck = false;
     checkPoint = false;
+    inGame = false;
 
     minutes = 0;
     secs = 0;
@@ -15444,13 +15445,13 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
         case 2:
             player3.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup, numberPlayersGroup);
             break;
-        case 4:
+        case 3:
             player4.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup, numberPlayersGroup);
             break;
-        case 5:
+        case 4:
             player5.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup, numberPlayersGroup);
             break;
-        case 6:
+        case 5:
             player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup, numberPlayersGroup);
     }
 
@@ -15473,14 +15474,9 @@ State Game::classificationRace(Configuration& c, SoundPlayer& r){
             goalCarStage++;
         }
 
-        string path = "Data/Vehicles/Police/Configuration/Configuration.xml";
-        string brandName, motorName;
-        float max_speed, angle;
+
         updatedGoalCar = false;
         updatedPlayerCar = false;
-
-        // Load the properties of the police car
-        loadVehicleProperties(path , brandName, max_speed, angle, motorName);
 
         // Code to generate randomly a vehicle to chase which cant be a motorbike
         int vehicle = rand_generator_int(0, 4);

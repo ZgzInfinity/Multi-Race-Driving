@@ -133,7 +133,7 @@
 			</Straight>
 		</P4>
 		<P5>
-			<Curve direction="-1.3">
+			<Curve direction="-1.1">
 				<Road startPosGE="199" finalPosLT="240">
 					<SpriteNearLeft>
 						<Each>1</Each>
@@ -159,7 +159,7 @@
 			</Curve>
 		</P5>
 		<P6>
-			<Curve direction="1.7">
+			<Curve direction="0.9">
 				<Road startPosGE="238" finalPosLT="291">
 					<SpriteNearLeft>
 						<Each>1</Each>
@@ -240,7 +240,7 @@
 			</Climbing>
 		</P8>
 		<P9>
-			<Curve direction="2.5">
+			<Curve direction="1.1">
 				<Road startPosGE="430" finalPosLT="480">
 					<SpriteNearLeft>
 						<Each>1</Each>
@@ -266,7 +266,7 @@
 			</Curve>
 		</P9>
 		<P10>
-			<Curve direction="-2.5">
+			<Curve direction="-0.7">
 				<Road startPosGE="480" finalPosLT="530">
 					<SpriteNearLeft>
 						<Each>1</Each>
@@ -422,7 +422,7 @@
 			</Straight>
 		</P12>
 		<P13>
-			<Curve direction="-2.5">
+			<Curve direction="-1.3">
 				<Road startPosGE="871" finalPosLT="922">
 					<SpriteNearLeft>
 						<Each>1</Each>
@@ -535,7 +535,7 @@
 			</Dropping>
 		</P13>
 		<P14>
-			<Curve direction="-1.8">
+			<Curve direction="-1.4">
 				<Road startPosGE="1173" finalPosLT="1273">
 					<SpriteNearLeft>
 						<Each>76</Each>
@@ -561,7 +561,7 @@
 			</Curve>
 		</P14>
 		<P15>
-			<Curve direction="1.8">
+			<Curve direction="1.2">
 				<Road startPosGE="1273" finalPosLT="1373">
 					<SpriteNearLeft>
 						<Each>87</Each>

@@ -310,7 +310,7 @@
 		<P11>
 			<Dropping elevation="9000">
 				<P1>
-					<Direction>1.7</Direction>
+					<Direction>1.3</Direction>
 					<Road startPosGE="700" finalPosLT="900">
 						<SpriteNearLeft>
 							<Each>70</Each>
@@ -335,7 +335,7 @@
 					</Road>
 				</P1>
 				<P2>
-					<Direction>-1.7</Direction>
+					<Direction>-1.3</Direction>
 					<Road startPosGE="900" finalPosLT="1200">
 						<SpriteNearLeft>
 							<Each>86</Each>
