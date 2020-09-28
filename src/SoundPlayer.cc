@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module SoundPlayer implementation file
  */

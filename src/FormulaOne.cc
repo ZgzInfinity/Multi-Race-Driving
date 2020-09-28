@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module FormulaOne implementation file
  */
@@ -448,6 +460,8 @@ void FormulaOne::draw(Configuration &c, SoundPlayer &r, const Action &a, const D
         firstTurnRight = true;
     }
 
+    multiplayerMutex.lock();
+
     // Check the current action of the formula one to be drawn in the screen
     if (a != NONE) {
         if (counter_code_image >= maxCounterToChange) {
@@ -659,6 +673,8 @@ void FormulaOne::draw(Configuration &c, SoundPlayer &r, const Action &a, const D
         current_code_image = 1;
     }
 
+    multiplayerMutex.unlock();
+
     // Draw the formula one in the screen adapted to the current screen resolution and pixel art effect
     sprite.setTexture(textures[current_code_image - 1], true);
     sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
@@ -833,5 +849,15 @@ string FormulaOne::getMotorName(){
  */
 float FormulaOne::getTopSpeed(){
     return topSpeed;
+}
+
+
+
+/**
+ * Returns the current code of the sprite of the vehicle to draw
+ * @return
+ */
+int FormulaOne::getCurrentCodeImage() const {
+    return Vehicle::getCurrentCodeImage();
 }
 

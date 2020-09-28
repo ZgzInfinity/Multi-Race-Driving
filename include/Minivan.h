@@ -18,11 +18,23 @@
  */
 
 
-#pragma once
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
 
 /*
  * Module Minivan interface file
  */
+
+#pragma once
 
 #ifndef MINIVAN_H
 #define MINIVAN_H
@@ -288,6 +300,14 @@ public:
      * @return
      */
     float getTopSpeed();
+
+
+
+    /**
+     * Returns the current code of the sprite of the vehicle to draw
+     * @return
+     */
+    int getCurrentCodeImage() const;
 
 };
 

@@ -18,11 +18,23 @@
  */
 
 
-#pragma once
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
 
 /*
  * Module Police interface file
  */
+
+#pragma once
 
 #ifndef POLICE_H
 #define POLICE_H
@@ -263,6 +275,14 @@ public:
      * @return
      */
     float getAngle();
+
+
+
+    /**
+     * Returns the current code of the sprite of the vehicle to draw
+     * @return
+     */
+    int getCurrentCodeImage() const;
 
 };
 

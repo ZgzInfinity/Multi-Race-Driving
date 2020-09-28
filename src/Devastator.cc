@@ -20,6 +20,17 @@
 
 
 /*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
+/*
  * Module Devastator implementation file
  */
 
@@ -516,12 +527,15 @@ void Devastator::draw(Configuration &c, SoundPlayer &r, const Action &a, const D
     }
 
     // Draw
+
     if (d != TURNLEFT){
         firstTurnLeft = true;
     }
     if (d != TURNRIGHT){
         firstTurnRight = true;
     }
+
+    multiplayerMutex.lock();
 
     // Check the current action of the devastator to be drawn in the screen
     if (a != NONE) {
@@ -725,6 +739,8 @@ void Devastator::draw(Configuration &c, SoundPlayer &r, const Action &a, const D
         current_code_image = 1;
     }
 
+    multiplayerMutex.unlock();
+
     // Draw the devastator in the screen adapted to the current screen resolution and pixel art effect
     sprite.setTexture(textures[current_code_image - 1], true);
     sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
@@ -913,5 +929,15 @@ float Devastator::getAngle(){
  */
 float Devastator::getTopSpeed(){
     return topSpeed;
+}
+
+
+
+/**
+ * Returns the current code of the sprite of the vehicle to draw
+ * @return
+ */
+int Devastator::getCurrentCodeImage() const {
+    return Vehicle::getCurrentCodeImage();
 }
 

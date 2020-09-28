@@ -17,11 +17,24 @@
  * along with Out Run.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
 
 /*
  * Module Vehicle interface file
  */
+
+#pragma once
 
 #ifndef VEHICLE_H
 #define VEHICLE_H
@@ -233,6 +246,14 @@ public:
      * @return
      */
     float getSpeed() const;
+
+
+
+    /**
+     * Returns the current code of the sprite of the vehicle to draw
+     * @return
+     */
+    int getCurrentCodeImage() const;
 
 
 };

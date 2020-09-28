@@ -17,21 +17,35 @@
  * along with Out Run.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+#define _WIN32_WINNT 0x0500
+
 #include <thread>
 #include "windows.h"
 #include "../include/Menu.h"
 #include "../include/Game.h"
 #include "../include/SoundPlayer.h"
-
-mutex mainMutex;
-
 #include <SFML/Graphics.hpp>
 
 
-#include <windows.h>
-
 using namespace sf;
 using namespace std;
+
+
+
+mutex mainMutex, multiplayerMutex;
+
+
 
 
 void loadGameConfiguration (const string path, Difficult& difficulty, int& volumeSoundtracks,
@@ -137,7 +151,12 @@ void loadGameConfiguration (const string path, Difficult& difficulty, int& volum
 
 
 
-int main() {
+int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show){
+
+    // Calling sell to execute ping command to make the tests
+    AllocConsole();
+    HWND hWnd = GetConsoleWindow();
+    ShowWindow(hWnd, SW_HIDE);
 
     // Throw the application with hight priority
     SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);

@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module Truck implementation file
  */
@@ -510,6 +522,8 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
         r.soundEffects[19]->stop();
     }
 
+
+
     // Draw
     if (d != TURNLEFT){
         firstTurnLeft = true;
@@ -517,6 +531,9 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
     if (d != TURNRIGHT){
         firstTurnRight = true;
     }
+
+
+    multiplayerMutex.lock();
 
     // Check the current action of the truck to be drawn in the screen
     if (a != NONE) {
@@ -592,7 +609,7 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
                         }
                         else if (d == TURNLEFT) {
                             if (firstTurnLeft) {
-                                if (current_code_image < 6 || current_code_image > 6)
+                                if (current_code_image < 6 || current_code_image > 10)
                                     current_code_image = 6;
                                 if (current_code_image == 7)
                                     firstTurnLeft = false;
@@ -720,6 +737,8 @@ void Truck::draw(Configuration &c, SoundPlayer &r, const Action &a, const Direct
         // Default code when the truck does not move
         current_code_image = 1;
     }
+
+    multiplayerMutex.unlock();
 
     // Draw the truck in the screen adapted to the current screen resolution and pixel art effect
     sprite.setTexture(textures[current_code_image - 1], true);
@@ -915,4 +934,14 @@ float Truck::getAngle(){
  */
 float Truck::getTopSpeed(){
     return topSpeed;
+}
+
+
+
+/**
+ * Returns the current code of the sprite of the vehicle to draw
+ * @return
+ */
+int Truck::getCurrentCodeImage() const {
+    return Vehicle::getCurrentCodeImage();
 }

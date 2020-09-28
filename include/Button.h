@@ -17,11 +17,24 @@
  * along with Out Run.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
 
 /*
  * Module Button interface file
  */
+
+#pragma once
 
 #ifndef BUTTON_H
 #define BUTTON_H

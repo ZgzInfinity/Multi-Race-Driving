@@ -17,6 +17,19 @@
  * along with Out Run.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module Menu implementation file
  */
@@ -73,7 +86,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
         c.window.display();
 
         // Sleep the process to see the menu icons correctly
-        sleep(milliseconds(60));
+        sleep(milliseconds(55));
     }
 
 
@@ -108,7 +121,7 @@ State introAnimation(Configuration &c, SoundPlayer& r) {
         c.window.display();
 
         // Sleep the process to see the menu icons correctly
-        sleep(milliseconds(60));
+        sleep(milliseconds(55));
     }
     return START;
 }

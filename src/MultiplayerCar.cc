@@ -18,7 +18,17 @@
  */
 
 
- #include "../include/MultiplayerCar.h"
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+#include "../include/MultiplayerCar.h"
 
 
 
@@ -39,8 +49,8 @@
  * @param colorCarSelected is the identifier color of the vehicle
  * @param vehicle is the name of the vehicle specified in text
  */
-MultiplayerCar::MultiplayerCar(const int numTextures, const float scaling, const float positionX, const float positionY,
-                               const int vehicleSelected, const int colorCarSelected, const string &vehicle)
+MultiplayerCar::MultiplayerCar(const int idPlayer, const string name, const int numTextures, const float scaling, const float positionX,
+                               const float positionY, const int vehicleSelected, const int colorCarSelected, const string &vehicle)
 {
     // Assignment of the attributes
     scale = scaling;
@@ -48,6 +58,9 @@ MultiplayerCar::MultiplayerCar(const int numTextures, const float scaling, const
     posY = positionY;
     typeOfVehicle = vehicleSelected;
     colorCar = colorCarSelected;
+    current_code_image = 1;
+    codePlayer = idPlayer;
+    namePlayer = name;
 
     // Load the textures of the vehicle selected
     // Reserves memory to store all the textures of the vehicle
@@ -66,6 +79,26 @@ MultiplayerCar::MultiplayerCar(const int numTextures, const float scaling, const
 
 
 
+ /**
+ * Sets the identifier code of the player
+ * @param positionCode is the code of the player in the group
+ */
+void MultiplayerCar::setCodePlayer(const int positionCode){
+    codePlayer = positionCode;
+}
+
+
+
+/**
+ * Sets the name of the player
+ * @param name is the name of the player
+ */
+void MultiplayerCar::setNamePlayer(const string name){
+    namePlayer = name;
+}
+
+
+
 /**
  * Establish the vehicle in a concrete position in the landscape
  * @param pX is the position in the axis x when the vehicle must be located
@@ -74,6 +107,16 @@ MultiplayerCar::MultiplayerCar(const int numTextures, const float scaling, const
 void MultiplayerCar::setPosition(float pX, float pY){
     posX = pX;
     posY = pY;
+}
+
+
+
+/**
+ * Establish the code of the sprite to be drawn in the screen
+ * @param codeImage is the code of the sprite to be drawn in the screen of the game
+ */
+void MultiplayerCar::setCurrentCodeImage(float codeImage){
+    current_code_image = codeImage;
 }
 
 
@@ -103,8 +146,19 @@ void MultiplayerCar::setMaxScreenX(float screenX){
  * @param current_code_image is the code of the sprite to be drawn
  * @return
  */
-const Texture* MultiplayerCar::getCurrentTexture(const int current_code_image) const {
+const Texture* MultiplayerCar::getCurrentTexture() const {
     return &textures[current_code_image - 1];
+}
+
+
+
+/**
+ * Returns the current texture of the multi player
+ * @param current_code_image is the code of the sprite to be drawn
+ * @return
+ */
+const Texture* MultiplayerCar::getCurrentTexture(const int referenceSprite, const int offsetSprite) const {
+    return &textures[referenceSprite + current_code_image % offsetSprite];
 }
 
 
@@ -155,5 +209,43 @@ float MultiplayerCar::getMinScreenX() const {
  */
 float MultiplayerCar::getMaxScreenX() const {
     return maxScreenX;
+}
+
+
+
+/**
+ * Returns the type of vehicle selected by the player
+ * @return
+ */
+int MultiplayerCar::getTypeVehicle() const {
+    return typeOfVehicle;
+}
+
+
+
+/**
+ * Returns the type of vehicle selected by the player
+ * @return
+ */
+int MultiplayerCar::getCurrentCodeImage() const {
+    return current_code_image;
+}
+
+
+
+/**
+ * Returns the code of the player in the group
+ */
+int MultiplayerCar::getCodePlayer() const {
+    return codePlayer;
+}
+
+
+
+/**
+ * Returns the name of the player in the group
+ */
+string MultiplayerCar::getNickNamePlayer() const {
+    return namePlayer;
 }
 

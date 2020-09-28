@@ -20,6 +20,17 @@
 
 
 /*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
+/*
  * Module Motorbike implementation file
  */
 
@@ -454,6 +465,9 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
         firstTurnRight = true;
     }
 
+
+    multiplayerMutex.lock();
+
     // Check the current action of the motorbike to be drawn in the screen
     if (a != NONE) {
         if (counter_code_image >= maxCounterToChange) {
@@ -665,6 +679,8 @@ void Motorbike::draw(Configuration &c, SoundPlayer &r, const Action &a, const Di
         current_code_image = 1;
     }
 
+    multiplayerMutex.unlock();
+
     // Draw the motorbike in the screen adapted to the current screen resolution and pixel art effect
     sprite.setTexture(textures[current_code_image - 1], true);
     sprite.setScale(scale * c.screenScale, scaleY * c.screenScale);
@@ -836,5 +852,15 @@ string Motorbike::getMotorName(){
  */
 float Motorbike::getTopSpeed(){
     return topSpeed;
+}
+
+
+
+/**
+ * Returns the current code of the sprite of the vehicle to draw
+ * @return
+ */
+int Motorbike::getCurrentCodeImage() const {
+    return Vehicle::getCurrentCodeImage();
 }
 

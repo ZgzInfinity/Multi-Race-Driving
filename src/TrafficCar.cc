@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module Traffic implementation file
  */
@@ -222,7 +234,9 @@ void TrafficCar::update(float iniPos, float endPos, float maxAggressiveness, con
     maxScreenX = 0;
 
     // Assign a type of AI to the traffic car
-    setAI(maxAggressiveness, difficulty, typeOfGame);
+    if (typeOfGame == 1){
+        setAI(maxAggressiveness, difficulty, typeOfGame);
+    }
 }
 
 

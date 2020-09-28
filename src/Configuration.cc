@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module Configuration implementation file
  */
@@ -140,7 +152,7 @@ Configuration::Configuration(const Difficult difficulty, const bool pixelArt, co
 
     // Assign icon to the screen of the game
     Image i;
-    i.loadFromFile("Data/Icon/Multi_Race_Driving.png");
+    i.loadFromFile("Data/Icon/MultiRaceDriving.png");
     window.setIcon(i.getSize().x, i.getSize().y, i.getPixelsPtr());
 
     // Calculate the factor of screen

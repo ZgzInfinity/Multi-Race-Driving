@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
  /*
  * Module MultiplayerCar interface file
  */
@@ -29,6 +41,7 @@
 #include <iostream>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "Globals.h"
 
 
 using namespace std;
@@ -40,6 +53,12 @@ using namespace sf;
  * the multi player mode
  */
  class MultiplayerCar {
+
+    // Code of the player
+    int codePlayer;
+
+    // Name of the player
+    string namePlayer;
 
     // Scale coefficient to be drawn on the screen depending of the resolutions
     float scale;
@@ -65,6 +84,9 @@ using namespace sf;
     // Vector with the textures of the vehicle
     vector<sf::Texture> textures;
 
+    // Code of the sprite of the vehicle to be drawn
+    int current_code_image;
+
 
 public:
 
@@ -87,8 +109,24 @@ public:
      * @param colorCarSelected is the identifier color of the vehicle
      * @param vehicle is the name of the vehicle specified in text
      */
-    MultiplayerCar(const int numTextures, const float scaling, const float positionX, const float positionY,
-                   const int vehicleSelected, const int colorCarSelected, const string &vehicle);
+    MultiplayerCar(const int idPlayer, const string name, const int numTextures, const float scaling, const float positionX,
+                   const float positionY, const int vehicleSelected, const int colorCarSelected, const string &vehicle);
+
+
+
+    /**
+     * Sets the identifier code of the player
+     * @param positionCode is the code of the player in the group
+     */
+    void setCodePlayer(const int positionCode);
+
+
+
+    /**
+     * Sets the name of the player
+     * @param name is the name of the player
+     */
+    void setNamePlayer(const string name);
 
 
 
@@ -98,6 +136,14 @@ public:
      * @param pY is the position in the axis y when the vehicle must be located
      */
     void setPosition(float pX, float pY);
+
+
+
+    /**
+     * Establish the code of the sprite to be drawn in the screen
+     * @param codeImage is the code of the sprite to be drawn in the screen of the game
+     */
+    void setCurrentCodeImage(float codeImage);
 
 
 
@@ -119,10 +165,18 @@ public:
 
     /**
      * Returns the current texture of the multi player
+     * @return
+     */
+    const sf::Texture *getCurrentTexture() const;
+
+
+
+    /**
+     * Returns the current texture of the multi player
      * @param current_code_image is the code of the sprite to be drawn
      * @return
      */
-    const sf::Texture *getCurrentTexture(const int current_code_image) const;
+    const sf::Texture * getCurrentTexture(const int referenceSprite, const int offsetSprite) const;
 
 
 
@@ -163,6 +217,37 @@ public:
      * @return
      */
     float getMaxScreenX() const;
+
+
+
+    /**
+     * Returns the type of vehicle selected by the player
+     * @return
+     */
+    int getTypeVehicle() const;
+
+
+
+    /**
+     * Returns the code of the vehicle sprite to be drawn
+     * @return
+     */
+    int getCurrentCodeImage() const;
+
+
+
+    /**
+     * Returns the code of the player in the group
+     */
+    int getCodePlayer() const;
+
+
+
+    /**
+     * Returns the name of the player in the group
+     */
+    string getNickNamePlayer() const;
+
 
 
  };

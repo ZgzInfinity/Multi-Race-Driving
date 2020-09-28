@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module Vehicle implementation file
  */
@@ -218,6 +230,16 @@ float Vehicle::getAcceleration() const {
  */
 float Vehicle::getSpeed() const {
     return speed;
+}
+
+
+
+/**
+ * Returns the current code of the sprite of the vehicle to draw
+ * @return
+ */
+int Vehicle::getCurrentCodeImage() const {
+    return current_code_image;
 }
 
 

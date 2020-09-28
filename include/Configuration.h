@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (c) 2020 Andrés Gavín
  * Copyright (c) 2020 Rubén Rodríguez
@@ -18,6 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Out Run.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
 
 /*
  * Module Configuration interface file

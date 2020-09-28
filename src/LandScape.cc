@@ -18,6 +18,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module LandScape implementation file
  */
@@ -1499,7 +1511,7 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int
                 break;
             case 2:
             case 3:
-                rectangles = 55;
+                rectangles = 56;
                 break;
             case 4:
             case 5:
@@ -1562,6 +1574,8 @@ LandScape::LandScape(const LandScape &landScape, const int typeOfGame, const int
             // People
             leftSprites[i].codeMapElement = 15;
             rightSprites[i].codeMapElement = 14;
+            leftSprites[i].offset = 0.f;
+            rightSprites[i].offset = 0.f;
         }
     }
 
@@ -1946,7 +1960,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
         sortedRivals.pop_back();
     }
 
-
     // Sort the multi player cars
     vector<MultiplayerCar*> sortedMultiplayerCars;
     sortedMultiplayerCars.reserve(multiplayerCars.size());
@@ -2222,12 +2235,13 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
 
         // Draw the multi player cars
         if (playingMultiplayer){
+
             // Draw multi player cars
             while (!sortedMultiplayerCars.empty() && int(sortedMultiplayerCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
 
                 MultiplayerCar *v = sortedMultiplayerCars.back();
                 Sprite sv;
-                sv.setTexture(*v->getCurrentTexture(1), true);
+                sv.setTexture(*v->getCurrentTexture(), true);
                 const float width = v->getScalingFactor() * sv.getTextureRect().width;
                 const float widthOri = sv.getTextureRect().width;
                 const float height = v->getScalingFactor() * sv.getTextureRect().height;
@@ -2241,6 +2255,149 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
                 sv.setPosition(v->getMinScreenX(), l->position_2d_y - destH);
                 c.w.draw(sv);
 
+                int vehicle = v->getTypeVehicle();
+
+                // Check if the multi player rival is out of the race
+                if (abs(v->getPosX()) > 1.0f){
+                    // Draw the terrain of the landscape
+                    const float j = sv.getPosition().y + sv.getGlobalBounds().height;
+
+                    switch (terrain){
+                    case 0:
+                        // Grass
+                        switch (vehicle){
+                            case 0:
+                                sv.setTexture(*v->getCurrentTexture(66, 8), true);
+                                break;
+                            case 1:
+                                sv.setTexture(*v->getCurrentTexture(63, 8), true);
+                                break;
+                            case 2:
+                                sv.setTexture(*v->getCurrentTexture(54, 8), true);
+                                break;
+                            case 3:
+                                sv.setTexture(*v->getCurrentTexture(81, 8), true);
+                                break;
+                            case 4:
+                                sv.setTexture(*v->getCurrentTexture(64, 8), true);
+                                break;
+                            case 5:
+                                sv.setTexture(*v->getCurrentTexture(60, 8), true);
+                        }
+                        break;
+                    case 1:
+                        switch (vehicle){
+                            case 0:
+                                sv.setTexture(*v->getCurrentTexture(60, 6), true);
+                                break;
+                            case 1:
+                                sv.setTexture(*v->getCurrentTexture(57, 6), true);
+                                break;
+                            case 2:
+                                sv.setTexture(*v->getCurrentTexture(49, 6), true);
+                                break;
+                            case 3:
+                                sv.setTexture(*v->getCurrentTexture(75, 6), true);
+                                break;
+                            case 4:
+                                sv.setTexture(*v->getCurrentTexture(58, 6), true);
+                                break;
+                            case 5:
+                                sv.setTexture(*v->getCurrentTexture(54, 6), true);
+                        }
+                        // Land
+                        break;
+                    case 2:
+                        // Snow
+                        switch (vehicle){
+                            case 0:
+                                sv.setTexture(*v->getCurrentTexture(74, 6), true);
+                                break;
+                            case 1:
+                                sv.setTexture(*v->getCurrentTexture(71, 6), true);
+                                break;
+                            case 2:
+                                sv.setTexture(*v->getCurrentTexture(63, 6), true);
+                                break;
+                            case 3:
+                                sv.setTexture(*v->getCurrentTexture(89, 6), true);
+                                break;
+                            case 4:
+                                sv.setTexture(*v->getCurrentTexture(72, 6), true);
+                                break;
+                            case 5:
+                                sv.setTexture(*v->getCurrentTexture(68, 6), true);
+                        }
+                    }
+
+                    sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
+                    sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
+                                       j - sv.getGlobalBounds().height);
+
+                    c.w.draw(sv);
+                    sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
+                    c.w.draw(sv);
+                }
+
+                multiplayerMutex.lock();
+                int codeImage = v->getCurrentCodeImage();
+                multiplayerMutex.unlock();
+
+                // Check if the vehicle car is crashing
+                switch (vehicle){
+                    case 1:
+                        // Devastator sprites
+                        if (codeImage >= 37 && codeImage <= 52){
+                            // Draw the smoke effect of the police
+                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
+                            sv.setTexture(*v->getCurrentTexture(52, 4), true);
+                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
+                                               j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                        }
+                        break;
+                    case 2:
+                        // Minivan sprites
+                        if (codeImage >= 29 && codeImage <= 44){
+                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
+                            sv.setTexture(*v->getCurrentTexture(44, 4), true);
+                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
+                                               j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                        }
+                        break;
+                    case 3:
+                        // Truck sprites
+                        if (codeImage >= 55 && codeImage <= 70){
+                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
+                            sv.setTexture(*v->getCurrentTexture(70, 4), true);
+                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
+                                               j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                        }
+                        break;
+                    case 5:
+                        // Police crash sprites
+                        if (codeImage >= 25 && codeImage <= 50){
+                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
+                            sv.setTexture(*v->getCurrentTexture(50, 4), true);
+                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
+                                               j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
+                            c.w.draw(sv);
+                        }
+                }
                 sortedMultiplayerCars.pop_back();
             }
         }

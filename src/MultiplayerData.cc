@@ -17,6 +17,18 @@
  */
 
 
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
+
+
+
 /*
  * Module MultiplayerData implementation file
  */
@@ -38,6 +50,27 @@
     vehicle = -1;
     color = -1;
  }
+
+
+
+
+/**
+ * Sets the identifier code of the player
+ * @param positionCode is the code of the player in the group
+ */
+void MultiplayerData::setCodePlayer(const int positionCode){
+    codePlayer = positionCode;
+}
+
+
+
+/**
+ * Sets the name of the player
+ * @param name is the name of the player
+ */
+void MultiplayerData::setNamePlayer(const string name){
+    nickName = name;
+}
 
 
 

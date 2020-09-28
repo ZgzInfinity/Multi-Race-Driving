@@ -1,12 +1,45 @@
+/*
+ * Copyright (c) 2020 Andrés Gavín
+ * Copyright (c) 2020 Rubén Rodríguez
+ *
+ * This file is part of Out Run.
+ * Out Run is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Out Run is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Out Run.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
+
+/*
+ * ----------------------------------------------
+ * Multi Race Driving: A general and customized
+ * platform for 2.5D racing games
+ * Author: ZgzInfinity
+ * Date: 28-09-20
+ * ----------------------------------------------
+ */
 
 #include "../include/Game.h"
 
 
 
 /**
- * Draw the initial animation of the HUD
+ * Shows the HUD animation in the World Tour and Pole Position modes
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
  */
 State Game::drawHudAnimationWorldTourPolePosition(Configuration& c, SoundPlayer& r){
+
+    // Offset positions to move the indicators of the HUD
 
     float elapSedIndicator = 2.39f;
     float elapsedTextLap = 3.55f;
@@ -395,7 +428,9 @@ State Game::drawHudAnimationWorldTourPolePosition(Configuration& c, SoundPlayer&
 
 
 /**
- * Draw the initial animation of the HUD
+ * Shows the HUD animation in the Out Run, Driving Fury and Demarrage game modes
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
  */
 State Game::drawHudAnimationOutRunDrivingFuryDemarrage(Configuration& c, SoundPlayer& r){
 
@@ -888,6 +923,11 @@ int cmd(char *cmd, char *output, DWORD maxbuffer)
 }
 
 
+
+/**
+ * Store the rival vehicles that the player has to beat
+ * @param c is the module configuration of the game
+ */
 void Game::storingRivalCars(Configuration& c){
 
     // Clear the vector of rival cars
@@ -1087,6 +1127,16 @@ void Game::storingRivalCars(Configuration& c){
 }
 
 
+
+/**
+ * Load the landscapes of the World Tour and Pole Position game modes
+ * @param c is the module configuration of the game
+ * @param path is the route of the folder where the landscapes are stored
+ * @param i is the identifier of the landscape to be processed
+ * @param timeLandscape is the time to complete the landscape
+ * @param typeOfGame is the type of game selected by the player
+ * @param tourLandScapesMutex is a vector that controls when a landscape processed has to be stored
+ */
 void Game::loadWorldTourPolePositionLandScape(Configuration& c, const string path, const int i, int timeLandscape, const int typeOfGame,
                                               mutex tourLandScapesMutex[])
 {
@@ -1107,6 +1157,16 @@ void Game::loadWorldTourPolePositionLandScape(Configuration& c, const string pat
 
 
 
+/**
+ * Load the landscapes of the World Tour and Pole Position game modes
+ * @param c is the module configuration of the game
+ * @param path is the route of the folder where the landscapes are stored
+ * @param i is the identifier of the landscape to be processed
+ * @param timeLandscape is the time to complete the landscape
+ * @param typeOfGame is the type of game selected by the player
+ * @param tourLandScapesMutex is a vector that controls when a landscape processed has to be stored
+ * @param vm is the matrix where all the landscapes are stored
+ */
 void Game::loadOutRunDrivingFuryDerramageLandScape(Configuration& c, const string path, const int i, int timeLandscape,
                                                    const int typeOfGame, mutex tourLandScapesMutex[], vector<LandScape>& vm)
 {
@@ -1127,7 +1187,9 @@ void Game::loadOutRunDrivingFuryDerramageLandScape(Configuration& c, const strin
 
 
 
-
+/**
+ * Updates the time elapsed in the game
+ */
 void Game::updateTimeElapsed(){
 
     // Clock counter of time
@@ -1193,6 +1255,9 @@ void Game::updateTimeElapsed(){
 
 
 
+/**
+ * Updates the time of the game to complete the landscape
+ */
 void Game::updateTimeLandScape(){
 
     // Initialize the clock counters of time
@@ -1241,14 +1306,20 @@ void Game::updateTimeLandScape(){
 
 
 
+/**
+ * Updates the score indicator in the Out Run game mode
+ */
 void Game::updateScore(){
 
+    // Control the end of the process
     bool arrived = false , endOfGame = false, pause = false;
     float speed;
 
+    // While the race is still in process
     while(!arrived && !endOfGame && !pause){
 
         mtx.lock();
+        // Check pause
         pause = onPause;
         mtx.unlock();
 
@@ -1342,21 +1413,32 @@ void Game::updateScore(){
 
 
 
+/**
+ * Find the current position of the player in the race
+ * @param posYPplayer is the position of the player in the axis y
+ */
 int Game::findPlayerPositionRanking(const float posYPlayer){
+    // Check if the player has been found or not
     bool found = false;
+    // Size of the ranking
     int i = 0, j = rankingVehicles.size() - 1;
     while (!found && i <= j){
+        // Check if the position is correct or not
         if (rankingVehicles[i] > posYPlayer){
+            // Increment index
             i++;
         }
         else {
+            // Position found
             found = true;
         }
     }
     if (!found){
+        // The player goes in last position
         return numberRacers + 1;
     }
     else {
+        // The player goes in a medium position
         return i + 1;
     }
 }
@@ -1364,7 +1446,7 @@ int Game::findPlayerPositionRanking(const float posYPlayer){
 
 
 /**
- * Load the Hud interface of the game
+ * Load the Hud interface of the World Tour and Pole Position game modes
  */
 void Game::loadHudGameWorldTourPolePosition(){
     // Load the elapsed time indicator with the time level indicator
@@ -1386,9 +1468,8 @@ void Game::loadHudGameWorldTourPolePosition(){
 
 
 
-
 /**
- * Load the Hud interface of the game
+ * Load the Hud interface of the Out Run, Driving Fury and Demarrage game modes
  */
 void Game::loadHudGameOutRunDrivingFuryDerramage(){
     // Load the elapsed time indicator with the time level indicator
@@ -1571,7 +1652,7 @@ void Game::drawNewLap(Configuration &c){
 
 
 /**
- * Draw the HUD interface of the game
+ * Draw the HUD interface of the Out Run, Driving Fury and Demarrage game modes
  * @param c is the configuration of the game
  */
 void Game::showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c) {
@@ -1920,7 +2001,7 @@ void Game::showHudInterfaceOutRunDrivingFuryDerramage(Configuration &c) {
 
 
 /**
- * Draw the HUD interface of the game
+ * Draw the HUD interface of the World Tour and Pole Position game modes
  * @param c is the configuration of the game
  */
 void Game::showHudInterfaceWorldTourPolePosition(Configuration &c) {
@@ -2299,12 +2380,8 @@ void Game::showCheckpointIndications(Configuration &c, bool visible) {
     textForLap.setPosition(float(c.w.getSize().x / 2.f) - textForLap.getGlobalBounds().width / 2.f,
                            initial + 3.4f * s.getGlobalBounds().height);
 
-    if (c.enablePixelArt){
-        s.setPosition(float(c.w.getSize().x / 2.f) - s.getLocalBounds().width / 2.0f, initial * 1.3f);
-    }
-    else {
-        s.setPosition(float(c.w.getSize().x / 2.f) - s.getLocalBounds().width / 0.9f, initial * 1.3f);
-    }
+    s.setPosition(float(c.w.getSize().x / 2.f) - s.getTexture()->getSize().x * s.getScale().x / 2.f, initial * 1.3f);
+
 
     if (visible) {
         textForLap.setFillColor(Color(146, 194, 186));
@@ -2733,10 +2810,10 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
     vector<int> times;
 
     if (typeOfGame == 1){
-        times = {68, 65, 63, 62, 62, 59, 59, 55, 55, 53, 53, 48, 47, 47, 48};
+        times = {78, 65, 63, 62, 62, 59, 55, 53, 53, 53, 53, 48, 47, 47, 48};
     }
     else {
-        times = {68, 65, 63, 62, 62, 59, 59, 55, 55, 53, 53, 48, 47, 47, 48};
+        times = {88, 75, 73, 72, 72, 69, 69, 65, 63, 55, 53, 53, 48, 47, 47, 48};
     }
 
     // Path which depends of the mode selected by the player
@@ -2970,7 +3047,7 @@ State Game::loadOutRunDrivingFuryDemarrageConf(Configuration& c){
 
 /**
  * Check the level of difficulty and regulates the parameters
- * @param c
+ * @param c is the configuration of the game
  */
 void Game::checkDifficulty(Configuration &c) {
     int numCars = static_cast<int>(cars.size()); // Number of vehicles simultaneously
@@ -3143,6 +3220,7 @@ float Game::getCents_SecondTrip() const {
 /**
  * Updates the logic of the game and refreshes the screen until you leave the game.
  * @param c is the configuration of the game
+ * @param r is the sound player module of the game
  * @return
  */
 State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
@@ -3345,8 +3423,14 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
 
 
 
-
-void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen){
+/**
+ * Control if the multi player race for the owner has finished due to the player has left it or the
+ * guests members of the group have left him
+ * @param canceledRace controls if all the guest members have left the group
+ * @param playerFallen stores the name of the guest player that has left the group
+ * @param positionCounters is a vector that stores the last positions communicated by the rest of the players of the group
+ */
+void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen, vector<long long>& positionCounters){
     // Local variable to finish the process
     bool finished = false;
 
@@ -3383,6 +3467,25 @@ void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen){
 
                 groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
 
+                bool founded = false;
+                int k = 1;
+                while (!founded){
+                    if (multiplayerCars[k - 1].getNickNamePlayer() == playerFallen){
+                        founded = true;
+                    }
+                    else {
+                        k++;
+                    }
+                }
+
+                // The petition is received
+                for (int j = k; j < (int)multiplayerCars.size(); j++){
+                    multiplayerCars[j].setCodePlayer(multiplayerCars[j].getCodePlayer() - 1);
+                }
+
+                positionCounters.erase(positionCounters.begin() + k - 1);
+                multiplayerCars.erase(multiplayerCars.begin() + k - 1);
+
                 // Alert to the rest of the members that this member must be deleted
                 for (int j = 2; j <= numberPlayersGroup; j++){
 
@@ -3407,7 +3510,14 @@ void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen){
 
 
 
-void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen){
+/**
+ * Control if the multi player race for the guest has finished due to the owner has cancel it. Also
+ * controls if any of the rest of the guest players have left the race
+ * @param canceledRace controls if the owner of the group has canceled the race
+ * @param playerFallen stores the name of the guest player that has left the group
+ * @param positionCounters is a vector that stores the last positions communicated by the rest of the players of the group
+ */
+void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen, vector<long long>& positionCounters){
     // Local variable to finish the process
     bool finished = false;
     bool abortedRace = false;
@@ -3448,6 +3558,26 @@ void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen){
             }
 
             groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
+
+            bool founded = false;;
+            int k = 1;
+            while (!founded){
+                if (multiplayerCars[k - 1].getNickNamePlayer() == playerFallen){
+                    founded = true;
+                }
+                else {
+                    k++;
+                }
+            }
+
+            // The petition is received
+            for (int j = k; j < (int)multiplayerCars.size(); j++){
+                multiplayerCars[j].setCodePlayer(multiplayerCars[j].getCodePlayer() - 1);
+            }
+
+            positionCounters.erase(positionCounters.begin() + k - 1);
+            multiplayerCars.erase(multiplayerCars.begin() + k - 1);
+
             numberPlayersGroup--;
             mtx3.unlock();
         }
@@ -3459,14 +3589,602 @@ void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen){
 
 
 /**
- * Updates the logic of the game and refreshes the screen until you leave the game.
+ * Sends the position of a guest player player of the group to all the guest of the multi player group
+ * @param canceledRace controls if all the owner of the group has canceled the race
+ * @param nRivals is the number of rivals that started the race with the owner player
+ * @param startPosition is the initial position of the owner when the race started
+ */
+void Game::senderMultiplayerPositionOwner(bool& canceledRace, const int nRivals, const int startPosition){
+
+   // Control locally if the race has been finished or canceled
+    bool finishedRace = false;
+    bool abortedRace = false;
+
+    // Position index to be processed
+    long long positionCounter = 0;
+
+    mtx3.lock();
+    bool canceledGroup = canceledRace;
+    mtx3.unlock();
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+    // Until the race don`t finishes or is canceled
+    while (!finishedRace && !abortedRace && !canceledGroup){
+
+        // Get the identifier of the player
+        bool found;
+
+        // Check if the race has finished arriving to the goal
+        Tuple t = Tuple("RACE_FINISHED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        Tuple r = winLindadriver.readNoteX(t, found);
+        if (found && r.get(1) != NF){
+            // Arrived to the goal
+            winLindadriver.removeNote(r);
+            finishedRace = true;
+        }
+        else {
+            // The race has not finished
+            t = Tuple("RACE_ABORTED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            r = winLindadriver.readNoteX(t, found);
+            if (found && r.get(1) != NF){
+                // The race has been aborted
+                winLindadriver.removeNote(r);
+                abortedRace = true;
+            }
+            else {
+                // Proceed to send the position of the vehicle of the player
+                mtx4.lock();
+                float positionX = 0.f, positionY = 0.f;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        positionX = player.getPosX();
+                        positionY = player.getPosY();
+                        break;
+                    case 1:
+                        positionX = player2.getPosX();
+                        positionY = player2.getPosY();
+                        break;
+                    case 2:
+                        positionX = player3.getPosX();
+                        positionY = player3.getPosY();
+                        break;
+                    case 3:
+                        positionX = player4.getPosX();
+                        positionY = player4.getPosY();
+                        break;
+                    case 4:
+                        positionX = player5.getPosX();
+                        positionY = player5.getPosY();
+                        break;
+                    case 5:
+                        positionX = player6.getPosX();
+                        positionY = player6.getPosY();
+                }
+                mtx4.unlock();
+
+                // Get the current code image of the vehicle player to draw
+                multiplayerMutex.lock();
+                int codeImage = 0;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        codeImage = player.getCurrentCodeImage();
+                        break;
+                    case 1:
+                        codeImage = player2.getCurrentCodeImage();
+                        break;
+                    case 2:
+                        codeImage = player3.getCurrentCodeImage();
+                        break;
+                    case 3:
+                        codeImage = player4.getCurrentCodeImage();
+                        break;
+                    case 4:
+                        codeImage = player5.getCurrentCodeImage();
+                        break;
+                    case 5:
+                        codeImage = player6.getCurrentCodeImage();
+                }
+                multiplayerMutex.unlock();
+
+                mtx3.lock();
+
+                bool founded = false;;
+                int codePlayer = 1;
+                while (!founded){
+                    if (multiplayerCars[codePlayer - 1].getNickNamePlayer() == nickNameMultiplayer){
+                        founded = true;
+                    }
+                    else {
+                        codePlayer++;
+                    }
+                }
+
+                int totalPlayers = multiplayerCars.size();
+
+                for (int i = 1; i <= totalPlayers; i++){
+
+                    // Check if its not the same player
+                    if (i != codePlayer){
+                        // Get the code and the name of each player group
+                        int code = multiplayerCars[i - 1].getCodePlayer();
+                        string namePlayer = multiplayerCars[i - 1].getNickNamePlayer();
+
+                        // Check the possible offset to add
+                        if (currentMap->isStartingLandScape()){
+                            if (nRivals <= 2){
+                                positionY += 13.f;
+                            }
+                            else {
+                                // Player starts in first position
+                                if (startPosition == 1){
+                                    if (i == 2){
+                                        positionY += 13.f;
+                                    }
+                                    else {
+                                        positionY += 33.f;
+                                    }
+                                }
+                                // Player starts in second position
+                                else if (startPosition == 2){
+                                    if (i == 1){
+                                        positionY += 13.f;
+                                    }
+                                    else {
+                                        positionY += 33.f;
+                                    }
+                                }
+                                // Player starts in third position
+                                else if (startPosition >= 3) {
+                                    positionY += 13.f;
+                                }
+                            }
+                        }
+
+                        // Send the position with the player to the rest of the players
+                        t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                  to_string(positionY), to_string(codeImage), to_string(positionCounter));
+
+                        // Post note the tuple with the information
+                        winLindadriver.postNote(t);
+
+                        // Increment the position counter
+                        positionCounter++;
+                    }
+                }
+                canceledGroup = canceledRace;
+                mtx3.unlock();
+
+                // Sleep the thread
+                this_thread::sleep_for(chrono::milliseconds(5));
+            }
+        }
+    }
+    // Close connection with server
+    winLindadriver.stop();
+}
+
+
+
+/**
+ * Sends the position of a guest player player of the group to the rest of the members of the multi player group
+ * @param canceledRace controls if all the guest members have left the group
+ * @param nRivals is the number of rivals that started the race with the owner player
+ * @param startPosition is the initial position of the owner when the race started
+ */
+void Game::senderMultiplayerPositionGuest(bool& canceledRace, const int nRivals, const int startPosition){
+
+   // Control locally if the race has been finished or canceled
+    bool finishedRace = false;
+    bool abortedRace = false;
+
+    // Position index to be processed
+    long long positionCounter = 0;
+
+    mtx3.lock();
+    bool canceledGuest = canceledRace;
+    mtx3.unlock();
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+    // Until the race don`t finishes or is canceled
+    while (!finishedRace && !abortedRace && !canceledGuest){
+
+        // Get the identifier of the player
+        bool found;
+
+        // Check if the race has finished arriving to the goal
+        Tuple t = Tuple("RACE_FINISHED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        Tuple r = winLindadriver.readNoteX(t, found);
+        if (found && r.get(1) != NF){
+            // Arrived to the goal
+            winLindadriver.removeNote(r);
+            finishedRace = true;
+        }
+        else {
+            // Check if the owner has been abandoned
+            t = Tuple("RACE_ABORTED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            r = winLindadriver.readNoteX(t, found);
+            if (found && r.get(1) != NF){
+                // The owner is alone in the group
+                winLindadriver.removeNote(r);
+                abortedRace = true;
+            }
+            else {
+                // Proceed to send the position of the vehicle of the player
+                mtx4.lock();
+                float positionX = 0.f, positionY = 0.f;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        positionX = player.getPosX();
+                        positionY = player.getPosY();
+                        break;
+                    case 1:
+                        positionX = player2.getPosX();
+                        positionY = player2.getPosY();
+                        break;
+                    case 2:
+                        positionX = player3.getPosX();
+                        positionY = player3.getPosY();
+                        break;
+                    case 3:
+                        positionX = player4.getPosX();
+                        positionY = player4.getPosY();
+                        break;
+                    case 4:
+                        positionX = player5.getPosX();
+                        positionY = player5.getPosY();
+                        break;
+                    case 5:
+                        positionX = player6.getPosX();
+                        positionY = player6.getPosY();
+                }
+                mtx4.unlock();
+
+                // Get the current code image of the vehicle player to draw
+                multiplayerMutex.lock();
+                int codeImage = 0;
+
+                switch(typeOfVehicle){
+                    case 0:
+                        codeImage = player.getCurrentCodeImage();
+                        break;
+                    case 1:
+                        codeImage = player2.getCurrentCodeImage();
+                        break;
+                    case 2:
+                        codeImage = player3.getCurrentCodeImage();
+                        break;
+                    case 3:
+                        codeImage = player4.getCurrentCodeImage();
+                        break;
+                    case 4:
+                        codeImage = player5.getCurrentCodeImage();
+                        break;
+                    case 5:
+                        codeImage = player6.getCurrentCodeImage();
+                }
+                multiplayerMutex.unlock();
+
+                mtx3.lock();
+
+                bool founded = false;;
+                int codePlayer = 1;
+                while (!founded){
+                    if (multiplayerCars[codePlayer - 1].getNickNamePlayer() == nickNameMultiplayer){
+                        founded = true;
+                    }
+                    else {
+                        codePlayer++;
+                    }
+                }
+
+                int totalPlayers = groupDataPlayers.size();
+
+                for (int i = 1; i<= totalPlayers; i++){
+                    // Check if its not the same player
+                    if (i != codePlayer){
+                        // Get the code and the name of each player group
+                        int code = groupDataPlayers[i - 1].getCodePlayer();
+                        string namePlayer = groupDataPlayers[i - 1].getNickNamePlayer();
+
+                        // Check the possible offset to add
+                        if (currentMap->isStartingLandScape()){
+                            if (nRivals <= 2){
+                                positionY += 13.f;
+                            }
+                            else {
+                                // Player starts in first position
+                                if (startPosition == 1){
+                                    if (i == 2){
+                                        positionY += 13.f;
+                                    }
+                                    else {
+                                        positionY += 33.f;
+                                    }
+                                }
+                                // Player starts in second position
+                                else if (startPosition == 2){
+                                    if (i == 1){
+                                        positionY += 13.f;
+                                    }
+                                    else {
+                                        positionY += 33.f;
+                                    }
+                                }
+                                // Player starts in third position
+                                else if (startPosition >= 3) {
+                                    positionY += 13.f;
+                                }
+                            }
+                        }
+
+                        // Send the position with the player to the rest of the players
+                        t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                  to_string(positionY), to_string(codeImage), to_string(positionCounter));
+
+                        // Post note the tuple with the information
+                        winLindadriver.postNote(t);
+
+                        // Increment the position counter
+                        positionCounter++;
+                    }
+                }
+                canceledGuest = canceledRace;
+                mtx3.unlock();
+
+                // Sleep the thread
+                this_thread::sleep_for(chrono::milliseconds(5));
+            }
+        }
+    }
+    // Close connection with server
+    winLindadriver.stop();
+}
+
+
+
+/**
+ * Receives the position of a guest player player of the group to all the guest of the multi player group
+ * @param canceledRace controls if all the owner of the group has canceled the race
+ * @param nRivals is the number of rivals that started the race with the owner player
+ * @param startPosition is the initial position of the owner when the race started
+ */
+void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long>& positionCounters){
+
+    // Control locally if the race has been finished or canceled
+    bool finishedRace = false;
+    bool abortedRace = false;
+
+    mtx3.lock();
+    bool canceledGroup = canceledRace;
+    mtx3.unlock();
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+    // Until the race don`t finishes or is canceled
+    while (!finishedRace && !abortedRace && !canceledGroup){
+
+        bool found;
+
+        // Check if the race has finished arriving to the goal
+        Tuple t = Tuple("RACE_TERMINATED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        Tuple r = winLindadriver.readNoteX(t, found);
+        if (found && r.get(1) != NF){
+            // Arrived to the goal
+            winLindadriver.removeNote(r);
+            finishedRace = true;
+        }
+        else {
+            // The race has not finished
+            t = Tuple("RACE_CLOSED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            r = winLindadriver.readNoteX(t, found);
+            if (found && r.get(1) != NF){
+                // The race has been aborted
+                winLindadriver.removeNote(r);
+                abortedRace = true;
+            }
+            else {
+                // Proceed to send the position of the vehicle of the player
+
+                mtx3.lock();
+                int players = multiplayerCars.size();
+
+                bool found;
+
+                bool founded = false;;
+                int codePlayer = 1;
+                while (!founded){
+                    if (multiplayerCars[codePlayer - 1].getNickNamePlayer() == nickNameMultiplayer){
+                        founded = true;
+                    }
+                    else {
+                        codePlayer++;
+                    }
+                }
+
+                // Iterate the vector of the rivals
+                for (int i = 1; i <= players; i++){
+
+                    if (i != codePlayer){
+
+                        // Get identifier and the name of the player
+                        int code = multiplayerCars[i - 1].getCodePlayer();
+                        string name = multiplayerCars[i - 1].getNickNamePlayer();
+
+                        // Check if there is a tuple with the position updated of this vehicle
+                        long long counter = positionCounters[i - 1];
+
+                        Tuple t = Tuple("PLAYER_POSITION_" + name, nickNameMultiplayer, "?A", "?B", "?C", to_string(counter));
+                        Tuple r = winLindadriver.readNoteX(t, found);
+                        if (found && r.get(1) != NF){
+
+                            // Get the tuple with the position
+                            winLindadriver.removeNote(r);
+
+                            // Get the opsitio
+                            float posX = stof(r.get(4));
+                            float posY = stof(r.get(5));
+                            int codeImage = stoi(r.get(6));
+
+                            // Assignment of the position and the code image
+                            multiplayerCars[i - 1].setPosition(posX, posY);
+                            multiplayerCars[i - 1].setCurrentCodeImage(codeImage);
+                            multiplayerCars[i - 1].setCodePlayer(code);
+                            multiplayerCars[i - 1].setNamePlayer(name);
+
+                            positionCounters[i - 1]++;
+                        }
+                    }
+                }
+                canceledGroup = canceledRace;
+                mtx3.unlock();
+
+                // Sleep the thread
+                this_thread::sleep_for(chrono::milliseconds(5));
+            }
+        }
+    }
+    // Close connection with server
+    winLindadriver.stop();
+}
+
+
+
+/**
+ * Receives the position of a guest player player of the group to the rest of the members of the multi player group
+ * @param canceledRace controls if all the guest members have left the group
+ * @param nRivals is the number of rivals that started the race with the owner player
+ * @param startPosition is the initial position of the owner when the race started
+ */
+void Game::receiverMultiplayerPositionGuest(bool& canceledRace, vector<long long>& positionCounters){
+
+    // Control locally if the race has been finished or canceled
+    bool finishedRace = false;
+    bool abortedRace = false;
+
+    mtx3.lock();
+    bool canceledGroup = canceledRace;
+
+    // Counter of positions processed
+    mtx3.unlock();
+
+    // Create a Linda driver compatible with Windows to make communicate with the Linda server
+    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+    // Until the race don`t finishes or is canceled
+    while (!finishedRace && !abortedRace && !canceledGroup){
+
+        // Get the identifier of the player
+        mtx3.lock();
+        int codePlayer = codePlayerInGroup;
+        mtx3.unlock();
+
+        bool found;
+
+        // Check if the race has finished arriving to the goal
+        Tuple t = Tuple("RACE_TERMINATED_GUEST", nickNameGroupMultiplayer, to_string(codePlayer), nickNameMultiplayer);
+        Tuple r = winLindadriver.readNoteX(t, found);
+        if (found && r.get(1) != NF){
+            // Arrived to the goal
+            winLindadriver.removeNote(r);
+            finishedRace = true;
+        }
+        else {
+            // The race has not finished
+            t = Tuple("RACE_CLOSED_GUEST", nickNameGroupMultiplayer, to_string(codePlayer), nickNameMultiplayer);
+            r = winLindadriver.readNoteX(t, found);
+            if (found && r.get(1) != NF){
+                // The race has been aborted
+                winLindadriver.removeNote(r);
+                abortedRace = true;
+            }
+            else {
+                mtx3.lock();
+                int players = groupDataPlayers.size();
+                mtx3.unlock();
+
+                bool found;
+
+                // Iterate the vector of the rivals
+                for (int i = 1; i <= players; i++){
+
+                    // Get identifier and the name of the player
+                    mtx3.lock();
+                    int code = groupDataPlayers[i - 1].getCodePlayer();
+                    string name = groupDataPlayers[i - 1].getNickNamePlayer();
+                    mtx3.unlock();
+
+                    // Check if there is a tuple with the position updated of this vehicle
+                    mtx3.lock();
+                    long long counter = positionCounters[i - 1];
+                    mtx3.unlock();
+
+                    Tuple t = Tuple("PLAYER_POSITION_" + name, nickNameMultiplayer, "?A", "?B", "?C", to_string(counter));
+                    Tuple r = winLindadriver.readNoteX(t, found);
+                    if (found && r.get(1) != NF){
+
+                        // Get the tuple with the position
+                        winLindadriver.removeNote(r);
+
+                        // Get the opsitio
+                        float posX = stof(r.get(4));
+                        float posY = stof(r.get(5));
+                        int codeImage = stoi(r.get(6));
+
+                        // Assignment of the position and the code image
+                        multiplayerCars[i - 1].setPosition(posX, posY);
+                        multiplayerCars[i - 1].setCurrentCodeImage(codeImage);
+                        multiplayerCars[i - 1].setCodePlayer(code);
+                        multiplayerCars[i - 1].setNamePlayer(name);
+
+                        mtx3.lock();
+                        positionCounters[i - 1]++;
+                        mtx3.unlock();
+                    }
+                }
+
+                mtx3.lock();
+                players = groupDataPlayers.size();
+                canceledGroup = canceledRace;
+                mtx3.unlock();
+
+                // Sleep the thread
+                this_thread::sleep_for(chrono::milliseconds(5));
+            }
+        }
+    }
+    // Close connection with server
+    winLindadriver.stop();
+}
+
+
+
+/**
+ * Updates the logic of the World Tour and Pole Position game modes and
+ * refreshes the screen until you leave the game.
  * @param c is the configuration of the game
  * @return
  */
 State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& r) {
 
-    if (onMultiplayer && !firstRace){
+    // Get the number of the rivals
+    int nRivals = multiplayerCars.size();
+    int startPosition = 0;
+
+    // Checking the starting position
+    if (!firstRace){
+        startPosition = codePlayerInGroup;
         posArrival = codePlayerInGroup;
+    }
+    else {
+        startPosition = posArrival;
     }
 
     if (!inGame) {
@@ -3521,13 +4239,34 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
     // Variable that stores the name of a player fallen
     string playerFallen = "", namePlayer = "";
 
+
+    vector<long long> positionCounters;
+    for (int i = 1; i <= nRivals; i++){
+        positionCounters.push_back(0);
+    }
+
+    // Check if the player is the owner or is the guest
     if (modeMultiplayer == 0){
+
+        // Throw the threads to send his position to the rest of the players
+        controlSenderPositions = thread(senderMultiplayerPositionOwner, this, ref(cancelledRaceOwner), nRivals, startPosition);
+
+        // Throw the thread to receive the position of the rest of the players
+        controlReceiverPositions = thread(receiverMultiplayerPositionOwner, this, ref(cancelledRaceOwner), ref(positionCounters));
+
         // Owner of the group
-        controlRaceOwner = thread(monitorizeRaceOwner, this, ref(cancelledRaceOwner), ref(playerFallen));
+        controlRaceOwner = thread(monitorizeRaceOwner, this, ref(cancelledRaceOwner), ref(playerFallen), ref(positionCounters));
     }
     else {
+
+        // Throw the threads to send his position to the rest of the players
+        controlSenderPositions = thread(senderMultiplayerPositionGuest, this, ref(cancelledRaceGuest), nRivals, startPosition);
+
+        // Throw the thread to receive the position of the rest of the players
+        controlReceiverPositions = thread(receiverMultiplayerPositionGuest, this, ref(cancelledRaceGuest), ref(positionCounters));
+
         // Guest if the group
-        controlRaceGuest = thread(monitorizeRaceGuest, this, ref(cancelledRaceGuest), ref(playerFallen));
+        controlRaceGuest = thread(monitorizeRaceGuest, this, ref(cancelledRaceGuest), ref(playerFallen), ref(positionCounters));
     }
 
 
@@ -3607,8 +4346,9 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         mtx.unlock();
         timer0.join();
         controlRaceGuest.join();
+        controlSenderPositions.join();
+        controlReceiverPositions.join();
         finalGame = false;
-        r.soundTracks[r.currentSoundtrack]->stop();
         inGame = false;
         if (randomMultiplayerJoined){
             return SELECT_MULTIPLAYER_JOIN;
@@ -3907,6 +4647,8 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
                 // Wait until both threads have finished
                 controlRacerGoal.join();
                 controlRaceOwner.join();
+                controlSenderPositions.join();
+                controlReceiverPositions.join();
 
                 // Stop the soundtrack
                 if (posArrival == 1){
@@ -4073,6 +4815,8 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
             // Wait until both threads have finished
             controlRacerGoal.join();
             controlRaceGuest.join();
+            controlSenderPositions.join();
+            controlReceiverPositions.join();
 
             // Stop the soundtrack
             if (posArrival == 1){
@@ -4420,6 +5164,20 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
             // Stop the thread
             controlRaceOwner.join();
+
+            // Terminate the process that sends the position of the owner
+            t = Tuple("RACE_FINISHED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
+
+            // Terminate the thread that controls the receiving positions of the players
+            t = Tuple("RACE_TERMINATED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
+
+            // Stop the thread
+            controlSenderPositions.join();
+
+            // Stop the thread
+            controlReceiverPositions.join();
         }
         else {
             // Canceled the local process that control the race
@@ -4428,6 +5186,20 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
             // Stop the thread
             controlRaceGuest.join();
+
+            // Canceled the local process that control the race
+            t = Tuple("RACE_FINISHED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
+
+            // Check if the race has finished arriving to the goal
+            t = Tuple("RACE_TERMINATED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
+
+            // Stop the thread
+            controlSenderPositions.join();
+
+            // Stop the thread
+            controlReceiverPositions.join();
         }
 
         // Close connection with server
@@ -4507,6 +5279,21 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
         // Stop the thread
         controlRaceOwner.join();
+
+        // The race has not finished
+        t = Tuple("RACE_ABORTED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
+
+        t = Tuple("RACE_CLOSED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
+        // Stop the thread
+        controlSenderPositions.join();
+
+        // Stop the thread
+        controlReceiverPositions.join();
+
 
         if (!cancelledRaceOwner){
             // The owner has leave the race
@@ -4622,11 +5409,25 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         t = Tuple("RACE_CANCELED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
         winLindadriver.postNote(t);
 
+        // Terminate the thread that control the send of the player positions
+        t = Tuple("RACE_ABORTED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
+
+        t = Tuple("RACE_CLOSED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
         // Close connection with server
         winLindadriver.stop();
 
         // Stop the thread
         controlRaceGuest.join();
+
+        // Stop the thread
+        controlSenderPositions.join();
+
+        // Stop the thread
+        controlReceiverPositions.join();
     }
 
     r.soundTracks[r.currentSoundtrack]->stop();
@@ -4667,7 +5468,8 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
 
 /**
- * Updates the logic of the game and refreshes the screen until you leave the game.
+ * Updates the logic of the Out Run, Driving Fury and Demarrage game modes and
+ * refreshes the screen until you leave the game.
  * @param c is the configuration of the game
  * @return
  */
@@ -5013,11 +5815,9 @@ State Game::playOutRunDrivingFuryDemarrage(Configuration &c, SoundPlayer& r) {
 
 
 /**
- * Stops the game
+ * Shows the initial animation when the player is in the start point
  * @param c is the configuration of the game
- * @param a is the last action done by the player
- * @param d is the last direction done by the player
- * @return
+ * @param r is the sound reproducer of the game
  */
 State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
@@ -5739,6 +6539,8 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
     int position = 0;
 
+    mtx4.lock();
+
     switch(typeOfVehicle){
         case 0:
             player.setPosition(player.getPosX(), 5.f);
@@ -5765,6 +6567,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
             position = int(player6.getPosY());
     }
 
+    mtx4.unlock();
     // claps
     if (posArrival <= 3 && (onMultiplayer || typeOfGame == 0 || typeOfGame == 2)){
         r.soundEffects[29]->stop();
@@ -5790,6 +6593,8 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 return EXIT;
             }
         }
+
+        mtx4.lock();
 
         switch(typeOfVehicle){
             case 0:
@@ -5817,6 +6622,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                 positionY = player6.getPosY();
         }
 
+        mtx4.unlock();
         // Update camera
         currentMap->updateCamera(positionX, positionY - RECTANGLE);
 
@@ -5827,12 +6633,16 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
         switch(typeOfVehicle){
             case 0:
+                mtx4.lock();
                 player.setPosition(player.getPosX(), player.getPosY() + 1);
+                mtx4.unlock();
                 player.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
                         currentMap->getElevation(player.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 1:
+                mtx4.lock();
                 player2.setPosition(player2.getPosX(), player2.getPosY() + 1);
+                mtx4.unlock();
                 player2.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
                         currentMap->getElevation(player2.getPosY()), currentMap->getTerrain(), false);
                 break;
@@ -5842,17 +6652,23 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
                         currentMap->getElevation(player3.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 3:
+                mtx4.lock();
                 player4.setPosition(player4.getPosX(), player4.getPosY() + 1);
+                mtx4.unlock();
                 player4.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
                         currentMap->getElevation(player4.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 4:
+                mtx4.lock();
                 player5.setPosition(player5.getPosX(), player5.getPosY() + 1);
+                mtx4.unlock();
                 player5.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
                         currentMap->getElevation(player5.getPosY()), currentMap->getTerrain(), false);
                 break;
             case 5:
+                mtx4.lock();
                 player6.setPosition(player6.getPosX(), player6.getPosY() + 1);
+                mtx4.unlock();
                 player6.draw(c, r, Vehicle::Action::ACCELERATE, Vehicle::Direction::RIGHT,
                         currentMap->getElevation(player6.getPosY()), currentMap->getTerrain(), false);
         }
@@ -5923,6 +6739,8 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
             drawBonus(c, seconds, decs_second);
         }
 
+        mtx4.lock();
+
         switch(typeOfVehicle){
             case 0:
                 position = int(player.getPosY());
@@ -5942,6 +6760,8 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
             case 5:
                 position = int(player6.getPosY());
         }
+
+        mtx4.unlock();
 
         Sprite bufferSprite(c.w.getTexture());
         c.w.display();
@@ -5992,8 +6812,12 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
 /**
  * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
- * with the vehicles on the screen.
+ * with the vehicles on the screen in World Tour mode for one player
  * @param c is the configuration of the game
+ * @param r is the sound reproducer of the game
+ * @param a is the action of the player that is going to be processed
+ * @param d is the direction of the player that is going to be processed
+ * @param terrain is the kind of terrain of the landscape
  */
 void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
                                      Vehicle::Direction &direction, int& terrain)
@@ -6711,8 +7535,12 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
 /**
  * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
- * with the vehicles on the screen.
+ * with the vehicles on the screen in World Tour for multi player mode
  * @param c is the configuration of the game
+ * @param r is the sound reproducer of the game
+ * @param a is the action of the player that is going to be processed
+ * @param d is the direction of the player that is going to be processed
+ * @param terrain is the kind of terrain of the landscape
  */
 void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
                                           Vehicle::Direction &direction, int& terrain)
@@ -6762,6 +7590,9 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
             case 5:
                 player6.setPosition(player6.getPosX() + currentMap->getOffsetX(), player6.getPosY() - currentMap->getMaxY());
         }
+
+        for (MultiplayerCar &v : multiplayerCars)
+            v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
 
         // Update to the map
         if (level < 0){
@@ -6877,9 +7708,11 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
         switch(typeOfVehicle){
             case 0:
                 if (!player.isCrashing()) { // If not has crashed
+                    mtx4.lock();
                     action = player.accelerationControl(c, currentMap->isOutSideRoad(player.getPosX(), player.getPosY()));
                     direction = player.rotationControl(c, currentMap->getCurveCoefficient(player.getPosY()),
                                                           currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                    mtx4.unlock();
                 }
                 else {
                     player.hitControl(vehicleCrash);
@@ -6911,9 +7744,11 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
                 break;
             case 1:
                 if (!player2.isCrashing()) { // If not has crashed
+                    mtx4.lock();
                     action = player2.accelerationControl(c, currentMap->isOutSideRoad(player2.getPosX(), player2.getPosY()));
                     direction = player2.rotationControl(c, currentMap->getCurveCoefficient(player2.getPosY()),
                                                            currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                    mtx4.unlock();
                 }
                 else {
                     player2.hitControl(vehicleCrash);
@@ -6946,9 +7781,11 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
                 break;
             case 2:
                 if (!player3.isCrashing()) { // If not has crashed
+                    mtx4.lock();
                     action = player3.accelerationControl(c, currentMap->isOutSideRoad(player3.getPosX(), player3.getPosY()));
                     direction = player3.rotationControl(c, currentMap->getCurveCoefficient(player3.getPosY()),
                                                            currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                    mtx4.unlock();
                 }
                 else {
                     player3.hitControl(vehicleCrash);
@@ -6981,9 +7818,11 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
                 break;
             case 3:
                 if (!player4.isCrashing()) { // If not has crashed
+                    mtx4.lock();
                     action = player4.accelerationControl(c, currentMap->isOutSideRoad(player4.getPosX(), player4.getPosY()));
                     direction = player4.rotationControl(c, currentMap->getCurveCoefficient(player4.getPosY()),
                                                            currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                    mtx4.unlock();
                 }
                 else {
                     player4.hitControl(vehicleCrash);
@@ -7016,9 +7855,11 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
                 break;
             case 4:
                 if (!player5.isCrashing()) { // If not has crashed
+                    mtx4.lock();
                     action = player5.accelerationControl(c, currentMap->isOutSideRoad(player5.getPosX(), player5.getPosY()));
                     direction = player5.rotationControl(c, currentMap->getCurveCoefficient(player5.getPosY()),
                                                            currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                    mtx4.unlock();
                 }
                 else {
                     player5.hitControl(vehicleCrash);
@@ -7051,9 +7892,11 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
                 break;
             case 5:
                 if (!player6.isCrashing()) { // If not has crashed
+                    mtx4.lock();
                     action = player6.accelerationControl(c, currentMap->isOutSideRoad(player6.getPosX(), player6.getPosY()));
                     direction = player6.rotationControl(c, currentMap->getCurveCoefficient(player6.getPosY()),
                                                            currentMap->getNextLeft()->isFinalLandScape(), currentMap->getMaxY());
+                    mtx4.unlock();
                 }
                 else {
                     player6.hitControl(vehicleCrash);
@@ -7095,8 +7938,12 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
 
 /**
  * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
- * with the vehicles on the screen.
+ * with the vehicles on the screen in Pole Position mode for one player
  * @param c is the configuration of the game
+ * @param r is the sound reproducer of the game
+ * @param a is the action of the player that is going to be processed
+ * @param d is the direction of the player that is going to be processed
+ * @param terrain is the kind of terrain of the landscape
  */
 void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
                                         Vehicle::Direction &direction, int& terrain)
@@ -7742,6 +8589,15 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
 
 
 
+/**
+ * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
+ * with the vehicles on the screen in Pole Position mode for one player
+ * @param c is the configuration of the game
+ * @param r is the sound reproducer of the game
+ * @param a is the action of the player that is going to be processed
+ * @param d is the direction of the player that is going to be processed
+ * @param terrain is the kind of terrain of the landscape
+ */
 void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
                                                    Vehicle::Direction &direction, int& terrain)
 {
@@ -8219,10 +9075,15 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
 }
 
 
+
 /**
  * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
- * with the vehicles on the screen.
+ * with the vehicles on the screen in Out Run and Demarrage mode for one player
  * @param c is the configuration of the game
+ * @param r is the sound reproducer of the game
+ * @param a is the action of the player that is going to be processed
+ * @param d is the direction of the player that is going to be processed
+ * @param terrain is the kind of terrain of the landscape
  */
 void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
                                            Vehicle::Direction &direction, int& terrain)
@@ -9007,8 +9868,12 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
 
 /**
  * Updates the logic of the landscapes and vehicles and draws the current landscape fragment
- * with the vehicles on the screen.
+ * with the vehicles on the screen in Driving Fury mode for one player
  * @param c is the configuration of the game
+ * @param r is the sound reproducer of the game
+ * @param a is the action of the player that is going to be processed
+ * @param d is the direction of the player that is going to be processed
+ * @param terrain is the kind of terrain of the landscape
  */
 void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
                                        Vehicle::Direction &direction, int& terrain)
@@ -10033,8 +10898,13 @@ void Game::loadPauseMenuConfiguration(const string path, Configuration& c){
 }
 
 
+
 /**
- * Display the pause menu of the game
+ * Stops the game
+ * @param c is the configuration of the game
+ * @param a is the last action done by the player
+ * @param d is the last direction done by the player
+ * @return
  */
 State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, const Vehicle::Direction &d) {
     c.w.clear();
@@ -10603,6 +11473,11 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
 
 
 
+/**
+ * Controls all the guest of the multi player group have left it and the car selection process to be canceled
+ * @param cancelledGroup controls if all the guest members have left the group
+ * @param vehiclesRead is a vector that checks which players of the group have been already selected a vehicle to run
+ */
 void Game::controlVehicleOwner(bool& cancelledGroup, vector<int>& vehiclesRead){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
@@ -10669,6 +11544,12 @@ void Game::controlVehicleOwner(bool& cancelledGroup, vector<int>& vehiclesRead){
 }
 
 
+
+/**
+ * Controls if the owner of the group has canceled the vehicle selection or not
+ * @param cancelledVehicle controls  if the owner has canceled the selection vehicle
+ * @param vehiclesRead is a vector that checks which players of the group have been already selected a vehicle to run
+ */
 void Game::controlVehicleGuest(bool& cancelledVehicle, vector<int>& vehiclesRead){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
@@ -10728,6 +11609,13 @@ void Game::controlVehicleGuest(bool& cancelledVehicle, vector<int>& vehiclesRead
 
 
 
+/**
+ * Controls the selection vehicle of a player and besides receives the selected
+ * cars by the rest of the players of the multi player group
+ * @param numPlayers is the number of players that have selected a car to run
+ * @param finishedRegister controls if all the members of the group have already selected a car to run
+ * @param vehiclesRead is a vector that checks which guest players have been already selected a vehicle to run
+ */
 void Game::storeRivalPlayers1(int& numPlayers, bool& finishedRegister, bool& cancelledGroup, vector<int>& vehiclesRead){
 
     // Local variables to store the information
@@ -10805,7 +11693,15 @@ void Game::storeRivalPlayers1(int& numPlayers, bool& finishedRegister, bool& can
 
 
 
-
+/**
+ * Store the player when arrives to the goal and waits until the rest of the players have arrived to goal too
+ * @param numPlayers is the number of players that have arrived to the goal
+ * @param finishedRegister controls if all the players of the group have arrived to the goal
+ * @param cancelledGroup controls if all the guest members have left the group
+ * @param cancelledOwner controls if the owner has canceled the race
+ * @param vehiclesRead is a vector that controls which players have arrived to the goal
+ * @param written controls if the player that has arrived has been written in the classification
+ */
 void Game::storeRivalPlayers2(int& numPlayers, bool& finishedRegister, bool& cancelledGroup, bool& cancelledOwner, vector<int>& vehiclesRead,
                               bool& written){
 
@@ -10878,6 +11774,8 @@ void Game::storeRivalPlayers2(int& numPlayers, bool& finishedRegister, bool& can
 
                         multiplayerCarsRanking[positionGoal - 1].setVehicleType(typeVehicle);
                         multiplayerCarsRanking[positionGoal - 1].setColorVehicle(colorVehicle);
+                        multiplayerCarsRanking[positionGoal - 1].setCodePlayer(positionGoal);
+                        multiplayerCarsRanking[positionGoal - 1].setNamePlayer(namePlayer);
 
                         playersRegistered = numPlayers;
                         vehiclesRead[i - 1] = 1;
@@ -13289,6 +14187,15 @@ State Game::selectionRivalTypeMenu(Configuration& c, SoundPlayer& r){
 }
 
 
+
+/**
+ * Read the current record of the game in the correspond file depending on the difficulty level
+ * @param path is the route of the file where the record has to be written
+ * @param namePlayer is the name of the player that has done a new record
+ * @param minutesLap are the minutes of the record time
+ * @param secondsLap are the seconds of the record time
+ * @param centsSecondLap are the hundredths of seconds of the record time
+ */
 void Game::readRecordFromLandScape(const string path, string& namePlayer, int& minutesLap, int& secondsLap, int& centsSecondLap){
 
     // Open the xml file of the scenario
@@ -13324,6 +14231,14 @@ void Game::readRecordFromLandScape(const string path, string& namePlayer, int& m
 
 
 
+/**
+ * Write a new record of the game in the correspond file depending on the difficulty level
+ * @param path is the route of the file where the record has to be written
+ * @param namePlayer is the name of the player that has done a new record
+ * @param minutesLap are the minutes of the record time
+ * @param secondsLap are the seconds of the record time
+ * @param centsSecondLap are the hundredths of seconds of the record time
+ */
 void Game::writeRecordFromLandScape(const string path, string namePlayer, int minutesLap, int secondsLap, int centsSecondLap){
     // xml file which stores the player with the highest score in the level
     ofstream theFile (path);
@@ -13367,6 +14282,12 @@ void Game::writeRecordFromLandScape(const string path, string namePlayer, int mi
 
 
 
+/**
+ * Shows to the player the classification race animation after the finishing of a race in
+ * World Tour and Pole Position game modes for one player
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::classificationRace(Configuration& c, SoundPlayer& r){
 
     // Clean the cars
@@ -14877,8 +15798,13 @@ void Game::loadCircuitMenuConfiguration(const string path, Configuration& c){
 
 
 
-
-void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup, bool& escape){
+/**
+ * Controls the pulses received by the guest players to the owner to check if they are alived
+ * @param itemSelected controls if the game mode or the circuit have been selected
+ * @param cancelledGroup controls if all the guest members of the group have left it
+ * @param escape controls if the owner has canceled the game mode or circuit selection
+ */
+void Game::controlGuestPulses(bool& itemSelected, bool& cancelledGroup, bool& escape){
 
     bool pathSelected, cancelled, escaped;
 
@@ -14887,7 +15813,7 @@ void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup, bool&
 
     // Store locally if the circuit has been selected
     mtx3.lock();
-    pathSelected = circuitSelected;
+    pathSelected = itemSelected;
     cancelled = cancelledGroup;
     escaped = escape;
     mtx3.unlock();
@@ -14972,7 +15898,7 @@ void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup, bool&
         }
         // Store locally if the circuit has been selected
         mtx3.lock();
-        pathSelected = circuitSelected;
+        pathSelected = itemSelected;
         cancelled = cancelledGroup;
         escaped = escape;
         mtx3.unlock();
@@ -14983,8 +15909,13 @@ void Game::controlGuestPulses(bool& circuitSelected, bool& cancelledGroup, bool&
 
 
 
-
-void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &cancelledCicruit){
+/**
+ * Controls the pulses sended by a guest player to the owner to alarm that is still alive
+ * @param itemSelected controls if the game mode or the circuit have been selected by the owner
+ * @param finishedGroup controls if the group has been canceled by the owner
+ * @param itemCanceled controls if the owner has canceled the game mode or circuit selection
+ */
+void Game::sendGuestPulses(bool& itemSelected, bool& finishedGroup, bool &itemCanceled){
 
     bool pathSelected = false, pulseReceived = false, found;
     bool fail = false;
@@ -15000,12 +15931,12 @@ void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &can
     string codeCircuit;
 
     mtx3.lock();
-    circuitSelected = pathSelected;
+    itemSelected = pathSelected;
     fail = finishedGroup;
     mtx3.unlock();
 
     // Until the circuit has been selected
-    while (!pathSelected && !fail && !cancelledCicruit){
+    while (!pathSelected && !fail && !itemCanceled){
 
         // Tuple that represents the pulse received
         t = Tuple("PULSE_RECEIVED", nickNameGroupMultiplayer, nickNameMultiplayer, to_string(codePlayerInGroup));
@@ -15035,7 +15966,7 @@ void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &can
             pathSelected = true;
 
             mtx3.lock();
-            circuitSelected = pathSelected;
+            itemSelected = pathSelected;
             landScapeSelected = stoi(r.get(4));
             numberLaps = stoi(r.get(5));
             mtx3.unlock();
@@ -15051,7 +15982,7 @@ void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &can
             pathSelected = true;
 
             mtx3.lock();
-            circuitSelected = pathSelected;
+            itemSelected = pathSelected;
             typeOfGameMultiplayer = stoi(r.get(4));
             mtx3.unlock();
         }
@@ -15091,7 +16022,7 @@ void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &can
         if (found && r.get(1) != NF){
             winLindadriver.removeNote(r);
             mtx3.lock();
-            cancelledCicruit = true;
+            itemCanceled = true;
             mtx3.unlock();
         }
 
@@ -15125,6 +16056,12 @@ void Game::sendGuestPulses(bool& circuitSelected, bool& finishedGroup, bool &can
 
 
 
+/**
+ * Displays the circuit selection menu and lets to the player select in which circuit run
+ * and also how many laps to do and with how many racers compete if it is not the multi player mode
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
 
     // Initialize the number of laps to do
@@ -15830,6 +16767,12 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
 
 
 
+/**
+ * Displays the goal animation when a level of the Driving Fury or Demarrage game modes
+ * have been completed
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
     // Check if the game is Driving Fury or Demarrage
     if (typeOfGame == 3){
@@ -16428,10 +17371,9 @@ void Game::setMultiplayerMode(const int multiPlayerMode){
 
 
 /**
- * Load the configuration of the player menu stored in its xml
- * configuration file
- * @param path contains the path of the xml configuration file
- * @param c is the configuration of the game
+ * Load the configuration of the multi player name player menu
+ * @param path is the route of the xml file that contains its configuration
+ * @param c is the module configuration of the game
  */
 void Game::loadMultiplayerNameConfiguration(const string path, Configuration& c){
 
@@ -16550,6 +17492,11 @@ void Game::loadMultiplayerNameConfiguration(const string path, Configuration& c)
 
 
 
+/**
+ * Displays the menu where the players have to introduce their aliases in multi player mode
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::introduceNameMultiplayer(Configuration& c, SoundPlayer& r){
 
 
@@ -16933,10 +17880,9 @@ State Game::introduceNameMultiplayer(Configuration& c, SoundPlayer& r){
 
 
 /**
- * Load the configuration of the player menu stored in its xml
- * configuration file
- * @param path contains the path of the xml configuration file
- * @param c is the configuration of the game
+ * Load the configuration of the multi player group player menu
+ * @param path is the route of the xml file that contains its configuration
+ * @param c is the module configuration of the game
  */
 void Game::loadMultiplayerGroupConfiguration(const string path, Configuration& c){
 
@@ -17055,6 +18001,12 @@ void Game::loadMultiplayerGroupConfiguration(const string path, Configuration& c
 
 
 
+/**
+ * Displays the menu where the players have to introduce the alias of the group to be created
+ * or to be joined depending of how they decided to play multi player mode
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::introduceGroupMultiplayer(Configuration& c, SoundPlayer& r){
 
     // The race done is cleaned
@@ -17467,12 +18419,11 @@ State Game::introduceGroupMultiplayer(Configuration& c, SoundPlayer& r){
 
 
 
-
 /**
- * Load the configuration of the player menu stored in its xml
- * configuration file
- * @param path contains the path of the xml configuration file
- * @param c is the configuration of the game
+ * Load the configuration menu where the players that are going to be joined to a group
+ * have to select if the want to be joined to a concrete group or randomly
+ * @param path is the route of the xml file that contains its configuration
+ * @param c is the module configuration of the game
  */
 void Game::loadMultiplayerJoinGroupMenuConfiguration(const string path, Configuration& c){
 
@@ -17697,6 +18648,11 @@ void Game::loadMultiplayerJoinGroupMenuConfiguration(const string path, Configur
 
 
 
+/**
+ * Displays the menu where the players select how to join to a multi player group
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
 
     // The race done is cleaned
@@ -17947,6 +18903,11 @@ State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
 
 
 
+/**
+ * Controls the petitions of player to be joined to the group created by the owner player
+ * @param fullGroup controls if the group is full of members or if the owner has closed it
+ * pressing Enter
+ */
 void Game::capturerOfPlayers(bool& fullGroup){
 
     // Store locally the number of players of the group created by the player
@@ -18045,6 +19006,12 @@ void Game::capturerOfPlayers(bool& fullGroup){
 
 
 
+/**
+ * Controls the process that consists in joining a player to a multi player group
+ * @param success controls if the group where the player has been joined has been fulled or closed correctly by the owner
+ * @param fail controls if the petition of join of group has resulted in a fail attempt
+ * @param oartialSuccess controls if the petition has been accepted by the owner of the group
+ */
 void Game::capturerOfGroups(bool& success, bool& fail, bool& partialSuccess){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
@@ -18204,6 +19171,11 @@ void Game::capturerOfGroups(bool& success, bool& fail, bool& partialSuccess){
 
 
 
+/**
+ * Displays the menu with all the members that form a multi player group
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
 
     // Control the players in the group
@@ -19684,6 +20656,11 @@ void Game::loadGameModesMultiplayerMenuConfiguration(const string path, Configur
 
 
 
+/**
+ * Displays the selection game mode multi player menu to the owner player of a group
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
 
     // Reinitialize configuration
@@ -20487,6 +21464,11 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
 
 
 
+/**
+ * Displays the selection circuit multi player menu to the owner player of a group
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r){
     if (modeMultiplayer == 0){
         // The player is the creator of the group and must selected a circuit
@@ -20818,7 +21800,11 @@ State Game::selectionCircuitMultiplayer(Configuration& c, SoundPlayer& r){
 
 
 
-
+/**
+ * Load the configuration of the menu that shows all the members that compose a multi player group
+ * @param path is the route of the xml file that contains its configuration
+ * @param c is the module configuration of the game
+ */
 void Game::loadMultiplayerMemberGroupMenuConfiguration(const string path, Configuration& c){
 
     // Open the xml file of the scenario
@@ -20974,7 +21960,13 @@ void Game::loadMultiplayerMemberGroupMenuConfiguration(const string path, Config
 
 
 
-
+/**
+ * Parses the test connection result after making ping command to the remote server
+ * @param testFinished controls if the test connection has finished successfully
+ * @param mininumLatency is the minimum latency obtained in the ping command
+ * @param mediumLatency is the average latency obtained in the ping command
+ * @param maxLantency is the maximum latency obtained in the ping command
+ */
 void Game::testConnection(bool& testFinished, string& mininumLatency, string& mediumLatency, string& maxLantency){
     // Make connection test using ping command
     char pingCommandOutput[2048];
@@ -21264,7 +22256,11 @@ void Game::loadMultiplayerMenuTestingNetworkConfiguration(const string path, Con
 
 
 
-
+/**
+ * Makes a test speed connection to the server to check the quality of the network
+ * @param c is the module configuration of the game
+ * @param r is the sound player module of the game
+ */
 State Game::makeConnectionServerTest(Configuration& c, SoundPlayer& r){
 
     // Variables to store the latencies of the test
@@ -21595,19 +22591,29 @@ State Game::makeConnectionServerTest(Configuration& c, SoundPlayer& r){
 
 
 
+/**
+ * Store all the multi player cars that are going to compete with the player
+ */
 void Game::storingMultiplayerCars(){
+
+
+     // Get the number of participants of the race
+    numberRacers = groupDataPlayers.size();
 
     // Clear the vector of rival cars
     multiplayerCars.clear();
+    multiplayerCars = vector<MultiplayerCar>(numberRacers);
+    MultiplayerCar players[numberRacers];
 
     MultiplayerCar v;
 
+    // Initialize the position of the player
+    string namePlayer = "", vehicle = "";
+    int typeVehicle, colorVehicle, numTextures, codePlayer;
+
     float positY, positX, scaling;
 
-    int numberRacers;
-
-    // Get the number of participants of the race
-    numberRacers = groupDataPlayers.size();
+    int numberRacers, ownPosition;
 
     // Control the initial position of the vehicle in the starting point
     switch(numberRacers){
@@ -21620,15 +22626,58 @@ void Game::storingMultiplayerCars(){
             positY = 33.f;
     }
 
-    // Initialize the position of the player
-    posArrival = codePlayerInGroup;
-    string pathFileMultiplayerCar = "";
-    int typeVehicle, colorVehicle, numTextures;
+    switch(typeOfVehicle){
+        case 0:
+            vehicle = "Data/Vehicles/Motorbikes/Motorbike" + to_string(colorCarSelected + 1);
+            scaling = 1.15f;
+            numTextures = 88;
+            break;
+        case 1:
+            vehicle = "Data/Vehicles/Devastators/Devastator" + to_string(colorCarSelected + 1);
+            scaling = 1.85f;
+            numTextures = 85;
+            break;
+        case 2:
+            vehicle = "Data/Vehicles/Minivans/Minivan" + to_string(colorCarSelected + 1);
+            scaling = 1.75f;
+            numTextures = 77;
+            break;
+        case 3:
+            vehicle = "Data/Vehicles/Trucks/Truck" + to_string(colorCarSelected + 1);
+            scaling = 2.02f;
+            numTextures = 103;
+            break;
+        case 4:
+            vehicle = "Data/Vehicles/FormulaOnes/FormulaOne" + to_string(colorCarSelected + 1);
+            scaling = 1.80f;
+            numTextures = 86;
+            break;
+        case 5:
+            vehicle = "Data/Vehicles/Police";
+            scaling = 1.85f;
+            numTextures = 74;
+    }
+
+    if (!firstRace){
+        players[codePlayerInGroup - 1] = MultiplayerCar(codePlayerInGroup, nickNameGroupMultiplayer, numTextures, scaling, positX,
+                                                        positY, typeOfVehicle, colorCarSelected, vehicle);
+    }
+    else {
+        players[posArrival - 1] = MultiplayerCar(codePlayerInGroup, nickNameGroupMultiplayer, numTextures, scaling, positX,
+                                                 positY, typeOfVehicle, colorVehicle, vehicle);
+    }
 
     // Store the rival cars in the vector
     for (int i = 1; i <= numberRacers; i++) {
 
-        if (i != codePlayerInGroup){
+        if (!firstRace){
+            ownPosition = codePlayerInGroup;
+        }
+        else {
+            ownPosition = posArrival;
+        }
+
+        if (i != ownPosition){
             // Set the position of the car in the axis X
             if (i % 2 != 0){
                 positX = -0.3f;
@@ -21641,13 +22690,15 @@ void Game::storingMultiplayerCars(){
             if (firstRace){
                 typeVehicle = multiplayerCarsRanking[i - 1].getVehicle();
                 colorVehicle = multiplayerCarsRanking[i - 1].getColor();
+                codePlayer = multiplayerCarsRanking[i - 1].getCodePlayer();
+                namePlayer = multiplayerCarsRanking[i - 1].getNickNamePlayer();
             }
             else {
                 typeVehicle = groupDataPlayers[i - 1].getVehicle();
                 colorVehicle = groupDataPlayers[i - 1].getColor();
+                codePlayer = groupDataPlayers[i - 1].getCodePlayer();
+                namePlayer = groupDataPlayers[i - 1].getNickNamePlayer();
             }
-
-            string vehicle = "";
 
             switch(typeVehicle){
                 case 0:
@@ -21681,8 +22732,17 @@ void Game::storingMultiplayerCars(){
                     numTextures = 74;
             }
 
-            v = MultiplayerCar(numTextures, scaling, positX, positY, typeVehicle, colorVehicle, vehicle);
-            multiplayerCars.push_back(v);
+            cout << "CODIGO " << codePlayer << endl;
+            cout << "JUGADOR " << namePlayer << endl;
+            cout << "TEXTURAS " << numTextures << endl;
+            cout << "ESCALA " << scaling << endl;
+            cout << "VEHICULO " << colorVehicle << endl;
+            cout << "RUTA " << vehicle << endl;
+
+            v = MultiplayerCar(codePlayer, namePlayer, numTextures, scaling, 0.f,
+                               0.f, typeVehicle, colorVehicle, vehicle);
+
+            players[i - 1] = v;
         }
 
         // Update the position of the staring vehicles
@@ -21690,16 +22750,26 @@ void Game::storingMultiplayerCars(){
             positY -= 20.f;
         }
     }
+    // Copy the array in the vector
+	for (int i = 0; i < numberRacers; i++){
+        multiplayerCars.push_back(players[i]);
+	}
 }
 
 
 
+/**
+ * Get how a player has decided to play the multi player mode
+ */
 bool Game::getOnMultiplayerMode(){
     return onMultiplayer;
 }
 
 
 
+/**
+ * Set that the player has started to play in multi player mode
+ */
 void Game::setMultiplayer(){
     onMultiplayer = false;
 }
