@@ -154,9 +154,12 @@ void loadGameConfiguration (const string path, Difficult& difficulty, int& volum
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show){
 
     // Calling sell to execute ping command to make the tests
+
+    /*
     AllocConsole();
     HWND hWnd = GetConsoleWindow();
     ShowWindow(hWnd, SW_HIDE);
+    */
 
     // Throw the application with hight priority
     SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);

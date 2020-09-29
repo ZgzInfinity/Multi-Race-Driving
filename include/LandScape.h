@@ -517,7 +517,7 @@ public:
      * @param vehicles is the vector with all the traffic cars
      */
     void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals,
-                       const int typeOfGame, RivalCar& goalCar, vector<MultiplayerCar> &multiplayerCars,
+                       const int typeOfGame, RivalCar& goalCar, vector<MultiplayerCar*> sortedMmultiplayerCars,
                        const bool displayGoalIndicator, const bool drawGoalCar, const bool playingMultiplayer);
 
 

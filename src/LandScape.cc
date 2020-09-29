@@ -1228,7 +1228,7 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
         else {
             posCameraX = 0.3f;
         }
-        if (numRivals == 1){
+        if (numRivals <= 2){
             posCameraY = 0.f;
         }
         else {
@@ -1273,10 +1273,11 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
         if (onMultiplayer){
             switch(numRivals){
                 case 1:
+                case 2:
                     rectangles = 50;
                     break;
-                case 2:
                 case 3:
+                case 4:
                     rectangles = 55;
             }
         }
@@ -1393,6 +1394,8 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
                         // People
                         leftSprites[i].codeMapElement = 15;
                         rightSprites[i].codeMapElement = 14;
+                        leftSprites[i].offset = 0.f;
+                        rightSprites[i].offset = 0.f;
                     }
                 }
                 else if (i > rectangles - 42){
@@ -1407,6 +1410,8 @@ LandScape::LandScape(const LandScape &landScape, int &flagger, int &semaphore, c
                         // People
                         leftSprites[i].codeMapElement = 15;
                         rightSprites[i].codeMapElement = 14;
+                        leftSprites[i].offset = 0.f;
+                        rightSprites[i].offset = 0.f;
                     }
                 }
             }
@@ -1914,7 +1919,7 @@ float LandScape::getCameraPosY() const {
  * @param vehicles is the vector with all the traffic cars
  */
 void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals, const int typeOfGame,
-                              RivalCar& goalCar, vector<MultiplayerCar> &multiplayerCars, const bool displayGoalIndicator,
+                              RivalCar& goalCar, vector<MultiplayerCar*> sortedMultiplayerCars, const bool displayGoalIndicator,
                               const bool drawGoalCar, const bool playingMultiplayer)
 {
     const int N = static_cast<const int>(newLines.size());
@@ -1961,11 +1966,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     }
 
     // Sort the multi player cars
-    vector<MultiplayerCar*> sortedMultiplayerCars;
-    sortedMultiplayerCars.reserve(multiplayerCars.size());
-    for (MultiplayerCar &v : multiplayerCars){
-        sortedMultiplayerCars.push_back(&v);
-    }
     sort(sortedMultiplayerCars.begin(), sortedMultiplayerCars.end(), ascendingSortMultiplayerCars);
 
     // Discard all the vehicles which are behind the player
@@ -1974,7 +1974,6 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
     {
         sortedMultiplayerCars.pop_back();
     }
-
 
     // Sort the traffic cars
     vector<RivalCar *> sortedGoalCars;
@@ -2240,6 +2239,7 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
             while (!sortedMultiplayerCars.empty() && int(sortedMultiplayerCars.back()->getPosY()) == n - startPos + int(posCameraY)) {
 
                 MultiplayerCar *v = sortedMultiplayerCars.back();
+
                 Sprite sv;
                 sv.setTexture(*v->getCurrentTexture(), true);
                 const float width = v->getScalingFactor() * sv.getTextureRect().width;

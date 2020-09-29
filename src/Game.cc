@@ -95,8 +95,29 @@ State Game::drawHudAnimationWorldTourPolePosition(Configuration& c, SoundPlayer&
 
         c.w.clear(Color(0, 0, 0));
 
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -490,8 +511,29 @@ State Game::drawHudAnimationOutRunDrivingFuryDemarrage(Configuration& c, SoundPl
             }
         }
 
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -3760,9 +3802,6 @@ void Game::senderMultiplayerPositionOwner(bool& canceledRace, const int nRivals,
                 }
                 canceledGroup = canceledRace;
                 mtx3.unlock();
-
-                // Sleep the thread
-                this_thread::sleep_for(chrono::milliseconds(5));
             }
         }
     }
@@ -3940,9 +3979,6 @@ void Game::senderMultiplayerPositionGuest(bool& canceledRace, const int nRivals,
                 }
                 canceledGuest = canceledRace;
                 mtx3.unlock();
-
-                // Sleep the thread
-                this_thread::sleep_for(chrono::milliseconds(5));
             }
         }
     }
@@ -4048,9 +4084,6 @@ void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long
                 }
                 canceledGroup = canceledRace;
                 mtx3.unlock();
-
-                // Sleep the thread
-                this_thread::sleep_for(chrono::milliseconds(5));
             }
         }
     }
@@ -4157,9 +4190,6 @@ void Game::receiverMultiplayerPositionGuest(bool& canceledRace, vector<long long
                 players = groupDataPlayers.size();
                 canceledGroup = canceledRace;
                 mtx3.unlock();
-
-                // Sleep the thread
-                this_thread::sleep_for(chrono::milliseconds(5));
             }
         }
     }
@@ -4250,7 +4280,6 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
     // Check if the player is the owner or is the guest
     if (modeMultiplayer == 0){
-
         // Throw the threads to send his position to the rest of the players
         controlSenderPositions = thread(senderMultiplayerPositionOwner, this, ref(cancelledRaceOwner), nRivals, startPosition);
 
@@ -4261,7 +4290,6 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         controlRaceOwner = thread(monitorizeRaceOwner, this, ref(cancelledRaceOwner), ref(playerFallen), ref(positionCounters));
     }
     else {
-
         // Throw the threads to send his position to the rest of the players
         controlSenderPositions = thread(senderMultiplayerPositionGuest, this, ref(cancelledRaceGuest), nRivals, startPosition);
 
@@ -4353,11 +4381,11 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         controlReceiverPositions.join();
         finalGame = false;
         inGame = false;
-        if (randomMultiplayerJoined){
-            return SELECT_MULTIPLAYER_JOIN;
+        if (typeOfGameMultiplayer == 0){
+            return SELECTION_MODE_MULTIPLAYER;
         }
         else {
-            return MULTIPLAYER_NAME_GROUP;
+            return SELECTION_CIRCUIT_MULTIPLAYER;
         }
     }
 
@@ -4507,9 +4535,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                     c.w.clear();
 
+                     mtx3.lock();
+                    vector<MultiplayerCar*> sortedMultiplayerCars;
+                    if (onMultiplayer){
+                        sortedMultiplayerCars.reserve(multiplayerCars.size());
+                        int j = 1;
+                        for (MultiplayerCar &v : multiplayerCars){
+                            if (firstRace){
+                                if (codePlayerInGroup != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            else {
+                                if (posArrival != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            j++;
+                        }
+                    }
+                    mtx3.unlock();
+
                     // Draw the landscape
-                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                              displayGoalCarIndicator, false, true);
+                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                              false, true);
 
                     // Draw the vehicle
                     switch(typeOfVehicle){
@@ -4562,9 +4611,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
                 // Display the menu
                 c.w.clear();
 
+                mtx3.lock();
+                vector<MultiplayerCar*> sortedMultiplayerCars;
+                if (onMultiplayer){
+                    sortedMultiplayerCars.reserve(multiplayerCars.size());
+                    int j = 1;
+                    for (MultiplayerCar &v : multiplayerCars){
+                        if (firstRace){
+                            if (codePlayerInGroup != j){
+                                sortedMultiplayerCars.push_back(&v);
+                            }
+                        }
+                        else {
+                            if (posArrival != j){
+                                sortedMultiplayerCars.push_back(&v);
+                            }
+                        }
+                        j++;
+                    }
+                }
+                mtx3.unlock();
+
                 // Draw the landscape
-                currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                                      displayGoalCarIndicator, false, true);
+                currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                          false, true);
 
                 // Draw the vehicle
                 switch(typeOfVehicle){
@@ -4688,9 +4758,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                             c.w.clear();
 
+                            mtx3.lock();
+                            vector<MultiplayerCar*> sortedMultiplayerCars;
+                            if (onMultiplayer){
+                                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                                int j = 1;
+                                for (MultiplayerCar &v : multiplayerCars){
+                                    if (firstRace){
+                                        if (codePlayerInGroup != j){
+                                            sortedMultiplayerCars.push_back(&v);
+                                        }
+                                    }
+                                    else {
+                                        if (posArrival != j){
+                                            sortedMultiplayerCars.push_back(&v);
+                                        }
+                                    }
+                                    j++;
+                                }
+                            }
+                            mtx3.unlock();
+
                             // Draw the landscape
-                            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                                      displayGoalCarIndicator, false, true);
+                            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                                      false, true);
 
                             // Draw the vehicle
                             switch(typeOfVehicle){
@@ -4734,9 +4825,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                         c.w.clear();
 
+                        mtx3.lock();
+                        vector<MultiplayerCar*> sortedMultiplayerCars;
+                        if (onMultiplayer){
+                            sortedMultiplayerCars.reserve(multiplayerCars.size());
+                            int j = 1;
+                            for (MultiplayerCar &v : multiplayerCars){
+                                if (firstRace){
+                                    if (codePlayerInGroup != j){
+                                        sortedMultiplayerCars.push_back(&v);
+                                    }
+                                }
+                                else {
+                                    if (posArrival != j){
+                                        sortedMultiplayerCars.push_back(&v);
+                                    }
+                                }
+                                j++;
+                            }
+                        }
+                        mtx3.unlock();
+
                         // Draw the landscape
-                        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                                              displayGoalCarIndicator, false, true);
+                        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                                  false, true);
 
                         // Draw the vehicle
                         switch(typeOfVehicle){
@@ -4856,9 +4968,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                         c.w.clear();
 
+                        mtx3.lock();
+                        vector<MultiplayerCar*> sortedMultiplayerCars;
+                        if (onMultiplayer){
+                            sortedMultiplayerCars.reserve(multiplayerCars.size());
+                            int j = 1;
+                            for (MultiplayerCar &v : multiplayerCars){
+                                if (firstRace){
+                                    if (codePlayerInGroup != j){
+                                        sortedMultiplayerCars.push_back(&v);
+                                    }
+                                }
+                                else {
+                                    if (posArrival != j){
+                                        sortedMultiplayerCars.push_back(&v);
+                                    }
+                                }
+                                j++;
+                            }
+                        }
+                        mtx3.unlock();
+
                         // Draw the landscape
-                        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                                  displayGoalCarIndicator, false, true);
+                        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                                  false, true);
 
                         // Draw the vehicle
                         switch(typeOfVehicle){
@@ -4902,9 +5035,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                     c.w.clear();
 
+                    mtx3.lock();
+                    vector<MultiplayerCar*> sortedMultiplayerCars;
+                    if (onMultiplayer){
+                        sortedMultiplayerCars.reserve(multiplayerCars.size());
+                        int j = 1;
+                        for (MultiplayerCar &v : multiplayerCars){
+                            if (firstRace){
+                                if (codePlayerInGroup != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            else {
+                                if (posArrival != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            j++;
+                        }
+                    }
+                    mtx3.unlock();
+
                     // Draw the landscape
-                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                                          displayGoalCarIndicator, false, true);
+                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                              false, true);
 
                     // Draw the vehicle
                     switch(typeOfVehicle){
@@ -5007,9 +5161,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                     c.w.clear();
 
+                    mtx3.lock();
+                    vector<MultiplayerCar*> sortedMultiplayerCars;
+                    if (onMultiplayer){
+                        sortedMultiplayerCars.reserve(multiplayerCars.size());
+                        int j = 1;
+                        for (MultiplayerCar &v : multiplayerCars){
+                            if (firstRace){
+                                if (codePlayerInGroup != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            else {
+                                if (posArrival != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            j++;
+                        }
+                    }
+                    mtx3.unlock();
+
                     // Draw the landscape
-                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                              displayGoalCarIndicator, false, false);
+                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                              false, false);
 
                     // Draw the vehicle
                     switch(typeOfVehicle){
@@ -5062,9 +5237,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
             // Display the menu
             c.w.clear();
 
+            mtx3.lock();
+            vector<MultiplayerCar*> sortedMultiplayerCars;
+            if (onMultiplayer){
+                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                int j = 1;
+                for (MultiplayerCar &v : multiplayerCars){
+                    if (firstRace){
+                        if (codePlayerInGroup != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    else {
+                        if (posArrival != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    j++;
+                }
+            }
+            mtx3.unlock();
+
             // Draw the landscape
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                                  displayGoalCarIndicator, false, false);
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                      false, false);
 
             // Draw the vehicle
             switch(typeOfVehicle){
@@ -5358,8 +5554,30 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
                 Event e;
                 c.window.pollEvent(e);
 
+                mtx3.lock();
+                vector<MultiplayerCar*> sortedMultiplayerCars;
+                if (onMultiplayer){
+                    sortedMultiplayerCars.reserve(multiplayerCars.size());
+                    int j = 1;
+                    for (MultiplayerCar &v : multiplayerCars){
+                        if (firstRace){
+                            if (codePlayerInGroup != j){
+                                sortedMultiplayerCars.push_back(&v);
+                            }
+                        }
+                        else {
+                            if (posArrival != j){
+                                sortedMultiplayerCars.push_back(&v);
+                            }
+                        }
+                        j++;
+                    }
+                }
+                mtx3.unlock();
+
                 // Draw the landscape
-                currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, false);
+                currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                          false, false);
 
                 // Draw the HUD of the game
                 showHudInterfaceWorldTourPolePosition(c);
@@ -5439,6 +5657,16 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
     if (modeMultiplayer == 0){
         if (cancelledRaceOwner){
+
+            // Create a Linda driver compatible with Windows to make communicate with the Linda server
+            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+
+            Tuple t = Tuple("NAME_GROUP", nickNameGroupMultiplayer);
+            winLindadriver.removeNote(t);
+
+            // Close connection
+            winLindadriver.stop();
+
             return MULTIPLAYER_NAME_GROUP;
         }
         else if (typeOfGameMultiplayer == 0){
@@ -5831,6 +6059,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
     // Check the landscape to raw
     if (indexLandScape == 0){
+
         // Stop the current soundtrack
         r.soundTracks[r.currentSoundtrack]->stop();
         // Check if the player is on multi player mode
@@ -5838,6 +6067,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
             // Get the number of racers
             numberRacers = multiplayerCars.size();
         }
+
         // Create the initial landscape
         startMap = new LandScape(*currentMap, flagger, semaphore, typeOfGame, numberRacers, onMultiplayer, codePlayerInGroup);
         startMap->addNewLandScape(currentMap);
@@ -5908,8 +6138,29 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
     // Draw the landscape animation
     for (int i = 255; i >= 0; i -= 15){
 
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -6056,8 +6307,31 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
                 // Draw map
                 c.w.clear();
+
+                mtx3.lock();
+                vector<MultiplayerCar*> sortedMultiplayerCars;
+                if (onMultiplayer){
+                    sortedMultiplayerCars.reserve(multiplayerCars.size());
+                    int j = 1;
+                    for (MultiplayerCar &v : multiplayerCars){
+                        if (firstRace){
+                            if (codePlayerInGroup != j){
+                                sortedMultiplayerCars.push_back(&v);
+                            }
+                        }
+                        else {
+                            if (posArrival != j){
+                                sortedMultiplayerCars.push_back(&v);
+                            }
+                        }
+                        j++;
+                    }
+                }
+                mtx3.unlock();
+
                 // Draw the landscape
-                currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+                currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                          false, onMultiplayer);
 
                 switch(typeOfVehicle){
                     case 0:
@@ -6158,8 +6432,31 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
             // Draw map
             c.w.clear();
+
+            mtx3.lock();
+            vector<MultiplayerCar*> sortedMultiplayerCars;
+            if (onMultiplayer){
+                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                int j = 1;
+                for (MultiplayerCar &v : multiplayerCars){
+                    if (firstRace){
+                        if (codePlayerInGroup != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    else {
+                        if (posArrival != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    j++;
+                }
+            }
+            mtx3.unlock();
+
             // Draw the landscape
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                      false, onMultiplayer);
 
             switch(typeOfVehicle){
                 case 0:
@@ -6218,9 +6515,31 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
                     // Draw map
                     c.w.clear();
+
+                    mtx3.lock();
+                    vector<MultiplayerCar*> sortedMultiplayerCars;
+                    if (onMultiplayer){
+                        sortedMultiplayerCars.reserve(multiplayerCars.size());
+                        int j = 1;
+                        for (MultiplayerCar &v : multiplayerCars){
+                            if (firstRace){
+                                if (codePlayerInGroup != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            else {
+                                if (posArrival != j){
+                                    sortedMultiplayerCars.push_back(&v);
+                                }
+                            }
+                            j++;
+                        }
+                    }
+                    mtx3.unlock();
+
                     // Draw the landscape
-                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
-                                              displayGoalCarIndicator, false, onMultiplayer);
+                    currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                              false, onMultiplayer);
 
                     switch(typeOfVehicle){
                         case 0:
@@ -6321,8 +6640,31 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
             // Draw map
             c.w.clear();
+
+            mtx3.lock();
+            vector<MultiplayerCar*> sortedMultiplayerCars;
+            if (onMultiplayer){
+                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                int j = 1;
+                for (MultiplayerCar &v : multiplayerCars){
+                    if (firstRace){
+                        if (codePlayerInGroup != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    else {
+                        if (posArrival != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    j++;
+                }
+            }
+            mtx3.unlock();
+
             // Draw the landscape
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                      false, onMultiplayer);
 
             switch(typeOfVehicle){
                 case 0:
@@ -6655,8 +6997,31 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
         // Draw map
         c.w.clear();
+
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, onMultiplayer);
 
         switch(typeOfVehicle){
             case 0:
@@ -7209,8 +7574,31 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
         // Draw map with cars
         c.w.clear();
+
+
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, false);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, false);
 
 
         // Player update and draw
@@ -7725,8 +8113,30 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
 
         // Draw map with cars
         c.w.clear();
+
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -8355,8 +8765,30 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
         }
         // Draw map with cars
         c.w.clear();
+
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, false);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, false);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -8842,8 +9274,30 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
 
         // Draw map with cars
         c.w.clear();
+
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars, displayGoalCarIndicator, false, true);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, true);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -9473,8 +9927,30 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
 
         // Draw map with cars
         c.w.clear();
+
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                   displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
 
         // Player update and draw
@@ -10275,8 +10751,30 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
 
         // Draw map with cars
         c.w.clear();
+
+        mtx3.lock();
+        vector<MultiplayerCar*> sortedMultiplayerCars;
+        if (onMultiplayer){
+            sortedMultiplayerCars.reserve(multiplayerCars.size());
+            int j = 1;
+            for (MultiplayerCar &v : multiplayerCars){
+                if (firstRace){
+                    if (codePlayerInGroup != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                else {
+                    if (posArrival != j){
+                        sortedMultiplayerCars.push_back(&v);
+                    }
+                }
+                j++;
+            }
+        }
+        mtx3.unlock();
+
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                   displayGoalCarIndicator, currentLandScape >= goalCarStage, false);
 
 
@@ -10936,15 +11434,36 @@ void Game::loadPauseMenuConfiguration(const string path, Configuration& c){
 State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, const Vehicle::Direction &d) {
     c.w.clear();
 
+    mtx3.lock();
+    vector<MultiplayerCar*> sortedMultiplayerCars;
+    if (onMultiplayer){
+        sortedMultiplayerCars.reserve(multiplayerCars.size());
+        int j = 1;
+        for (MultiplayerCar &v : multiplayerCars){
+            if (firstRace){
+                if (codePlayerInGroup != j){
+                    sortedMultiplayerCars.push_back(&v);
+                }
+            }
+            else {
+                if (posArrival != j){
+                    sortedMultiplayerCars.push_back(&v);
+                }
+            }
+            j++;
+        }
+    }
+    mtx3.unlock();
+
     // Draw the map
     if (typeOfGame < 3 || typeOfGame > 4){
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                       displayGoalCarIndicator, false, false);
     }
     else {
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                   displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
     }
 
@@ -16916,8 +17435,30 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
+
+            mtx3.lock();
+            vector<MultiplayerCar*> sortedMultiplayerCars;
+            if (onMultiplayer){
+                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                int j = 1;
+                for (MultiplayerCar &v : multiplayerCars){
+                    if (firstRace){
+                        if (codePlayerInGroup != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    else {
+                        if (posArrival != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    j++;
+                }
+            }
+            mtx3.unlock();
+
             // Draw the landscape
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                       displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
 
             switch(typeOfVehicle){
@@ -17098,8 +17639,30 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
+
+            mtx3.lock();
+            vector<MultiplayerCar*> sortedMultiplayerCars;
+            if (onMultiplayer){
+                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                int j = 1;
+                for (MultiplayerCar &v : multiplayerCars){
+                    if (firstRace){
+                        if (codePlayerInGroup != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    else {
+                        if (posArrival != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    j++;
+                }
+            }
+            mtx3.unlock();
+
             // Draw the landscape
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                       displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
 
             switch(typeOfVehicle){
@@ -17201,8 +17764,30 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
+
+            mtx3.lock();
+            vector<MultiplayerCar*> sortedMultiplayerCars;
+            if (onMultiplayer){
+                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                int j = 1;
+                for (MultiplayerCar &v : multiplayerCars){
+                    if (firstRace){
+                        if (codePlayerInGroup != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    else {
+                        if (posArrival != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    j++;
+                }
+            }
+            mtx3.unlock();
+
             // Draw the landscape
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                       displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
 
             switch(typeOfVehicle){
@@ -17322,8 +17907,30 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw map
             c.w.clear();
+
+            mtx3.lock();
+            vector<MultiplayerCar*> sortedMultiplayerCars;
+            if (onMultiplayer){
+                sortedMultiplayerCars.reserve(multiplayerCars.size());
+                int j = 1;
+                for (MultiplayerCar &v : multiplayerCars){
+                    if (firstRace){
+                        if (codePlayerInGroup != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    else {
+                        if (posArrival != j){
+                            sortedMultiplayerCars.push_back(&v);
+                        }
+                    }
+                    j++;
+                }
+            }
+            mtx3.unlock();
+
             // Draw the landscape
-            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, multiplayerCars,
+            currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
                                       displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
 
             switch(typeOfVehicle){
@@ -22619,13 +23226,11 @@ State Game::makeConnectionServerTest(Configuration& c, SoundPlayer& r){
  */
 void Game::storingMultiplayerCars(){
 
-
-     // Get the number of participants of the race
+    // Get the number of participants of the race
     numberRacers = groupDataPlayers.size();
 
     // Clear the vector of rival cars
     multiplayerCars.clear();
-    multiplayerCars = vector<MultiplayerCar>(numberRacers);
     MultiplayerCar players[numberRacers];
 
     MultiplayerCar v;
@@ -22636,7 +23241,7 @@ void Game::storingMultiplayerCars(){
 
     float positY, positX, scaling;
 
-    int numberRacers, ownPosition;
+    int ownPosition;
 
     // Control the initial position of the vehicle in the starting point
     switch(numberRacers){
@@ -22646,7 +23251,22 @@ void Game::storingMultiplayerCars(){
             break;
         case 3:
         case 4:
-            positY = 33.f;
+            if (!firstRace){
+                if (codePlayerInGroup <= 2){
+                    positY = 33.f;
+                }
+                else {
+                    positY = 13.f;
+                }
+            }
+            else {
+                if (posArrival <= 2){
+                    positY = 33.f;
+                }
+                else {
+                    positY = 13.f;
+                }
+            }
     }
 
     switch(typeOfVehicle){
@@ -22681,12 +23301,27 @@ void Game::storingMultiplayerCars(){
             numTextures = 74;
     }
 
+
     if (!firstRace){
-        players[codePlayerInGroup - 1] = MultiplayerCar(codePlayerInGroup, nickNameGroupMultiplayer, numTextures, scaling, positX,
+        if (codePlayerInGroup % 2 != 0){
+            positX = -0.3f;
+        }
+        else {
+            positX = 0.3f;
+        }
+
+        players[codePlayerInGroup - 1] = MultiplayerCar(codePlayerInGroup, nickNameMultiplayer, numTextures, scaling, positX,
                                                         positY, typeOfVehicle, colorCarSelected, vehicle);
     }
     else {
-        players[posArrival - 1] = MultiplayerCar(codePlayerInGroup, nickNameGroupMultiplayer, numTextures, scaling, positX,
+        if (posArrival % 2 != 0){
+            positX = -0.3f;
+        }
+        else {
+            positX = 0.3f;
+        }
+
+        players[posArrival - 1] = MultiplayerCar(codePlayerInGroup, nickNameMultiplayer, numTextures, scaling, positX,
                                                  positY, typeOfVehicle, colorVehicle, vehicle);
     }
 
@@ -22707,6 +23342,22 @@ void Game::storingMultiplayerCars(){
             }
             else {
                 positX = 0.3f;
+            }
+
+            // Control the initial position of the vehicle in the starting point
+            switch(numberRacers){
+                case 1:
+                case 2:
+                    positY = 13.f;
+                    break;
+                case 3:
+                case 4:
+                    if (i <= 2){
+                        positY = 33.f;
+                    }
+                    else {
+                        positY = 13.f;
+                    }
             }
 
             // Get the type and color of the vehicle selected by the player
@@ -22755,15 +23406,8 @@ void Game::storingMultiplayerCars(){
                     numTextures = 74;
             }
 
-            cout << "CODIGO " << codePlayer << endl;
-            cout << "JUGADOR " << namePlayer << endl;
-            cout << "TEXTURAS " << numTextures << endl;
-            cout << "ESCALA " << scaling << endl;
-            cout << "VEHICULO " << colorVehicle << endl;
-            cout << "RUTA " << vehicle << endl;
-
-            v = MultiplayerCar(codePlayer, namePlayer, numTextures, scaling, 0.f,
-                               0.f, typeVehicle, colorVehicle, vehicle);
+            v = MultiplayerCar(codePlayer, namePlayer, numTextures, scaling, positX,
+                               positY, typeVehicle, colorVehicle, vehicle);
 
             players[i - 1] = v;
         }
