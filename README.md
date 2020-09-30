@@ -26,7 +26,6 @@ _**Multi Race Driving**_ is a general and customized platform for racing games w
 
 <p align="center">
   <img src="https://i.ibb.co/p21Ch8N/portada.png">
-  <p align="center"> <b>Super Hang On</b> for <b>Sega Mega Drive</b> (1989)</b></p>
 </p>
 
 &nbsp;
