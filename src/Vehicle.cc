@@ -132,7 +132,7 @@ void Vehicle::setVehicle(const int typeOfGame, const bool onMultiplayer, const i
         }
         else {
             if (codePlayerInGroup <= 2){
-                posY = 25.f;
+                posY = 20.f;
             }
             else {
                 posY = 0.f;

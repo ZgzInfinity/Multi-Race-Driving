@@ -297,6 +297,7 @@ void RivalCar::hitControl(const bool vehicleCrash, SoundPlayer& r, float posPlay
         if (current_code_image == 58){
             // Restart the values
             crashing = false;
+            shoutDone = false;
             xDest = 1000;
             previousY = posY;
             speedCollision = 0.0f;

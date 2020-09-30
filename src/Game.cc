@@ -3487,8 +3487,16 @@ void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen, vector<
         Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", "?C");
         Tuple r = winLindadriver.removeNote(t);
 
+        if (r.get(1) == "RACE_CLOSED_OWNER" ||
+            r.get(1) == "RACE_ABORTED_OWNER" ||
+            r.get(1) == "RACE_TERMINATED_OWNER" ||
+            r.get(1) == "RACE_FINISHED_OWNER")
+        {
+            winLindadriver.postNote(r);
+            this_thread::sleep_for(chrono::milliseconds(5));
+        }
         // Check the tuple response
-        if (r.get(1) == "RACE_COMPLETED_OWNER" ||
+        else if (r.get(1) == "RACE_COMPLETED_OWNER" ||
             r.get(1) == "RACE_CANCELED_OWNER")
         {
             finished = true;
@@ -3503,12 +3511,12 @@ void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen, vector<
 
             if (numberPlayersGroup > 1){
 
+                playerFallen = groupDataPlayers[i - 1].getNickNamePlayer();
+
                 // The petition is received
                 for (int j = i; j < (int)groupDataPlayers.size(); j++){
                     groupDataPlayers[j].codePlayer--;
                 }
-
-                playerFallen = groupDataPlayers[i - 1].getNickNamePlayer();
 
                 groupDataPlayers.erase(groupDataPlayers.begin() + i - 1);
 
@@ -3575,9 +3583,17 @@ void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen, vector<
         Tuple t = Tuple("?A", nickNameGroupMultiplayer, "?B", nickNameMultiplayer);
         Tuple r = winLindadriver.removeNote(t);
 
+        if (r.get(1) == "RACE_CLOSED_GUEST" ||
+            r.get(1) == "RACE_ABORTED_GUEST" ||
+            r.get(1) == "RACE_TERMINATED_GUEST" ||
+            r.get(1) == "RACE_FINISHED_GUEST")
+        {
+            winLindadriver.postNote(r);
+            this_thread::sleep_for(chrono::milliseconds(5));
+        }
         // Check the tuple response
-        if (r.get(1) == "RACE_COMPLETED_GUEST" ||
-            r.get(1) == "RACE_CANCELED_GUEST")
+        else if (r.get(1) == "RACE_COMPLETED_GUEST" ||
+                 r.get(1) == "RACE_CANCELED_GUEST")
         {
             finished = true;
         }
@@ -4068,12 +4084,12 @@ void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long
                             winLindadriver.removeNote(r);
 
                             // Get the opsitio
-                            float posX = stof(r.get(4));
-                            float posY = stof(r.get(5));
-                            int codeImage = stoi(r.get(6));
+                            float positionX = stof(r.get(3));
+                            float positionY = stof(r.get(4));
+                            int codeImage = stoi(r.get(5));
 
                             // Assignment of the position and the code image
-                            multiplayerCars[i - 1].setPosition(posX, posY);
+                            multiplayerCars[i - 1].setPosition(positionX, positionY);
                             multiplayerCars[i - 1].setCurrentCodeImage(codeImage);
                             multiplayerCars[i - 1].setCodePlayer(code);
                             multiplayerCars[i - 1].setNamePlayer(name);
@@ -4170,12 +4186,12 @@ void Game::receiverMultiplayerPositionGuest(bool& canceledRace, vector<long long
                         winLindadriver.removeNote(r);
 
                         // Get the opsitio
-                        float posX = stof(r.get(4));
-                        float posY = stof(r.get(5));
-                        int codeImage = stoi(r.get(6));
+                        float positionX = stof(r.get(3));
+                        float positionY = stof(r.get(4));
+                        int codeImage = stoi(r.get(5));
 
                         // Assignment of the position and the code image
-                        multiplayerCars[i - 1].setPosition(posX, posY);
+                        multiplayerCars[i - 1].setPosition(positionX, positionY);
                         multiplayerCars[i - 1].setCurrentCodeImage(codeImage);
                         multiplayerCars[i - 1].setCodePlayer(code);
                         multiplayerCars[i - 1].setNamePlayer(name);
@@ -5357,48 +5373,50 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
         if (modeMultiplayer == 0){
-            // Canceled the local process that control the race
-            Tuple t = Tuple("RACE_COMPLETED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+
+            // Terminate the process that sends the position of the owner
+            Tuple t = Tuple("RACE_FINISHED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
             winLindadriver.postNote(t);
 
             // Stop the thread
-            controlRaceOwner.join();
-
-            // Terminate the process that sends the position of the owner
-            t = Tuple("RACE_FINISHED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
-            winLindadriver.postNote(t);
+            controlSenderPositions.join();
 
             // Terminate the thread that controls the receiving positions of the players
             t = Tuple("RACE_TERMINATED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
             winLindadriver.postNote(t);
 
             // Stop the thread
-            controlSenderPositions.join();
+            controlReceiverPositions.join();
+
+             // Canceled the local process that control the race
+            t = Tuple("RACE_COMPLETED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
 
             // Stop the thread
-            controlReceiverPositions.join();
+            controlRaceOwner.join();
         }
         else {
+
             // Canceled the local process that control the race
-            Tuple t = Tuple("RACE_COMPLETED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            Tuple t = Tuple("RACE_FINISHED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
             winLindadriver.postNote(t);
 
             // Stop the thread
-            controlRaceGuest.join();
-
-            // Canceled the local process that control the race
-            t = Tuple("RACE_FINISHED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
-            winLindadriver.postNote(t);
+            controlSenderPositions.join();
 
             // Check if the race has finished arriving to the goal
             t = Tuple("RACE_TERMINATED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
             winLindadriver.postNote(t);
 
             // Stop the thread
-            controlSenderPositions.join();
+            controlReceiverPositions.join();
+
+                        // Canceled the local process that control the race
+            t = Tuple("RACE_COMPLETED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+            winLindadriver.postNote(t);
 
             // Stop the thread
-            controlReceiverPositions.join();
+            controlRaceGuest.join();
         }
 
         // Close connection with server
@@ -5472,26 +5490,26 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         // Create a Linda driver compatible with Windows to make communicate with the Linda server
         LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
-        // Inform that the group is cancelled
-        Tuple t = Tuple("RACE_CANCELED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        // The race has not finished
+        Tuple t = Tuple("RACE_ABORTED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
         winLindadriver.postNote(t);
 
         // Stop the thread
-        controlRaceOwner.join();
-
-        // The race has not finished
-        t = Tuple("RACE_ABORTED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
-        winLindadriver.postNote(t);
+        controlSenderPositions.join();
 
 
         t = Tuple("RACE_CLOSED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
         winLindadriver.postNote(t);
 
         // Stop the thread
-        controlSenderPositions.join();
+        controlReceiverPositions.join();
+
+        // Inform that the group is cancelled
+        t = Tuple("RACE_CANCELED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
 
         // Stop the thread
-        controlReceiverPositions.join();
+        controlRaceOwner.join();
 
 
         if (!cancelledRaceOwner){
@@ -5622,33 +5640,32 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         // Create a Linda driver compatible with Windows to make communicate with the Linda server
         LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
 
+        // Terminate the thread that control the send of the player positions
+        Tuple t = Tuple("RACE_ABORTED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
+        // Stop the thread
+        controlSenderPositions.join();
+
+        t = Tuple("RACE_CLOSED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
+        winLindadriver.postNote(t);
+
+        // Stop the thread
+        controlReceiverPositions.join();
+
         // Alert to the owner that leaves the group
-        Tuple t = Tuple("PLAYER_ABORT", nickNameGroupMultiplayer, to_string(codePlayerInGroup), name);
+        t = Tuple("PLAYER_ABORT", nickNameGroupMultiplayer, to_string(codePlayerInGroup), name);
         winLindadriver.postNote(t);
 
         // Canceled the local process that control the race
         t = Tuple("RACE_CANCELED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
         winLindadriver.postNote(t);
 
-        // Terminate the thread that control the send of the player positions
-        t = Tuple("RACE_ABORTED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
-        winLindadriver.postNote(t);
-
-
-        t = Tuple("RACE_CLOSED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
-        winLindadriver.postNote(t);
-
-        // Close connection with server
-        winLindadriver.stop();
-
         // Stop the thread
         controlRaceGuest.join();
 
-        // Stop the thread
-        controlSenderPositions.join();
-
-        // Stop the thread
-        controlReceiverPositions.join();
+        // Close connection with server
+        winLindadriver.stop();
     }
 
     r.soundTracks[r.currentSoundtrack]->stop();
@@ -7964,22 +7981,22 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
     // Update camera
     switch(typeOfVehicle){
         case 0:
-            currentMap->updateCamera(player.getPosX(), player.getPosY() - RECTANGLE);
+            currentMap->updateCamera(player.getPosX(), player.getPosY());
             break;
         case 1:
-            currentMap->updateCamera(player2.getPosX(), player2.getPosY() - RECTANGLE);
+            currentMap->updateCamera(player2.getPosX(), player2.getPosY());
             break;
         case 2:
-            currentMap->updateCamera(player3.getPosX(), player3.getPosY() - RECTANGLE);
+            currentMap->updateCamera(player3.getPosX(), player3.getPosY());
             break;
         case 3:
-            currentMap->updateCamera(player4.getPosX(), player4.getPosY() - RECTANGLE);
+            currentMap->updateCamera(player4.getPosX(), player4.getPosY());
             break;
         case 4:
-            currentMap->updateCamera(player5.getPosX(), player5.getPosY() - RECTANGLE);
+            currentMap->updateCamera(player5.getPosX(), player5.getPosY());
             break;
         case 5:
-            currentMap->updateCamera(player6.getPosX(), player6.getPosY() - RECTANGLE);
+            currentMap->updateCamera(player6.getPosX(), player6.getPosY());
             break;
     }
 
@@ -9103,6 +9120,9 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
             case 5:
                 player6.setPosition(player6.getPosX() + currentMap->getOffsetX(), player6.getPosY() - currentMap->getMaxY());
         }
+
+        for (MultiplayerCar &v : multiplayerCars)
+            v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
 
         // Update to the map
         if (level < 0){
