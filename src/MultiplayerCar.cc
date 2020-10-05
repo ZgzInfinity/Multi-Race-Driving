@@ -61,6 +61,8 @@ MultiplayerCar::MultiplayerCar(const int idPlayer, const string name, const int 
     current_code_image = 1;
     codePlayer = idPlayer;
     namePlayer = name;
+    isCrashing = false;
+    soundCrash = true;
 
     // Load the textures of the vehicle selected
     // Reserves memory to store all the textures of the vehicle
@@ -107,6 +109,8 @@ void MultiplayerCar::setNamePlayer(const string name){
 void MultiplayerCar::setPosition(float pX, float pY){
     posX = pX;
     posY = pY;
+    previousX = pX;
+    previousY = pY;
 }
 
 
@@ -139,6 +143,26 @@ void MultiplayerCar::setMaxScreenX(float screenX){
     maxScreenX = screenX;
 }
 
+
+
+/**
+ * Set if the multi player is crashing or not
+ */
+void MultiplayerCar::setIsCrashing(bool crash){
+    isCrashing = crash;
+    if (!crash){
+        soundCrash = true;
+    }
+}
+
+
+
+/**
+ * Set if the multi player sound crash has to be reproduced
+ */
+void MultiplayerCar::setSoundCrash(){
+    soundCrash = false;
+}
 
 
 /**
@@ -214,6 +238,26 @@ float MultiplayerCar::getMaxScreenX() const {
 
 
 /**
+ * Returns the last position of the player in axis X in multi player mode
+ * @return
+ */
+float MultiplayerCar::getPreviousX() const {
+    return previousX;
+}
+
+
+
+/**
+ * Returns the last position of the player in axis Y in multi player mode
+ * @return
+ */
+float MultiplayerCar::getPreviousY() const {
+    return previousY;
+}
+
+
+
+/**
  * Returns the type of vehicle selected by the player
  * @return
  */
@@ -243,9 +287,81 @@ int MultiplayerCar::getCodePlayer() const {
 
 
 /**
+ * Returns if the multi player is crashing or not
+ */
+bool MultiplayerCar::getIsCrashing() const {
+    return isCrashing;
+}
+
+
+
+/**
+ * Returns if the sound collision of the multi player car has to be reproduced
+ */
+bool MultiplayerCar::getSoundCrash() const {
+    return soundCrash;
+}
+
+
+
+/**
  * Returns the name of the player in the group
  */
 string MultiplayerCar::getNickNamePlayer() const {
     return namePlayer;
 }
 
+
+
+/**
+ * Returns true if the car is displayed on screen and the distance to the player, otherwise returns false.
+ * @param c is the module configuration of the game
+ * @param minY is the position of the camera in the axis y
+ * @param playerX is the player position in the axis x
+ * @param playerY is the player position in the axis y
+ * @param distanceX is the distance between the rival car and the vehicle of the player in the axis x
+ * @param distanceY is the distance between the rival car and the vehicle of the player in the axis y
+ * @return
+ */
+bool MultiplayerCar::isVisible(const Configuration &c, float minY, float playerX, float playerY, float &distanceX, float &distanceY) const {
+    // Check if the rival car is visible from the position of the player's vehicle
+    if (posY < minY || posY > minY + float(c.renderLen) || minScreenX < 0 || maxScreenX > c.w.getSize().y) {
+        // The rival car is not visible
+        return false;
+    }
+    else {
+        // The rival car is visible and calculate the distance in both axis with it
+        distanceX = abs(playerX - posX);
+        distanceY = abs(playerY - posY);
+        return true;
+    }
+}
+
+
+
+
+/**
+ * Returns true if there has been a collision between the multi player vehicle and the player's vehicle.
+ * If true, it also returns the Y position where they have collided
+ * @param currentY is the current position of the player's vehicle in the axis y
+ * @param prevY is the last position of the player's vehicle in the axis y
+ * @param minX is the minimum position in axis x occupied by the vehicle
+ * @param maxX is the maximum position in axis y occupied by the vehicle
+ * @param crashPos is the position in axis y where the crash has happened
+ * @return
+ */
+bool MultiplayerCar::hasCrashed(float prevY, float currentY, float minX, float maxX, float &crashPos) const {
+    // Check if the path of the rival car is approximately the same path of the player's vehicle
+    if (minScreenX != maxScreenX && ((prevY <= posY + 10.f && currentY >= posY - 10.f) ||
+                                     (currentY <= posY + 10.f && prevY >= posY - 10.f)) && // y matches
+        ((minX >= minScreenX && minX <= maxScreenX) ||
+         (maxX >= minScreenX && maxX <= maxScreenX) ||
+         (minScreenX >= minX && minScreenX <= maxX) ||
+         (maxScreenX >= minX && maxScreenX <= maxX))) { // x matches
+        // There is a crash between both cars
+        crashPos = posY;
+        return true;
+    }
+    // There is no crash
+    return false;
+}

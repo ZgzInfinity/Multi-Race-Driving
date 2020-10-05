@@ -2257,11 +2257,11 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
 
                 int vehicle = v->getTypeVehicle();
 
-                // Check if the multi player rival is out of the race
-                if (abs(v->getPosX()) > 1.0f){
-                    // Draw the terrain of the landscape
-                    const float j = sv.getPosition().y + sv.getGlobalBounds().height;
+                float pY = sv.getPosition().y + sv.getGlobalBounds().height * 0.8f;
 
+                // Check if the multi player rival is out of the race
+                if (isOutSideRoad(v->getPosX(), v->getPosY())){
+                    // Draw the terrain of the landscape
                     switch (terrain){
                     case 0:
                         // Grass
@@ -2330,12 +2330,8 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
                         }
                     }
 
-                    sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
-                    sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
-                                       j - sv.getGlobalBounds().height);
-
-                    c.w.draw(sv);
-                    sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
+                    sv.setScale(destW / widthOri, destH / heightOri);
+                    sv.setPosition(v->getMinScreenX() - 5.f, pY);
                     c.w.draw(sv);
                 }
 
@@ -2345,57 +2341,72 @@ void LandScape::drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, ve
 
                 // Check if the vehicle car is crashing
                 switch (vehicle){
+                    case 0:
+                        if (codeImage >= 46 && codeImage <= 58){
+                            v->setIsCrashing(true);
+                        }
+                        else {
+                            v->setIsCrashing(false);
+                        }
+                        break;
                     case 1:
                         // Devastator sprites
                         if (codeImage >= 37 && codeImage <= 52){
                             // Draw the smoke effect of the police
-                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
+                            v->setIsCrashing(true);
                             sv.setTexture(*v->getCurrentTexture(52, 4), true);
-                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
-                                               j - sv.getGlobalBounds().height);
+                            sv.setScale(destW / widthOri, destH / heightOri);
+                            sv.setPosition(v->getMinScreenX() - 5.f, pY);
                             c.w.draw(sv);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
-                            c.w.draw(sv);
+                        }
+                        else {
+                            v->setIsCrashing(false);
                         }
                         break;
                     case 2:
                         // Minivan sprites
                         if (codeImage >= 29 && codeImage <= 44){
-                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
-                            sv.setTexture(*v->getCurrentTexture(44, 4), true);
-                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
-                                               j - sv.getGlobalBounds().height);
+                            v->setIsCrashing(true);
+                            sv.setTexture(*v->getCurrentTexture(52, 4), true);
+                            sv.setScale(destW / widthOri, destH / heightOri);
+                            sv.setPosition(v->getMinScreenX() - 5.f, pY);
                             c.w.draw(sv);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
-                            c.w.draw(sv);
+                        }
+                        else {
+                            v->setIsCrashing(false);
                         }
                         break;
                     case 3:
                         // Truck sprites
                         if (codeImage >= 55 && codeImage <= 70){
-                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
-                            sv.setTexture(*v->getCurrentTexture(70, 4), true);
-                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
-                                               j - sv.getGlobalBounds().height);
-                            c.w.draw(sv);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
+                            v->setIsCrashing(true);
+                            sv.setTexture(*v->getCurrentTexture(52, 4), true);
+                            sv.setScale(destW / widthOri, destH / heightOri);
+                            sv.setPosition(v->getMinScreenX() - 5.f, pY);
                             c.w.draw(sv);
                         }
+                        else {
+                            v->setIsCrashing(false);
+                        }
                         break;
-                    case 5:
+                    case 4:
                         // Police crash sprites
                         if (codeImage >= 25 && codeImage <= 50){
-                            const float j = sv.getPosition().y + sv.getGlobalBounds().height;
-                            sv.setTexture(*v->getCurrentTexture(50, 4), true);
-                            sv.setScale(3.f * c.screenScale, 3.5f * c.screenScale);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f - sv.getGlobalBounds().width,
-                                               j - sv.getGlobalBounds().height);
+                            v->setIsCrashing(true);
+                            sv.setTexture(*v->getCurrentTexture(52, 4), true);
+                            sv.setScale(destW / widthOri, destH / heightOri);
+                            sv.setPosition(v->getMinScreenX() - 5.f, pY);
                             c.w.draw(sv);
-                            sv.setPosition(((float) c.w.getSize().x) / 2.0f, j - sv.getGlobalBounds().height);
-                            c.w.draw(sv);
+                        }
+                        else {
+                            v->setIsCrashing(false);
+                        }
+                    case 5:
+                        if (codeImage >= 25 && codeImage <= 37){
+                            v->setIsCrashing(true);
+                        }
+                        else {
+                            v->setIsCrashing(false);
                         }
                 }
                 sortedMultiplayerCars.pop_back();

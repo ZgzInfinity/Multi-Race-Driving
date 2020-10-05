@@ -603,7 +603,7 @@ class Game {
      * @param terrain is the kind of terrain of the landscape
      */
     void updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
-                                              Vehicle::Direction &direction, int& terrain);
+                                              Vehicle::Direction &direction, int& terrain, const int startPosition);
 
 
 
@@ -631,7 +631,7 @@ class Game {
      * @param terrain is the kind of terrain of the landscape
      */
     void updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer& r, Vehicle::Action &action,
-                                                 Vehicle::Direction &direction, int& terrain);
+                                                 Vehicle::Direction &direction, int& terrain, const int startPosition);
 
 
 

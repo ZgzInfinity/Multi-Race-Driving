@@ -42,6 +42,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "Globals.h"
+#include "Configuration.h"
 
 
 using namespace std;
@@ -69,6 +70,12 @@ using namespace sf;
     // Current position in axis y
     float posY;
 
+     // Last position in axis x
+    float previousX;
+
+    // Last position in axis y
+    float previousY;
+
     // Minimum coefficient to draw the vehicle in the screen
     float minScreenX;
 
@@ -86,6 +93,12 @@ using namespace sf;
 
     // Code of the sprite of the vehicle to be drawn
     int current_code_image;
+
+    // Control if a multi player is crashing or not
+    bool isCrashing;
+
+    // Control the crash sound of the multi player car
+    bool soundCrash;
 
 
 public:
@@ -164,6 +177,20 @@ public:
 
 
     /**
+     * Set if the multi player is crashing or not
+     */
+    void setIsCrashing(bool crash);
+
+
+
+    /**
+     * Set if the multi player sound crash has to be reproduced
+     */
+    void setSoundCrash();
+
+
+
+    /**
      * Returns the current texture of the multi player
      * @return
      */
@@ -221,6 +248,22 @@ public:
 
 
     /**
+     * Returns the last position of the player in axis X in multi player mode
+     * @return
+     */
+    float getPreviousX() const;
+
+
+
+    /**
+     * Returns the last position of the player in axis Y in multi player mode
+     * @return
+     */
+    float getPreviousY() const;
+
+
+
+    /**
      * Returns the type of vehicle selected by the player
      * @return
      */
@@ -244,9 +287,51 @@ public:
 
 
     /**
+     * Returns if the multi player is crashing or not
+     */
+    bool getIsCrashing() const;
+
+
+
+    /**
+     * Returns if the sound collision of the multi player car has to be reproduced
+     */
+    bool getSoundCrash() const;
+
+
+
+    /**
      * Returns the name of the player in the group
      */
     string getNickNamePlayer() const;
+
+
+
+    /**
+     * Returns true if the car is displayed on screen and the distance to the player, otherwise returns false.
+     * @param c is the module configuration of the game
+     * @param minY is the position of the camera in the axis y
+     * @param playerX is the player position in the axis x
+     * @param playerY is the player position in the axis y
+     * @param distanceX is the distance between the rival car and the vehicle of the player in the axis x
+     * @param distanceY is the distance between the rival car and the vehicle of the player in the axis y
+     * @return
+     */
+    bool isVisible(const Configuration &c, float minY, float playerX, float playerY, float &distanceX, float &distanceY) const;
+
+
+
+    /**
+     * Returns true if there has been a collision between the multi player vehicle and the player's vehicle.
+     * If true, it also returns the Y position where they have collided
+     * @param currentY is the current position of the player's vehicle in the axis y
+     * @param prevY is the last position of the player's vehicle in the axis y
+     * @param minX is the minimum position in axis x occupied by the vehicle
+     * @param maxX is the maximum position in axis y occupied by the vehicle
+     * @param crashPos is the position in axis y where the crash has happened
+     * @return
+     */
+    bool hasCrashed(float prevY, float currentY, float minX, float maxX, float &crashPos) const;
 
 
 

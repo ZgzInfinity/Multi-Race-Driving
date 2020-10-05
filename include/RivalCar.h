@@ -331,7 +331,7 @@ public:
 
 
     /**
-     * Returns true if there has been a collision between the traffic vehicle and the player's vehicle.
+     * Returns true if there has been a collision between the rival vehicle and the player's vehicle.
      * If true, it also returns the Y position where they have collided
      * @param currentY is the current position of the player's vehicle in the axis y
      * @param prevY is the last position of the player's vehicle in the axis y
