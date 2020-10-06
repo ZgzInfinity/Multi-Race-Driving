@@ -119,11 +119,14 @@ Code is released under the GNU General Public License v3.0.
 
 &nbsp;
 
-## 6. 
+## 6. Supporting the project
 
 This is the first version of the videogame. The designer has tested it as best as he could but he he is absolutely aware that some fault may have due to its
 complexity, complexity, especially in multiplayer mode. The fact that the project is open source is the real way for the community to solve all the possible 
 problems together, feel free to open an issue or do a pull request. See the open issues for a list of known issues (and proposed features).
+
+&nbsp;
+
 
 ## 7. Documentation
 
