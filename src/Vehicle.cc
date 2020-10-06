@@ -138,6 +138,7 @@ void Vehicle::setVehicle(const int typeOfGame, const bool onMultiplayer, const i
                 posY = 0.f;
             }
         }
+        absPosY = posY;
     }
     else {
         if (typeOfGame == 0 || typeOfGame == 2){
@@ -190,6 +191,16 @@ float Vehicle::getPreviousX() const {
  */
 float Vehicle::getPosY() const {
     return posY;
+}
+
+
+
+/**
+ * Returns the current absolute position of the vehicle in the axis y
+ * @return
+ */
+float Vehicle::getAbsPosY() const {
+    return absPosY;
 }
 
 

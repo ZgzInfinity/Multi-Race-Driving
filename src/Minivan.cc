@@ -335,6 +335,7 @@ Vehicle::Action Minivan::accelerationControl(Configuration &c, bool hasGotOut) {
         previousY = posY;
         // Store the new position using the current speed
         posY += speed;
+        absPosY += speed;
     }
     return a;
 }

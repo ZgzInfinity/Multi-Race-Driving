@@ -783,9 +783,8 @@ public:
      * guests members of the group have left him
      * @param canceledRace controls if all the guest members have left the group
      * @param playerFallen stores the name of the guest player that has left the group
-     * @param positionCounters is a vector that stores the last positions communicated by the rest of the players of the group
      */
-    void monitorizeRaceOwner(bool& canceledRace, string& playerFallen, vector<long long>& positionCounters);
+    void monitorizeRaceOwner(bool& canceledRace, string& playerFallen);
 
 
 
@@ -794,9 +793,8 @@ public:
      * controls if any of the rest of the guest players have left the race
      * @param canceledRace controls if the owner of the group has canceled the race
      * @param playerFallen stores the name of the guest player that has left the group
-     * @param positionCounters is a vector that stores the last positions communicated by the rest of the players of the group
      */
-    void monitorizeRaceGuest(bool& canceledRace, string& playerFallen, vector<long long>& positionCounters);
+    void monitorizeRaceGuest(bool& canceledRace, string& playerFallen);
 
 
 
@@ -823,20 +821,16 @@ public:
     /**
      * Receives the position of a guest player player of the group to all the guest of the multi player group
      * @param canceledRace controls if all the owner of the group has canceled the race
-     * @param nRivals is the number of rivals that started the race with the owner player
-     * @param startPosition is the initial position of the owner when the race started
      */
-    void receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long>& positionCounters);
+    void receiverMultiplayerPositionOwner(bool& canceledRace);
 
 
 
     /**
      * Receives the position of a guest player player of the group to the rest of the members of the multi player group
      * @param canceledRace controls if all the guest members have left the group
-     * @param nRivals is the number of rivals that started the race with the owner player
-     * @param startPosition is the initial position of the owner when the race started
      */
-    void receiverMultiplayerPositionGuest(bool& canceledRace, vector<long long>& positionCounters);
+    void receiverMultiplayerPositionGuest(bool& canceledRace);
 
 
 

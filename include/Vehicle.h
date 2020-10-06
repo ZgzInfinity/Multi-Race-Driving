@@ -117,6 +117,9 @@ protected:
     // Last position in axis y
     float previousY;
 
+    // Absolute position of the vehicle in the axis y
+    float absPosY;
+
     // Minimum coefficient to draw the vehicle in the screen
     float minScreenX;
 
@@ -214,6 +217,14 @@ public:
      * @return
      */
     float getPosY() const;
+
+
+
+    /**
+     * Returns the current position of the vehicle in the axis y
+     * @return
+     */
+    float getAbsPosY() const;
 
 
 

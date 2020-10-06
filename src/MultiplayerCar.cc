@@ -63,6 +63,7 @@ MultiplayerCar::MultiplayerCar(const int idPlayer, const string name, const int 
     namePlayer = name;
     isCrashing = false;
     soundCrash = true;
+    indexLandscape = 1;
 
     // Load the textures of the vehicle selected
     // Reserves memory to store all the textures of the vehicle
@@ -121,6 +122,16 @@ void MultiplayerCar::setPosition(float pX, float pY){
  */
 void MultiplayerCar::setCurrentCodeImage(float codeImage){
     current_code_image = codeImage;
+}
+
+
+
+/**
+ * Establish the index of the landscape where is now the player
+ * @param codeLandscape is the index of the landscape where is now the player
+ */
+void MultiplayerCar::setIndexLandScape(int codeLandscape){
+    indexLandscape = codeLandscape;
 }
 
 
@@ -282,6 +293,16 @@ int MultiplayerCar::getCurrentCodeImage() const {
  */
 int MultiplayerCar::getCodePlayer() const {
     return codePlayer;
+}
+
+
+
+/**
+ * Get the index of the landscape where is now the player
+ * @param codeLandscape is the index of the landscape where is now the player
+ */
+int MultiplayerCar::getIndexLandScape() const {
+    return indexLandscape;
 }
 
 

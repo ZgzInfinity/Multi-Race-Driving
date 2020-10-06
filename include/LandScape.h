@@ -515,10 +515,18 @@ public:
      * Draws the percent of landscape visible with all the traffic cars in it
      * @param c is the configuration of the player
      * @param vehicles is the vector with all the traffic cars
+     * @param carRivals is the vector with all the rival cars
+     * @param typeOfGame is the game mode selected by the player for only one player
+     * @param goalCar represents the goal car to chase in Driving Fury and Demarrage game modes
+     * @param sortedMultiplayerCars is the vector with all the multi player cars
+     * @param displayGoalIndicator controls if the goal indicator in DrivingFury have to be drawn
+     * @param drawGoalCar controls if the goal car to chase in Driving Fury and Demarrage game modes has to be drawn
+     * @param playingMultiplayer controls if the player is playing in multi player mode
+     * @param currentLandScape represents the current landscape of the player in multi player mode
      */
     void drawLandScape(Configuration &c, vector<TrafficCar> &vehicles, vector<RivalCar> &carRivals,
                        const int typeOfGame, RivalCar& goalCar, vector<MultiplayerCar*> sortedMmultiplayerCars,
-                       const bool displayGoalIndicator, const bool drawGoalCar, const bool playingMultiplayer);
+                       const bool displayGoalIndicator, const bool drawGoalCar, const bool playingMultiplayer, const int currentLandScape);
 
 
 

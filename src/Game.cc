@@ -116,7 +116,8 @@ State Game::drawHudAnimationWorldTourPolePosition(Configuration& c, SoundPlayer&
         mtx3.unlock();
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, onMultiplayer, currentStage);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -531,7 +532,8 @@ State Game::drawHudAnimationOutRunDrivingFuryDemarrage(Configuration& c, SoundPl
         mtx3.unlock();
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, onMultiplayer, currentStage);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -3381,6 +3383,8 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
             }
 
 
+            cout << player.getPosY() << endl;
+
             // Update the indicators
             mtx.lock();
             lap = (minutes < 10) ? "0" + to_string(int(minutes)) + ":" : to_string(int(minutes)) + ":";
@@ -3476,9 +3480,8 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
  * guests members of the group have left him
  * @param canceledRace controls if all the guest members have left the group
  * @param playerFallen stores the name of the guest player that has left the group
- * @param positionCounters is a vector that stores the last positions communicated by the rest of the players of the group
  */
-void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen, vector<long long>& positionCounters){
+void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen){
     // Local variable to finish the process
     bool finished = false;
 
@@ -3539,7 +3542,6 @@ void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen, vector<
                     multiplayerCars[j].setCodePlayer(multiplayerCars[j].getCodePlayer() - 1);
                 }
 
-                positionCounters.erase(positionCounters.begin() + k - 1);
                 multiplayerCars.erase(multiplayerCars.begin() + k - 1);
 
                 // Alert to the rest of the members that this member must be deleted
@@ -3571,9 +3573,8 @@ void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen, vector<
  * controls if any of the rest of the guest players have left the race
  * @param canceledRace controls if the owner of the group has canceled the race
  * @param playerFallen stores the name of the guest player that has left the group
- * @param positionCounters is a vector that stores the last positions communicated by the rest of the players of the group
  */
-void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen, vector<long long>& positionCounters){
+void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen){
     // Local variable to finish the process
     bool finished = false;
     bool abortedRace = false;
@@ -3639,7 +3640,6 @@ void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen, vector<
                 multiplayerCars[j].setCodePlayer(multiplayerCars[j].getCodePlayer() - 1);
             }
 
-            positionCounters.erase(positionCounters.begin() + k - 1);
             multiplayerCars.erase(multiplayerCars.begin() + k - 1);
 
             numberPlayersGroup--;
@@ -3663,9 +3663,6 @@ void Game::senderMultiplayerPositionOwner(bool& canceledRace, const int nRivals,
    // Control locally if the race has been finished or canceled
     bool finishedRace = false;
     bool abortedRace = false;
-
-    // Position index to be processed
-    long long positionCounter = 0;
 
     mtx3.lock();
     bool canceledGroup = canceledRace;
@@ -3700,32 +3697,38 @@ void Game::senderMultiplayerPositionOwner(bool& canceledRace, const int nRivals,
             else {
                 // Proceed to send the position of the vehicle of the player
                 mtx4.lock();
-                float positionX = 0.f, positionY = 0.f;
+                float positionX = 0.f, positionY = 0.f, posLocalY = 0,f;
 
                 switch(typeOfVehicle){
                     case 0:
                         positionX = player.getPosX();
-                        positionY = player.getPosY();
+                        positionY = player.getAbsPosY();
+                        posLocalY = player.getPosY();
                         break;
                     case 1:
                         positionX = player2.getPosX();
-                        positionY = player2.getPosY();
+                        positionY = player2.getAbsPosY();
+                        posLocalY = player2.getPosY();
                         break;
                     case 2:
                         positionX = player3.getPosX();
-                        positionY = player3.getPosY();
+                        positionY = player3.getAbsPosY();
+                        posLocalY = player3.getPosY();
                         break;
                     case 3:
                         positionX = player4.getPosX();
-                        positionY = player4.getPosY();
+                        positionY = player4.getAbsPosY();
+                        posLocalY = player4.getPosY();
                         break;
                     case 4:
                         positionX = player5.getPosX();
-                        positionY = player5.getPosY();
+                        positionY = player5.getAbsPosY();
+                        posLocalY = player5.getPosY();
                         break;
                     case 5:
                         positionX = player6.getPosX();
-                        positionY = player6.getPosY();
+                        positionY = player6.getAbsPosY();
+                        posLocalY = player6.getPosY();
                 }
                 mtx4.unlock();
 
@@ -3777,46 +3780,88 @@ void Game::senderMultiplayerPositionOwner(bool& canceledRace, const int nRivals,
                         int code = multiplayerCars[i - 1].getCodePlayer();
                         string namePlayer = multiplayerCars[i - 1].getNickNamePlayer();
 
-                        // Check the possible offset to add
-                        if (currentMap->isStartingLandScape()){
-                            if (nRivals <= 2){
-                                positionY += 13.f;
+                        // Check if the player to send the information in the same landscape
+                        if (multiplayerCars[i - 1].getIndexLandScape() == currentStage){
+                            // Check the possible offset to add
+                            if (currentMap->isStartingLandScape()){
+                                if (nRivals <= 2){
+                                    positionY += 13.f;
+                                }
+                                else {
+                                    // Player starts in first position
+                                    if (startPosition == 1){
+                                        if (i == 2){
+                                            positionY += 13.f;
+                                        }
+                                        else {
+                                            positionY += 33.f;
+                                        }
+                                    }
+                                    // Player starts in second position
+                                    else if (startPosition == 2){
+                                        if (i == 1){
+                                            positionY += 13.f;
+                                        }
+                                        else {
+                                            positionY += 33.f;
+                                        }
+                                    }
+                                    // Player starts in third position
+                                    else if (startPosition >= 3) {
+                                        positionY += 13.f;
+                                    }
+                                }
+
+                                // Send the position with the player to the rest of the players
+                                t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                          to_string(positionY), to_string(codeImage), to_string(currentStage));
+
+                                // Post note the tuple with the information
+                                winLindadriver.postNote(t);
                             }
                             else {
-                                // Player starts in first position
-                                if (startPosition == 1){
-                                    if (i == 2){
-                                        positionY += 13.f;
-                                    }
-                                    else {
-                                        positionY += 33.f;
-                                    }
+                                // Send the position with the player to the rest of the players
+                                t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                          to_string(posLocalY), to_string(codeImage), to_string(currentStage));
+
+                                // Post note the tuple with the information
+                                winLindadriver.postNote(t);
+                            }
+                        }
+                        else {
+                            // The landscapes are different
+                            if (multiplayerCars[i - 1].getIndexLandScape() > currentStage){
+
+                                // Send the position with the player to the rest of the players
+                                t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                          to_string(positionY), to_string(codeImage), to_string(currentStage));
+
+                                // Post note the tuple with the information
+                                winLindadriver.postNote(t);
+                            }
+                            else {
+                                // The destination player is in the initial landscape
+                                if (multiplayerCars[i - 1].getIndexLandScape() == 1){
+                                    // Send the position with the player to the rest of the players
+                                    t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                              to_string(positionY), to_string(codeImage), to_string(currentStage));
+
+                                    // Post note the tuple with the information
+                                    winLindadriver.postNote(t);
                                 }
-                                // Player starts in second position
-                                else if (startPosition == 2){
-                                    if (i == 1){
-                                        positionY += 13.f;
-                                    }
-                                    else {
-                                        positionY += 33.f;
-                                    }
-                                }
-                                // Player starts in third position
-                                else if (startPosition >= 3) {
-                                    positionY += 13.f;
+                                else {
+
+                                    float positY = multiplayerCars[i - 1].getPosY();
+
+                                    // Send the position with the player to the rest of the players
+                                    t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                              to_string(positionY - positY), to_string(codeImage), to_string(currentStage));
+
+                                    // Post note the tuple with the information
+                                    winLindadriver.postNote(t);
                                 }
                             }
                         }
-
-                        // Send the position with the player to the rest of the players
-                        t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
-                                  to_string(positionY), to_string(codeImage), to_string(positionCounter));
-
-                        // Post note the tuple with the information
-                        winLindadriver.postNote(t);
-
-                        // Increment the position counter
-                        positionCounter++;
                     }
                 }
                 canceledGroup = canceledRace;
@@ -3841,9 +3886,6 @@ void Game::senderMultiplayerPositionGuest(bool& canceledRace, const int nRivals,
    // Control locally if the race has been finished or canceled
     bool finishedRace = false;
     bool abortedRace = false;
-
-    // Position index to be processed
-    long long positionCounter = 0;
 
     mtx3.lock();
     bool canceledGuest = canceledRace;
@@ -3878,32 +3920,38 @@ void Game::senderMultiplayerPositionGuest(bool& canceledRace, const int nRivals,
             else {
                 // Proceed to send the position of the vehicle of the player
                 mtx4.lock();
-                float positionX = 0.f, positionY = 0.f;
+                float positionX = 0.f, positionY = 0.f, posLocalY = 0.f;
 
                 switch(typeOfVehicle){
                     case 0:
                         positionX = player.getPosX();
-                        positionY = player.getPosY();
+                        positionY = player.getAbsPosY();
+                        posLocalY = player.getPosY();
                         break;
                     case 1:
                         positionX = player2.getPosX();
-                        positionY = player2.getPosY();
+                        positionY = player2.getAbsPosY();
+                        posLocalY = player2.getPosY();
                         break;
                     case 2:
                         positionX = player3.getPosX();
-                        positionY = player3.getPosY();
+                        positionY = player3.getAbsPosY();
+                        posLocalY = player3.getPosY();
                         break;
                     case 3:
                         positionX = player4.getPosX();
-                        positionY = player4.getPosY();
+                        positionY = player4.getAbsPosY();
+                        posLocalY = player4.getPosY();
                         break;
                     case 4:
                         positionX = player5.getPosX();
-                        positionY = player5.getPosY();
+                        positionY = player5.getAbsPosY();
+                        posLocalY = player5.getPosY();
                         break;
                     case 5:
                         positionX = player6.getPosX();
-                        positionY = player6.getPosY();
+                        positionY = player6.getAbsPosY();
+                        posLocalY = player6.getPosY();
                 }
                 mtx4.unlock();
 
@@ -3947,53 +3995,95 @@ void Game::senderMultiplayerPositionGuest(bool& canceledRace, const int nRivals,
 
                 int totalPlayers = groupDataPlayers.size();
 
-                for (int i = 1; i<= totalPlayers; i++){
+                for (int i = 1; i <= totalPlayers; i++){
                     // Check if its not the same player
                     if (i != codePlayer){
                         // Get the code and the name of each player group
                         int code = groupDataPlayers[i - 1].getCodePlayer();
                         string namePlayer = groupDataPlayers[i - 1].getNickNamePlayer();
 
-                        // Check the possible offset to add
-                        if (currentMap->isStartingLandScape()){
-                            if (nRivals <= 2){
-                                positionY += 13.f;
+                        // Check if the player to send the information in the same landscape
+                        if (multiplayerCars[i - 1].getIndexLandScape() == currentStage){
+                            // Check the possible offset to add
+                            if (currentMap->isStartingLandScape()){
+                                if (nRivals <= 2){
+                                    positionY += 13.f;
+                                }
+                                else {
+                                    // Player starts in first position
+                                    if (startPosition == 1){
+                                        if (i == 2){
+                                            positionY += 13.f;
+                                        }
+                                        else {
+                                            positionY += 33.f;
+                                        }
+                                    }
+                                    // Player starts in second position
+                                    else if (startPosition == 2){
+                                        if (i == 1){
+                                            positionY += 13.f;
+                                        }
+                                        else {
+                                            positionY += 33.f;
+                                        }
+                                    }
+                                    // Player starts in third position
+                                    else if (startPosition >= 3) {
+                                        positionY += 13.f;
+                                    }
+                                }
+
+                                // Send the position with the player to the rest of the players
+                                t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                          to_string(positionY), to_string(codeImage), to_string(currentStage));
+
+                                // Post note the tuple with the information
+                                winLindadriver.postNote(t);
                             }
                             else {
-                                // Player starts in first position
-                                if (startPosition == 1){
-                                    if (i == 2){
-                                        positionY += 13.f;
-                                    }
-                                    else {
-                                        positionY += 33.f;
-                                    }
+                                // Send the position with the player to the rest of the players
+                                t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                          to_string(posLocalY), to_string(codeImage), to_string(currentStage));
+
+                                // Post note the tuple with the information
+                                winLindadriver.postNote(t);
+                            }
+                        }
+                        else {
+                            // The landscapes are different
+                            if (multiplayerCars[i - 1].getIndexLandScape() > currentStage){
+
+                                // Send the position with the player to the rest of the players
+                                t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                          to_string(positionY), to_string(codeImage), to_string(currentStage));
+
+                                // Post note the tuple with the information
+                                winLindadriver.postNote(t);
+                            }
+                            else {
+                                // The destination player is in the initial landscape
+                                if (multiplayerCars[i - 1].getIndexLandScape() == 1){
+                                    // Send the position with the player to the rest of the players
+                                    t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                              to_string(positionY), to_string(codeImage), to_string(currentStage));
+
+                                    // Post note the tuple with the information
+                                    winLindadriver.postNote(t);
                                 }
-                                // Player starts in second position
-                                else if (startPosition == 2){
-                                    if (i == 1){
-                                        positionY += 13.f;
-                                    }
-                                    else {
-                                        positionY += 33.f;
-                                    }
-                                }
-                                // Player starts in third position
-                                else if (startPosition >= 3) {
-                                    positionY += 13.f;
+                                else {
+
+                                    float positY = multiplayerCars[i - 1].getPosY();
+
+                                    // Send the position with the player to the rest of the players
+                                    t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
+                                              to_string(positionY - positY), to_string(codeImage), to_string(currentStage));
+
+                                    // Post note the tuple with the information
+                                    winLindadriver.postNote(t);
                                 }
                             }
                         }
-
-                        // Send the position with the player to the rest of the players
-                        t = Tuple("PLAYER_POSITION_" + nickNameMultiplayer, namePlayer, to_string(positionX),
-                                  to_string(positionY), to_string(codeImage), to_string(positionCounter));
-
-                        // Post note the tuple with the information
-                        winLindadriver.postNote(t);
-
-                        // Increment the position counter
-                        positionCounter++;
                     }
                 }
                 canceledGuest = canceledRace;
@@ -4010,10 +4100,8 @@ void Game::senderMultiplayerPositionGuest(bool& canceledRace, const int nRivals,
 /**
  * Receives the position of a guest player player of the group to all the guest of the multi player group
  * @param canceledRace controls if all the owner of the group has canceled the race
- * @param nRivals is the number of rivals that started the race with the owner player
- * @param startPosition is the initial position of the owner when the race started
  */
-void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long>& positionCounters){
+void Game::receiverMultiplayerPositionOwner(bool& canceledRace){
 
     // Control locally if the race has been finished or canceled
     bool finishedRace = false;
@@ -4053,6 +4141,7 @@ void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long
 
                 mtx3.lock();
                 int players = multiplayerCars.size();
+                mtx3.unlock();
 
                 bool found;
 
@@ -4073,13 +4162,12 @@ void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long
                     if (i != codePlayer){
 
                         // Get identifier and the name of the player
+                        mtx3.lock();
                         int code = multiplayerCars[i - 1].getCodePlayer();
                         string name = multiplayerCars[i - 1].getNickNamePlayer();
+                        mtx3.unlock();
 
-                        // Check if there is a tuple with the position updated of this vehicle
-                        long long counter = positionCounters[i - 1];
-
-                        Tuple t = Tuple("PLAYER_POSITION_" + name, nickNameMultiplayer, "?A", "?B", "?C", to_string(counter));
+                        Tuple t = Tuple("PLAYER_POSITION_" + name, nickNameMultiplayer, "?A", "?B", "?C", "?D");
                         Tuple r = winLindadriver.readNoteX(t, found);
                         if (found && r.get(1) != NF){
 
@@ -4090,14 +4178,16 @@ void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long
                             float positionX = stof(r.get(3));
                             float positionY = stof(r.get(4));
                             int codeImage = stoi(r.get(5));
+                            int codeLandscape = stoi(r.get(6));
 
                             // Assignment of the position and the code image
+                            mtx3.lock();
                             multiplayerCars[i - 1].setPosition(positionX, positionY);
                             multiplayerCars[i - 1].setCurrentCodeImage(codeImage);
                             multiplayerCars[i - 1].setCodePlayer(code);
                             multiplayerCars[i - 1].setNamePlayer(name);
-
-                            positionCounters[i - 1]++;
+                            multiplayerCars[i - 1].setIndexLandScape(codeLandscape);
+                            mtx3.unlock();
                         }
                     }
                 }
@@ -4115,19 +4205,16 @@ void Game::receiverMultiplayerPositionOwner(bool& canceledRace, vector<long long
 /**
  * Receives the position of a guest player player of the group to the rest of the members of the multi player group
  * @param canceledRace controls if all the guest members have left the group
- * @param nRivals is the number of rivals that started the race with the owner player
- * @param startPosition is the initial position of the owner when the race started
  */
-void Game::receiverMultiplayerPositionGuest(bool& canceledRace, vector<long long>& positionCounters){
+void Game::receiverMultiplayerPositionGuest(bool& canceledRace){
 
     // Control locally if the race has been finished or canceled
     bool finishedRace = false;
     bool abortedRace = false;
 
+    // Counter of positions processed
     mtx3.lock();
     bool canceledGroup = canceledRace;
-
-    // Counter of positions processed
     mtx3.unlock();
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
@@ -4161,47 +4248,58 @@ void Game::receiverMultiplayerPositionGuest(bool& canceledRace, vector<long long
                 abortedRace = true;
             }
             else {
+
                 mtx3.lock();
-                int players = groupDataPlayers.size();
-                mtx3.unlock();
 
                 bool found;
+
+                bool founded = false;;
+                int codePlayer = 1;
+                while (!founded){
+                    if (multiplayerCars[codePlayer - 1].getNickNamePlayer() == nickNameMultiplayer){
+                        founded = true;
+                    }
+                    else {
+                        codePlayer++;
+                    }
+                }
+
+                int players = groupDataPlayers.size();
+                mtx3.unlock();
 
                 // Iterate the vector of the rivals
                 for (int i = 1; i <= players; i++){
 
-                    // Get identifier and the name of the player
-                    mtx3.lock();
-                    int code = groupDataPlayers[i - 1].getCodePlayer();
-                    string name = groupDataPlayers[i - 1].getNickNamePlayer();
-                    mtx3.unlock();
+                    if (i != codePlayer){
 
-                    // Check if there is a tuple with the position updated of this vehicle
-                    mtx3.lock();
-                    long long counter = positionCounters[i - 1];
-                    mtx3.unlock();
-
-                    Tuple t = Tuple("PLAYER_POSITION_" + name, nickNameMultiplayer, "?A", "?B", "?C", to_string(counter));
-                    Tuple r = winLindadriver.readNoteX(t, found);
-                    if (found && r.get(1) != NF){
-
-                        // Get the tuple with the position
-                        winLindadriver.removeNote(r);
-
-                        // Get the opsitio
-                        float positionX = stof(r.get(3));
-                        float positionY = stof(r.get(4));
-                        int codeImage = stoi(r.get(5));
-
-                        // Assignment of the position and the code image
-                        multiplayerCars[i - 1].setPosition(positionX, positionY);
-                        multiplayerCars[i - 1].setCurrentCodeImage(codeImage);
-                        multiplayerCars[i - 1].setCodePlayer(code);
-                        multiplayerCars[i - 1].setNamePlayer(name);
-
+                        // Get identifier and the name of the player
                         mtx3.lock();
-                        positionCounters[i - 1]++;
+                        int code = groupDataPlayers[i - 1].getCodePlayer();
+                        string name = groupDataPlayers[i - 1].getNickNamePlayer();
                         mtx3.unlock();
+
+                        Tuple t = Tuple("PLAYER_POSITION_" + name, nickNameMultiplayer, "?A", "?B", "?C", "?D");
+                        Tuple r = winLindadriver.readNoteX(t, found);
+                        if (found && r.get(1) != NF){
+
+                            // Get the tuple with the position
+                            winLindadriver.removeNote(r);
+
+                            // Get the opsitio
+                            float positionX = stof(r.get(3));
+                            float positionY = stof(r.get(4));
+                            int codeImage = stoi(r.get(5));
+                            int codeLandscape = stoi(r.get(6));
+
+                            // Assignment of the position and the code image
+                            mtx3.lock();
+                            multiplayerCars[i - 1].setPosition(positionX, positionY);
+                            multiplayerCars[i - 1].setCurrentCodeImage(codeImage);
+                            multiplayerCars[i - 1].setCodePlayer(code);
+                            multiplayerCars[i - 1].setNamePlayer(name);
+                            multiplayerCars[i - 1].setIndexLandScape(codeLandscape);
+                            mtx3.unlock();
+                        }
                     }
                 }
 
@@ -4229,6 +4327,10 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
     // Get the number of the rivals
     int nRivals = multiplayerCars.size();
     int startPosition = 0;
+
+    // Initialize the landscape of the multi player game mode
+    currentStage = 1;
+
 
     // Checking the starting position
     if (!firstRace){
@@ -4291,32 +4393,26 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
     // Variable that stores the name of a player fallen
     string playerFallen = "", namePlayer = "";
 
-
-    vector<long long> positionCounters;
-    for (int i = 1; i <= nRivals; i++){
-        positionCounters.push_back(0);
-    }
-
     // Check if the player is the owner or is the guest
     if (modeMultiplayer == 0){
         // Throw the threads to send his position to the rest of the players
         controlSenderPositions = thread(senderMultiplayerPositionOwner, this, ref(cancelledRaceOwner), nRivals, startPosition);
 
         // Throw the thread to receive the position of the rest of the players
-        controlReceiverPositions = thread(receiverMultiplayerPositionOwner, this, ref(cancelledRaceOwner), ref(positionCounters));
+        controlReceiverPositions = thread(receiverMultiplayerPositionOwner, this, ref(cancelledRaceOwner));
 
         // Owner of the group
-        controlRaceOwner = thread(monitorizeRaceOwner, this, ref(cancelledRaceOwner), ref(playerFallen), ref(positionCounters));
+        controlRaceOwner = thread(monitorizeRaceOwner, this, ref(cancelledRaceOwner), ref(playerFallen));
     }
     else {
         // Throw the threads to send his position to the rest of the players
         controlSenderPositions = thread(senderMultiplayerPositionGuest, this, ref(cancelledRaceGuest), nRivals, startPosition);
 
         // Throw the thread to receive the position of the rest of the players
-        controlReceiverPositions = thread(receiverMultiplayerPositionGuest, this, ref(cancelledRaceGuest), ref(positionCounters));
+        controlReceiverPositions = thread(receiverMultiplayerPositionGuest, this, ref(cancelledRaceGuest));
 
         // Guest if the group
-        controlRaceGuest = thread(monitorizeRaceGuest, this, ref(cancelledRaceGuest), ref(playerFallen), ref(positionCounters));
+        controlRaceGuest = thread(monitorizeRaceGuest, this, ref(cancelledRaceGuest), ref(playerFallen));
     }
 
 
@@ -4576,7 +4672,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                     // Draw the landscape
                     currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                              false, true);
+                                              false, true, currentStage);
 
                     // Draw the vehicle
                     switch(typeOfVehicle){
@@ -4651,7 +4747,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                 // Draw the landscape
                 currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                          false, true);
+                                          false, true, currentStage);
 
                 // Draw the vehicle
                 switch(typeOfVehicle){
@@ -4797,7 +4893,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                             // Draw the landscape
                             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                                      false, true);
+                                                      false, true, currentStage);
 
                             // Draw the vehicle
                             switch(typeOfVehicle){
@@ -4863,7 +4959,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                         // Draw the landscape
                         currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                                  false, true);
+                                                  false, true, currentStage);
 
                         // Draw the vehicle
                         switch(typeOfVehicle){
@@ -5005,7 +5101,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                         // Draw the landscape
                         currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                                  false, true);
+                                                  false, true, currentStage);
 
                         // Draw the vehicle
                         switch(typeOfVehicle){
@@ -5071,7 +5167,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                     // Draw the landscape
                     currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                              false, true);
+                                              false, true, currentStage);
 
                     // Draw the vehicle
                     switch(typeOfVehicle){
@@ -5196,7 +5292,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                     // Draw the landscape
                     currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                              false, false);
+                                              false, false, currentStage);
 
                     // Draw the vehicle
                     switch(typeOfVehicle){
@@ -5271,7 +5367,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
             // Draw the landscape
             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                      false, false);
+                                      false, false, currentStage);
 
             // Draw the vehicle
             switch(typeOfVehicle){
@@ -5587,7 +5683,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
                 // Draw the landscape
                 currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                          false, false);
+                                          false, false, currentStage);
 
                 // Draw the HUD of the game
                 showHudInterfaceWorldTourPolePosition(c);
@@ -6168,7 +6264,8 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
         mtx3.unlock();
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, onMultiplayer, currentStage);
 
         // Draw the vehicle
         switch(typeOfVehicle){
@@ -6338,7 +6435,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
                 // Draw the landscape
                 currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                          false, onMultiplayer);
+                                          false, onMultiplayer, currentStage);
 
                 switch(typeOfVehicle){
                     case 0:
@@ -6462,7 +6559,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
             // Draw the landscape
             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                      false, onMultiplayer);
+                                      false, onMultiplayer, currentStage);
 
             switch(typeOfVehicle){
                 case 0:
@@ -6544,7 +6641,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
                     // Draw the landscape
                     currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                              false, onMultiplayer);
+                                              false, onMultiplayer, currentStage);
 
                     switch(typeOfVehicle){
                         case 0:
@@ -6668,7 +6765,7 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
             // Draw the landscape
             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                      false, onMultiplayer);
+                                      false, onMultiplayer, currentStage);
 
             switch(typeOfVehicle){
                 case 0:
@@ -7024,7 +7121,7 @@ State Game::showsGoalAnimation(Configuration &c, SoundPlayer& r) {
 
         // Draw the landscape
         currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
-                                  false, onMultiplayer);
+                                  false, onMultiplayer, currentStage);
 
         switch(typeOfVehicle){
             case 0:
@@ -7429,7 +7526,7 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
 
             float posY = v.getPosY();
 
-            // Store the new position of the vehicle
+// Store the new position of the vehicle
             rankingVehicles.push_back(posY);
 
             // Draw the vehicle
@@ -7600,7 +7697,8 @@ void Game::updateGameWorldTourStatus(Configuration &c, SoundPlayer& r, Vehicle::
         mtx3.unlock();
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, false);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, false, currentStage);
 
 
         // Player update and draw
@@ -7987,6 +8085,12 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
 
     // World tour and pole position modes
     if (currentMap->isOutSideLandScape()) {
+
+        // The landscape has been completed
+        mtx3.lock();
+        currentStage++;
+        mtx3.unlock();
+
         // Update player and vehicle positions
         switch(typeOfVehicle){
             case 0:
@@ -8007,9 +8111,6 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
             case 5:
                 player6.setPosition(player6.getPosX() + currentMap->getOffsetX(), player6.getPosY() - currentMap->getMaxY());
         }
-
-        for (MultiplayerCar &v : multiplayerCars)
-            v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
 
         // Update to the map
         if (level < 0){
@@ -8075,6 +8176,7 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
         c.w.clear();
 
         mtx3.lock();
+        int codeLandscape = currentStage;
         vector<MultiplayerCar*> sortedMultiplayerCars;
         if (onMultiplayer){
             rankingVehicles.clear();
@@ -8127,7 +8229,8 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
         mtx3.unlock();
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, onMultiplayer, codeLandscape);
 
         float crashPos;
 
@@ -8135,143 +8238,146 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
 
         for (MultiplayerCar* v : sortedMultiplayerCars){
 
-            switch(typeOfVehicle){
-                case 0:
+            if (v->getIndexLandScape() == currentLandScape){
 
-                    vehicleCrash = v->hasCrashed(player.getPosY(), player.getPreviousY(),
-                                                player.getMinScreenX(), player.getMaxScreenX(), crashPos);
+                switch(typeOfVehicle){
+                    case 0:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player.getPreviousX() > v->getPreviousX()){
-                            player.setPosition(player.getPosX() + 0.3f, player.getPosY() - 10.f);
-                        }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player.setPosition(player.getPosX() - 0.3f, player.getPosY() - 10.f);
-                        }
-                        else {
-                            player.setPosition(player.getPosX(), player.getPosY() - 20.f);
-                        }
+                        vehicleCrash = v->hasCrashed(player.getPosY(), player.getPreviousY(),
+                                                    player.getMinScreenX(), player.getMaxScreenX(), crashPos);
 
-                        // Voice sound
-                        r.soundEffects[69]->stop();
-                        r.soundEffects[70]->stop();
-                        r.soundEffects[71]->stop();
-                        r.soundEffects[72]->stop();
-                        r.soundEffects[73]->stop();
-                        r.soundEffects[74]->stop();
-                        r.soundEffects[75]->stop();
-                        r.soundEffects[rand_generator_int(69, 75)]->play();
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player.getPreviousX() > v->getPreviousX()){
+                                player.setPosition(player.getPosX() + 0.3f, player.getPosY() - 10.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player.setPosition(player.getPosX() - 0.3f, player.getPosY() - 10.f);
+                            }
+                            else {
+                                player.setPosition(player.getPosX(), player.getPosY() - 20.f);
+                            }
 
-                        // Collision sound
-                        r.soundEffects[76]->stop();
-                        r.soundEffects[77]->stop();
-                        r.soundEffects[78]->stop();
-                        r.soundEffects[79]->stop();
-                        r.soundEffects[80]->stop();
-                        r.soundEffects[81]->stop();
-                        r.soundEffects[rand_generator_int(76, 81)]->play();
-                    }
-                    break;
-                case 1:
+                            // Voice sound
+                            r.soundEffects[69]->stop();
+                            r.soundEffects[70]->stop();
+                            r.soundEffects[71]->stop();
+                            r.soundEffects[72]->stop();
+                            r.soundEffects[73]->stop();
+                            r.soundEffects[74]->stop();
+                            r.soundEffects[75]->stop();
+                            r.soundEffects[rand_generator_int(69, 75)]->play();
 
-                    vehicleCrash = v->hasCrashed(player2.getPosY(), player2.getPreviousY(),
-                                                player2.getMinScreenX(), player2.getMaxScreenX(), crashPos);
+                            // Collision sound
+                            r.soundEffects[76]->stop();
+                            r.soundEffects[77]->stop();
+                            r.soundEffects[78]->stop();
+                            r.soundEffects[79]->stop();
+                            r.soundEffects[80]->stop();
+                            r.soundEffects[81]->stop();
+                            r.soundEffects[rand_generator_int(76, 81)]->play();
+                        }
+                        break;
+                    case 1:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player2.getPreviousX() > v->getPreviousX()){
-                            player2.setPosition(player2.getPosX() + 0.3f, player2.getPosY() - 20.f);
-                        }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player2.setPosition(player2.getPosX() - 0.3f, player2.getPosY() - 20.f);
-                        }
-                        else {
-                            player2.setPosition(player2.getPosX(), player2.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 2:
+                        vehicleCrash = v->hasCrashed(player2.getPosY(), player2.getPreviousY(),
+                                                    player2.getMinScreenX(), player2.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player3.getPosY(), player3.getPreviousY(),
-                                                player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player2.getPreviousX() > v->getPreviousX()){
+                                player2.setPosition(player2.getPosX() + 0.3f, player2.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player2.setPosition(player2.getPosX() - 0.3f, player2.getPosY() - 20.f);
+                            }
+                            else {
+                                player2.setPosition(player2.getPosX(), player2.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 2:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player3.getPreviousX() >= v->getPreviousX()){
-                            player3.setPosition(player3.getPosX() + 0.3f, player3.getPosY() - 20.f);
-                        }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player3.setPosition(player3.getPosX() - 0.3f, player3.getPosY() - 20.f);
-                        }
-                        else {
-                            player3.setPosition(player3.getPosX(), player3.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 3:
+                        vehicleCrash = v->hasCrashed(player3.getPosY(), player3.getPreviousY(),
+                                                    player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player4.getPosY(), player4.getPreviousY(),
-                                                player4.getMinScreenX(), player4.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player3.getPreviousX() >= v->getPreviousX()){
+                                player3.setPosition(player3.getPosX() + 0.3f, player3.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player3.setPosition(player3.getPosX() - 0.3f, player3.getPosY() - 20.f);
+                            }
+                            else {
+                                player3.setPosition(player3.getPosX(), player3.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 3:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player4.getPreviousX() > v->getPreviousX()){
-                            player4.setPosition(player4.getPosX() + 0.3f, player4.getPosY() - 20.f);
-                        }
-                        else if (player4.getPreviousX() < v->getPreviousX()){
-                            player4.setPosition(player4.getPosX() - 0.3f, player4.getPosY() - 20.f);
-                        }
-                        else {
-                            player4.setPosition(player4.getPosX(), player4.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 4:
+                        vehicleCrash = v->hasCrashed(player4.getPosY(), player4.getPreviousY(),
+                                                    player4.getMinScreenX(), player4.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player5.getPosY(), player5.getPreviousY(),
-                                                player5.getMinScreenX(), player5.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player4.getPreviousX() > v->getPreviousX()){
+                                player4.setPosition(player4.getPosX() + 0.3f, player4.getPosY() - 20.f);
+                            }
+                            else if (player4.getPreviousX() < v->getPreviousX()){
+                                player4.setPosition(player4.getPosX() - 0.3f, player4.getPosY() - 20.f);
+                            }
+                            else {
+                                player4.setPosition(player4.getPosX(), player4.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 4:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player5.getPreviousX() > v->getPreviousX()){
-                            player5.setPosition(player5.getPosX() + 0.3f, player5.getPosY() - 20.f);
-                        }
-                        else if (player5.getPreviousX() < v->getPreviousX()){
-                            player5.setPosition(player5.getPosX() - 0.3f, player5.getPosY() - 20.f);
-                        }
-                        else {
-                            player5.setPosition(player5.getPosX(), player5.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 5:
+                        vehicleCrash = v->hasCrashed(player5.getPosY(), player5.getPreviousY(),
+                                                    player5.getMinScreenX(), player5.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player6.getPosY(), player6.getPreviousY(),
-                                                player6.getMinScreenX(), player6.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player5.getPreviousX() > v->getPreviousX()){
+                                player5.setPosition(player5.getPosX() + 0.3f, player5.getPosY() - 20.f);
+                            }
+                            else if (player5.getPreviousX() < v->getPreviousX()){
+                                player5.setPosition(player5.getPosX() - 0.3f, player5.getPosY() - 20.f);
+                            }
+                            else {
+                                player5.setPosition(player5.getPosX(), player5.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 5:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player6.getPreviousX() > v->getPreviousX()){
-                            player6.setPosition(player6.getPosX() + 0.3f, player6.getPosY() - 20.f);
+                        vehicleCrash = v->hasCrashed(player6.getPosY(), player6.getPreviousY(),
+                                                    player6.getMinScreenX(), player6.getMaxScreenX(), crashPos);
+
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player6.getPreviousX() > v->getPreviousX()){
+                                player6.setPosition(player6.getPosX() + 0.3f, player6.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player6.setPosition(player6.getPosX() - 0.3f, player6.getPosY() - 20.f);
+                            }
+                            else {
+                                player6.setPosition(player6.getPosX(), player6.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
                         }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player6.setPosition(player6.getPosX() - 0.3f, player6.getPosY() - 20.f);
-                        }
-                        else {
-                            player6.setPosition(player6.getPosX(), player6.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
+                }
             }
         }
 
@@ -8503,87 +8609,90 @@ void Game::updateGameWorldTourStatusMultiplayer(Configuration &c, SoundPlayer& r
         }
         if (!finalGame && !arrival){
             // Check if enemies are displayed on the screen
-            mtx3.lock();
             for (MultiplayerCar *v : sortedMultiplayerCars) {
-                float distX, distY;
 
-                bool visible = true;
+                if (v->getIndexLandScape() == currentLandScape){
 
-                switch(typeOfVehicle){
-                    case 0:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
-                        break;
-                    case 1:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
-                        break;
-                    case 2:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
-                        break;
-                    case 3:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
-                        break;
-                    case 4:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
-                        break;
-                    case 5:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player6.getPosX(), player6.getPosY(), distX, distY);
-                }
+                    float distX, distY;
 
-                if (visible) {
+                    bool visible = true;
 
-                    float crashPos;
-
-                    // Check if the player is outside the road
-                    if (currentMap->isOutSideRoad(v->getPosX(), v->getPosY())){
-                        if (r.soundEffects[53]->getStatus() != SoundSource::Playing) {
-                            // Engine sound
-                            r.soundEffects[53]->stop();
-                            r.soundEffects[53]->play();
-                        }
+                    switch(typeOfVehicle){
+                        case 0:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                            break;
+                        case 1:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                            break;
+                        case 2:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                            break;
+                        case 3:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
+                            break;
+                        case 4:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
+                            break;
+                        case 5:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player6.getPosX(), player6.getPosY(), distX, distY);
                     }
-                    // Check if the multi player car is crashing
-                    if (v->getIsCrashing() && v->getSoundCrash()){
-                        if (v->getTypeVehicle() != 0){
-                            r.soundEffects[17]->stop();
-                            r.soundEffects[18]->stop();
-                            r.soundEffects[19]->stop();
-                            r.soundEffects[17]->play();
-                            r.soundEffects[rand_generator_int(18, 19)]->play();
-                            if (r.soundEffects[52]->getStatus() != SoundSource::Playing) {
+
+                    if (visible) {
+
+                        float crashPos;
+
+                        // Check if the player is outside the road
+                        if (currentMap->isOutSideRoad(v->getPosX(), v->getPosY())){
+                            if (r.soundEffects[53]->getStatus() != SoundSource::Playing) {
                                 // Engine sound
-                                r.soundEffects[52]->stop();
-                                r.soundEffects[52]->play();
+                                r.soundEffects[53]->stop();
+                                r.soundEffects[53]->play();
                             }
                         }
-                        else {
-                            r.soundEffects[32]->stop();
-                            r.soundEffects[18]->stop();
-                            r.soundEffects[19]->stop();
-                            r.soundEffects[32]->play();
-                            r.soundEffects[rand_generator_int(18, 19)]->play();
+                        // Check if the multi player car is crashing
+                        if (v->getIsCrashing() && v->getSoundCrash()){
+                            if (v->getTypeVehicle() != 0){
+                                r.soundEffects[17]->stop();
+                                r.soundEffects[18]->stop();
+                                r.soundEffects[19]->stop();
+                                r.soundEffects[17]->play();
+                                r.soundEffects[rand_generator_int(18, 19)]->play();
+                                if (r.soundEffects[52]->getStatus() != SoundSource::Playing) {
+                                    // Engine sound
+                                    r.soundEffects[52]->stop();
+                                    r.soundEffects[52]->play();
+                                }
+                            }
+                            else {
+                                r.soundEffects[32]->stop();
+                                r.soundEffects[18]->stop();
+                                r.soundEffects[19]->stop();
+                                r.soundEffects[32]->play();
+                                r.soundEffects[rand_generator_int(18, 19)]->play();
+                            }
+                            v->setPosition(v->getPosY(), crashPos);
+                            v->setSoundCrash();
                         }
-                        v->setPosition(v->getPosY(), crashPos);
-                        v->setSoundCrash();
-                    }
 
-                    if (distY <= 30.f && distX <= 1.2f) {
-                        // Thread with sound of the woman
-                        elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
-                        if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
-                            // makeCarTrafficSound
-                            r.soundEffects[82]->stop();
-                            r.soundEffects[83]->stop();
-                            r.soundEffects[84]->stop();
-                            r.soundEffects[rand_generator_int(82, 84)]->play();
-                            trafficCarSound.restart();
+                        if (distY <= 30.f && distX <= 1.2f) {
+                            // Thread with sound of the woman
+                            elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                            if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                                // makeCarTrafficSound
+                                r.soundEffects[82]->stop();
+                                r.soundEffects[83]->stop();
+                                r.soundEffects[84]->stop();
+                                r.soundEffects[rand_generator_int(82, 84)]->play();
+                                trafficCarSound.restart();
+                            }
                         }
                     }
                 }
             }
-            mtx3.unlock();
         }
     }
 }
+
 
 
 
@@ -8781,7 +8890,8 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
     }
 
     if (!finalGame && !arrival) {
-        // Update and prepare cars to draw
+
+        // Update and prepare cars to
         if (lastY <= currentMap->getCameraPosY() + float(c.renderLen)){
             lastY = currentMap->getCameraPosY() + float(c.renderLen);
         }
@@ -9002,7 +9112,8 @@ void Game::updateGamePolePositionStatus(Configuration &c, SoundPlayer& r, Vehicl
         mtx3.unlock();
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, false);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, false, currentStage);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -9296,8 +9407,13 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
 
     // World tour and pole position modes
     if (currentMap->isOutSideLandScape()) {
-        // Update player and vehicle positions
 
+                // The landscape has been completed
+        mtx3.lock();
+        currentStage++;
+        mtx3.unlock();
+
+        // Update player and vehicle positions
         switch(typeOfVehicle){
             case 0:
                 player.setPosition(player.getPosX() + currentMap->getOffsetX(), player.getPosY() - currentMap->getMaxY());
@@ -9317,9 +9433,6 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
             case 5:
                 player6.setPosition(player6.getPosX() + currentMap->getOffsetX(), player6.getPosY() - currentMap->getMaxY());
         }
-
-        for (MultiplayerCar &v : multiplayerCars)
-            v.setPosition(v.getPosX(), v.getPosY() - currentMap->getMaxY());
 
         // Update to the map
         if (level < 0){
@@ -9448,6 +9561,7 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
 
         mtx3.lock();
         vector<MultiplayerCar*> sortedMultiplayerCars;
+        int codeLandscape = currentStage;
         if (onMultiplayer){
             rankingVehicles.clear();
             int j = 1;
@@ -9499,7 +9613,8 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
         mtx3.unlock();
 
         // Draw the landscape
-        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator, false, onMultiplayer);
+        currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars, displayGoalCarIndicator,
+                                  false, onMultiplayer, codeLandscape);
 
         float crashPos;
 
@@ -9507,143 +9622,146 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
 
         for (MultiplayerCar* v : sortedMultiplayerCars){
 
-            switch(typeOfVehicle){
-                case 0:
+            if (v->getIndexLandScape() == currentLandScape){
 
-                    vehicleCrash = v->hasCrashed(player.getPosY(), player.getPreviousY(),
-                                                player.getMinScreenX(), player.getMaxScreenX(), crashPos);
+                switch(typeOfVehicle){
+                    case 0:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player.getPreviousX() > v->getPreviousX()){
-                            player.setPosition(player.getPosX() + 0.3f, player.getPosY() - 10.f);
-                        }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player.setPosition(player.getPosX() - 0.3f, player.getPosY() - 10.f);
-                        }
-                        else {
-                            player.setPosition(player.getPosX(), player.getPosY() - 20.f);
-                        }
+                        vehicleCrash = v->hasCrashed(player.getPosY(), player.getPreviousY(),
+                                                    player.getMinScreenX(), player.getMaxScreenX(), crashPos);
 
-                        // Voice sound
-                        r.soundEffects[69]->stop();
-                        r.soundEffects[70]->stop();
-                        r.soundEffects[71]->stop();
-                        r.soundEffects[72]->stop();
-                        r.soundEffects[73]->stop();
-                        r.soundEffects[74]->stop();
-                        r.soundEffects[75]->stop();
-                        r.soundEffects[rand_generator_int(69, 75)]->play();
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player.getPreviousX() > v->getPreviousX()){
+                                player.setPosition(player.getPosX() + 0.3f, player.getPosY() - 10.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player.setPosition(player.getPosX() - 0.3f, player.getPosY() - 10.f);
+                            }
+                            else {
+                                player.setPosition(player.getPosX(), player.getPosY() - 20.f);
+                            }
 
-                        // Collision sound
-                        r.soundEffects[76]->stop();
-                        r.soundEffects[77]->stop();
-                        r.soundEffects[78]->stop();
-                        r.soundEffects[79]->stop();
-                        r.soundEffects[80]->stop();
-                        r.soundEffects[81]->stop();
-                        r.soundEffects[rand_generator_int(76, 81)]->play();
-                    }
-                    break;
-                case 1:
+                            // Voice sound
+                            r.soundEffects[69]->stop();
+                            r.soundEffects[70]->stop();
+                            r.soundEffects[71]->stop();
+                            r.soundEffects[72]->stop();
+                            r.soundEffects[73]->stop();
+                            r.soundEffects[74]->stop();
+                            r.soundEffects[75]->stop();
+                            r.soundEffects[rand_generator_int(69, 75)]->play();
 
-                    vehicleCrash = v->hasCrashed(player2.getPosY(), player2.getPreviousY(),
-                                                player2.getMinScreenX(), player2.getMaxScreenX(), crashPos);
+                            // Collision sound
+                            r.soundEffects[76]->stop();
+                            r.soundEffects[77]->stop();
+                            r.soundEffects[78]->stop();
+                            r.soundEffects[79]->stop();
+                            r.soundEffects[80]->stop();
+                            r.soundEffects[81]->stop();
+                            r.soundEffects[rand_generator_int(76, 81)]->play();
+                        }
+                        break;
+                    case 1:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player2.getPreviousX() > v->getPreviousX()){
-                            player2.setPosition(player2.getPosX() + 0.3f, player2.getPosY() - 20.f);
-                        }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player2.setPosition(player2.getPosX() - 0.3f, player2.getPosY() - 20.f);
-                        }
-                        else {
-                            player2.setPosition(player2.getPosX(), player2.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 2:
+                        vehicleCrash = v->hasCrashed(player2.getPosY(), player2.getPreviousY(),
+                                                    player2.getMinScreenX(), player2.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player3.getPosY(), player3.getPreviousY(),
-                                                player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player2.getPreviousX() > v->getPreviousX()){
+                                player2.setPosition(player2.getPosX() + 0.3f, player2.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player2.setPosition(player2.getPosX() - 0.3f, player2.getPosY() - 20.f);
+                            }
+                            else {
+                                player2.setPosition(player2.getPosX(), player2.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 2:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player3.getPreviousX() >= v->getPreviousX()){
-                            player3.setPosition(player3.getPosX() + 0.3f, player3.getPosY() - 20.f);
-                        }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player3.setPosition(player3.getPosX() - 0.3f, player3.getPosY() - 20.f);
-                        }
-                        else {
-                            player3.setPosition(player3.getPosX(), player3.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 3:
+                        vehicleCrash = v->hasCrashed(player3.getPosY(), player3.getPreviousY(),
+                                                    player3.getMinScreenX(), player3.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player4.getPosY(), player4.getPreviousY(),
-                                                player4.getMinScreenX(), player4.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player3.getPreviousX() >= v->getPreviousX()){
+                                player3.setPosition(player3.getPosX() + 0.3f, player3.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player3.setPosition(player3.getPosX() - 0.3f, player3.getPosY() - 20.f);
+                            }
+                            else {
+                                player3.setPosition(player3.getPosX(), player3.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 3:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player4.getPreviousX() > v->getPreviousX()){
-                            player4.setPosition(player4.getPosX() + 0.3f, player4.getPosY() - 20.f);
-                        }
-                        else if (player4.getPreviousX() < v->getPreviousX()){
-                            player4.setPosition(player4.getPosX() - 0.3f, player4.getPosY() - 20.f);
-                        }
-                        else {
-                            player4.setPosition(player4.getPosX(), player4.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 4:
+                        vehicleCrash = v->hasCrashed(player4.getPosY(), player4.getPreviousY(),
+                                                    player4.getMinScreenX(), player4.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player5.getPosY(), player5.getPreviousY(),
-                                                player5.getMinScreenX(), player5.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player4.getPreviousX() > v->getPreviousX()){
+                                player4.setPosition(player4.getPosX() + 0.3f, player4.getPosY() - 20.f);
+                            }
+                            else if (player4.getPreviousX() < v->getPreviousX()){
+                                player4.setPosition(player4.getPosX() - 0.3f, player4.getPosY() - 20.f);
+                            }
+                            else {
+                                player4.setPosition(player4.getPosX(), player4.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 4:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player5.getPreviousX() > v->getPreviousX()){
-                            player5.setPosition(player5.getPosX() + 0.3f, player5.getPosY() - 20.f);
-                        }
-                        else if (player5.getPreviousX() < v->getPreviousX()){
-                            player5.setPosition(player5.getPosX() - 0.3f, player5.getPosY() - 20.f);
-                        }
-                        else {
-                            player5.setPosition(player5.getPosX(), player5.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
-                    break;
-                case 5:
+                        vehicleCrash = v->hasCrashed(player5.getPosY(), player5.getPreviousY(),
+                                                    player5.getMinScreenX(), player5.getMaxScreenX(), crashPos);
 
-                    vehicleCrash = v->hasCrashed(player6.getPosY(), player6.getPreviousY(),
-                                                player6.getMinScreenX(), player6.getMaxScreenX(), crashPos);
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player5.getPreviousX() > v->getPreviousX()){
+                                player5.setPosition(player5.getPosX() + 0.3f, player5.getPosY() - 20.f);
+                            }
+                            else if (player5.getPreviousX() < v->getPreviousX()){
+                                player5.setPosition(player5.getPosX() - 0.3f, player5.getPosY() - 20.f);
+                            }
+                            else {
+                                player5.setPosition(player5.getPosX(), player5.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
+                        }
+                        break;
+                    case 5:
 
-                    // Check it has been crash between player and rival
-                    if (vehicleCrash){
-                        if (player6.getPreviousX() > v->getPreviousX()){
-                            player6.setPosition(player6.getPosX() + 0.3f, player6.getPosY() - 20.f);
+                        vehicleCrash = v->hasCrashed(player6.getPosY(), player6.getPreviousY(),
+                                                    player6.getMinScreenX(), player6.getMaxScreenX(), crashPos);
+
+                        // Check it has been crash between player and rival
+                        if (vehicleCrash){
+                            if (player6.getPreviousX() > v->getPreviousX()){
+                                player6.setPosition(player6.getPosX() + 0.3f, player6.getPosY() - 20.f);
+                            }
+                            else if (player.getPreviousX() < v->getPreviousX()){
+                                player6.setPosition(player6.getPosX() - 0.3f, player6.getPosY() - 20.f);
+                            }
+                            else {
+                                player6.setPosition(player6.getPosX(), player6.getPosY() - 20.f);
+                            }
+                            r.soundEffects[87]->stop();
+                            r.soundEffects[87]->play();
                         }
-                        else if (player.getPreviousX() < v->getPreviousX()){
-                            player6.setPosition(player6.getPosX() - 0.3f, player6.getPosY() - 20.f);
-                        }
-                        else {
-                            player6.setPosition(player6.getPosX(), player6.getPosY() - 20.f);
-                        }
-                        r.soundEffects[87]->stop();
-                        r.soundEffects[87]->play();
-                    }
+                }
             }
         }
 
@@ -9876,67 +9994,71 @@ void Game::updateGamePolePositionStatusMultiplayer(Configuration &c, SoundPlayer
         if (!finalGame && !arrival){
             // Check if enemies are displayed on the screen
             for (MultiplayerCar *v : sortedMultiplayerCars) {
-                float distX, distY;
 
-                bool visible = true;
+                if (v->getIndexLandScape() == currentLandScape){
 
-                switch(typeOfVehicle){
-                    case 0:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
-                        break;
-                    case 1:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
-                        break;
-                    case 2:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
-                        break;
-                    case 3:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
-                        break;
-                    case 4:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
-                        break;
-                    case 5:
-                        visible = v->isVisible(c, currentMap->getCameraPosY(), player6.getPosX(), player6.getPosY(), distX, distY);
-                }
+                    float distX, distY;
 
-                if (visible) {
+                    bool visible = true;
 
-                    bool crash = currentMap->hasCrashed(c, v->getPreviousY(), v->getPosY(), v->getPosX(),
-                                                        v->getMinScreenX(), v->getMaxScreenX(), crashPos, typeOfGame);
-
-                    if (crash){
-                        if (v->getTypeVehicle() != 0){
-                            r.soundEffects[17]->stop();
-                            r.soundEffects[18]->stop();
-                            r.soundEffects[19]->stop();
-                            r.soundEffects[17]->play();
-                            r.soundEffects[rand_generator_int(18, 19)]->play();
-                            if (r.soundEffects[52]->getStatus() != SoundSource::Playing) {
-                                // Engine sound
-                                r.soundEffects[52]->stop();
-                                r.soundEffects[52]->play();
-                            }
-                        }
-                        else {
-                            r.soundEffects[32]->stop();
-                            r.soundEffects[18]->stop();
-                            r.soundEffects[19]->stop();
-                            r.soundEffects[32]->play();
-                            r.soundEffects[rand_generator_int(18, 19)]->play();
-                        }
+                    switch(typeOfVehicle){
+                        case 0:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player.getPosX(), player.getPosY(), distX, distY);
+                            break;
+                        case 1:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player2.getPosX(), player2.getPosY(), distX, distY);
+                            break;
+                        case 2:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player3.getPosX(), player3.getPosY(), distX, distY);
+                            break;
+                        case 3:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player4.getPosX(), player4.getPosY(), distX, distY);
+                            break;
+                        case 4:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player5.getPosX(), player5.getPosY(), distX, distY);
+                            break;
+                        case 5:
+                            visible = v->isVisible(c, currentMap->getCameraPosY(), player6.getPosX(), player6.getPosY(), distX, distY);
                     }
 
-                    if (distY <= 30.f && distX <= 1.2f) {
-                        // Thread with sound of the woman
-                        elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
-                        if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
-                            // makeCarTrafficSound
-                            r.soundEffects[82]->stop();
-                            r.soundEffects[83]->stop();
-                            r.soundEffects[84]->stop();
-                            r.soundEffects[rand_generator_int(82, 84)]->play();
-                            trafficCarSound.restart();
+                    if (visible) {
+
+                        bool crash = currentMap->hasCrashed(c, v->getPreviousY(), v->getPosY(), v->getPosX(),
+                                                            v->getMinScreenX(), v->getMaxScreenX(), crashPos, typeOfGame);
+
+                        if (crash){
+                            if (v->getTypeVehicle() != 0){
+                                r.soundEffects[17]->stop();
+                                r.soundEffects[18]->stop();
+                                r.soundEffects[19]->stop();
+                                r.soundEffects[17]->play();
+                                r.soundEffects[rand_generator_int(18, 19)]->play();
+                                if (r.soundEffects[52]->getStatus() != SoundSource::Playing) {
+                                    // Engine sound
+                                    r.soundEffects[52]->stop();
+                                    r.soundEffects[52]->play();
+                                }
+                            }
+                            else {
+                                r.soundEffects[32]->stop();
+                                r.soundEffects[18]->stop();
+                                r.soundEffects[19]->stop();
+                                r.soundEffects[32]->play();
+                                r.soundEffects[rand_generator_int(18, 19)]->play();
+                            }
+                        }
+
+                        if (distY <= 30.f && distX <= 1.2f) {
+                            // Thread with sound of the woman
+                            elapsed8 = trafficCarSound.getElapsedTime().asSeconds();
+                            if (elapsed8 - elapsed7 >= traffic_delay.asSeconds()) {
+                                // makeCarTrafficSound
+                                r.soundEffects[82]->stop();
+                                r.soundEffects[83]->stop();
+                                r.soundEffects[84]->stop();
+                                r.soundEffects[rand_generator_int(82, 84)]->play();
+                                trafficCarSound.restart();
+                            }
                         }
                     }
                 }
@@ -10339,7 +10461,7 @@ void Game::updateGameOutRunDerramageStatus(Configuration &c, SoundPlayer& r, Veh
 
         // Draw the landscape
         currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                  displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
+                                  displayGoalCarIndicator, (currentLandScape >= goalCarStage), false, currentStage);
 
         // Player update and draw
         action = Vehicle::CRASH;
@@ -11159,7 +11281,7 @@ void Game::updateGameDrivingFuryStatus(Configuration &c, SoundPlayer& r, Vehicle
 
         // Draw the landscape
         currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                  displayGoalCarIndicator, currentLandScape >= goalCarStage, false);
+                                  displayGoalCarIndicator, currentLandScape >= goalCarStage, false, currentStage);
 
 
         // Player update and draw
@@ -11842,12 +11964,12 @@ State Game::pause(Configuration &c, SoundPlayer& r,const Vehicle::Action &a, con
     if (typeOfGame < 3 || typeOfGame > 4){
         // Draw the landscape
         currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                      displayGoalCarIndicator, false, false);
+                                      displayGoalCarIndicator, false, false, currentStage);
     }
     else {
         // Draw the landscape
         currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                  displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
+                                  displayGoalCarIndicator, (currentLandScape >= goalCarStage), false, currentStage);
     }
 
     switch(typeOfVehicle){
@@ -17841,7 +17963,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw the landscape
             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
+                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false, currentStage);
 
             switch(typeOfVehicle){
                 case 0:
@@ -18044,7 +18166,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw the landscape
             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
+                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false, currentStage);
 
             switch(typeOfVehicle){
                 case 0:
@@ -18168,7 +18290,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw the landscape
             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
+                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false, currentStage);
 
             switch(typeOfVehicle){
                 case 0:
@@ -18310,7 +18432,7 @@ void Game::showsDerramageDrivingFuryAnimation(Configuration& c, SoundPlayer& r){
 
             // Draw the landscape
             currentMap->drawLandScape(c, cars, rivals, typeOfGame, goalCar, sortedMultiplayerCars,
-                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false);
+                                      displayGoalCarIndicator, (currentLandScape >= goalCarStage), false, currentStage);
 
             switch(typeOfVehicle){
                 case 0:

@@ -100,6 +100,9 @@ using namespace sf;
     // Control the crash sound of the multi player car
     bool soundCrash;
 
+    // Index of the current landscape of the vehicle car
+    int indexLandscape;
+
 
 public:
 
@@ -157,6 +160,14 @@ public:
      * @param codeImage is the code of the sprite to be drawn in the screen of the game
      */
     void setCurrentCodeImage(float codeImage);
+
+
+
+    /**
+     * Establish the index of the landscape where is now the player
+     * @param codeLandscape is the index of the landscape where is now the player
+     */
+    void setIndexLandScape(int codeLandscape);
 
 
 
@@ -283,6 +294,14 @@ public:
      * Returns the code of the player in the group
      */
     int getCodePlayer() const;
+
+
+
+    /**
+     * Get the index of the landscape where is now the player
+     * @param codeLandscape is the index of the landscape where is now the player
+     */
+    int getIndexLandScape() const;
 
 
 
