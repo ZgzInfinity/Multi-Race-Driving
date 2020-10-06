@@ -119,6 +119,12 @@ Code is released under the GNU General Public License v3.0.
 
 &nbsp;
 
-## 6. Documentation
+## 6. 
+
+This is the first version of the videogame. The designer has tested it as best as he could but he he is absolutely aware that some fault may have due to its
+complexity, complexity, especially in multiplayer mode. The fact that the project is open source is the real way for the community to solve all the possible 
+problems together, feel free to open an issue or do a pull request. See the open issues for a list of known issues (and proposed features).
+
+## 7. Documentation
 
 Please, go to the [Wiki](https://github.com/ZgzInfinity/Multi-Race-Driving/wiki/World-Tour) in order to be able to see the more details about what _**Multi Race Driving**_ can offer to you.
