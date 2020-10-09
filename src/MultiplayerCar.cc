@@ -64,6 +64,10 @@ MultiplayerCar::MultiplayerCar(const int idPlayer, const string name, const int 
     isCrashing = false;
     soundCrash = true;
     indexLandscape = 1;
+    previousX = posX;
+    previousY = posY;
+    minScreenX = 0;
+    maxScreenX = 0;
 
     // Load the textures of the vehicle selected
     // Reserves memory to store all the textures of the vehicle
@@ -378,7 +382,8 @@ bool MultiplayerCar::hasCrashed(float prevY, float currentY, float minX, float m
         ((minX >= minScreenX && minX <= maxScreenX) ||
          (maxX >= minScreenX && maxX <= maxScreenX) ||
          (minScreenX >= minX && minScreenX <= maxX) ||
-         (maxScreenX >= minX && maxScreenX <= maxX))) { // x matches
+         (maxScreenX >= minX && maxScreenX <= maxX)))
+    { // x matches
         // There is a crash between both cars
         crashPos = posY;
         return true;

@@ -674,6 +674,8 @@ void drawQuad(RenderTexture &w, Color c, int x1, int y1, int w1, int x2, int y2,
 
 /**
  * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * @param v1 is a traffic car
+ * @param v2 is another traffic car
  * Otherwise returns false
  */
 bool ascendingSortTrafficCars(const TrafficCar *v1, const TrafficCar *v2);
@@ -682,6 +684,8 @@ bool ascendingSortTrafficCars(const TrafficCar *v1, const TrafficCar *v2);
 
 /**
  * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * @param v1 is a rival car
+ * @param v2 is another rival car
  * Otherwise returns false
  */
 bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2);
@@ -690,14 +694,18 @@ bool ascendingSortRivalCars(const RivalCar *v1, const RivalCar *v2);
 
 /**
  * Returns true is the traffic car v1 is lower than the traffic car v2.
+ * @param v1 is a multi player rival car
+ * @param v2 is another rival car
  * Otherwise returns false
  */
 bool ascendingSortMultiplayerCars(const MultiplayerCar *v1, const MultiplayerCar *v2);
 
 
 
-/*
- * Returns true is the traffic car v1 is lower than the traffic car v2.
+/**
+ * Returns true is the position p1 in axis y is higher or equal to the position p2 in axis y
+ * @param p1 is a concrete position in the axis y
+ * @param p2 is a concrete position in the axis y
  * Otherwise returns false
  */
 bool ascendingRanking(const float p1, const float p2);
