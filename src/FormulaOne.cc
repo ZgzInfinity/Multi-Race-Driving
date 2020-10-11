@@ -125,16 +125,6 @@ void FormulaOne::hitControl(const bool vehicleCrash) {
     speed = sqrt(acceleration);
     mainMutex.unlock();
 
-    // Check if the crash is with another car
-    if (vehicleCrash){
-        if (posX > 0.f){
-            posX -= 0.03f;
-        }
-        else if (posX < 0.f){
-            posX += 0.03f;
-        }
-        posY -= 20.f;
-    }
     // Control the end of the crash animation of the formula one
     if (current_code_image == 53){
         acceleration = minCrashAcc;

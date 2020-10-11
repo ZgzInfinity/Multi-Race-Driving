@@ -6861,33 +6861,23 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
 
     // Reproduce the cars running
     if ((typeOfGame == 0 || typeOfGame == 2) && numberRacers > 0){
-        switch(typeOfVehicle){
+        switch(rivalTypeMode){
             case 0:
-                r.soundEffects[30]->stop();
-                r.soundEffects[30]->play();
-                break;
+                    if (typeOfGame == 0){
+                        r.soundEffects[30]->stop();
+                        r.soundEffects[30]->play();
+                    }
+                    else {
+                        r.soundEffects[122]->stop();
+                        r.soundEffects[122]->play();
+                    }
+                    break;
             case 1:
-                r.soundEffects[28]->stop();
-                r.soundEffects[88]->stop();
-                r.soundEffects[88]->play();
-                break;
-            case 2:
-                r.soundEffects[28]->stop();
-                r.soundEffects[89]->stop();
-                r.soundEffects[89]->play();
-                break;
-            case 3:
-                r.soundEffects[28]->stop();
-                r.soundEffects[90]->stop();
-                r.soundEffects[90]->play();
-                break;
-            case 4:
-                r.soundEffects[28]->stop();
-                r.soundEffects[122]->stop();
-                r.soundEffects[122]->play();
-                break;
-            case 5:
-                switch(kindVehicle){
+                   switch(typeOfVehicle){
+                    case 0:
+                        r.soundEffects[30]->stop();
+                        r.soundEffects[30]->play();
+                        break;
                     case 1:
                         r.soundEffects[28]->stop();
                         r.soundEffects[88]->stop();
@@ -6907,12 +6897,38 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                         r.soundEffects[28]->stop();
                         r.soundEffects[122]->stop();
                         r.soundEffects[122]->play();
+                        break;
+                    case 5:
+                        switch(kindVehicle){
+                            case 1:
+                                r.soundEffects[28]->stop();
+                                r.soundEffects[88]->stop();
+                                r.soundEffects[88]->play();
+                                break;
+                            case 2:
+                                r.soundEffects[28]->stop();
+                                r.soundEffects[89]->stop();
+                                r.soundEffects[89]->play();
+                                break;
+                            case 3:
+                                r.soundEffects[28]->stop();
+                                r.soundEffects[90]->stop();
+                                r.soundEffects[90]->play();
+                                break;
+                            case 4:
+                                r.soundEffects[28]->stop();
+                                r.soundEffects[122]->stop();
+                                r.soundEffects[122]->play();
+                        }
                 }
-        }
+            case 2:
+                    r.soundEffects[89]->stop();
+                    r.soundEffects[89]->play();
+            }
+    }
 
-        for (RivalCar rival : rivals){
-            rival.setSmoking();
-        }
+    for (RivalCar rival : rivals){
+        rival.setSmoking();
     }
 
     // Reproduce police car sound
