@@ -79,17 +79,21 @@ To carry out the development of _**Multi Race Driving**_ the following software 
 
 ## 3. Outstanding features
 
-* Five racing games where the player can play in a solo adventure.
-* Multiplayer mode to play with up to four people, randomly or with friends.
-* Multiple cars available in different colours.
+This new the following features with respect to the original versions:
+
+* Multiple game modes for one player.
+* Multiplayer online mode.
+* Different types of vehicles available, customizabled and with many colors.
 * Realistic and spectacular graphics in 2.5D.
+* Realistic physics (speed, braking, collision, inertia).
+* Customizable menus (fonts, colors, images, texts).
 * Compatible with many screen resolutions.
+* Graphics available in HD and in pixel art. quality.
 * Fantastic soundtracks and SFX fully customizable.
 * Various difficulty levels.
 * Numerous types of artificial intelligence integrated.
 * Configuration of the controllers customizable.
-* Completely new maps available.
-* Fully customizable GUI.
+* Completely new scenarios available and customizable.
 
 &nbsp;
 
@@ -121,7 +125,7 @@ Code is released under the GNU General Public License v3.0.
 
 ## 6. Supporting the project
 
-This is the first version of the videogame. The designer has tested it as best as he could but he he is absolutely aware that some fault may have due to its
+This is the first version of the video game. The designer has tested it as best as he could but he he is absolutely aware that some fault may have due to its
 complexity, complexity, especially in multiplayer mode. The fact that the project is open source is the real way for the community to solve all the possible 
 problems together, feel free to open an issue or do a pull request. See the open issues for a list of known issues (and proposed features).
 
