@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MultiplayerMembersGroupMenu>
+	<Background>Data/Menus/MultiplayerMembersGroupMenu/Images/cover.png</Background>
+	<MenuPanel>
+		<Background>Data/Menus/MultiplayerMembersGroupMenu/Images/crono.png</Background>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</MenuPanel>
+	<Title>
+		<Content>MEMBERS OF</Content>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorText>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorText>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</Title>
+	<MemberIndicator>
+		<ColorText>
+			<R>0</R>
+			<G>255</G>
+			<B>0</B>
+		</ColorText>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</MemberIndicator>
+</MultiplayerMembersGroupMenu>

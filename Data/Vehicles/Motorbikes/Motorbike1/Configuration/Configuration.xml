@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Motorbike>
+	<Name>Suzuki GSX-RR</Name>
+	<MaxSpeed>300</MaxSpeed>
+	<Angle>0.049</Angle>
+	<Motor>Yamaha yzWR 250</Motor>
+</Motorbike>

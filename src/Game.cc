@@ -3494,7 +3494,7 @@ void Game::monitorizeRaceOwner(bool& canceledRace, string& playerFallen){
     bool finished = false;
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the work has not finished
     while (!finished){
@@ -3588,7 +3588,7 @@ void Game::monitorizeRaceGuest(bool& canceledRace, string& playerFallen){
     bool abortedRace = false;
 
      // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the work has not finished
     while (!finished && !abortedRace){
@@ -3677,7 +3677,7 @@ void Game::senderMultiplayerPositionOwner(bool& canceledRace, const int nRivals,
     mtx3.unlock();
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the race don`t finishes or is canceled
     while (!finishedRace && !abortedRace && !canceledGroup){
@@ -3909,7 +3909,7 @@ void Game::senderMultiplayerPositionGuest(bool& canceledRace, const int nRivals,
     mtx3.unlock();
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the race don`t finishes or is canceled
     while (!finishedRace && !abortedRace && !canceledGuest){
@@ -4138,7 +4138,7 @@ void Game::receiverMultiplayerPositionOwner(bool& canceledRace){
     mtx3.unlock();
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the race don`t finishes or is canceled
     while (!finishedRace && !abortedRace && !canceledGroup){
@@ -4244,7 +4244,7 @@ void Game::receiverMultiplayerPositionGuest(bool& canceledRace){
     mtx3.unlock();
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the race don`t finishes or is canceled
     while (!finishedRace && !abortedRace && !canceledGroup){
@@ -5485,7 +5485,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         firstRace = true;
 
         // Create a Linda driver compatible with Windows to make communicate with the Linda server
-        LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+        LD winLindadriver = LD(domain, port);
 
         if (modeMultiplayer == 0){
 
@@ -5603,7 +5603,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
 
     if (modeMultiplayer == 0){
         // Create a Linda driver compatible with Windows to make communicate with the Linda server
-        LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+        LD winLindadriver = LD(domain, port);
 
         // The race has not finished
         Tuple t = Tuple("RACE_ABORTED_OWNER", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
@@ -5752,7 +5752,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         string name = groupDataPlayers[0].getNickNamePlayer();
 
         // Create a Linda driver compatible with Windows to make communicate with the Linda server
-        LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+        LD winLindadriver = LD(domain, port);
 
         // Terminate the thread that control the send of the player positions
         Tuple t = Tuple("RACE_ABORTED_GUEST", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer);
@@ -5790,7 +5790,7 @@ State Game::playWorldTourPolePositionMultiplayer(Configuration &c, SoundPlayer& 
         if (cancelledRaceOwner){
 
             // Create a Linda driver compatible with Windows to make communicate with the Linda server
-            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+            LD winLindadriver = LD(domain, port);
 
             Tuple t = Tuple("NAME_GROUP", nickNameGroupMultiplayer);
             winLindadriver.removeNote(t);
@@ -6922,8 +6922,8 @@ State Game::showsInitialAnimation(Configuration &c, SoundPlayer& r) {
                         }
                 }
             case 2:
-                    r.soundEffects[89]->stop();
-                    r.soundEffects[89]->play();
+                r.soundEffects[89]->stop();
+                r.soundEffects[89]->play();
             }
     }
 
@@ -12637,7 +12637,7 @@ void Game::loadVehicleSelectionMenuConfiguration(const string path, Configuratio
 void Game::controlVehicleOwner(bool& cancelledGroup, vector<int>& vehiclesRead){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Control the group is not canceled
     bool canceled, stopped = false;;
@@ -12709,7 +12709,7 @@ void Game::controlVehicleOwner(bool& cancelledGroup, vector<int>& vehiclesRead){
 void Game::controlVehicleGuest(bool& cancelledVehicle, vector<int>& vehiclesRead){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Control the group is not canceled
     bool canceled, stopped = false;;
@@ -12783,7 +12783,7 @@ void Game::storeRivalPlayers1(int& numPlayers, bool& finishedRegister, bool& can
                         to_string(typeOfVehicle), to_string(colorCarSelected));
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
 
     mtx3.lock();
@@ -12879,7 +12879,7 @@ void Game::storeRivalPlayers2(int& numPlayers, bool& finishedRegister, bool& can
     Tuple t = Tuple("ARRIVED_GOAL", nickNameGroupMultiplayer, to_string(codePlayerInGroup), nickNameMultiplayer, to_string(posArrival));
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
 
     mtx3.lock();
@@ -14149,18 +14149,6 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
     r.soundEffects[40]->stop();
 
-    if (c.enablePixelArt) {
-        if (c.isDefaultScreen)
-            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
-                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
-        else
-            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
-                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
-        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
-                   static_cast<unsigned int>(c.window.getView().getSize().y));
-        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
-    }
-
     if (backSpacePressed){
 
         // Stop the soundtrack
@@ -14222,11 +14210,26 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                         c.window.draw(bufferSprite);
                         c.window.display();
                     }
+
+                    if (c.enablePixelArt) {
+                        if (c.isDefaultScreen){
+                            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                        }
+                        else {
+                            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                        }
+                        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                                   static_cast<unsigned int>(c.window.getView().getSize().y));
+                        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                    }
+
                     return MULTIPLAYER_NAME_GROUP;
                 }
 
                 // Create a Linda driver compatible with Windows to make communicate with the Linda server
-                LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+                LD winLindadriver = LD(domain, port);
 
                 mtx3.lock();
                 int numPlayers = groupDataPlayers.size();
@@ -14303,6 +14306,20 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     c.window.display();
                 }
 
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 // Control the end point
                 if (typeOfGameMultiplayer == 0){
                     return SELECTION_MODE_MULTIPLAYER;
@@ -14329,7 +14346,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     complainText.setOutlineColor(c.colorTitleBorderMultiplayerMenu);
                     complainText.setOutlineThickness(5.0f * c.screenScale);
                     complainText.setPosition(c.w.getSize().x / 2.f - complainText.getLocalBounds().width / 2.f,
-                                                 c.w.getSize().y / 2.f + 210.0f * c.screenScale);
+                                                 c.w.getSize().y / 2.f + 190.0f * c.screenScale);
 
                     for (int i = 0; i <= 80; i++){
 
@@ -14366,6 +14383,20 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                         c.window.display();
                     }
 
+                    if (c.enablePixelArt) {
+                        if (c.isDefaultScreen){
+                            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                        }
+                        else {
+                            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                        }
+                        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                                   static_cast<unsigned int>(c.window.getView().getSize().y));
+                        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                    }
+
                     // Control the end point
                     if (typeOfGameMultiplayer == 0){
                         return SELECTION_MODE_MULTIPLAYER;
@@ -14376,7 +14407,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                 }
 
                 // Create a Linda driver compatible with Windows to make communicate with the Linda server
-                LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+                LD winLindadriver = LD(domain, port);
 
                 // Get the owner nickname
                 string name = groupDataPlayers[0].getNickNamePlayer();
@@ -14440,6 +14471,20 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     c.window.display();
                 }
 
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 if (randomMultiplayerJoined){
                     return SELECT_MULTIPLAYER_JOIN;
                 }
@@ -14449,6 +14494,21 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             }
         }
         else {
+
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
+
             r.soundTracks[1]->play();
             if (typeOfGame == 2){
                 return CIRCUIT_SELECTION_MENU;
@@ -14649,6 +14709,21 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
                 r.soundTracks[16]->stop();
 
+
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 return MULTIPLAYER_NAME_GROUP;
             }
             else {
@@ -14656,7 +14731,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             }
 
             // Create the connection with the Linda server
-            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+            LD winLindadriver = LD(domain, port);
 
             if (modeMultiplayer == 0){
                 // Inform that the group is cancelled
@@ -14769,6 +14844,21 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
             // Load the configuration of the game mode selected
             loadWorldTourPolePositionConf(c);
 
+
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
+
             // Go to the loading screen
             return LOADING;
         }
@@ -14801,9 +14891,39 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                     case 5:
                         player6.setVehicle(typeOfGame, onMultiplayer, codePlayerInGroup, numberPlayersGroup);
                 }
+
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 return LOADING;
             }
             else {
+
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 return LOAD_GAME;
             }
         }
@@ -16983,7 +17103,7 @@ void Game::controlGuestPulses(bool& itemSelected, bool& cancelledGroup, bool& es
     }
 
     // Create the connection with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the circuit has been selected
     while (!pathSelected && !cancelled && !escaped){
@@ -17073,7 +17193,7 @@ void Game::sendGuestPulses(bool& itemSelected, bool& finishedGroup, bool &itemCa
     bool fail = false;
 
     // Create the connection with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Send first pulse
     Tuple t = Tuple("PULSE_SENDED", nickNameGroupMultiplayer, nickNameMultiplayer, to_string(codePlayerInGroup));
@@ -17722,7 +17842,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
         if (onMultiplayer){
 
             // Create the connection with the Linda server
-            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+            LD winLindadriver = LD(domain, port);
 
             // Iterate the members of the group
             for (int i = 2; i <= numberPlayersGroup; i++){
@@ -17798,11 +17918,55 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
             // Stop the soundtrack of the menu
             r.soundTracks[18]->stop();
 
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
+
             return LOADING;
         }
         else {
+
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
+
             return VEHICLE_SELECTION;
         }
+
+        if (c.enablePixelArt) {
+            if (c.isDefaultScreen){
+                c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                      Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+            }
+            else {
+                c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                      Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+            }
+            c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                       static_cast<unsigned int>(c.window.getView().getSize().y));
+            c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+        }
+
         return VEHICLE_SELECTION;
     }
     else if (backSpacePressed){
@@ -17810,7 +17974,7 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
         if (onMultiplayer){
 
             // Create a Linda driver compatible with Windows to make communicate with the Linda server
-            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+            LD winLindadriver = LD(domain, port);
 
             if (numberPlayersGroup > 1){
                 for (int i = 2; i <= numberPlayersGroup; i++){
@@ -17904,13 +18068,58 @@ State Game::selectionCircuitMenu(Configuration& c, SoundPlayer& r){
                     c.window.draw(bufferSprite);
                     c.window.display();
                 }
+
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 return MULTIPLAYER_NAME_GROUP;
             }
             else {
+
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 return SELECTION_MODE_MULTIPLAYER;
             }
         }
         else {
+
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
+
             return RIVAL_TYPE_MENU;
         }
     }
@@ -18772,7 +18981,7 @@ State Game::introduceNameMultiplayer(Configuration& c, SoundPlayer& r){
     c.window.display();
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // While start and backspace have not been pressed
     while (!startPressed && !escapePressed) {
@@ -19288,7 +19497,7 @@ State Game::introduceGroupMultiplayer(Configuration& c, SoundPlayer& r){
     c.window.display();
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // While start and backspace have not been pressed
     while (!startPressed && !escapePressed) {
@@ -20124,7 +20333,7 @@ State Game::selectJoiningMode(Configuration& c, SoundPlayer& r){
     else if (backSpacePressed) {
 
         // Create a Linda driver compatible with Windows to make communicate with the Linda server
-        LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+        LD winLindadriver = LD(domain, port);
 
         Tuple t = Tuple("NAME_PLAYER", nickNameMultiplayer);
         winLindadriver.removeNote(t);
@@ -20153,7 +20362,7 @@ void Game::capturerOfPlayers(bool& fullGroup){
     string namePlayer;
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Until the group is full or start key is not pressed
     while (!fullGroup){
@@ -20251,7 +20460,7 @@ void Game::capturerOfPlayers(bool& fullGroup){
 void Game::capturerOfGroups(bool& success, bool& fail, bool& partialSuccess){
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // Control if a player can join to the group that he wants
     bool canBeJoined;
@@ -20418,7 +20627,7 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
     int localPlayersGroup = 0;
 
     // Create a Linda driver compatible with Windows to make communicate with the Linda server
-    LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+    LD winLindadriver = LD(domain, port);
 
     // The xml configuration file of the player menu has been read
     c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
@@ -20705,6 +20914,22 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
                         c.window.draw(bufferSprite);
                         c.window.display();
                     }
+
+                    // Control the pixel art flag to construct the view of the screen
+                    if (c.enablePixelArt) {
+                        if (c.isDefaultScreen){
+                            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                        }
+                        else {
+                            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                        }
+                        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                                   static_cast<unsigned int>(c.window.getView().getSize().y));
+                        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                    }
+
                     return MULTIPLAYER_NAME_GROUP;
                 }
 
@@ -20925,6 +21150,21 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
             // Close connection with Linda server
             winLindadriver.stop();
 
+            // Control the pixel art flag to construct the view of the screen
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
+
             return MULTIPLAYER_NAME_GROUP;
         }
     }
@@ -21087,6 +21327,22 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
                         c.window.draw(bufferSprite);
                         c.window.display();
                     }
+
+                    // Control the pixel art flag to construct the view of the screen
+                    if (c.enablePixelArt) {
+                        if (c.isDefaultScreen){
+                            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                        }
+                        else {
+                            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                        }
+                        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                                   static_cast<unsigned int>(c.window.getView().getSize().y));
+                        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                    }
+
                     return MULTIPLAYER_NAME_GROUP;
                 }
 
@@ -21266,6 +21522,23 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
             // Check the reason of leaving the loop
             if (escapePressed){
                 capturerGroups.join();
+
+
+                // Control the pixel art flag to construct the view of the screen
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 return MULTIPLAYER_NAME_GROUP;
             }
         }
@@ -21522,10 +21795,41 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
             }
             // Check the reason of leaving the loop
             if (fail){
+                // Control the pixel art flag to construct the view of the screen
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 capturerGroups.join();
                 return SELECT_MULTIPLAYER_JOIN;
             }
             else if (escapePressed){
+
+                // Control the pixel art flag to construct the view of the screen
+                if (c.enablePixelArt) {
+                    if (c.isDefaultScreen){
+                        c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                              Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                    }
+                    else {
+                        c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                              Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                    }
+                    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                               static_cast<unsigned int>(c.window.getView().getSize().y));
+                    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+                }
+
                 return SELECT_MULTIPLAYER_JOIN;
             }
         }
@@ -21537,23 +21841,8 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
         capturerGroups.join();
     }
 
-    // Control the pixel art flag to construct the view of the screen
-    if (c.enablePixelArt) {
-        if (c.isDefaultScreen){
-            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
-                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
-        }
-        else {
-            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
-                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
-        }
-        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
-                   static_cast<unsigned int>(c.window.getView().getSize().y));
-        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
-    }
     // The group has been formed correctly
     onMultiplayer = true;
-
 
     if (modeMultiplayer != 0){
         Text complainText;
@@ -21620,6 +21909,22 @@ State Game::creationOfGroups(Configuration& c, SoundPlayer& r){
             c.window.display();
         }
     }
+
+    // Control the pixel art flag to construct the view of the screen
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen){
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        }
+        else {
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        }
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+    }
+
     return SELECTION_MODE_MULTIPLAYER;
 }
 
@@ -22206,23 +22511,10 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
             }
         }
 
-        // Control the pixel art flag to set the view of the screen
-        if (c.enablePixelArt) {
-            if (c.isDefaultScreen)
-                c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
-                                      Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
-            else
-                c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
-                                      Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
-            c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
-                       static_cast<unsigned int>(c.window.getView().getSize().y));
-            c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
-        }
-
         if (escapePressed){
 
             // Create a Linda driver compatible with Windows to make communicate with the Linda server
-            LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+            LD winLindadriver = LD(domain, port);
 
             if (numberPlayersGroup > 1){
                 for (int i = 2; i <= numberPlayersGroup; i++){
@@ -22320,13 +22612,26 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
                 c.window.display();
             }
 
-
+            // Control the pixel art flag to construct the view of the screen
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
 
             return MULTIPLAYER_NAME_GROUP;
         }
 
         // Create the connection with the Linda server
-        LD winLindadriver = LD("onlinda.zgzinfinity.tech", "11777");
+        LD winLindadriver = LD(domain, port);
 
         // Iterate the members of the group
         for (int i = 2; i <= numberPlayersGroup; i++){
@@ -22569,6 +22874,21 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
                 c.window.display();
             }
 
+            // Control the pixel art flag to construct the view of the screen
+            if (c.enablePixelArt) {
+                if (c.isDefaultScreen){
+                    c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                          Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+                }
+                else {
+                    c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                          Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+                }
+                c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                           static_cast<unsigned int>(c.window.getView().getSize().y));
+                c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
+            }
+
             if (randomMultiplayerJoined){
                 return SELECT_MULTIPLAYER_JOIN;
             }
@@ -22688,6 +23008,21 @@ State Game::selectionModeMultiplayer(Configuration& c, SoundPlayer& r){
             c.window.draw(bufferSprite);
             c.window.display();
         }
+    }
+
+    // Control the pixel art flag to construct the view of the screen
+    if (c.enablePixelArt) {
+        if (c.isDefaultScreen){
+            c.window.setView(View(Vector2f(DEFAULT_WIDTH / 4.0f, DEFAULT_HEIGHT / 4.0f),
+                                  Vector2f(DEFAULT_WIDTH / 2.0f, DEFAULT_HEIGHT / 2.0f)));
+        }
+        else {
+            c.window.setView(View(Vector2f(SCREEN_HD_WIDTH / 4.0f, SCREEN_HD_HEIGHT / 4.0f),
+                                  Vector2f(SCREEN_HD_WIDTH / 2.0f, SCREEN_HD_HEIGHT / 2.0f)));
+        }
+        c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+                   static_cast<unsigned int>(c.window.getView().getSize().y));
+        c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
     }
 
     if (typeOfGameMultiplayer == 0){
@@ -23206,7 +23541,9 @@ void Game::loadMultiplayerMemberGroupMenuConfiguration(const string path, Config
 void Game::testConnection(bool& testFinished, string& mininumLatency, string& mediumLatency, string& maxLantency){
     // Make connection test using ping command
     char pingCommandOutput[2048];
-    cmd("ping onlinda.zgzinfinity.tech", pingCommandOutput, 2048);
+    string ping = "ping " + domain;
+    char * dom = const_cast<char*>(ping.c_str());
+    cmd(dom, pingCommandOutput, 2048);
 
     // Index of the buffer character
     int i = 0;
@@ -23498,6 +23835,14 @@ void Game::loadMultiplayerMenuTestingNetworkConfiguration(const string path, Con
  * @param r is the sound player module of the game
  */
 State Game::makeConnectionServerTest(Configuration& c, SoundPlayer& r){
+
+     // Prepare the screen to display the main multi player menu
+    c.window.setView(View(Vector2f(c.window.getSize().x / 2.0f, c.window.getSize().y / 2.0f),
+                          Vector2f(c.window.getSize().x, c.window.getSize().y)));
+    c.w.create(static_cast<unsigned int>(c.window.getView().getSize().x),
+               static_cast<unsigned int>(c.window.getView().getSize().y));
+
+    c.screenScale = float(c.w.getSize().x) / float(DEFAULT_WIDTH);
 
     // Variables to store the latencies of the test
     string mininumLatency = "", mediumLatency = "", maxLantency = "";

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RivalTypeMenu>
+	<Background>Data/Menus/RivalTypeMenu/Images/cover.png</Background>
+	<MenuPanel>
+		<Background>Data/Menus/RivalTypeMenu/Images/crono.png</Background>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</MenuPanel>
+	<Title>
+		<Content>SELECT TYPE RIVAL MODE</Content>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorText>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorText>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</Title>	
+	<DescriptionPanel>
+		<ColorPanelInside>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorPanelInside>
+		<ColorPanelBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorPanelBorder>
+	</DescriptionPanel>
+	<MenuButtons>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorFont>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorFont>
+		<Buttons>
+			<B0>
+				<Content>Classic mode</Content>
+				<InitialState>1</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+				<Image>Data/Menus/PlayerMenu/Images/SinglePlayer.png</Image>
+				<Description>
+					<D1>The rival vehicles are of the same</D1>
+					<D2>type as the original video game</D2>
+					<D3>in which this game mode is inspired.</D3>
+				</Description>
+			</B0>
+			<B1>	
+				<Content>User Mode</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+				<Image>Data/Menus/PlayerMenu/Images/MultiPlayer.png</Image>
+				<Description>
+					<D1>Rival vehicles are of</D1>
+					<D2>the same type as the vehicle</D2>
+					<D3>selected by the user.</D3>
+				</Description>
+			</B1>
+			<B2>
+				<Content>Random mode</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+				<Image>Data/Menus/PlayerMenu/Images/Options.png</Image>
+				<Description>
+					<D1>Rival vehicles are</D1>
+					<D2>totally random.</D2>
+				</Description>
+			</B2>
+		</Buttons>
+	</MenuButtons>
+</RivalTypeMenu>

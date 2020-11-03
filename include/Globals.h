@@ -18,5 +18,7 @@ using namespace std;
 
 extern mutex mainMutex, multiplayerMutex;
 
+// Variables to control the connection to the Linda server
+extern string domain, port;
 
 #endif

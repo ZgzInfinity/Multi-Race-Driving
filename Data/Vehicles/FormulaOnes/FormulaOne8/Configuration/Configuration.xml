@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FormulaOne>
+	<Name>Covintry Max</Name>
+	<MaxSpeed>300</MaxSpeed>
+	<Angle>0.049</Angle>
+	<Motor>BMW M12-TT</Motor>
+</FormulaOne>

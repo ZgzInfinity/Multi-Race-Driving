@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PlayerMenu>
+	<Background>Data/Menus/PlayerMenu/Images/cover.png</Background>
+	<MenuPanel>
+		<Background>Data/Menus/PlayerMenu/Images/crono.png</Background>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</MenuPanel>
+	<Title>
+		<Content>SELECT PLAYER MODE</Content>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorText>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorText>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</Title>	
+	<DescriptionPanel>
+		<ColorPanelInside>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorPanelInside>
+		<ColorPanelBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorPanelBorder>
+	</DescriptionPanel>
+	<MenuButtons>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorFont>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorFont>
+		<Buttons>
+			<B0>
+				<Content>Single Player</Content>
+				<InitialState>1</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+				<Image>Data/Menus/PlayerMenu/Images/SinglePlayer.png</Image>
+				<Description>
+					<D1>Enjoy several amazing</D1>
+					<D2>game modes in a solo</D2>
+					<D3>adventure.</D3>
+				</Description>
+			</B0>
+			<B1>	
+				<Content>Multi Player</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+				<Image>Data/Menus/PlayerMenu/Images/MultiPlayer.png</Image>
+				<Description>
+					<D1>Enjoy fantastic races</D1>
+					<D2>competing with up to eight</D2>
+					<D3>players.</D3>
+				</Description>
+			</B1>
+			<B2>
+				<Content>Options</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+				<Image>Data/Menus/PlayerMenu/Images/Options.png</Image>
+				<Description>
+					<D1>Configure the game</D1>
+					<D2>completely like</D2>
+					<D3>you want.</D3>
+				</Description>
+			</B2>
+		</Buttons>
+	</MenuButtons>
+</PlayerMenu>

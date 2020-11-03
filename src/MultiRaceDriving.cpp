@@ -46,6 +46,9 @@ using namespace std;
 mutex mainMutex, multiplayerMutex;
 
 
+// Change these variables to control your connection to your personal server
+string port = "??????";
+string domain = "??????";
 
 
 void loadGameConfiguration (const string path, Difficult& difficulty, int& volumeSoundtracks,
