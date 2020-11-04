@@ -3,7 +3,7 @@
 	<Difficulty>Normal</Difficulty>
 	<Volume_Soundtracks>100</Volume_Soundtracks>
 	<Volume_Effects>100</Volume_Effects>
-	<PixelArt>Disabled</PixelArt>
+	<PixelArt>Enabled</PixelArt>
 	<Full_screen>Disabled</Full_screen>
 	<Resolution_x>921</Resolution_x>
 	<Resolution_y>691</Resolution_y>
@@ -13,4 +13,5 @@
 	<Controller_brake>LALT</Controller_brake>
 	<Controller_soundtrack>Z</Controller_soundtrack>
 </Settings>
+
 
