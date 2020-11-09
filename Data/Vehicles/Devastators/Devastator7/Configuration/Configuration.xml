@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Devastator>
+	<Name>Devastator IX</Name>
+	<MaxSpeed>280</MaxSpeed>
+	<Angle>0.048</Angle>
+	<Motor>Kia Stinguer V6</Motor>
+</Devastator>

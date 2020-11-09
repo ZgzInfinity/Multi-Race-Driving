@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MultiPlayerMenu>
+	<Background>Data/Menus/MultiplayerMenu/Images/cover.png</Background>
+	<MenuPanel>
+		<Background>Data/Menus/MultiplayerMenu/Images/crono.png</Background>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</MenuPanel>
+	<Title>
+		<Content>MULTIPLAYER MODE</Content>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorText>
+			<R>255</R>
+			<G>255</G>
+			<B>255</B>
+		</ColorText>
+		<ColorBorder>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorBorder>
+	</Title>	
+	<MenuButtons>
+		<Font>Data/Fonts/Hetikademo.otf</Font>
+		<ColorFont>
+			<R>0</R>
+			<G>0</G>
+			<B>0</B>
+		</ColorFont>
+		<Buttons>
+			<B0>
+				<Content>Create group</Content>
+				<InitialState>1</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+			</B0>
+			<B1>	
+				<Content>Join group</Content>
+				<InitialState>0</InitialState>
+				<Colors>
+					<C1>
+						<R>249</R>
+						<G>54</G>
+						<B>46</B>
+					</C1>
+					<C2>
+						<R>255</R>
+						<G>255</G>
+						<B>255</B>
+					</C2>
+				</Colors>
+			</B1>
+		</Buttons>
+	</MenuButtons>
+</MultiPlayerMenu>

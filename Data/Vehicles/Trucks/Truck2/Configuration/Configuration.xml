@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Truck>
+	<Name>Scania XLION</Name>
+	<MaxSpeed>260</MaxSpeed>
+	<Angle>0.046</Angle>
+	<Motor>DAF 95XF 430</Motor>
+</Truck>

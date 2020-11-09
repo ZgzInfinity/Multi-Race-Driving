@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FormulaOne>
+	<Name>Jules Honday</Name>
+	<MaxSpeed>300</MaxSpeed>
+	<Angle>0.049</Angle>
+	<Motor>Mercedes-AMG F1</Motor>
+</FormulaOne>

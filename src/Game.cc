@@ -13224,7 +13224,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
 
     Text angle;
     string value = to_string(angleVehicles[0][0]);
-    angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+    angle.setString(value.substr(0, value.find(".") + 4));
     angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                       c.w.getSize().y / 2.f - 5.0f * c.screenScale);
     angle.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
@@ -13409,7 +13409,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13443,7 +13443,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13477,7 +13477,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13510,7 +13510,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13543,7 +13543,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13588,7 +13588,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13622,7 +13622,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13656,7 +13656,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13690,7 +13690,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13723,7 +13723,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13770,7 +13770,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13802,7 +13802,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13834,7 +13834,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13866,7 +13866,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13897,7 +13897,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13941,7 +13941,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -13973,7 +13973,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -14005,7 +14005,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -14036,7 +14036,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 
@@ -14067,7 +14067,7 @@ State Game::selectionVehicleMenu(Configuration& c, SoundPlayer& r){
                                               c.w.getSize().y / 2.f - 75.0f * c.screenScale);
 
                             value = to_string(angleVehicles[optionSelected][colorSelected]);
-                            angle.setString(value.substr(0, value.find(".") + 4) + " RAD/S");
+                            angle.setString(value.substr(0, value.find(".") + 4));
                             angle.setPosition(c.w.getSize().x / 2.f - 385.0f * c.screenScale + angleTurnText.getLocalBounds().width + 5.f,
                                               c.w.getSize().y / 2.f - 5.0f * c.screenScale);
 

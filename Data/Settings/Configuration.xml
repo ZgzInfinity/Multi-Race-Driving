@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Settings>
+	<Difficulty>Normal</Difficulty>
+	<Volume_Soundtracks>100</Volume_Soundtracks>
+	<Volume_Effects>100</Volume_Effects>
+	<PixelArt>Enabled</PixelArt>
+	<Full_screen>Disabled</Full_screen>
+	<Resolution_x>921</Resolution_x>
+	<Resolution_y>691</Resolution_y>
+	<Controller_left>LEFT CURSOR</Controller_left>
+	<Controller_right>RIGHT CURSOR</Controller_right>
+	<Controller_accelerate>LCTRL</Controller_accelerate>
+	<Controller_brake>LALT</Controller_brake>
+	<Controller_soundtrack>Z</Controller_soundtrack>
+</Settings>
+

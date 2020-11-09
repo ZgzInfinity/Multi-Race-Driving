@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LandScape>
+	<Sprites>
+		<S1>Data/LandScapeCommon/1.png</S1>
+		<S2>Data/LandScapeCommon/2.png</S2>
+		<S3>Data/LandScapeCommon/3.png</S3>
+		<S4>Data/LandScapeCommon/4.png</S4>
+		<S5>Data/LandScapeCommon/5.png</S5>
+		<S6>Data/LandScapeCommon/6.png</S6>
+		<S7>Data/LandScapeCommon/7.png</S7>
+		<S8>Data/LandScapeCommon/8.png</S8>
+		<S9>Data/LandScapeCommon/9.png</S9>
+		<S10>Data/LandScapeCommon/10.png</S10>
+		<S11>Data/LandScapeCommon/11.png</S11>
+		<S12>Data/LandScapeCommon/12.png</S12>
+		<S13>Data/LandScapeCommon/13.png</S13>
+		<S14>Data/LandScapeCommon/14.png</S14>
+		<S15>Data/LandScapeCommon/15.png</S15>
+		<S16>Data/LandScapeCommon/16.png</S16>
+		<S17>Data/LandScapeCommon/17.png</S17>
+		<S18>Data/LandScapeCommon/18.png</S18>
+		<S19>Data/LandScapeCommon/19.png</S19>
+	</Sprites>
+</LandScape>

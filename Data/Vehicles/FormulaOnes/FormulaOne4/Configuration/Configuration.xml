@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FormulaOne>
+	<Name>Drift Jordan</Name>
+	<MaxSpeed>300</MaxSpeed>
+	<Angle>0.049</Angle>
+	<Motor>Mugen-Honda SXP</Motor>
+</FormulaOne>
