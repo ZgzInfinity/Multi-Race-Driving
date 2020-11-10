@@ -45,13 +45,27 @@ using namespace std;
 
 mutex mainMutex, multiplayerMutex;
 
-
-// Change these variables to control your connection to your personal server
-string port = "??????";
-string domain = "??????";
+// Variables to control the connection to the multi player server
+string domain, port;
 
 
-void loadGameConfiguration (const string path, Difficult& difficulty, int& volumeSoundtracks,
+/**
+ * Load the current configuration of the game
+ * @param path is the xml file with the configuration
+ * @param difficulty is the difficulty of the game
+ * @param volumeSoundtracks is the volume of the music
+ * @param volumeEffects is the volume of the SFX
+ * @param pixelArt controls if the graphics have to be drawn with pixel art
+ * @param fullScreen controls if the screen has to be drawn in completed screen
+ * @param axis_x is the width of the screen
+ * @param axis_y is the height of the screen
+ * @param controlLeft controls the key to move the vehicle of the player to the left
+ * @param controlRight controls the key to move the vehicle of the player to the right
+ * @param controlAccelerate controls the key to accelerate the vehicle of the player
+ * @param controlBrake controls the key to brake the vehicle of the player
+ * @param controlSoundtrack controls the key to change the soundtrack of the game
+ */
+ void loadGameConfiguration (const string path, Difficult& difficulty, int& volumeSoundtracks,
                             int& volumeEffects, bool& pixelArt, bool& fullScreen, int& axis_x, int& axis_y, string& controlLeft,
                             string& controlRight, string& controlAccelerate, string& controlBrake,
                             string& controlSoundtrack)
@@ -154,6 +168,40 @@ void loadGameConfiguration (const string path, Difficult& difficulty, int& volum
 
 
 
+/**
+ * Load the current of the multi player server
+ * @param path is the xml file with the configuration
+ */
+void loadServerConfiguration (const string path){
+    // Open the xml file of the scenario
+    char* pFile = const_cast<char*>(path.c_str());
+    xml_document<> doc;
+    file<> file(pFile);
+    // Parsing the content of file
+    doc.parse<0>(file.data());
+    // Get the principal node of the file
+    xml_node<> *menuNode = doc.first_node();
+
+    // Iterate the different configuration nodes
+    for (xml_node<> *property = menuNode->first_node(); property; property = property->next_sibling()){
+        // Check if it's the node that controls the domain of the server
+        if ((string)property->name() == "Domain"){
+            // Get the resolution in axis x
+            domain = string(property->value());
+        }
+        // Check if it's the node that controls the port of the server
+        else if ((string)property->name() == "Port"){
+            // Get the resolution in axis y
+            port = string(property->value());
+        }
+    }
+}
+
+
+
+/**
+ * Main program that controls Multi Race Driving
+ */
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show){
 
     // Calling sell to execute ping command to make the tests
@@ -166,7 +214,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show){
     SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 
     // Load the properties of the game
-    const string path = "Data/Settings/Configuration.xml";
+    string path = "Data/Settings/Configuration.xml";
 
     // Variables to control the configuration of the game
     Difficult difficulty;
@@ -180,6 +228,12 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show){
     // Creation of the configuration module of the game
     Configuration c(difficulty, pixelArt, fullScreen, axis_x, axis_y, controlLeft, controlRight, controlAccelerate,
                     controlBrake, controlSoundtrack);
+
+    // Load the properties of the multi player server
+    path = "Data/Settings/Multiplayer.xml";
+
+    // Load the multi player configuration server
+    loadServerConfiguration(path);
 
     // Creation of the reproductor module of the game
     SoundPlayer r(volumeSoundtracks, volumeEffects);

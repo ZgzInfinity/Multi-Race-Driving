@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Example configuration file for the multi player server of Boreas-->
+<Settings>
+	<Domain>INSERT BOREAS DOMAIN HERE!</Domain>
+	<Port>PORT OF BOREAS P.E 20000</Port>
+</Settings>
+
