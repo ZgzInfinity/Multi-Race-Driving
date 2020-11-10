@@ -3537,7 +3537,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
 
     // Loading the background texture
     Texture rankingBackground;
-    rankingBackground.loadFromFile("Data/RankingMenu/bg.png");
+    rankingBackground.loadFromFile("Data/Animations/RankingAnimation/bg.png");
     Sprite palm_trees(rankingBackground);
     palm_trees.setScale((float) c.w.getSize().x / rankingBackground.getSize().x,
                         (float) c.w.getSize().y / rankingBackground.getSize().y);
