@@ -920,6 +920,16 @@ float Police::getAngle(){
 
 
 /**
+ * Returns the maximum speed reached by the police
+ * @return
+ */
+float Police::getTopSpeed(){
+    return topSpeed;
+}
+
+
+
+/**
  * Returns the current code of the sprite of the vehicle to draw
  * @return
  */

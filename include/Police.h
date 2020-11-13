@@ -279,6 +279,14 @@ public:
 
 
     /**
+     * Returns the maximum speed reached by the police
+     * @return
+     */
+    float getTopSpeed();
+
+
+
+    /**
      * Returns the current code of the sprite of the vehicle to draw
      * @return
      */

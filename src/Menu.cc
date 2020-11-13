@@ -311,7 +311,7 @@ State startMenu(Configuration &c, SoundPlayer &r, bool startPressed) {
     textElements[2].setFillColor(c.colorTexts[2]);
     textElements[2].setOutlineColor(c.colorBorders[2]);
     textElements[2].setOutlineThickness(3.0f * c.screenScale);
-    textElements[2].setPosition(initialX + textElements[2].getGlobalBounds().width, initialY - 40.f * c.screenScale);
+    textElements[2].setPosition(initialX + textElements[2].getGlobalBounds().width * 1.3f, initialY - 40.f * c.screenScale);
 
     initialX = textElements[1].getGlobalBounds().width;
     textElements[3].setString(c.contents[3]);
@@ -2824,7 +2824,7 @@ State optionsMenu(Configuration &c, SoundPlayer& r, const bool &inGame){
         string controlSoundtrack = kM.mapperIdKeyWord[index];
 
         // Update the file with the new configuration
-        updateGameConfiguration(path, c.level, r.volumeMusic, r.volumeEffects, c.enablePixelArt, c.resIndex,
+        updateGameConfiguration(path, c.level, r.volumeMusic, r.volumeEffects, c.enablePixelArt, c.fullScreen,
                                 c.resolutions[c.resIndex].first, c.resolutions[c.resIndex].second, controlLeft, controlRight,
                                 controlAccelerate, controlBrake, controlSoundtrack);
 
@@ -3801,7 +3801,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
             while (c.window.pollEvent(event)) {
                 if (event.type == Event::Closed) {
                     return EXIT;
-                } else if (event.type == Event::KeyPressed) {
+                } else if (c.window.hasFocus()&& event.type == Event::KeyPressed) {
                     // Get code of the key
                     int code = event.key.code;
                     // Check if the key pressed is a letter or not
@@ -3899,7 +3899,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, const unsigned long scorePla
  * @param controlSoundtrack is the key selected by the player to change the soundtrack of the game
  */
 void updateGameConfiguration(const string path, const Difficult difficulty, const int volumeSoundtracks,
-                             const int volumeEffects, const bool pixelArt, const int fullScreen, const int axis_x, const int axis_y,
+                             const int volumeEffects, const bool pixelArt, const bool fullScreen, const int axis_x, const int axis_y,
                              const string controlLeft, const string controlRight, const string controlAccelerate, const string controlBrake,
                              const string controlSoundtrack)
 {
@@ -3957,7 +3957,7 @@ void updateGameConfiguration(const string path, const Difficult difficulty, cons
     // Create the node of the full screen controller
     xml_node<>* fullScreenNode = doc.allocate_node(node_element, "Full_screen");
     root->append_node(fullScreenNode);
-    if (fullScreen == -1){
+    if (fullScreen){
         activeFullScreen = "Enabled";
     }
     else {
@@ -4842,7 +4842,7 @@ State credits(Configuration& c, SoundPlayer& r){
 
     // Information credits
     Text info;
-    info.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
+    info.setCharacterSize(static_cast<unsigned int>(int(19.0f * c.screenScale)));
     info.setFont(c.fontsMainMenu[0]);
     info.setFillColor(Color::White);
     info.setOutlineColor(Color::Black);
@@ -4901,7 +4901,7 @@ State credits(Configuration& c, SoundPlayer& r){
     Text brandName;
     brandName.setCharacterSize(static_cast<unsigned int>(int(20.0f * c.screenScale)));
     brandName.setFont(c.fontsMainMenu[0]);
-    brandName.setString("INFINITYGAMES ENTERTAINMENT, INC");
+    brandName.setString("ZGZ INFINITGAMES ENTERTAINMENT. INC");
     brandName.setFillColor(Color::White);
     brandName.setOutlineColor(Color::Black);
     brandName.setOutlineThickness(5.0f * c.screenScale);
@@ -4986,18 +4986,18 @@ State credits(Configuration& c, SoundPlayer& r){
             switch(numAnimation){
                 case 3:
                 case 4:
-                    creditTitle.setString("SOUNDTRACKS OF THE SIMULATOR");
+                    creditTitle.setString("SOUNDTRACKS");
                     break;
                 case 5:
                 case 6:
                 case 7:
-                    creditTitle.setString("SFX OF THE SIMULATOR");
+                    creditTitle.setString("SFX");
                     break;
                 case 8:
-                    creditTitle.setString("BACKGROUNDS OF THE SIMULATOR");
+                    creditTitle.setString("BACKGROUNDS");
                     break;
                 case 9:
-                    creditTitle.setString("SPRITES OF THE SIMULATOR");
+                    creditTitle.setString("SPRITES");
                     break;
                 case 10:
                     creditTitle.setString("MULTIPLAYER SUPPORTING");

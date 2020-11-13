@@ -224,7 +224,7 @@ State rankingMenu(Configuration &c, SoundPlayer& r, unsigned long scorePlayerGam
  * @param controlSoundtrack is the key selected by the player to change the soundtrack of the game
  */
 void updateGameConfiguration(const string path, const Difficult difficulty, const int volumeSoundtracks,
-                             const int volumeEffects, const bool pixelArt, const int fullScreen, const int axis_x,
+                             const int volumeEffects, const bool pixelArt, const bool fullScreen, const int axis_x,
                              const int axis_y, const string controlLeft, const string controlRight, const string controlAccelerate,
                              const string controlBrake, const string controlSoundtrack);
 

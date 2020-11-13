@@ -80,7 +80,6 @@ int LD::initWinSock(){
     if(iResult != 0)
 	{
 	    // Problem initializing winSock
-	    cerr << "WSAStartup failed with error: " << iResult << endl;
 	    return -1;
 	}
 	else {
@@ -104,7 +103,6 @@ int LD::solvingAdressingPort(const string ip, const string port){
     if(iResult != 0)
 	{
 	    // Error while solving address and port for the connection
-	    cerr << "getaddrinfo failed with error:" << iResult << endl;
 	    WSACleanup();
 	    return -1;
 	}
@@ -131,13 +129,8 @@ int LD::connectToServer(){
 	    // Create a SOCKET for connecting to server
 	    ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 
-		if (setsockopt(ConnectSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&bOptVal, bOptLen) == SOCKET_ERROR){
-			printf("FAILED IN TCP_NODELAY\n");
-		}
-
 	    if(ConnectSocket == INVALID_SOCKET)
 		{
-		    cerr << "socket failed with error: " << WSAGetLastError() << endl;
 		    WSACleanup();
 		    return -1;
 		}
@@ -166,7 +159,6 @@ int LD::checkConnection(){
     // Check if the connection is running or not
     if(ConnectSocket == INVALID_SOCKET)
 	{
-	    cout << "Unable to connect to server!" << endl;
 	    WSACleanup();
 	    return -1;
 	}
@@ -186,7 +178,6 @@ int LD::sending(const string message){
     iResult = send(ConnectSocket, message.c_str(), (int)message.size(), 0);
     if(iResult == SOCKET_ERROR)
 	{
-	    cerr << "Send failed with error: " << WSAGetLastError() << endl;
 	    closesocket(ConnectSocket);
 	    WSACleanup();
 	    return -1;
@@ -208,15 +199,12 @@ int LD::sending(const string message){
 void LD::receiving(char recvbuf[], const int recvbuflen, int& error){
     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
     if (iResult > 0){
-        cout << recvbuf << endl;
         error = 0;
     }
     else if (iResult == 0){
-        cerr << "Connection closed" << endl;
         error = -1;
     }
     else {
-        cerr << "Recv failed with error: " << WSAGetLastError() << endl;
         error = -1;
     }
 }

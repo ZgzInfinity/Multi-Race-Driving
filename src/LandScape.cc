@@ -58,7 +58,6 @@ inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode,
         attr = child->first_attribute("startPosGT");
         startPosition = (attr != nullptr) ? attr->value() : "Unknown";
         if (startPosition == "Unknown"){
-            cerr << "There is not start position specification in the interval " << elementsRead << endl;
             exit(1);
         }
         else {
@@ -71,7 +70,6 @@ inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode,
                 attr = child->first_attribute("finalPosLT");
                 finalPosition = (attr != nullptr) ? attr->value() : "Unknown";
                 if (finalPosition == "Unknown"){
-                    cerr << "There is not final position specification in the interval " << intervalsRead << endl;
                     exit(1);
                 }
                 else {
@@ -85,8 +83,6 @@ inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode,
                 attr = child->first_attribute("finalPosLT");
                 string finalPositionNew = (attr != nullptr) ? attr->value() : "Unknown";
                 if (finalPositionNew != "Unknown"){
-                    cerr << "Error, the interval " << intervalsRead <<
-                            " cannot be specified with finalPosGE and finalPosGT and the same time " << endl;
                     exit(10);
                 }
                 else {
@@ -103,8 +99,6 @@ inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode,
         attr = child->first_attribute("startPosGT");
         string startPositionNew = (attr != nullptr) ? attr->value() : "Unknown";
         if (startPositionNew != "Unknown"){
-            cerr << "Error, the interval " << intervalsRead <<
-                    " cannot be specified with startPosGE and startPosGT and the same time " << endl;
             exit(10);
         }
         else {
@@ -116,10 +110,7 @@ inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode,
                 // The first option is not in the file so looks for the second one
                 attr = child->first_attribute("finalPosLT");
                 finalPosition = (attr != nullptr) ? attr->value() : "Unknown";
-                if (finalPosition == "Unknown"){
-                    cerr << "There is not final position specification in the interval " << intervalsRead << endl;
-                }
-                else {
+                if (finalPosition != "Unknown"){
                     startPos = stoi(startPosition);
                     finalPos = stoi(finalPosition); finalPos--;
                 }
@@ -129,8 +120,6 @@ inline void LandScape::getIntervalCoordinates(xml_node<> *child, int objectCode,
                 attr = child->first_attribute("finalPosLT");
                 string finalPositionNew = (attr != nullptr) ? attr->value() : "Unknown";
                 if (finalPositionNew != "Unknown"){
-                    cerr << "Error, the interval " << intervalsRead <<
-                            " cannot be specified with finalPosGE and finalPosGT and the same time " << endl;
                     exit(10);
                 }
                 else {

@@ -575,14 +575,14 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                                           "Multi Race Driving",
                                           Style::Titlebar | Style::Close);
 
-                            // The current screen is on full screen mode
-                            fullScreen = true;
+                            // The screen is not in full screen mode
+                            fullScreen = false;
                         }
                         else {
                             // Create a new screen with the new resolution
                             window.create(VideoMode::getFullscreenModes()[0], "Multi Race Driving", Style::Fullscreen);
-                            // The screen is not in full screen mode
-                            fullScreen = false;
+                            // The current screen is on full screen mode
+                            fullScreen = true;
                         }
                         window.setFramerateLimit(FPS);
                         window.setKeyRepeatEnabled(false);
@@ -638,6 +638,7 @@ State Configuration::graphicsMenu(SoundPlayer& r) {
                         currentResized = true;
                         resized = true;
                     }
+                    fullScreen = false;
                     changeAnyParameter = true;
                 }
                 // Calculation of threshold to display correctly the description of the buttons

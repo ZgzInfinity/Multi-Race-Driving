@@ -1376,10 +1376,22 @@ void Game::updateScore(){
                     speed = player.getRealSpeed();
                     mainMutex.unlock();
                     // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
+                    if (speed > 0.f && speed <= (player.getTopSpeed() / 3.f)) {
                         // Add score
                         mainMutex.lock();
                         score += int(player.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (player.getTopSpeed() / 3.f) && speed <= (2.f * player.getTopSpeed() / 3.f)) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player.getRealSpeed() * (1.5f *scoreMul));
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (2.f * player.getTopSpeed() / 3.f) && speed <= player.getTopSpeed()) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player.getRealSpeed() * (2.0f *scoreMul));
                         mainMutex.unlock();
                     }
                     break;
@@ -1388,10 +1400,22 @@ void Game::updateScore(){
                     speed = player2.getRealSpeed();
                     mainMutex.unlock();
                     // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
+                    if (speed > 0.f && speed <= (player2.getTopSpeed() / 3.f)) {
                         // Add score
                         mainMutex.lock();
                         score += int(player2.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (player2.getTopSpeed() / 3.f) && speed <= (2.f * player2.getTopSpeed() / 3.f)) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player2.getRealSpeed() * (1.5f *scoreMul));
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (2.f * player2.getTopSpeed() / 3.f) && speed <= player2.getTopSpeed()) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player2.getRealSpeed() * (2.0f *scoreMul));
                         mainMutex.unlock();
                     }
                     break;
@@ -1400,10 +1424,22 @@ void Game::updateScore(){
                     speed = player3.getRealSpeed();
                     mainMutex.unlock();
                     // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
+                    if (speed > 0.f && speed <= (player3.getTopSpeed() / 3.f)) {
                         // Add score
                         mainMutex.lock();
                         score += int(player3.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (player3.getTopSpeed() / 3.f) && speed <= (2.f * player3.getTopSpeed() / 3.f)) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player3.getRealSpeed() * (1.5f *scoreMul));
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (2.f * player3.getTopSpeed() / 3.f) && speed <= player3.getTopSpeed()) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player3.getRealSpeed() * (2.0f *scoreMul));
                         mainMutex.unlock();
                     }
                     break;
@@ -1412,10 +1448,22 @@ void Game::updateScore(){
                     speed = player4.getRealSpeed();
                     mainMutex.unlock();
                     // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
+                    if (speed > 0.f && speed <= (player4.getTopSpeed() / 3.f)) {
                         // Add score
                         mainMutex.lock();
                         score += int(player4.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (player4.getTopSpeed() / 3.f) && speed <= (2.f * player4.getTopSpeed() / 3.f)) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player4.getRealSpeed() * (1.5f *scoreMul));
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (2.f * player4.getTopSpeed() / 3.f) && speed <= player4.getTopSpeed()) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player4.getRealSpeed() * (2.0f *scoreMul));
                         mainMutex.unlock();
                     }
                     break;
@@ -1424,10 +1472,22 @@ void Game::updateScore(){
                     speed = player5.getRealSpeed();
                     mainMutex.unlock();
                     // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
+                    if (speed > 0.f && speed <= (player5.getTopSpeed() / 3.f)) {
                         // Add score
                         mainMutex.lock();
                         score += int(player5.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (player5.getTopSpeed() / 3.f) && speed <= (2.f * player5.getTopSpeed() / 3.f)) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player5.getRealSpeed() * (1.5f *scoreMul));
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (2.f * player5.getTopSpeed() / 3.f) && speed <= player5.getTopSpeed()) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player5.getRealSpeed() * (2.0f *scoreMul));
                         mainMutex.unlock();
                     }
                     break;
@@ -1436,10 +1496,22 @@ void Game::updateScore(){
                     speed = player6.getRealSpeed();
                     mainMutex.unlock();
                     // Update the score of the player if the player is not stopped
-                    if (speed > 0.0f) {
+                    if (speed > 0.f && speed <= (player6.getTopSpeed() / 3.f)) {
                         // Add score
                         mainMutex.lock();
                         score += int(player6.getRealSpeed() * scoreMul);
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (player6.getTopSpeed() / 3.f) && speed <= (2.f * player6.getTopSpeed() / 3.f)) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player6.getRealSpeed() * (1.5f *scoreMul));
+                        mainMutex.unlock();
+                    }
+                    else if (speed > (2.f * player6.getTopSpeed() / 3.f) && speed <= player6.getTopSpeed()) {
+                        // Add score
+                        mainMutex.lock();
+                        score += int(player6.getRealSpeed() * (2.0f *scoreMul));
                         mainMutex.unlock();
                     }
             }
@@ -3389,9 +3461,6 @@ State Game::playWorldTourPolePosition(Configuration &c, SoundPlayer& r) {
                     return EXIT;
                 }
             }
-
-
-            cout << player.getPosY() << endl;
 
             // Update the indicators
             mtx.lock();
