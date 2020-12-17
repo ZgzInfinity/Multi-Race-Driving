@@ -73,7 +73,7 @@ To carry out the development of _**Multi Race Driving**_ the following software 
 * The IDE for C++ programming [Codeblocks](http://www.codeblocks.org/), version 17.12.
 * The API of [SFML](https://www.sfml-dev.org/download.php), version 2.5.1.
 * The XML parser library [RapidXML](http://rapidxml.sourceforge.net/).
-* [Boreas](https://github.com/aeri/Boreas), a C++ implementation of the Linda framework under **GPL-3.O License**.
+* [Boreas](https://github.com/aeri/Boreas), a C++ implementation of the Linda framework under **GPL-3.0 License**.
 
 &nbsp;
 
